@@ -1,0 +1,7 @@
+transformers==4.7.0
+jsonlines
+h5py
+numpy
+psutil
+torch
+tqdm
