@@ -22,7 +22,8 @@ This software package is designed for preparing data that can be used to train g
 ## Installation
 ```git clone https://github.com/sambanova/generative_data_prep.git
 cd to the repo
-pip install -r requirements.txt```
+pip install -r requirements.txt
+```
 
 ## Requirements
 - Python version 3.7+, **only verified on python 3.7.6**
