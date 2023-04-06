@@ -21,23 +21,20 @@ from __future__ import absolute_import
 
 import os
 import sys
+
 from transformers import PreTrainedTokenizerBase
 
 from generative_data_prep.data_buffers import Hdf5FileBuffer
 from generative_data_prep.processors import ArticleTokenizer
-from generative_data_prep.utils import BoundaryType, PackingStyleType
+from generative_data_prep.utils import BoundaryType, PackingConfig
 
 
-def data_prep_main(silent: bool,
-                   tokenizer: PreTrainedTokenizerBase,
-                   input_file: str,
-                   output_file: str,
-                   max_seq_length: int,
-                   input_packing_style: PackingStyleType,
+def data_prep_main(silent: bool, tokenizer: PreTrainedTokenizerBase,
+                   input_file: str, output_file: str, max_seq_length: int,
+                   input_packing_config: PackingConfig,
                    packing_boundary: BoundaryType,
                    attention_boundary: BoundaryType,
-                   disable_space_separator: bool,
-                   prompt_keyword: str,
+                   disable_space_separator: bool, prompt_keyword: str,
                    completion_keyword: str):
     """Tokenize input_file into packed sequences stored in output_file.
 
@@ -47,7 +44,7 @@ def data_prep_main(silent: bool,
         input_file: Input jsonl file to tokenize.
         output_file: Tokenized output hdf5 file.
         max_seq_length: Maximum number of tokens that fit in models sequence.
-        input_packing_style: How to pack the inputs when doing tokenization.
+        input_packing_config: How to pack the inputs when doing tokenization.
         packing_boundary: How to define the boundary when packing.
         attention_boundary: How to define the boundary when attending to other tokens.
         disable_space_separator: Disable adding space separator if true.
@@ -57,9 +54,11 @@ def data_prep_main(silent: bool,
     if silent:
         sys.stdout = open(os.devnull, 'w')
 
-    article_tokenizer = ArticleTokenizer(tokenizer, max_seq_length, input_packing_style, packing_boundary,
-                                         attention_boundary, disable_space_separator, prompt_keyword,
-                                         completion_keyword)
+    article_tokenizer = ArticleTokenizer(tokenizer, max_seq_length,
+                                         input_packing_config,
+                                         packing_boundary, attention_boundary,
+                                         disable_space_separator,
+                                         prompt_keyword, completion_keyword)
 
     with Hdf5FileBuffer(output_file, max_seq_length) as hdf5_text_buffer:
         with open(input_file, 'r') as reader:

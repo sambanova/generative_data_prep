@@ -23,12 +23,13 @@ import os
 from multiprocessing import cpu_count
 from typing import Optional
 
+from transformers import AutoTokenizer, PreTrainedTokenizerBase
+
 from generative_data_prep.data_prep import data_prep_main, pipeline_main
 from generative_data_prep.utils import (GPT2_KEY, SEP_STR, TOKENIZER_CLASSES,
                                         data_prep_arg_builder,
                                         verify_input_file, verify_output_dir,
                                         verify_output_file)
-from transformers import AutoTokenizer, PreTrainedTokenizerBase
 
 
 def add_data_prep_args(subparser: argparse.ArgumentParser):
@@ -56,34 +57,40 @@ def add_pipeline_args(subparser: argparse.ArgumentParser):
         default=None,
         type=int,
         required=False,
-        help="The number of training files to split input data into. If you specify the --dev_ratio and --test_ratio \
+        help=  # noqa: E251
+        "The number of training files to split input data into. If you specify the --dev_ratio and --test_ratio \
         flags, The total number of splits will be (num_training_splits / (1-dev_ratio-test_ratio)), and the number \
         of dev and test splits are calculated accordingly. If you specify --num_dev_splits and --num_test_splits \
         flags then those will  directory define the number of splits and therefore the ratios. We recommend you do \
         not include this flag and allow it to default, because the number of training splits must be greater than \
         the number of parallel workers and it is best if the number of training splits is a multiple of the number \
         of workers. It defaults to 32 training splits if input_file_size < 10GB, 128 training splits if 10GB < \
-        input_file_size <100GB, 256 training splits if 100GB < input_file_size.")
+        input_file_size <100GB, 256 training splits if 100GB < input_file_size."
+    )
     subparser.add_argument(
         "--dev_ratio",
         default=None,
         type=float,
         required=False,
-        help="The ratio of data that should be excluded from train set and used for evaluation, defaults to 10%%. If \
-        you specify this flag, do not specify --num_dev_splits or --num_test_splits.")
+        help=  # noqa: E251
+        "The ratio of data that should be excluded from train set and used for evaluation, defaults to 10%%. If \
+        you specify this flag, do not specify --num_dev_splits or --num_test_splits."
+    )
     subparser.add_argument(
         "--num_dev_splits",
         default=None,
         type=int,
         required=False,
-        help="If you do not specify --dev_ratio, you may specify num_dev_splits. If you include this flag, you must \
+        help=  # noqa: E251
+        "If you do not specify --dev_ratio, you may specify num_dev_splits. If you include this flag, you must \
         also include the --num_dev_splits and --num_training_splits flags")
     subparser.add_argument(
         "--test_ratio",
         default=None,
         type=float,
         required=False,
-        help="The ratio of data that should be excluded from train set and is saved for testing. This data is not \
+        help=  # noqa: E251
+        "The ratio of data that should be excluded from train set and is saved for testing. This data is not \
         tokenized and left in jsonl format, defaults to 0%%. If you specify this flag, do not specify \
         --num_dev_splits or --num_test_splits.")
     subparser.add_argument(
@@ -91,7 +98,8 @@ def add_pipeline_args(subparser: argparse.ArgumentParser):
         default=None,
         type=int,
         required=False,
-        help="If you do not specify --test_ratio, you may specify num_dev_splits. If you include this flag, you must \
+        help=  # noqa: E251
+        "If you do not specify --test_ratio, you may specify num_dev_splits. If you include this flag, you must \
         also include the --num_dev_splits and --num_training_splits flags.")
     subparser.add_argument(
         "--shuffle",
@@ -99,22 +107,27 @@ def add_pipeline_args(subparser: argparse.ArgumentParser):
         const='False',
         nargs='?',
         choices=['False', 'on_RAM', 'large_file'],
-        help="Choose the on_RAM option if your file is small enough to fit on RAM (If you are not sure if it fits \
+        help=  # noqa: E251
+        "Choose the on_RAM option if your file is small enough to fit on RAM (If you are not sure if it fits \
         on RAM, default to this flag). If you are running a linux operating system and your file is too large to fit \
         on RAM, please choose large_file option, this will run approximate file shuffling that can handle files of \
         any size. If you want to do large file shuffling but you are not on linux, please shuffle the file before \
-        using this script. If the input file should not be shuffled, do not include this flag, it defaults to False.")
+        using this script. If the input file should not be shuffled, do not include this flag, it defaults to False."
+    )
     subparser.add_argument(
         "--do_not_balance_hdf5",
         action='store_true',
-        help="If you DO NOT want to balance hdf5 files, this is not recommended unless the you are dealing with a \
-        huge amount of data (many terabytes), or do not want shuffling among splits.")
+        help=  # noqa: E251
+        "If you DO NOT want to balance hdf5 files, this is not recommended unless the you are dealing with a \
+        huge amount of data (many terabytes), or do not want shuffling among splits."
+    )
     subparser.add_argument(
         "--num_workers",
         default=cpu_count(),
         type=int,
         required=False,
-        help="The number of CPU workers to multi-process run tokenization over, if the previous run failed you need to \
+        help=  # noqa: E251
+        "The number of CPU workers to multi-process run tokenization over, if the previous run failed you need to \
         decrease this number.")
 
     # add arguments that are required to be passed on to generative_data_prep/data_prep/data_prep.py
@@ -138,7 +151,8 @@ def get_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase, special_tokens_dict: str):
+def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase,
+                            special_tokens_dict: str):
     """Add the special tokens dictionary to tokenizer.
 
     Args:
@@ -152,8 +166,10 @@ def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase, special_tokens_d
     tokenizer.add_special_tokens(json.loads(dict_string))
 
 
-def get_tokenizer(pretrained_tokenizer: Optional[str], tokenizer_class: Optional[str], vocab_file: str,
-                  merges_file: str, special_tokens_dict: Optional[str]) -> PreTrainedTokenizerBase:
+def get_tokenizer(pretrained_tokenizer: Optional[str],
+                  tokenizer_class: Optional[str], vocab_file: str,
+                  merges_file: str, special_tokens_dict: Optional[str]
+                  ) -> PreTrainedTokenizerBase:
     """Create a tokenizer based on input arguments.
 
     Args:
@@ -173,13 +189,15 @@ def get_tokenizer(pretrained_tokenizer: Optional[str], tokenizer_class: Optional
     if pretrained_tokenizer is None and tokenizer_class is None:
         pretrained_tokenizer = GPT2_KEY
 
-    if not pretrained_tokenizer and not (merges_file and vocab_file and tokenizer_class):
+    if not pretrained_tokenizer and not (merges_file and vocab_file
+                                         and tokenizer_class):
         err_msg = 'You must include either --pretrained_tokenizer, \
         or all three flags: --merges_file, --vocab_file and --tokenizer_class'
 
         raise ValueError(err_msg)
 
-    if (pretrained_tokenizer and (merges_file or vocab_file or tokenizer_class)):
+    if (pretrained_tokenizer
+            and (merges_file or vocab_file or tokenizer_class)):
         err_msg = 'You may not include --pretrained_tokenizer along with any of the following flags: \
         --merges_file, --vocab_file and --tokenizer_class'
 
@@ -196,7 +214,8 @@ def get_tokenizer(pretrained_tokenizer: Optional[str], tokenizer_class: Optional
 
         if tokenizer is None:
             raise NotImplementedError(
-                f'The tokenizer_class you selected ({args.tokenizer_class}) has not been implemented ')
+                f'The tokenizer_class you selected ({args.tokenizer_class}) has not been implemented '
+            )
 
     if special_tokens_dict:
         add_special_tokens_dict(tokenizer, special_tokens_dict)
@@ -225,7 +244,8 @@ def get_output_dir(cmd, output_path, overwrite_output_path):
     elif args.cmd == 'data_prep':
         verify_output_file(output_path, overwrite_output_path)
         if os.path.splitext(output_path)[-1] != '.hdf5':
-            raise ValueError(f'The output path {output_path} does not end with .hdf5')
+            raise ValueError(
+                f'The output path {output_path} does not end with .hdf5')
         output_dir = os.path.dirname(output_path)
 
     return output_dir
@@ -234,17 +254,25 @@ def get_output_dir(cmd, output_path, overwrite_output_path):
 if __name__ == '__main__':
     args = get_args()
     verify_input_file(args.input_file_path)
-    output_dir = get_output_dir(args.cmd, args.output_path, args.overwrite_output_path)
-    tokenizer = get_tokenizer(args.pretrained_tokenizer, args.tokenizer_class, args.vocab_file,
-                              args.merges_file, args.special_tokens_dict)
+    output_dir = get_output_dir(args.cmd, args.output_path,
+                                args.overwrite_output_path)
+    tokenizer = get_tokenizer(args.pretrained_tokenizer, args.tokenizer_class,
+                              args.vocab_file, args.merges_file,
+                              args.special_tokens_dict)
 
     if args.cmd == 'pipeline':
-        pipeline_main(args.input_file_path, tokenizer, output_dir, args.disable_space_separator,
-                      args.prompt_keyword, args.completion_keyword, args.shuffle, args.overwrite_output_path,
-                      args.num_workers, args.do_not_balance_hdf5, args.max_seq_length, args.input_packing_style,
-                      args.packing_boundary, args.attention_boundary, args.num_training_splits, args.num_dev_splits,
-                      args.num_test_splits, args.dev_ratio, args.test_ratio)
+        pipeline_main(args.input_file_path, tokenizer, output_dir,
+                      args.disable_space_separator, args.prompt_keyword,
+                      args.completion_keyword, args.shuffle,
+                      args.overwrite_output_path, args.num_workers,
+                      args.do_not_balance_hdf5, args.max_seq_length,
+                      args.input_packing_config, args.packing_boundary,
+                      args.attention_boundary, args.num_training_splits,
+                      args.num_dev_splits, args.num_test_splits,
+                      args.dev_ratio, args.test_ratio)
     elif args.cmd == 'data_prep':
-        data_prep_main(args.silent, tokenizer, args.input_file_path, args.output_path, args.max_seq_length,
-                       args.input_packing_style, args.packing_boundary, args.attention_boundary,
-                       args.disable_space_separator, args.prompt_keyword, args.completion_keyword)
+        data_prep_main(args.silent, tokenizer, args.input_file_path,
+                       args.output_path, args.max_seq_length,
+                       args.input_packing_config, args.packing_boundary,
+                       args.attention_boundary, args.disable_space_separator,
+                       args.prompt_keyword, args.completion_keyword)

@@ -14,12 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from .arg_configs import PackingConfig
-from .balance_hdf5_files import balance_hdf5_files
-from .constants import (BoundaryType, OverflowType, PackingStyleType,
-                        TokenTypeIds)
-from .large_file_shuffle import large_file_shuffle
-from .path_verify import (verify_input_file, verify_output_dir,
-                          verify_output_file)
-from .utils import (GPT2_KEY, SEP_STR, TOKENIZER_CLASSES,
-                    data_prep_arg_builder, execute_and_return_stdout)
+from generative_data_prep.utils import PackingConfig
+
+
+def test_config_instantiation():
+    """Basic test to verify that every Packing Config choice can be instantiated using from_str."""
+    for choice in PackingConfig.get_choices():
+        assert choice == PackingConfig.from_str(str(choice))

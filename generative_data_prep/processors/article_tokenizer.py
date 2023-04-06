@@ -22,13 +22,18 @@ the SequencePacker class.
 """
 
 import json
-from transformers import PreTrainedTokenizerBase, logging
 from typing import List, Optional, Tuple, Union
 
-from generative_data_prep.utils import BoundaryType, PackingStyleType, TokenTypeIds
-from generative_data_prep.tokenized_line import TokenizedArticle, TokenizedSequence
+from transformers import PreTrainedTokenizerBase, logging
+
+from generative_data_prep.tokenized_line import (TokenizedArticle,
+                                                 TokenizedSequence)
+from generative_data_prep.utils import (BoundaryType, PackingConfig,
+                                        TokenTypeIds)
 
 from .sequence_packer import SequencePacker
+
+DEFAULT_PACKING_CONFIG = PackingConfig.get_default()
 
 
 class ArticleTokenizer:
@@ -36,7 +41,7 @@ class ArticleTokenizer:
     def __init__(self,
                  tokenizer: PreTrainedTokenizerBase,
                  max_seq_length: int,
-                 packing_style: PackingStyleType = PackingStyleType.FULL,
+                 packing_config: PackingConfig = DEFAULT_PACKING_CONFIG,
                  packing_boundary: BoundaryType = BoundaryType.JSONL,
                  attention_boundary: BoundaryType = BoundaryType.JSONL,
                  disable_space_separator: bool = False,
@@ -48,7 +53,7 @@ class ArticleTokenizer:
             tokenizer: Huggingface tokenizer that inherits from PreTrainedTokenizerBase and contains an
                 encode function.
             max_seq_length: Maximum sequence length of model.
-            packing_style: How to pack tokens into sequences. Refer to SequencePacker class.
+            packing_config: How to pack tokens into sequences. Refer to SequencePacker class.
                 Defaults to PackingStyleType.FULL.
             packing_boundary: Defines whether entire jsonl or prompt completion pair should be treated as
                 one unit when running packing.Defaults to BoundaryType.JSONL.
@@ -86,7 +91,8 @@ class ArticleTokenizer:
         self.prompt_keyword = prompt_keyword
         self.completion_keyword = completion_keyword
         self.eos_token_id = tokenizer.eos_token_id
-        self.packer = SequencePacker(max_seq_length, self.eos_token_id, packing_style)
+        self.packer = SequencePacker(max_seq_length, self.eos_token_id,
+                                     packing_config)
         logging.set_verbosity_error()
 
     def __call__(self, article: Optional[str]) -> List[TokenizedSequence]:
@@ -140,7 +146,8 @@ class ArticleTokenizer:
         tokenized_article = TokenizedArticle(token_ids, token_type_ids)
         return [tokenized_article]
 
-    def process_jsonl(self, jsonl: Union[dict, List]) -> List[TokenizedArticle]:
+    def process_jsonl(self,
+                      jsonl: Union[dict, List]) -> List[TokenizedArticle]:
         """Tokenize a loaded jsonl and store in a TokenizedArticle object.
 
         Takes in a loaded jsonl, and returns a List of tokenized articles based on self.BoundaryType.
@@ -161,20 +168,25 @@ class ArticleTokenizer:
         tokenized_articles = []
         token_ids, token_type_ids = [], []
         for i, prompt_completion in enumerate(jsonl):
-            prompt = prompt_completion[self.prompt_keyword] if self.prompt_keyword in prompt_completion else ''
+            prompt = prompt_completion[
+                self.
+                prompt_keyword] if self.prompt_keyword in prompt_completion else ''
             if self.completion_keyword not in prompt_completion:
                 err_msg = f'Completion keyword required in every jsonl, {self.completion_keyword} not found'
                 raise json.JSONDecodeError(err_msg, str(jsonl), 0)
             completion = prompt_completion[self.completion_keyword]
 
             completion, prompt = self._add_space_separator(completion, prompt)
-            new_token_ids, new_token_type_ids = self.tokenize(completion, prompt)
+            new_token_ids, new_token_type_ids = self.tokenize(
+                completion, prompt)
             token_ids += new_token_ids
             token_type_ids += new_token_type_ids
 
-            if self.attention_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and len(token_type_ids) > 0:
+            if self.attention_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and len(
+                    token_type_ids) > 0:
                 token_type_ids[-1] = TokenTypeIds.SEP
-            if self.packing_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and i != len(jsonl) - 1:
+            if self.packing_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and i != len(
+                    jsonl) - 1:
                 tokenized_article = TokenizedArticle(token_ids, token_type_ids)
                 tokenized_articles.append(tokenized_article)
                 token_ids, token_type_ids = [], []
@@ -185,7 +197,8 @@ class ArticleTokenizer:
 
         return tokenized_articles
 
-    def _add_space_separator(self, completion: str, prompt: str) -> Tuple[str, str]:
+    def _add_space_separator(self, completion: str,
+                             prompt: str) -> Tuple[str, str]:
         """Remove any spaces between the prompt and completion and add a space before the completion.
 
         Args:
@@ -203,7 +216,8 @@ class ArticleTokenizer:
 
         return completion, prompt
 
-    def tokenize(self, completion: str, prompt: Optional[str] = None) -> Tuple[List[int], List[int]]:
+    def tokenize(self, completion: str,
+                 prompt: Optional[str] = None) -> Tuple[List[int], List[int]]:
         """Tokenize the input prompt and completion.
 
         Call self.tokenizer.encode to convert the input prompt and completion into token ids.
@@ -228,7 +242,9 @@ class ArticleTokenizer:
         if completion:
             completion_token_ids = self.tokenizer.encode(completion)
             token_ids += completion_token_ids
-            token_type_ids += len(completion_token_ids) * [TokenTypeIds.COMPLETION]
+            token_type_ids += len(completion_token_ids) * [
+                TokenTypeIds.COMPLETION
+            ]
 
         if len(token_ids) >= 1:
             token_ids.append(self.eos_token_id)

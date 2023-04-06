@@ -17,21 +17,25 @@ limitations under the License.
 Data preparation pipeline for converting a jsonl file to tokenized hdf5 files consumable by SambaSuite.
 """
 
-import numpy as np
 import os
-import psutil
 import random
 from multiprocessing import Pool
 from sys import platform
 from typing import List, Optional, Tuple
 
-from generative_data_prep.data_prep import data_prep_main
-from generative_data_prep.utils import (SEP_STR, BoundaryType, PackingStyleType, balance_hdf5_files,
-                                        execute_and_return_stdout, large_file_shuffle, verify_output_dir)
+import numpy as np
+import psutil
 from transformers import PreTrainedTokenizerBase
 
+from generative_data_prep.data_prep import data_prep_main
+from generative_data_prep.utils import (SEP_STR, BoundaryType, PackingConfig,
+                                        PackingStyleType, balance_hdf5_files,
+                                        execute_and_return_stdout,
+                                        large_file_shuffle, verify_output_dir)
 
-def split_file_linux(num_splits: int, input_file_path: str, split_dir: str) -> None:
+
+def split_file_linux(num_splits: int, input_file_path: str,
+                     split_dir: str) -> None:
     """Split the [input_file_path] into num_splits and places it in [split_dir].
 
     Args:
@@ -56,7 +60,8 @@ def check_RAM(input_file_size_in_bytes: int):
     assert shuffle_on_RAM, err_msg
 
 
-def rename_files(split_dir: str, train_count: int, dev_count: int, test_count: int, num_splits: int, test_dir: str,
+def rename_files(split_dir: str, train_count: int, dev_count: int,
+                 test_count: int, num_splits: int, test_dir: str,
                  overwrite_output_path: bool) -> List[str]:
     """Take all the files in [split_dir] and renames them.
 
@@ -87,18 +92,25 @@ def rename_files(split_dir: str, train_count: int, dev_count: int, test_count: i
 
         err_msg = f'{new_file_path} already exists, and you are trying to overwrite it.'
         err_msg += ' To fix this error either specify --overwrite_output_path or move the conflicting file'
-        assert not os.path.exists(new_file_path) or overwrite_output_path, err_msg
+        assert not os.path.exists(
+            new_file_path) or overwrite_output_path, err_msg
 
-        os.rename(os.path.join(split_dir, str(i).zfill(max(2, num_digits))), new_file_path)
+        os.rename(os.path.join(split_dir,
+                               str(i).zfill(max(2, num_digits))),
+                  new_file_path)
         if train_count <= i < train_count + test_count:
-            os.rename(os.path.join(split_dir, new_name), os.path.join(test_dir, new_name))
+            os.rename(os.path.join(split_dir, new_name),
+                      os.path.join(test_dir, new_name))
         else:
             files_to_tokenize.append(new_name)
     return files_to_tokenize
 
 
-def get_split_counts(input_file_size_in_gb: float, num_training_splits: Optional[int], num_dev_splits: Optional[int],
-                     num_test_splits: Optional[int], dev_ratio: Optional[float],
+def get_split_counts(input_file_size_in_gb: float,
+                     num_training_splits: Optional[int],
+                     num_dev_splits: Optional[int],
+                     num_test_splits: Optional[int],
+                     dev_ratio: Optional[float],
                      test_ratio: Optional[float]) -> Tuple[int, int, int, int]:
     """Based on the input arguments, returns the number number of output files to split into train, dev and test.
 
@@ -158,11 +170,14 @@ def get_split_counts(input_file_size_in_gb: float, num_training_splits: Optional
     return train_count, dev_count, test_count, num_splits
 
 
-def multiprocess_data_prep(files_to_tokenize: List[str], split_dir: str, hdf5_dir: str, max_seq_length: int,
-                           input_packing_style: PackingStyleType, packing_boundary: BoundaryType,
-                           attention_boundary: BoundaryType, prompt_keyword: str, completion_keyword: str,
-                           disable_space_separator: bool, tokenizer: PreTrainedTokenizerBase,
-                           num_workers: int, input_file_size_in_gb: float) -> Tuple[List[str], List[str]]:
+def multiprocess_data_prep(
+        files_to_tokenize: List[str], split_dir: str, hdf5_dir: str,
+        max_seq_length: int, input_packing_config: PackingStyleType,
+        packing_boundary: BoundaryType, attention_boundary: BoundaryType,
+        prompt_keyword: str, completion_keyword: str,
+        disable_space_separator: bool, tokenizer: PreTrainedTokenizerBase,
+        num_workers: int,
+        input_file_size_in_gb: float) -> Tuple[List[str], List[str]]:
     """Tokenizes all the files in files_to_tokenize efficiently using multirpocessing library.
 
     Args:
@@ -170,7 +185,7 @@ def multiprocess_data_prep(files_to_tokenize: List[str], split_dir: str, hdf5_di
         split_dir: Directory that contains the files to tokenize.
         hdf5_dir: Directory to output tokenized hdf5 files.
         max_seq_length: Maximum sequence length of the model.
-        input_packing_style: Packing style used during tokenization.
+        input_packing_config: Packing style used during tokenization.
         packing_boundary: How to define the boundary when packing tokens.
         attention_boundary: How to define the boundary when attending to tokens.
         prompt_keyword: The keyword used to extract prompt from jsonl.
@@ -184,38 +199,53 @@ def multiprocess_data_prep(files_to_tokenize: List[str], split_dir: str, hdf5_di
         List of output training and dev hdf5 file paths
     """
     print(SEP_STR)
-    print(f'Running tokenization jobs locally, There are {num_workers} processes working on it')
+    print(
+        f'Running tokenization jobs locally, There are {num_workers} processes working on it'
+    )
     if input_file_size_in_gb > 10:
         warning_msg = f'your input file size is {input_file_size_in_gb} GB, '
         warning_msg += 'this is large and may take up a lot of your machines resources for a long time'
         print(warning_msg)
-    sub_input_file_paths = list(map(lambda file_name: os.path.join(split_dir, file_name), files_to_tokenize))
+    sub_input_file_paths = list(
+        map(lambda file_name: os.path.join(split_dir, file_name),
+            files_to_tokenize))
     sub_output_file_paths = list(
-        map(lambda file_name: os.path.join(hdf5_dir, file_name.replace('.jsonl', '.hdf5')), files_to_tokenize))
-    train_hdf5_files = list(filter(lambda file_name: 'train' in file_name, sub_output_file_paths))
-    dev_hdf5_files = list(filter(lambda file_name: 'dev' in file_name, sub_output_file_paths))
+        map(
+            lambda file_name: os.path.join(
+                hdf5_dir, file_name.replace('.jsonl', '.hdf5')),
+            files_to_tokenize))
+    train_hdf5_files = list(
+        filter(lambda file_name: 'train' in file_name, sub_output_file_paths))
+    dev_hdf5_files = list(
+        filter(lambda file_name: 'dev' in file_name, sub_output_file_paths))
 
     global data_prep_main_wrapper
 
     def data_prep_main_wrapper(input_output_files):
         sub_input_file_path = input_output_files[0]
         sub_output_file_path = input_output_files[1]
-        data_prep_main(True, tokenizer, sub_input_file_path, sub_output_file_path, max_seq_length,
-                       input_packing_style, packing_boundary, attention_boundary, disable_space_separator,
+        data_prep_main(True, tokenizer, sub_input_file_path,
+                       sub_output_file_path, max_seq_length,
+                       input_packing_config, packing_boundary,
+                       attention_boundary, disable_space_separator,
                        prompt_keyword, completion_keyword)
 
     with Pool(num_workers) as p:
-        _ = p.map(data_prep_main_wrapper, zip(sub_input_file_paths, sub_output_file_paths))
+        _ = p.map(data_prep_main_wrapper,
+                  zip(sub_input_file_paths, sub_output_file_paths))
 
     return train_hdf5_files, dev_hdf5_files
 
 
-def pipeline_main(input_file_path: str, tokenizer: PreTrainedTokenizerBase, output_dir: str,
-                  disable_space_separator: bool, prompt_keyword: str, completion_keyword: str, shuffle: str,
-                  overwrite_output_path: bool, num_workers: int, do_not_balance_hdf5: bool, max_seq_length: int,
-                  input_packing_style: PackingStyleType, packing_boundary: BoundaryType,
-                  attention_boundary: BoundaryType, num_training_splits: Optional[int], num_dev_splits: Optional[int],
-                  num_test_splits: Optional[int], dev_ratio: Optional[float], test_ratio: Optional[float]):
+def pipeline_main(
+        input_file_path: str, tokenizer: PreTrainedTokenizerBase,
+        output_dir: str, disable_space_separator: bool, prompt_keyword: str,
+        completion_keyword: str, shuffle: str, overwrite_output_path: bool,
+        num_workers: int, do_not_balance_hdf5: bool, max_seq_length: int,
+        input_packing_config: PackingConfig, packing_boundary: BoundaryType,
+        attention_boundary: BoundaryType, num_training_splits: Optional[int],
+        num_dev_splits: Optional[int], num_test_splits: Optional[int],
+        dev_ratio: Optional[float], test_ratio: Optional[float]):
     """Endpoint for preparing data, shuffles, splits and tokenize input file.
 
     Args:
@@ -230,7 +260,7 @@ def pipeline_main(input_file_path: str, tokenizer: PreTrainedTokenizerBase, outp
         num_workers: Number of workers to use for multiprocessing
         do_not_balance_hdf5: If true, do not re-balance hdf5 files.
         max_seq_length: Maximum sequence length of the model.
-        input_packing_style: Packing style used during tokenization.
+        input_packing_config: Packing style used during tokenization.
         packing_boundary: How to define the boundary when packing text.
         attention_boundary: How to define the boundary of what tokens are attended to.
         split_dir: input directory that contains split files
@@ -253,13 +283,13 @@ def pipeline_main(input_file_path: str, tokenizer: PreTrainedTokenizerBase, outp
     input_file_size_in_bytes = os.stat(input_file_path).st_size
     input_file_size_in_gb = input_file_size_in_bytes / (1024**3)
     print(SEP_STR)
-    print('Size of input jsonl file is: {:.2f} GB, or {:.2f} MB'.format(input_file_size_in_gb,
-                                                                        input_file_size_in_bytes / (1024**2)))
+    print('Size of input jsonl file is: {:.2f} GB, or {:.2f} MB'.format(
+        input_file_size_in_gb, input_file_size_in_bytes / (1024**2)))
     assert input_file_size_in_bytes > 1, f"your inputted file {input_file_path} is empty"
 
-    train_count, dev_count, test_count, num_splits = get_split_counts(input_file_size_in_gb, num_training_splits,
-                                                                      num_dev_splits, num_test_splits, dev_ratio,
-                                                                      test_ratio)
+    train_count, dev_count, test_count, num_splits = get_split_counts(
+        input_file_size_in_gb, num_training_splits, num_dev_splits,
+        num_test_splits, dev_ratio, test_ratio)
 
     split_dir = os.path.join(output_dir, 'splits')
     verify_output_dir(split_dir, False)
@@ -282,7 +312,8 @@ def pipeline_main(input_file_path: str, tokenizer: PreTrainedTokenizerBase, outp
         err_msg = 'You specified --shuffle=large_file, but this is only supported on linux operating systems, '
         err_msg += f'your operating system is {platform}. Please change the flag to --shuffle=on_RAM or --shuffle=False'
         assert 'linux' in platform.lower(), err_msg
-        split_dir = large_file_shuffle(input_file_path, output_dir, False, num_splits)
+        split_dir = large_file_shuffle(input_file_path, output_dir, False,
+                                       num_splits)
 
     # Case 2: Shuffling on RAM with linux OS
     elif shuffle == 'on_RAM' and 'linux' in platform.lower():
@@ -310,18 +341,22 @@ def pipeline_main(input_file_path: str, tokenizer: PreTrainedTokenizerBase, outp
         splits = np.array_split(lines, num_splits)
         num_digits = len(str(num_splits))
         for i, split in enumerate(splits):
-            out_file_path = os.path.join(split_dir, str(i).zfill(max(2, num_digits)))
+            out_file_path = os.path.join(split_dir,
+                                         str(i).zfill(max(2, num_digits)))
             with open(out_file_path, 'w') as out_file:
                 out_file.writelines(split)
 
     # Case 4: Do not shuffle, split file without linux OS
     elif shuffle == 'False' and 'linux' not in platform.lower():
         print(SEP_STR)
-        print("You did not specify the --shuffle flag, so no shuffling was done!")
+        print(
+            "You did not specify the --shuffle flag, so no shuffling was done!"
+        )
         out_files = []
         num_digits = len(str(num_splits))
         for i in range(num_splits):
-            out_file_path = os.path.join(split_dir, str(i).zfill(max(2, num_digits)))
+            out_file_path = os.path.join(split_dir,
+                                         str(i).zfill(max(2, num_digits)))
             out_files.append(out_file_path)
             with open(out_file_path, 'w') as _:
                 pass
@@ -334,20 +369,25 @@ def pipeline_main(input_file_path: str, tokenizer: PreTrainedTokenizerBase, outp
     # Case 5: Do not shuffle, split file with linux OS
     elif shuffle == 'False' and 'linux' in platform.lower():
         print(SEP_STR)
-        print("You did not specify the --shuffle flag, so no shuffling was done!")
+        print(
+            "You did not specify the --shuffle flag, so no shuffling was done!"
+        )
         split_file_linux(num_splits, input_file_path, split_dir)
 
     # rename files to include the corresponding names of 'test', 'dev' and 'train'
-    files_to_tokenize = rename_files(split_dir, train_count, dev_count, test_count, num_splits, test_dir,
+    files_to_tokenize = rename_files(split_dir, train_count, dev_count,
+                                     test_count, num_splits, test_dir,
                                      overwrite_output_path)
 
-    train_hdf5_files, dev_hdf5_files = multiprocess_data_prep(files_to_tokenize, split_dir, hdf5_dir,
-                                                              max_seq_length, input_packing_style,
-                                                              packing_boundary, attention_boundary, prompt_keyword,
-                                                              completion_keyword, disable_space_separator,
-                                                              tokenizer, num_workers, input_file_size_in_gb)
+    train_hdf5_files, dev_hdf5_files = multiprocess_data_prep(
+        files_to_tokenize, split_dir, hdf5_dir, max_seq_length,
+        input_packing_config, packing_boundary, attention_boundary,
+        prompt_keyword, completion_keyword, disable_space_separator, tokenizer,
+        num_workers, input_file_size_in_gb)
 
-    print(f'Tokenization is complete, the outputs are in {hdf5_dir}, the held out test files are located at {test_dir}')
+    print(
+        f'Tokenization is complete, the outputs are in {hdf5_dir}, the held out test files are located at {test_dir}'
+    )
     print(SEP_STR)
 
     # Balance hdf5 files so they all have the same number of sequences to within 1
@@ -357,8 +397,12 @@ def pipeline_main(input_file_path: str, tokenizer: PreTrainedTokenizerBase, outp
         print(warning)
         print(SEP_STR)
     else:
-        print('Balancing hdf5 files to ensure they have the same number of sequences')
+        print(
+            'Balancing hdf5 files to ensure they have the same number of sequences'
+        )
         balance_hdf5_files(train_hdf5_files)
         balance_hdf5_files(dev_hdf5_files)
-        print(f'Hdf5 balancing is complete, the outputs are located at {hdf5_dir}')
+        print(
+            f'Hdf5 balancing is complete, the outputs are located at {hdf5_dir}'
+        )
         print(SEP_STR)
