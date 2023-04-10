@@ -79,14 +79,12 @@ def balance_hdf5_files(hdf5_file_paths: List[str]) -> None:
                 curr_extra_token_seqs = curr_hdf5_file['input_ids'][
                     -num_extra_seq:]
                 extra_token_seqs.append(curr_extra_token_seqs)
-                # TODO check if this resize properly gets rid of the right lines
                 curr_hdf5_file['input_ids'].resize((curr_num_seq, seq_len))
 
                 # save extra token type id sequences, and update hdf5 file
                 curr_extra_ttid_seqs = curr_hdf5_file['token_type_ids'][
                     -num_extra_seq:]
                 extra_ttid_seqs.append(curr_extra_ttid_seqs)
-                # TODO check if this resize properly gets rid of the right lines
                 curr_hdf5_file['token_type_ids'].resize(
                     (curr_num_seq, seq_len))
 
