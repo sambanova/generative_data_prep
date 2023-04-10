@@ -133,7 +133,8 @@ def balance_hdf5_files(hdf5_file_paths: List[str]) -> None:
                 -num_needed_seq:] = extra_ttid_seqs_np[:num_needed_seq]
             # remove saved token_type_ids sequences so they are not used again
             extra_ttid_seqs_np = extra_ttid_seqs_np[num_needed_seq:]
-
+            
+    assert len(extra_token_seqs_np) == 0
     assert remainder == 0
 
 
