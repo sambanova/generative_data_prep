@@ -100,7 +100,9 @@ def data_prep_arg_builder(parser: argparse.ArgumentParser):
         default=PackingConfig.get_default(),
         choices=PackingConfig.get_choices(),
         required=False,
-        help='Options to pack the tokenized data into sequences')
+        help=
+        "The first argument in the packing config defines the method of placing text into sequences, the second argument defines how to handle jsonls that do not fit within the max_seq_length. 'full': Defines the entire packing config, Completely fill sequences with tokens, as soon as sequences is full start packing into new sequence. Ignore article boundaries, they may be split across multiple sequences. 'greedy': Fit as many articles as possible into a sequence, make sure no article is split across multiple sequences. Fill the left over space in each sequence with padding. 'single': Each sequence contains only 1 article.  Fill the rest of the sequence with padding.  'drop': Drop the entire article if there are any tokens that overflow beyond the max sequence length.  'truncate_left':  Truncate the article from the left if there are any tokens that overflow beyond the max sequence length.  'truncate_right':  Truncate the article from the right if there are any tokens that overflow beyond the max sequence length."
+    )
     parser.add_argument(
         "--packing_boundary",
         type=str,

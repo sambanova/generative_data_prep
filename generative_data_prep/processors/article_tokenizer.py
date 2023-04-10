@@ -38,6 +38,7 @@ DEFAULT_PACKING_CONFIG = PackingConfig.get_default()
 
 class ArticleTokenizer:
     """Tokenize and pack text into sequences used for training NLP models."""
+
     def __init__(self,
                  tokenizer: PreTrainedTokenizerBase,
                  max_seq_length: int,
@@ -146,8 +147,8 @@ class ArticleTokenizer:
         tokenized_article = TokenizedArticle(token_ids, token_type_ids)
         return [tokenized_article]
 
-    def process_jsonl(self,
-                      jsonl: Union[dict, List]) -> List[TokenizedArticle]:
+    def process_jsonl(self, jsonl: Union[dict,
+                                         List]) -> List[TokenizedArticle]:
         """Tokenize a loaded jsonl and store in a TokenizedArticle object.
 
         Takes in a loaded jsonl, and returns a List of tokenized articles based on self.BoundaryType.
@@ -216,7 +217,8 @@ class ArticleTokenizer:
 
         return completion, prompt
 
-    def tokenize(self, completion: str,
+    def tokenize(self,
+                 completion: str,
                  prompt: Optional[str] = None) -> Tuple[List[int], List[int]]:
         """Tokenize the input prompt and completion.
 

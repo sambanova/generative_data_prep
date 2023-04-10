@@ -29,7 +29,7 @@ from transformers import PreTrainedTokenizerBase
 
 from generative_data_prep.data_prep import data_prep_main
 from generative_data_prep.utils import (SEP_STR, BoundaryType, PackingConfig,
-                                        PackingStyleType, balance_hdf5_files,
+                                        balance_hdf5_files,
                                         execute_and_return_stdout,
                                         large_file_shuffle, verify_output_dir)
 
@@ -172,7 +172,7 @@ def get_split_counts(input_file_size_in_gb: float,
 
 def multiprocess_data_prep(
         files_to_tokenize: List[str], split_dir: str, hdf5_dir: str,
-        max_seq_length: int, input_packing_config: PackingStyleType,
+        max_seq_length: int, input_packing_config: PackingConfig,
         packing_boundary: BoundaryType, attention_boundary: BoundaryType,
         prompt_keyword: str, completion_keyword: str,
         disable_space_separator: bool, tokenizer: PreTrainedTokenizerBase,

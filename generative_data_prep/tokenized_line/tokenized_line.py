@@ -32,6 +32,7 @@ TokenizedLineSubClass = TypeVar('TokenizedLineSubClass', bound='TokenizedLine')
 
 class TokenizedLine(ABC):
     """Represent a line of text that has been tokenized into token ids and token type ids."""
+
     def __init__(self, token_ids: List[int], token_type_ids: List[int]):
         """Create a TokenizedLine.
 
@@ -68,8 +69,10 @@ class TokenizedLine(ABC):
         """See __getitem__ docstring below, this is just a type hint."""
         ...
 
-    def __getitem__(self: TokenizedLineSubClass, index: Union[int, slice]
-                    ) -> Union[Tuple[int, int], TokenizedLineSubClass]:
+    def __getitem__(
+        self: TokenizedLineSubClass,
+        index: Union[int,
+                     slice]) -> Union[Tuple[int, int], TokenizedLineSubClass]:
         """Return the token ID and the token type ID at the specified index / slice."""
         if isinstance(index, slice):
             return self._get_slice(index)
@@ -131,6 +134,7 @@ class TokenizedArticle(TokenizedLine):
     An article is a block of semantically related text like a paragraph, or a conversation, etc. depending on the
     textual data you are training on.
     """
+
     @classmethod
     def get_empty(cls) -> 'TokenizedArticle':
         """See base class."""
@@ -149,6 +153,7 @@ class TokenizedSequence(TokenizedLine):
     require the training sequence of tokens to be bounded by a certain length, which is why we can't directly use
     the TokenizedArticles, and must first compress the TokenizedArticles into length-bounded TokenizedSequences.
     """
+
     def __init__(self, token_ids: List[int], token_type_ids: List[int],
                  max_seq_length: int, eos_token_id: int):
         """Create a TokenizedSequence.

@@ -166,10 +166,10 @@ def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase,
     tokenizer.add_special_tokens(json.loads(dict_string))
 
 
-def get_tokenizer(pretrained_tokenizer: Optional[str],
-                  tokenizer_class: Optional[str], vocab_file: str,
-                  merges_file: str, special_tokens_dict: Optional[str]
-                  ) -> PreTrainedTokenizerBase:
+def get_tokenizer(
+        pretrained_tokenizer: Optional[str], tokenizer_class: Optional[str],
+        vocab_file: str, merges_file: str,
+        special_tokens_dict: Optional[str]) -> PreTrainedTokenizerBase:
     """Create a tokenizer based on input arguments.
 
     Args:

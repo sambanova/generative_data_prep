@@ -19,6 +19,7 @@ from enum import Enum
 
 class BaseEnum(Enum):
     """ Contains additional utility methods for the custom Enums """
+
     @classmethod
     def as_list(cls):
         return [member.value for member in cls]

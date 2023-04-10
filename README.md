@@ -20,7 +20,10 @@ This software package is designed for preparing data that can be used to train g
     - [Meta in context learning](#meta-in-context-learning)
 
 ## Installation
-TODO
+```git clone https://github.com/sambanova/generative_data_prep.git
+cd to the repo
+pip install -r requirements.txt
+```
 
 ## Requirements
 - Python version 3.7+, **only verified on python 3.7.6**
@@ -75,7 +78,7 @@ The output hdf5 files each contain two datasets:
 | `merges_file` | str | None | Valid file path | The merges file to be used with the tokenizer class specified by `tokenizer_class`. If `pretrained_tokenizer` tokenizer is not specified, this is required. It should be a .txt file for a GPT2 tokenizer. |
 | `special_tokens_dict` | str | None | string representation of json | Any non-standard special tokens in JSON format to add to tokenizer. e.g. \"{'sep_token': \"[SEP]\"}\". |
 | `max_seq_length` | int | 2048 | 512 for gpt2 small, 1024 for gpt-xl, 2048 for gpt3-13B. | The maximum sequence length of the model you are using. |
-| `input_packing_config` | PackingConfig | 'full' | ['full', 'single::truncate_left', 'single::truncate_right', 'single::drop', 'greedy::truncate_left', 'greedy::truncate_right', 'greedy::drop'] | 'full': Completely fill sequences with tokens, as soon as sequences is full start packing into new sequence. Ignore article boundaries, they may be split across multiple sequences. 'greedy': Fit as many articles as possible into a sequence, make sure no article is split across multiple sequences. Fill the left over space in each sequence with padding.  'single': Each sequence contains only 1 article.  Fill the rest of the sequence with padding.  'drop': Drop the entire article if there are any tokens that overflow beyond the max sequence length.  'truncate_left':  Truncate the article from the left if there are any tokens that overflow beyond the max sequence length.  'truncate_right':  Truncate the article from the right if there are any tokens that overflow beyond the max sequence length. |
+| `input_packing_config` | PackingConfig | 'full' | ['full', 'single::truncate_left', 'single::truncate_right', 'single::drop', 'greedy::truncate_left', 'greedy::truncate_right', 'greedy::drop'] | The first argument in the packing config defines the method of placing text into sequences, the second argument defines how to handle jsonls that do not fit within the max_seq_length. 'full': Defines the entire packing config, Completely fill sequences with tokens, as soon as sequences is full start packing into new sequence. Ignore article boundaries, they may be split across multiple sequences. 'greedy': Fit as many articles as possible into a sequence, make sure no article is split across multiple sequences. Fill the left over space in each sequence with padding. 'single': Each sequence contains only 1 article.  Fill the rest of the sequence with padding.  'drop': Drop the entire article if there are any tokens that overflow beyond the max sequence length.  'truncate_left':  Truncate the article from the left if there are any tokens that overflow beyond the max sequence length.  'truncate_right':  Truncate the article from the right if there are any tokens that overflow beyond the max sequence length. |
 | `packing_boundary` | str | 'jsonl' | ['jsonl', 'prompt_completion_pair'] | 'jsonl': When packing text into sequences, keeps json lines together. This means that for greedy or single packing if the entire line does not fit in the sequences it will be thrown out. 'prompt_completion_pair': When packing text into sequences, prompt_completion_pairs together, but may break up json lines that contain a list of prompt completion pairs. |
 | `attention_boundary` | str | 'jsonl' | ['jsonl', 'prompt_completion_pair'] | What boundary to use when training with --article_attention flag. If you choose prompt_completion_pair tokens will only attend to tokens in the prompt_completion_pair. If you choose jsonl, then tokens will attend to all the prompt completion pairs in the jsonl |
 | `prompt_keyword` | str | 'prompt' | 512 for gpt2 small, 1024 for gpt-xl, 2048 for gpt3-13B. | If your input json has a string keyword for prompt other than "prompt", place the keyword here. e.g Input_json: {"source": ... "target": ...} ->`prompt_keyword`='source'. |
@@ -125,7 +128,7 @@ The output hdf5 files contains two datasets:
 | `merges_file` | str | None | Valid file path | The merges file to be used with the tokenizer class specified by `tokenizer_class`. If `pretrained_tokenizer` tokenizer is not specified, this is required. It should be a .txt file for a GPT2 tokenizer. |
 | `special_tokens_dict` | str | None | string representation of json | Any non-standard special tokens in JSON format to add to tokenizer. e.g. \"{'sep_token': \"[SEP]\"}\". |
 | `max_seq_length` | int | 2048 | 512 for gpt2 small, 1024 for gpt-xl, 2048 for gpt3-13B. | The maximum sequence length of the model you are using. |
-| `input_packing_config` | PackingConfig | 'full' | ['full', 'single::truncate_left', 'single::truncate_right', 'single::drop', 'greedy::truncate_left', 'greedy::truncate_right', 'greedy::drop'] | 'full': Completely fill sequences with tokens, as soon as sequences is full start packing into new sequence. Ignore article boundaries, they may be split across multiple sequences. 'greedy': Fit as many articles as possible into a sequence, make sure no article is split across multiple sequences. Fill the left over space in each sequence with padding.  'single': Each sequence contains only 1 article.  Fill the rest of the sequence with padding.  'drop': Drop the entire article if there are any tokens that overflow beyond the max sequence length.  'truncate_left':  Truncate the article from the left if there are any tokens that overflow beyond the max sequence length.  'truncate_right':  Truncate the article from the right if there are any tokens that overflow beyond the max sequence length. |
+| `input_packing_config` | PackingConfig | 'full' | ['full', 'single::truncate_left', 'single::truncate_right', 'single::drop', 'greedy::truncate_left', 'greedy::truncate_right', 'greedy::drop'] | The first argument in the packing config defines the method of placing text into sequences, the second argument defines how to handle jsonls that do not fit within the max_seq_length. 'full': Defines the entire packing config, Completely fill sequences with tokens, as soon as sequences is full start packing into new sequence. Ignore article boundaries, they may be split across multiple sequences. 'greedy': Fit as many articles as possible into a sequence, make sure no article is split across multiple sequences. Fill the left over space in each sequence with padding. 'single': Each sequence contains only 1 article.  Fill the rest of the sequence with padding.  'drop': Drop the entire article if there are any tokens that overflow beyond the max sequence length.  'truncate_left':  Truncate the article from the left if there are any tokens that overflow beyond the max sequence length.  'truncate_right':  Truncate the article from the right if there are any tokens that overflow beyond the max sequence length.|
 | `packing_boundary` | str | 'jsonl' | ['jsonl', 'prompt_completion_pair'] | 'jsonl': When packing text into sequences, keeps json lines together. This means that for greedy or single packing if the entire line does not fit in the sequences it will be thrown out. 'prompt_completion_pair': When packing text into sequences, prompt_completion_pairs together, but may break up json lines that contain a list of prompt completion pairs. |
 | `attention_boundary` | str | 'jsonl' | ['jsonl', 'prompt_completion_pair'] | What boundary to use when training with --article_attention flag. If you choose prompt_completion_pair tokens will only attend to tokens in the prompt_completion_pair. If you choose jsonl, then tokens will attend to all the prompt completion pairs in the jsonl |
 | `prompt_keyword` | str | 'prompt' | 512 for gpt2 small, 1024 for gpt-xl, 2048 for gpt3-13B. | If your input json has a string keyword for prompt other than "prompt", place the keyword here. e.g Input_json: {"source": ... "target": ...} -> --prompt_keyword='source'. |
@@ -145,7 +148,7 @@ python3 examples/decode_hdf5.py --hdf5_file_path=path_to_hdf5_file --output_deco
 
 ## Example use cases
 ### Pretraining
-Pretraining on unstructured data enables large languages models to learn general language patterns and structures that are useful for a wide range of downstream tasks. In order to prepare pretraining data, you need a large amount of unstructured text data. To prepare pretraining data use the flag `--input_packing_config='full'`.
+Pretraining on unstructured data enables large languages models to learn general language patterns and structures that are useful for a wide range of downstream tasks. In order to prepare pretraining data, you need a large amount of unstructured text data. To prepare pretraining data use the flag `--input_packing_config=full`.
 
 #### Example data
 For pretraining you can have your data in two formats.
@@ -158,7 +161,7 @@ We recommend to use jsonlines with empty prompts and all the text in the complet
 #### Example command
 
 ```
-python3 -m generative_data_prep pipeline --input_file_path=./examples/pretraining/pretraining_data.jsonl --output_path=./examples/pretraining/pipeline_pretraining --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_config='full' --shuffle=on_RAM
+python3 -m generative_data_prep pipeline --input_file_path=./examples/pretraining/pretraining_data.jsonl --output_path=./examples/pretraining/pipeline_pretraining --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_config=full --shuffle=on_RAM
 ```
 
 > [View decoded output](examples/pretraining/decoded_data_prep_pretraining.txt)
@@ -177,13 +180,13 @@ When training on this kind of data using SambaStudio, set `prompt_loss_weight=0.
 #### Example command
 
 ```python
-python3 -m generative_data_prep pipeline --input_file_path=./examples/generative_tuning/example_generative_tuning_data.jsonl --output_path=./examples/generative_tuning/pipeline_generative_tuning --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_config='single::drop_overflow' --shuffle=on_RAM
+python3 -m generative_data_prep pipeline --input_file_path=./examples/generative_tuning/example_generative_tuning_data.jsonl --output_path=./examples/generative_tuning/pipeline_generative_tuning --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_config=single::drop_overflow --shuffle=on_RAM
 ```
 
 > [View decoded output](examples/generative_tuning/decoded_data_prep_generative_tuning.txt)
 
 ### Dialogue
-Dialogue data often involves multiple turns in a conversation between a user and an agent. In order to train on this data, the entire conversation needs to be in the same sequence of tokens and the model should only learn to generate the agents responses based on the users inputs. To prepare data like this create a list of prompt completion pairs, and if you train with `packing_boundary=jsonl` and `input_packing_config='single::truncate_right'` then these conversations are guaranteed to be in the provided order in the same sequence. Additionally if you include the `prompt_loss_weight=0.0` option while training on SambaStudio, only the completions will be learned.
+Dialogue data often involves multiple turns in a conversation between a user and an agent. In order to train on this data, the entire conversation needs to be in the same sequence of tokens and the model should only learn to generate the agents responses based on the users inputs. To prepare data like this create a list of prompt completion pairs, and if you train with `packing_boundary=jsonl` and `input_packing_config=single::truncate_right` then these conversations are guaranteed to be in the provided order in the same sequence. Additionally if you include the `prompt_loss_weight=0.0` option while training on SambaStudio, only the completions will be learned.
 
 #### Example data
 > [Lists of prompt completion pairs that represent turns in a conversation](examples/dialogue/example_dialogue_data.jsonl)
@@ -191,13 +194,13 @@ Dialogue data often involves multiple turns in a conversation between a user and
 #### Example command
 
 ```python
-python3 -m generative_data_prep pipeline --input_file_path=./examples/dialogue/example_dialogue_data.jsonl --output_path=./examples/dialogue/pipeline_dialogue --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_config='single::truncate_right' --shuffle=on_RAM
+python3 -m generative_data_prep pipeline --input_file_path=./examples/dialogue/example_dialogue_data.jsonl --output_path=./examples/dialogue/pipeline_dialogue --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_config=single::truncate_right --shuffle=on_RAM
 ```
 
 > [View decoded output](examples/dialogue/decoded_data_prep_dialogue.txt)
 
 ### Meta in context learning
-[Meta In Context Learning](https://arxiv.org/pdf/2110.15943.pdf) improves the few shot performance of a model by including training data formatted in a few shot style. This infrastructure allows you to prepare data in a variant of meta in context learning SambaNova uses called "All Shot" learning. In order to prepare data in this format prepare lists of prompt completion pairs, where every list contains prompt completion pairs that are completing the same instruction/task. Then prepare the data with the `input_packing_config='greedy::drop'`, `packing_boundary=prompt_completion_pair` and `attention_boundary=jsonl`. This ensures that every sequence contains prompt completion pairs following the same "instruction", and that when learning a completion the model is attending to all the other prompt completion pairs before it.
+[Meta In Context Learning](https://arxiv.org/pdf/2110.15943.pdf) improves the few shot performance of a model by including training data formatted in a few shot style. This infrastructure allows you to prepare data in a variant of meta in context learning SambaNova uses called "All Shot" learning. In order to prepare data in this format prepare lists of prompt completion pairs, where every list contains prompt completion pairs that are completing the same instruction/task. Then prepare the data with the `input_packing_config=greedy::drop`, `packing_boundary=prompt_completion_pair` and `attention_boundary=jsonl`. This ensures that every sequence contains prompt completion pairs following the same "instruction", and that when learning a completion the model is attending to all the other prompt completion pairs before it.
 
 #### Example data
 > [Lists of prompt completion pairs that are all from the same task](examples/metaICL/example_metaICL_data.jsonl)

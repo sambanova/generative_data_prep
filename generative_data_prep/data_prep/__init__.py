@@ -16,5 +16,3 @@ limitations under the License.
 
 from .data_prep import data_prep_main
 from .pipeline import pipeline_main
-
-__all__ = [data_prep_main, pipeline_main]

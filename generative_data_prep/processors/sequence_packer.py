@@ -31,6 +31,7 @@ from generative_data_prep.utils import (OverflowType, PackingConfig,
 
 class SequencePacker:
     """Takes articles and packs them into fixed length sequences."""
+
     def __init__(self, max_seq_length: int, eos_token_id: int,
                  packing_config: PackingConfig):
         """Create the SequencePacker.
@@ -100,8 +101,9 @@ class SequencePacker:
         self.unfinished_sequence = TokenizedSequence.get_empty(
             self.max_seq_length, self.eos_token_id)
 
-    def __call__(self, tokenized_articles: Optional[List[TokenizedArticle]]
-                 ) -> List[TokenizedSequence]:
+    def __call__(
+        self, tokenized_articles: Optional[List[TokenizedArticle]]
+    ) -> List[TokenizedSequence]:
         """Call the SequencePacker
 
         Args:
@@ -151,8 +153,8 @@ class SequencePacker:
                 f'Invalid Overflow Type {self.packing_config.overflow_type}')
 
     def _get_packed_sequences(
-            self, tokenized_article: TokenizedArticle,
-            unfinished_sequence: TokenizedSequence
+        self, tokenized_article: TokenizedArticle,
+        unfinished_sequence: TokenizedSequence
     ) -> Tuple[List[TokenizedSequence], TokenizedSequence]:
         """Packs the tokenized article into sequences.
         Args:
