@@ -219,20 +219,17 @@ def multiprocess_data_prep(
     dev_hdf5_files = list(
         filter(lambda file_name: 'dev' in file_name, sub_output_file_paths))
 
-    global data_prep_main_wrapper
-
-    def data_prep_main_wrapper(input_output_files):
-        sub_input_file_path = input_output_files[0]
-        sub_output_file_path = input_output_files[1]
-        data_prep_main(True, tokenizer, sub_input_file_path,
-                       sub_output_file_path, max_seq_length,
-                       input_packing_config, packing_boundary,
-                       attention_boundary, disable_space_separator,
-                       prompt_keyword, completion_keyword)
+    data_prep_main_args_list = []
+    for input_file_path, output_file_path in zip(sub_input_file_paths,
+                                                 sub_output_file_paths):
+        data_prep_main_args_list.append(
+            (True, tokenizer, input_file_path, output_file_path,
+             max_seq_length, input_packing_config, packing_boundary,
+             attention_boundary, disable_space_separator, prompt_keyword,
+             completion_keyword))
 
     with Pool(num_workers) as p:
-        _ = p.map(data_prep_main_wrapper,
-                  zip(sub_input_file_paths, sub_output_file_paths))
+        _ = p.starmap(data_prep_main, data_prep_main_args_list)
 
     return train_hdf5_files, dev_hdf5_files
 
