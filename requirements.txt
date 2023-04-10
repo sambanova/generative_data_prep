@@ -12,3 +12,4 @@ pydocstyle
 pytest
 autoflake
 isort
+coverage
