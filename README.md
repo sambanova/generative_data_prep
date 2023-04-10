@@ -143,7 +143,7 @@ The output hdf5 files contains two datasets:
 
 ## View decoded hdf5 files in human readable text format
 ```python
-python3 examples/decode_hdf5.py --hdf5_file_path=path_to_hdf5_file --output_decoded_file_path=path_to_output_txt_file
+python3 generative_data_prep/utils/decode_hdf5.py --hdf5_file_path=path_to_hdf5_file --output_decoded_file_path=path_to_output_txt_file
 ```
 
 ## Example use cases

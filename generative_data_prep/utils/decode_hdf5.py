@@ -17,7 +17,7 @@ limitations under the License.
 import h5py
 from transformers import AutoTokenizer
 from argparse import ArgumentParser
-from generative_data_prep.utils.constants import TokenTypeIds
+from constants import TokenTypeIds
 
 SEP_STR = '=' * 80 + '\n'
 ATTENTION_SEPARATOR = '-' * 30 + 'ATTENTION SEPARATOR' + '-' * 30 + '\n'
