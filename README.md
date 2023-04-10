@@ -3,7 +3,7 @@
 </a>
 
 # Generative data preparation
-This software package is designed for preparing data that can be used to train generative models. It offers an efficient way to convert input text files into tokenized sequences that are packed into a fixed sequence length. The resulting output directory can be directly used for training with SambaStudio. This package features many styles of packing text of any length into tokenized sequences, compressed hdf5 file outputs, efficient multiprocessing, shuffling any sized dataset, splitting your data into train/dev/test, and specifying what tokens are attended to during training. 
+This software package is designed for preparing data that can be used to train generative models. It offers an efficient way to convert input text files into tokenized sequences that are packed into a fixed sequence length. The resulting output directory can be directly used for training with SambaStudio. This package features many styles of packing text of any length into tokenized sequences, compressed hdf5 file outputs, efficient multiprocessing, shuffling any sized dataset, splitting your data into train/dev/test, and specifying what tokens are attended to during training.
 
 ## Table of contents
 - [Installation](#installation)
@@ -30,13 +30,13 @@ pip install -r requirements.txt
 - Support for linux and mac OS. Not tested on Windows
 
 ## Introduction
-The `generative_data_prep/data_prep/pipeline.py` script is designed to facilitate end-to-end data preparation for training machine learning models. This script takes a single [jsonline](https://jsonlines.org/) or text file as input, shuffles it, splits it into multiple train/dev/test files, then calls `generative_data_prep/data_prep/data_prep.py` on all the splits to tokenize the text, pack into fixed length sequences and convert to [HDF5 format](https://www.geeksforgeeks.org/hdf5-files-in-python/). The output `hdf5` directory can be used directly for training. 
+The `generative_data_prep/data_prep/pipeline.py` script is designed to facilitate end-to-end data preparation for training machine learning models. This script takes a single [jsonline](https://jsonlines.org/) or text file as input, shuffles it, splits it into multiple train/dev/test files, then calls `generative_data_prep/data_prep/data_prep.py` on all the splits to tokenize the text, pack into fixed length sequences and convert to [HDF5 format](https://www.geeksforgeeks.org/hdf5-files-in-python/). The output `hdf5` directory can be used directly for training.
 
 The `generative_data_prep/data_prep/data_prep.py` script is used for tokenizing a single [jsonline](https://jsonlines.org/) or text file, packing it into fixed length sequences and converting it to [HDF5 format](https://www.geeksforgeeks.org/hdf5-files-in-python/).  However, when training with SambaStudio, multiple split HDF5 files are needed to run data parallel training. Therefore, unless you already have multiple split input files that you want to tokenize directly, we recommend using the `pipeline.py` script for end-to-end data preparation.
 
 ## Input format
 
-Each line in the input file must be either plain text or [jsonline](https://jsonlines.org/). if the jsonline has different keywords, refer to the `prompt_keyword`, and `completion_keyword` flag documentation below. 
+Each line in the input file must be either plain text or [jsonline](https://jsonlines.org/). if the jsonline has different keywords, refer to the `prompt_keyword`, and `completion_keyword` flag documentation below.
 
 Each line in the input file can be formatted as one of the following:
 - Plain text
@@ -48,7 +48,7 @@ Each line in the input file can be formatted as one of the following:
 The `generative_data_prep/data_prep/pipeline.py` script takes a single jsonline or text file as input, shuffles it, splits it into multiple train/dev/test, tokenizes the text, packs it into fixed sequence lengths and then converts it to HDF5 file format.
 
 ### Example
-```python 
+```python
 python3 -m generative_data_prep pipeline --input_file_path=path_to_jsonl.jsonl --output_path=path_to_output_directory --dev_ratio=0.1 --shuffle=on_RAM --pretrained_tokenizer=gpt2 --max_seq_length=1024
 ```
 
@@ -68,7 +68,7 @@ The output hdf5 files each contain two datasets:
   <summary>CLICK HERE to see flags</summary>
 
 | Flag Name  | Type | Default | Options | Description |
-| --- | --- | --- | --- | --- | 
+| --- | --- | --- | --- | --- |
 | `input_file_path`  | str | REQUIRED | Any existing file path | Path to the input dataset which must be in jsonline format, where each line is of the form specified in [Input Format](#input-format).|
 | `output_path` | str | `input_file_path`'s directory | Any valid directory path | The directory to store the output files |
 | `overwrite_output_path` | bool | False | Include flag for True, no arguments | Permission to delete and overwrite files in `output_path`. |
@@ -78,7 +78,7 @@ The output hdf5 files each contain two datasets:
 | `merges_file` | str | None | Valid file path | The merges file to be used with the tokenizer class specified by `tokenizer_class`. If `pretrained_tokenizer` tokenizer is not specified, this is required. It should be a .txt file for a GPT2 tokenizer. |
 | `special_tokens_dict` | str | None | string representation of json | Any non-standard special tokens in JSON format to add to tokenizer. e.g. \"{'sep_token': \"[SEP]\"}\". |
 | `max_seq_length` | int | 2048 | 512 for gpt2 small, 1024 for gpt-xl, 2048 for gpt3-13B. | The maximum sequence length of the model you are using. |
-| `input_packing_style` | str | 'full' | ['full', 'single_truncate_overflow', 'single_drop_overflow', 'greedy'] | 'full': Completely fill sequences with tokens, as soon as sequences is full start packing into new sequence. Ignore article boundaries, they may be split across multiple sequences. 'greedy' Fit as many articles as possible into a sequence, make sure no article is split across multiple sequences. Fill the left over space in each sequence with padding. If an article is longer than the maximum sequence length, throw it out. 'single_drop_overflow' Each sequence contains only 1 article.  Fill the rest of the sequence with padding.  If an article is longer than the maximum sequence length, throw out the article. 'single_truncate_overflow': Each sequence contains only 1 article.  Fill the rest of the sequence with padding.  If an article is longer than the maximum sequence length truncate it, and throw the remaining portion of the article out. |
+| `input_packing_config` | PackingConfig | 'full' | ['full', 'single::truncate_left', 'single::truncate_right', 'single::drop', 'greedy::truncate_left', 'greedy::truncate_right', 'greedy::drop'] | The first argument in the packing config defines the method of placing text into sequences, the second argument defines how to handle jsonls that do not fit within the max_seq_length. 'full': Defines the entire packing config, Completely fill sequences with tokens, as soon as sequences is full start packing into new sequence. Ignore article boundaries, they may be split across multiple sequences. 'greedy': Fit as many articles as possible into a sequence, make sure no article is split across multiple sequences. Fill the left over space in each sequence with padding. 'single': Each sequence contains only 1 article.  Fill the rest of the sequence with padding.  'drop': Drop the entire article if there are any tokens that overflow beyond the max sequence length.  'truncate_left':  Truncate the article from the left if there are any tokens that overflow beyond the max sequence length.  'truncate_right':  Truncate the article from the right if there are any tokens that overflow beyond the max sequence length. |
 | `packing_boundary` | str | 'jsonl' | ['jsonl', 'prompt_completion_pair'] | 'jsonl': When packing text into sequences, keeps json lines together. This means that for greedy or single packing if the entire line does not fit in the sequences it will be thrown out. 'prompt_completion_pair': When packing text into sequences, prompt_completion_pairs together, but may break up json lines that contain a list of prompt completion pairs. |
 | `attention_boundary` | str | 'jsonl' | ['jsonl', 'prompt_completion_pair'] | What boundary to use when training with --article_attention flag. If you choose prompt_completion_pair tokens will only attend to tokens in the prompt_completion_pair. If you choose jsonl, then tokens will attend to all the prompt completion pairs in the jsonl |
 | `prompt_keyword` | str | 'prompt' | 512 for gpt2 small, 1024 for gpt-xl, 2048 for gpt3-13B. | If your input json has a string keyword for prompt other than "prompt", place the keyword here. e.g Input_json: {"source": ... "target": ...} ->`prompt_keyword`='source'. |
@@ -99,7 +99,7 @@ The output hdf5 files each contain two datasets:
 The `generative_data_prep/data_prep/data_prep.py` script tokenizes a single jsonline file and converts it to an HDF5 file. However, training with SambaStudio requires multiple split HDF5 files. So, unless you already have multiple split jsonline files that you want to tokenize directly, we recommend using the `generative_data_prep/data_prep/pipeline.py` script.
 
 ### Example
-```python 
+```python
 python3 -m generative_data_prep data_prep --input_file_path=path_to_jsonl.jsonl --output_path=path_to_output_file --pretrained_tokenizer=gpt2 --max_seq_length=1024
 ```
 
@@ -115,10 +115,10 @@ The output hdf5 files contains two datasets:
 ### Flags
 <details>
   <summary>CLICK HERE to see flags</summary>
-  
+
 
 | Flag Name  | Type | Default | Options | Description |
-| --- | --- | --- | --- | --- | 
+| --- | --- | --- | --- | --- |
 | `input_file_path`  | str | REQUIRED | Any existing file path | Path to the input dataset where each line is of the form specified in [Input Format](#input-format).|
 | `output_path` | str | `input_file_path`'s directory | Any valid directory path | The directory to store the output files |
 | `overwrite_output_path` | bool | False | Include flag for True, no arguments | Permission to delete and overwrite files in `output_path`. |
@@ -128,7 +128,7 @@ The output hdf5 files contains two datasets:
 | `merges_file` | str | None | Valid file path | The merges file to be used with the tokenizer class specified by `tokenizer_class`. If `pretrained_tokenizer` tokenizer is not specified, this is required. It should be a .txt file for a GPT2 tokenizer. |
 | `special_tokens_dict` | str | None | string representation of json | Any non-standard special tokens in JSON format to add to tokenizer. e.g. \"{'sep_token': \"[SEP]\"}\". |
 | `max_seq_length` | int | 2048 | 512 for gpt2 small, 1024 for gpt-xl, 2048 for gpt3-13B. | The maximum sequence length of the model you are using. |
-| `input_packing_style` | str | 'full' | ['full', 'single_truncate_overflow', 'single_drop_overflow', 'greedy'] | 'full': Completely fill sequences with tokens, as soon as sequences is full start packing into new sequence. Ignore article boundaries, they may be split across multiple sequences. 'greedy' Fit as many articles as possible into a sequence, make sure no article is split across multiple sequences. Fill the left over space in each sequence with padding. If an article is longer than the maximum sequence length, throw it out. 'single_drop_overflow' Each sequence contains only 1 article.  Fill the rest of the sequence with padding.  If an article is longer than the maximum sequence length, throw out the article. 'single_truncate_overflow': Each sequence contains only 1 article.  Fill the rest of the sequence with padding.  If an article is longer than the maximum sequence length truncate it, and throw the remaining portion of the article out. |
+| `input_packing_config` | PackingConfig | 'full' | ['full', 'single::truncate_left', 'single::truncate_right', 'single::drop', 'greedy::truncate_left', 'greedy::truncate_right', 'greedy::drop'] | The first argument in the packing config defines the method of placing text into sequences, the second argument defines how to handle jsonls that do not fit within the max_seq_length. 'full': Defines the entire packing config, Completely fill sequences with tokens, as soon as sequences is full start packing into new sequence. Ignore article boundaries, they may be split across multiple sequences. 'greedy': Fit as many articles as possible into a sequence, make sure no article is split across multiple sequences. Fill the left over space in each sequence with padding. 'single': Each sequence contains only 1 article.  Fill the rest of the sequence with padding.  'drop': Drop the entire article if there are any tokens that overflow beyond the max sequence length.  'truncate_left':  Truncate the article from the left if there are any tokens that overflow beyond the max sequence length.  'truncate_right':  Truncate the article from the right if there are any tokens that overflow beyond the max sequence length.|
 | `packing_boundary` | str | 'jsonl' | ['jsonl', 'prompt_completion_pair'] | 'jsonl': When packing text into sequences, keeps json lines together. This means that for greedy or single packing if the entire line does not fit in the sequences it will be thrown out. 'prompt_completion_pair': When packing text into sequences, prompt_completion_pairs together, but may break up json lines that contain a list of prompt completion pairs. |
 | `attention_boundary` | str | 'jsonl' | ['jsonl', 'prompt_completion_pair'] | What boundary to use when training with --article_attention flag. If you choose prompt_completion_pair tokens will only attend to tokens in the prompt_completion_pair. If you choose jsonl, then tokens will attend to all the prompt completion pairs in the jsonl |
 | `prompt_keyword` | str | 'prompt' | 512 for gpt2 small, 1024 for gpt-xl, 2048 for gpt3-13B. | If your input json has a string keyword for prompt other than "prompt", place the keyword here. e.g Input_json: {"source": ... "target": ...} -> --prompt_keyword='source'. |
@@ -137,21 +137,21 @@ The output hdf5 files contains two datasets:
 </details>
 
 ## Running tests
-```python 
+```python
 ./test.sh
 ```
 
 ## View decoded hdf5 files in human readable text format
-```python 
+```python
 python3 examples/decode_hdf5.py --hdf5_file_path=path_to_hdf5_file --output_decoded_file_path=path_to_output_txt_file
 ```
 
 ## Example use cases
 ### Pretraining
-Pretraining on unstructured data enables large languages models to learn general language patterns and structures that are useful for a wide range of downstream tasks. In order to prepare pretraining data, you need a large amount of unstructured text data. To prepare pretraining data use the flag `--input_packing_style=full`.
+Pretraining on unstructured data enables large languages models to learn general language patterns and structures that are useful for a wide range of downstream tasks. In order to prepare pretraining data, you need a large amount of unstructured text data. To prepare pretraining data use the flag `--input_packing_config=full`.
 
 #### Example data
-For pretraining you can have your data in two formats. 
+For pretraining you can have your data in two formats.
 
 > [text separated by newlines.](examples/pretraining/pretraining_data.txt)
 
@@ -161,14 +161,14 @@ We recommend to use jsonlines with empty prompts and all the text in the complet
 #### Example command
 
 ```
-python3 -m generative_data_prep pipeline --input_file_path=./examples/pretraining/pretraining_data.jsonl --output_path=./examples/pretraining/pipeline_pretraining --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_style=full --shuffle=on_RAM 
+python3 -m generative_data_prep pipeline --input_file_path=./examples/pretraining/pretraining_data.jsonl --output_path=./examples/pretraining/pipeline_pretraining --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_config=full --shuffle=on_RAM
 ```
 
 > [View decoded output](examples/pretraining/decoded_data_prep_pretraining.txt)
 
 
 ### Generative tuning
-Generative tuning or "fine tuning" is a technique used to adapt a pre-trained language model to perform better at a specific task. This approach typically involves training the model on input data that is structured as a "prompt" followed by a "completion". The prompt represents the input for a specific task, while the completion is the output that the model should generate. During training, the model learns to generate the relevant completion tokens based on the context provided by the prompt tokens. 
+Generative tuning or "fine tuning" is a technique used to adapt a pre-trained language model to perform better at a specific task. This approach typically involves training the model on input data that is structured as a "prompt" followed by a "completion". The prompt represents the input for a specific task, while the completion is the output that the model should generate. During training, the model learns to generate the relevant completion tokens based on the context provided by the prompt tokens.
 
 The benefit of using this training format is that the model can learn to generate high-quality outputs for a specific task without requiring a large amount of task-specific training data. By leveraging the pre-trained language model's knowledge gained from being trained on a large corpus of text data, the fine-tuned model can quickly adapt to the new task and generate high-quality outputs with minimal training data.
 
@@ -180,13 +180,13 @@ When training on this kind of data using SambaStudio, set `prompt_loss_weight=0.
 #### Example command
 
 ```python
-python3 -m generative_data_prep pipeline --input_file_path=./examples/generative_tuning/example_generative_tuning_data.jsonl --output_path=./examples/generative_tuning/pipeline_generative_tuning --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_style=single_drop_overflow --shuffle=on_RAM 
+python3 -m generative_data_prep pipeline --input_file_path=./examples/generative_tuning/example_generative_tuning_data.jsonl --output_path=./examples/generative_tuning/pipeline_generative_tuning --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_config=single::drop_overflow --shuffle=on_RAM
 ```
 
 > [View decoded output](examples/generative_tuning/decoded_data_prep_generative_tuning.txt)
 
 ### Dialogue
-Dialogue data often involves multiple turns in a conversation between a user and an agent. In order to train on this data, the entire conversation needs to be in the same sequence of tokens and the model should only learn to generate the agents responses based on the users inputs. To prepare data like this create a list of prompt completion pairs, and if you train with `packing_boundary=jsonl` and `input_packing_style=single_truncate_overflow` then these conversations are guaranteed to be in the provided order in the same sequence. Additionally if you include the `prompt_loss_weight=0.0` option while training on SambaStudio, only the completions will be learned.
+Dialogue data often involves multiple turns in a conversation between a user and an agent. In order to train on this data, the entire conversation needs to be in the same sequence of tokens and the model should only learn to generate the agents responses based on the users inputs. To prepare data like this create a list of prompt completion pairs, and if you train with `packing_boundary=jsonl` and `input_packing_config=single::truncate_right` then these conversations are guaranteed to be in the provided order in the same sequence. Additionally if you include the `prompt_loss_weight=0.0` option while training on SambaStudio, only the completions will be learned.
 
 #### Example data
 > [Lists of prompt completion pairs that represent turns in a conversation](examples/dialogue/example_dialogue_data.jsonl)
@@ -194,13 +194,13 @@ Dialogue data often involves multiple turns in a conversation between a user and
 #### Example command
 
 ```python
-python3 -m generative_data_prep pipeline --input_file_path=./examples/dialogue/example_dialogue_data.jsonl --output_path=./examples/dialogue/pipeline_dialogue --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_style=single_truncate_overflow --shuffle=on_RAM 
+python3 -m generative_data_prep pipeline --input_file_path=./examples/dialogue/example_dialogue_data.jsonl --output_path=./examples/dialogue/pipeline_dialogue --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_config=single::truncate_right --shuffle=on_RAM
 ```
 
 > [View decoded output](examples/dialogue/decoded_data_prep_dialogue.txt)
 
 ### Meta in context learning
-[Meta In Context Learning](https://arxiv.org/pdf/2110.15943.pdf) improves the few shot performance of a model by including training data formatted in a few shot style. This infrastructure allows you to prepare data in a variant of meta in context learning SambaNova uses called "All Shot" learning. In order to prepare data in this format prepare lists of prompt completion pairs, where every list contains prompt completion pairs that are completing the same instruction/task. Then prepare the data with the `input_packing_style=greedy`, `packing_boundary=prompt_completion_pair` and `attention_boundary=jsonl`. This ensures that every sequence contains prompt completion pairs following the same "instruction", and that when learning a completion the model is attending to all the other prompt completion pairs before it.
+[Meta In Context Learning](https://arxiv.org/pdf/2110.15943.pdf) improves the few shot performance of a model by including training data formatted in a few shot style. This infrastructure allows you to prepare data in a variant of meta in context learning SambaNova uses called "All Shot" learning. In order to prepare data in this format prepare lists of prompt completion pairs, where every list contains prompt completion pairs that are completing the same instruction/task. Then prepare the data with the `input_packing_config=greedy::drop`, `packing_boundary=prompt_completion_pair` and `attention_boundary=jsonl`. This ensures that every sequence contains prompt completion pairs following the same "instruction", and that when learning a completion the model is attending to all the other prompt completion pairs before it.
 
 #### Example data
 > [Lists of prompt completion pairs that are all from the same task](examples/metaICL/example_metaICL_data.jsonl)
@@ -208,7 +208,7 @@ python3 -m generative_data_prep pipeline --input_file_path=./examples/dialogue/e
 #### Example command
 
 ```python
-python3 -m generative_data_prep pipeline --input_file_path=./examples/metaICL/example_metaICL_data.jsonl --output_path=./examples/metaICL/pipeline_metaICL --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_style=greedy --packing_boundary=prompt_completion_pair --attention_boundary=jsonl --shuffle=on_RAM 
+python3 -m generative_data_prep pipeline --input_file_path=./examples/metaICL/example_metaICL_data.jsonl --output_path=./examples/metaICL/pipeline_metaICL --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_config=greedy::drop --packing_boundary=prompt_completion_pair --attention_boundary=jsonl --shuffle=on_RAM
 ```
 
 > [View decoded output](examples/metaICL/decoded_data_prep_metaICL.txt)

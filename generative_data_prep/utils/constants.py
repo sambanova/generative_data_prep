@@ -19,21 +19,27 @@ from enum import Enum
 
 class BaseEnum(Enum):
     """ Contains additional utility methods for the custom Enums """
+
     @classmethod
     def as_list(cls):
         return [member.value for member in cls]
 
 
-class PackingStyleType(str, BaseEnum):
-    FULL = 'full'
-    SINGLE_TRUNCATE_OVERFLOW = 'single_truncate_overflow'
-    SINGLE_DROP_OVERFLOW = 'single_drop_overflow'
-    GREEDY = 'greedy'
-
-
 class BoundaryType(str, BaseEnum):
     PROMPT_COMPLETION_PAIR = 'prompt_completion_pair'
     JSONL = 'jsonl'
+
+
+class OverflowType(str, BaseEnum):
+    DROP = 'drop'
+    TRUNCATE_LEFT = 'truncate_left'
+    TRUNCATE_RIGHT = 'truncate_right'
+
+
+class PackingStyleType(str, BaseEnum):
+    GREEDY = 'greedy'
+    FULL = 'full'
+    SINGLE = 'single'
 
 
 class TokenTypeIds(int, BaseEnum):

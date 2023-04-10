@@ -32,6 +32,7 @@ TokenizedLineSubClass = TypeVar('TokenizedLineSubClass', bound='TokenizedLine')
 
 class TokenizedLine(ABC):
     """Represent a line of text that has been tokenized into token ids and token type ids."""
+
     def __init__(self, token_ids: List[int], token_type_ids: List[int]):
         """Create a TokenizedLine.
 
@@ -49,24 +50,29 @@ class TokenizedLine(ABC):
         self._token_ids = token_ids
         self._token_type_ids = token_type_ids
 
-    def __iadd__(self: TokenizedLineSubClass, tokenized_line: 'TokenizedLine') -> TokenizedLineSubClass:
+    def __iadd__(self: TokenizedLineSubClass,
+                 tokenized_line: 'TokenizedLine') -> TokenizedLineSubClass:
         """Implement += for a tokenized line."""
         self._token_type_ids += tokenized_line.token_type_ids
         self._token_ids += tokenized_line.token_ids
         return self
 
     @overload
-    def __getitem__(self: TokenizedLineSubClass, index: slice) -> TokenizedLineSubClass:
+    def __getitem__(self: TokenizedLineSubClass,
+                    index: slice) -> TokenizedLineSubClass:
         """See __getitem__ docstring below, this is just a type hint."""
         ...
 
     @overload
-    def __getitem__(self: TokenizedLineSubClass, index: int) -> Tuple[int, int]:
+    def __getitem__(self: TokenizedLineSubClass,
+                    index: int) -> Tuple[int, int]:
         """See __getitem__ docstring below, this is just a type hint."""
         ...
 
-    def __getitem__(self: TokenizedLineSubClass,
-                    index: Union[int, slice]) -> Union[Tuple[int, int], TokenizedLineSubClass]:
+    def __getitem__(
+        self: TokenizedLineSubClass,
+        index: Union[int,
+                     slice]) -> Union[Tuple[int, int], TokenizedLineSubClass]:
         """Return the token ID and the token type ID at the specified index / slice."""
         if isinstance(index, slice):
             return self._get_slice(index)
@@ -112,7 +118,8 @@ class TokenizedLine(ABC):
         return len(self) == 0
 
     @abstractmethod
-    def _get_slice(self: TokenizedLineSubClass, slice_index: slice) -> TokenizedLineSubClass:
+    def _get_slice(self: TokenizedLineSubClass,
+                   slice_index: slice) -> TokenizedLineSubClass:
         """Return a slice of the TokenizedLine.
 
         Args:
@@ -127,6 +134,7 @@ class TokenizedArticle(TokenizedLine):
     An article is a block of semantically related text like a paragraph, or a conversation, etc. depending on the
     textual data you are training on.
     """
+
     @classmethod
     def get_empty(cls) -> 'TokenizedArticle':
         """See base class."""
@@ -134,7 +142,8 @@ class TokenizedArticle(TokenizedLine):
 
     def _get_slice(self, slice_index: slice) -> 'TokenizedArticle':
         """See base class."""
-        return TokenizedArticle(self.token_ids[slice_index], self.token_type_ids[slice_index])
+        return TokenizedArticle(self.token_ids[slice_index],
+                                self.token_type_ids[slice_index])
 
 
 class TokenizedSequence(TokenizedLine):
@@ -144,7 +153,9 @@ class TokenizedSequence(TokenizedLine):
     require the training sequence of tokens to be bounded by a certain length, which is why we can't directly use
     the TokenizedArticles, and must first compress the TokenizedArticles into length-bounded TokenizedSequences.
     """
-    def __init__(self, token_ids: List[int], token_type_ids: List[int], max_seq_length: int, eos_token_id: int):
+
+    def __init__(self, token_ids: List[int], token_type_ids: List[int],
+                 max_seq_length: int, eos_token_id: int):
         """Create a TokenizedSequence.
 
         Args:
@@ -163,12 +174,15 @@ class TokenizedSequence(TokenizedLine):
         self.eos_token_id = eos_token_id
 
     @classmethod
-    def get_empty(cls, max_seq_length: int, eos_token_id: int) -> 'TokenizedSequence':
+    def get_empty(cls, max_seq_length: int,
+                  eos_token_id: int) -> 'TokenizedSequence':
         """See base class."""
-        return cls.from_article(TokenizedArticle.get_empty(), max_seq_length, eos_token_id)
+        return cls.from_article(TokenizedArticle.get_empty(), max_seq_length,
+                                eos_token_id)
 
     @classmethod
-    def from_article(cls, tokenized_article: TokenizedArticle, max_seq_length: int, eos_token_id: int):
+    def from_article(cls, tokenized_article: TokenizedArticle,
+                     max_seq_length: int, eos_token_id: int):
         """Create a TokenizedLine from a TokenizedArticle.
 
         Args:
@@ -178,7 +192,9 @@ class TokenizedSequence(TokenizedLine):
         Returns:
             The newly created TokenizedLine.
         """
-        return cls(tokenized_article.token_ids, tokenized_article.token_type_ids, max_seq_length, eos_token_id)
+        return cls(tokenized_article.token_ids,
+                   tokenized_article.token_type_ids, max_seq_length,
+                   eos_token_id)
 
     def __iadd__(self, tokenized_line: TokenizedLine) -> 'TokenizedSequence':
         """Add another TokenizedLine to this TokenizedSequence.
@@ -193,14 +209,20 @@ class TokenizedSequence(TokenizedLine):
         """
         err_msg_1 = f'Tokenized line with length: {len(tokenized_line)} is too long to be added to'
         err_msg_2 = f'sequence with length: {len(self)} and max sequence length: {self.max_seq_length}'
-        assert len(self) + len(tokenized_line) <= self.max_seq_length, f'{err_msg_1} {err_msg_2}'
+        assert len(self) + len(
+            tokenized_line) <= self.max_seq_length, f'{err_msg_1} {err_msg_2}'
         return super().__iadd__(tokenized_line)
+
+    @property
+    def free_tokens(self):
+        return self.max_seq_length - len(self)
 
     def is_packed(self) -> bool:
         """Return whether or not the TokenizedSequence is at its maximum length."""
         return len(self.token_ids) == self.max_seq_length
 
-    def pack(self, tokenized_line: TokenizedLineSubClass) -> TokenizedLineSubClass:
+    def pack(self,
+             tokenized_line: TokenizedLineSubClass) -> TokenizedLineSubClass:
         """Pack a TokenizedLine into this TokenizedSequence.
 
         Add as much of a TokenizedLine as possible to this TokenizedSequence.
@@ -223,5 +245,8 @@ class TokenizedSequence(TokenizedLine):
 
     def _get_slice(self, slice_index: slice) -> 'TokenizedSequence':
         """See base class."""
-        tokenized_article = TokenizedArticle(self.token_ids[slice_index], self.token_type_ids[slice_index])
-        return TokenizedSequence.from_article(tokenized_article, self.max_seq_length, self.eos_token_id)
+        tokenized_article = TokenizedArticle(self.token_ids[slice_index],
+                                             self.token_type_ids[slice_index])
+        return TokenizedSequence.from_article(tokenized_article,
+                                              self.max_seq_length,
+                                              self.eos_token_id)

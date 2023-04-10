@@ -14,5 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from .data_prep import data_prep_main
-from .pipeline import pipeline_main
+from generative_data_prep.utils import PackingConfig
+
+
+def test_config_instantiation():
+    """Basic test to verify that every Packing Config choice can be instantiated using from_str."""
+    for choice in PackingConfig.get_choices():
+        assert choice == PackingConfig.from_str(str(choice))

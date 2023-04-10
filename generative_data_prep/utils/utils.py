@@ -20,7 +20,8 @@ from subprocess import PIPE, run
 
 from transformers import GPT2Tokenizer
 
-from .constants import BoundaryType, PackingStyleType
+from .arg_configs import PackingConfig
+from .constants import BoundaryType
 
 GPT2_KEY = 'gpt2'
 TOKENIZER_CLASSES = {GPT2_KEY: GPT2Tokenizer}
@@ -36,7 +37,10 @@ def data_prep_arg_builder(parser: argparse.ArgumentParser):
     Args:
         parser (argparse.ArgumentParser): parser to add arguments to
     """
-    parser.add_argument("--input_file_path", type=str, required=True, help="The input jsonl file path.")
+    parser.add_argument("--input_file_path",
+                        type=str,
+                        required=True,
+                        help="The input jsonl file path.")
     parser.add_argument(
         "--output_path",
         type=str,
@@ -44,9 +48,11 @@ def data_prep_arg_builder(parser: argparse.ArgumentParser):
         help=
         "The path to the output directory if using end to end data preparation, the path to output hdf5 file if running tokenization"
     )
-    parser.add_argument("--overwrite_output_path",
-                        action='store_true',
-                        help="If the file or files stored at the output path can be over-written")
+    parser.add_argument(
+        "--overwrite_output_path",
+        action='store_true',
+        help=
+        "If the file or files stored at the output path can be over-written")
     parser.add_argument(
         "--tokenizer_class",
         type=str,
@@ -72,11 +78,14 @@ def data_prep_arg_builder(parser: argparse.ArgumentParser):
         help=
         "The vocabulary file for the tokenizer. Should be a .json file for the tokenizer class specified by --tokenizer_class."
     )
-    parser.add_argument("--merges_file",
-                        type=str,
-                        default=None,
-                        required=False,
-                        help="The merges file to be used with the tokenizer class specified by --tokenizer_class.")
+    parser.add_argument(
+        "--merges_file",
+        type=str,
+        default=None,
+        required=False,
+        help=
+        "The merges file to be used with the tokenizer class specified by --tokenizer_class."
+    )
     parser.add_argument(
         "--max_seq_length",
         default=2048,
@@ -86,13 +95,13 @@ def data_prep_arg_builder(parser: argparse.ArgumentParser):
         "The max sequence length after tokenization. \n Sequence will be truncated or padded to this length before input into the model. Defaults to 512."
     )
     parser.add_argument(
-        "--input_packing_style",
-        type=str,
-        default=PackingStyleType.FULL.value,
-        choices=PackingStyleType.as_list(),
+        "--input_packing_config",
+        type=PackingConfig.from_str,
+        default=PackingConfig.get_default(),
+        choices=PackingConfig.get_choices(),
         required=False,
         help=
-        "If == 'full', pack inputs. If use 'single_overflow', enforce that each prompt-completion pair is in its own sequence and the sequence is padded with token to max_seq_length. If the number of tokens exceeds max_seq_length, it will overflow to the following sequence(s). If use 'single_avoid_overflow', same as 'single_overflow' except that data with tokens exceeding max_seq_length will be dropped."
+        "The first argument in the packing config defines the method of placing text into sequences, the second argument defines how to handle jsonls that do not fit within the max_seq_length. 'full': Defines the entire packing config, Completely fill sequences with tokens, as soon as sequences is full start packing into new sequence. Ignore article boundaries, they may be split across multiple sequences. 'greedy': Fit as many articles as possible into a sequence, make sure no article is split across multiple sequences. Fill the left over space in each sequence with padding. 'single': Each sequence contains only 1 article.  Fill the rest of the sequence with padding.  'drop': Drop the entire article if there are any tokens that overflow beyond the max sequence length.  'truncate_left':  Truncate the article from the left if there are any tokens that overflow beyond the max sequence length.  'truncate_right':  Truncate the article from the right if there are any tokens that overflow beyond the max sequence length."
     )
     parser.add_argument(
         "--packing_boundary",
@@ -117,17 +126,22 @@ def data_prep_arg_builder(parser: argparse.ArgumentParser):
         type=str,
         default=None,
         required=False,
-        help="Any non-standard special tokens in JSON format to add to tokenizer. e.g. \'{'sep_token': \"[SEP]\"}\'")
+        help=
+        "Any non-standard special tokens in JSON format to add to tokenizer. e.g. \'{'sep_token': \"[SEP]\"}\'"
+    )
     parser.add_argument("--prompt_keyword",
                         default="prompt",
                         type=str,
                         required=False,
                         help="keyword used in input json to specify prompt")
-    parser.add_argument("--completion_keyword",
-                        default="completion",
-                        type=str,
-                        required=False,
-                        help="keyword used in input json to specify completion, defaults to 'completion")
+    parser.add_argument(
+        "--completion_keyword",
+        default="completion",
+        type=str,
+        required=False,
+        help=
+        "keyword used in input json to specify completion, defaults to 'completion"
+    )
     parser.add_argument(
         "--disable_space_separator",
         action='store_true',
@@ -146,5 +160,9 @@ def execute_and_return_stdout(command):
     Returns:
         Piped Out object: Access text using .stout or .stderr attributes of output object
     """
-    result = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, shell=True)
+    result = run(command,
+                 stdout=PIPE,
+                 stderr=PIPE,
+                 universal_newlines=True,
+                 shell=True)
     return result
