@@ -26,9 +26,7 @@ from generative_data_prep.utils import BoundaryType, PackingConfig
 
 from .test_utils import check_balance, check_diff_hdf5, check_pipeline
 
-TOKENIZER = GPT2Tokenizer.from_pretrained(
-    os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                 'gpt2_tokenizer'))
+TOKENIZER = GPT2Tokenizer.from_pretrained('gpt2')
 
 INPUT_FILES = 'tests/e2e_test_files'
 
