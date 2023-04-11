@@ -153,18 +153,18 @@ Pretraining on unstructured data enables large languages models to learn general
 #### Example data
 For pretraining you can have your data in two formats.
 
-> [text separated by newlines.](tests/examples/pretraining/pretraining_data.txt)
+> [text separated by newlines.](tests/examples/pretraining/example_pretraining_data.txt)
 
-> [jsonlines with empty prompts and text in the completions.](tests/examples/pretraining/pretraining_data.jsonl)
+> [jsonlines with empty prompts and text in the completions.](tests/examples/pretraining/example_pretraining_data.jsonl)
 
 We recommend to use jsonlines with empty prompts and all the text in the completion, this is so that newlines in the text do not separate semantically related articles.
 #### Example command
 
 ```
-python3 -m generative_data_prep pipeline --input_file_path=./tests/examples/pretraining/pretraining_data.jsonl --output_path=./tests/examples/pretraining/pipeline_pretraining --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_config=full --shuffle=on_RAM
+python3 -m generative_data_prep pipeline --input_file_path=./tests/examples/pretraining/example_pretraining_data.jsonl --output_path=./tests/examples/pretraining/pipelined_pretraining --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_config=full
 ```
 
-> [View decoded output](tests/examples/pretraining/decoded_data_prep_pretraining.txt)
+> [View decoded output](tests/examples/pretraining/decoded_data_prepped_pretraining.txt)
 
 
 ### Generative tuning
@@ -180,10 +180,10 @@ When training on this kind of data using SambaStudio, set `prompt_loss_weight=0.
 #### Example command
 
 ```python
-python3 -m generative_data_prep pipeline --input_file_path=./tests/examples/generative_tuning/example_generative_tuning_data.jsonl --output_path=./tests/examples/generative_tuning/pipeline_generative_tuning --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_config=single::drop --shuffle=on_RAM
+python3 -m generative_data_prep pipeline --input_file_path=./tests/examples/generative_tuning/example_generative_tuning_data.jsonl --output_path=./tests/examples/generative_tuning/pipelined_generative_tuning --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_config=single::drop
 ```
 
-> [View decoded output](tests/examples/generative_tuning/decoded_data_prep_generative_tuning.txt)
+> [View decoded output](tests/examples/generative_tuning/decoded_data_prepped_generative_tuning.txt)
 
 ### Dialogue
 Dialogue data often involves multiple turns in a conversation between a user and an agent. In order to train on this data, the entire conversation needs to be in the same sequence of tokens and the model should only learn to generate the agents responses based on the users inputs. To prepare data like this create a list of prompt completion pairs, and if you train with `packing_boundary=jsonl` and `input_packing_config=single::truncate_right` then these conversations are guaranteed to be in the provided order in the same sequence. Additionally if you include the `prompt_loss_weight=0.0` option while training on SambaStudio, only the completions will be learned.
@@ -194,10 +194,10 @@ Dialogue data often involves multiple turns in a conversation between a user and
 #### Example command
 
 ```python
-python3 -m generative_data_prep pipeline --input_file_path=./tests/examples/dialogue/example_dialogue_data.jsonl --output_path=./tests/examples/dialogue/pipeline_dialogue --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_config=single::truncate_right --shuffle=on_RAM
+python3 -m generative_data_prep pipeline --input_file_path=./tests/examples/dialogue/example_dialogue_data.jsonl --output_path=./tests/examples/dialogue/pipelined_dialogue --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_config=single::truncate_right
 ```
 
-> [View decoded output](tests/examples/dialogue/decoded_data_prep_dialogue.txt)
+> [View decoded output](tests/examples/dialogue/decoded_data_prepped_dialogue.txt)
 
 ### Meta in context learning
 [Meta In Context Learning](https://arxiv.org/pdf/2110.15943.pdf) improves the few shot performance of a model by including training data formatted in a few shot style. This infrastructure allows you to prepare data in a variant of meta in context learning SambaNova uses called "All Shot" learning. In order to prepare data in this format prepare lists of prompt completion pairs, where every list contains prompt completion pairs that are completing the same instruction/task. Then prepare the data with the `input_packing_config=greedy::drop`, `packing_boundary=prompt_completion_pair` and `attention_boundary=jsonl`. This ensures that every sequence contains prompt completion pairs following the same "instruction", and that when learning a completion the model is attending to all the other prompt completion pairs before it.
@@ -208,7 +208,7 @@ python3 -m generative_data_prep pipeline --input_file_path=./tests/examples/dial
 #### Example command
 
 ```python
-python3 -m generative_data_prep pipeline --input_file_path=./tests/examples/metaICL/example_metaICL_data.jsonl --output_path=./tests/examples/metaICL/pipeline_metaICL --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_config=greedy::drop --packing_boundary=prompt_completion_pair --attention_boundary=jsonl --shuffle=on_RAM
+python3 -m generative_data_prep pipeline --input_file_path=./tests/examples/metaICL/example_metaICL_data.jsonl --output_path=./tests/examples/metaICL/pipelined_metaICL --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_config=greedy::drop --packing_boundary=prompt_completion_pair --attention_boundary=jsonl
 ```
 
-> [View decoded output](tests/examples/metaICL/decoded_data_prep_metaICL.txt)
+> [View decoded output](tests/examples/metaICL/decoded_data_prepped_metaICL.txt)

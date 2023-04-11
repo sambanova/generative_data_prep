@@ -85,11 +85,45 @@ def test_data_prep(tokenizer: PreTrainedTokenizerBase, test_name: str,
         check_diff_hdf5(output_file, gold_path)
 
 
+"""
+('pipeline_test', False, 'prompt', 'completion', 'False', True, 1024,
+      PackingConfig.get_default(), BoundaryType.JSONL, BoundaryType.JSONL,
+      None, None, None, 0.2, 0.1),
+('pretraining', False, 'prompt', 'completion', 'False', False, 1024,
+      PackingConfig.get_default(), BoundaryType.JSONL, BoundaryType.JSONL,
+      32, 0, 0, None, None),
+('generative_tuning', False, 'prompt', 'completion', 'False', False, 1024,
+      PackingConfig.from_str('single::drop'), BoundaryType.JSONL, BoundaryType.JSONL,
+      32, 0, 0, None, None),
+('dialogue', False, 'prompt', 'completion', 'False', False, 1024,
+      PackingConfig.from_str('single::truncate_right'), BoundaryType.JSONL,
+      BoundaryType.JSONL, 32, 0, 0, None, None),
+('metaICL', False, 'prompt', 'completion', 'False', False, 1024,
+     PackingConfig.from_str('greedy::drop'),
+      BoundaryType.PROMPT_COMPLETION_PAIR, BoundaryType.JSONL, 32, 0, 0, None, None)
+"""
+
+
 @pytest.mark.parametrize(
     'test_name,disable_space_separator,prompt_keyword,completion_keyword,shuffle,do_not_balance_hdf5,\
         max_seq_length,input_packing_config,packing_boundary,attention_boundary,\
             num_training_splits,num_dev_splits,num_test_splits,dev_ratio,test_ratio',
-    [])
+    [('pipeline_test', False, 'prompt', 'completion', 'False', True, 1024,
+      PackingConfig.get_default(), BoundaryType.JSONL, BoundaryType.JSONL,
+      None, None, None, 0.2, 0.1),
+     ('pretraining', False, 'prompt', 'completion', 'False', False, 1024,
+      PackingConfig.get_default(), BoundaryType.JSONL, BoundaryType.JSONL, 32,
+      0, 0, None, None),
+     ('generative_tuning', False, 'prompt', 'completion', 'False', False, 1024,
+      PackingConfig.from_str('single::drop'), BoundaryType.JSONL,
+      BoundaryType.JSONL, 32, 0, 0, None, None),
+     ('dialogue', False, 'prompt', 'completion', 'False', False, 1024,
+      PackingConfig.from_str('single::truncate_right'), BoundaryType.JSONL,
+      BoundaryType.JSONL, 32, 0, 0, None, None),
+     ('metaICL', False, 'prompt', 'completion', 'False', False, 1024,
+      PackingConfig.from_str('greedy::drop'),
+      BoundaryType.PROMPT_COMPLETION_PAIR, BoundaryType.JSONL, 32, 0, 0, None,
+      None)])
 def test_pipeline(test_name: str, disable_space_separator: bool,
                   prompt_keyword: str, completion_keyword: str, shuffle: str,
                   do_not_balance_hdf5: bool, max_seq_length: int,
@@ -123,7 +157,6 @@ def test_pipeline(test_name: str, disable_space_separator: bool,
                       num_test_splits=num_test_splits,
                       dev_ratio=dev_ratio,
                       test_ratio=test_ratio)
-
         check_pipeline(output_dir, gold_path)
 
         if not do_not_balance_hdf5:
