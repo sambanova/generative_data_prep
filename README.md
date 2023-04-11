@@ -180,7 +180,7 @@ When training on this kind of data using SambaStudio, set `prompt_loss_weight=0.
 #### Example command
 
 ```python
-python3 -m generative_data_prep pipeline --input_file_path=./examples/generative_tuning/example_generative_tuning_data.jsonl --output_path=./examples/generative_tuning/pipeline_generative_tuning --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_config=single::drop_overflow --shuffle=on_RAM
+python3 -m generative_data_prep pipeline --input_file_path=./examples/generative_tuning/example_generative_tuning_data.jsonl --output_path=./examples/generative_tuning/pipeline_generative_tuning --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_config=single::drop --shuffle=on_RAM
 ```
 
 > [View decoded output](examples/generative_tuning/decoded_data_prep_generative_tuning.txt)
