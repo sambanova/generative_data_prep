@@ -47,3 +47,8 @@ class TokenTypeIds(int, BaseEnum):
     COMPLETION = 1
     PADDING = 2
     SEP = 3
+
+
+class FileExtension(str, BaseEnum):
+    TXT = '.txt'
+    JSONL = '.jsonl'

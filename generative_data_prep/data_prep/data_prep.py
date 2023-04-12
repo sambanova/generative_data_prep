@@ -26,7 +26,8 @@ from transformers import PreTrainedTokenizerBase
 
 from generative_data_prep.data_buffers import Hdf5FileBuffer
 from generative_data_prep.processors import ArticleTokenizer
-from generative_data_prep.utils import BoundaryType, PackingConfig
+from generative_data_prep.utils import (BoundaryType, FileExtension,
+                                        PackingConfig)
 
 
 def data_prep_main(silent: bool, tokenizer: PreTrainedTokenizerBase,
@@ -54,7 +55,8 @@ def data_prep_main(silent: bool, tokenizer: PreTrainedTokenizerBase,
     if silent:
         sys.stdout = open(os.devnull, 'w')
 
-    article_tokenizer = ArticleTokenizer(tokenizer, max_seq_length,
+    file_ext = FileExtension(os.path.splitext(input_file)[1])
+    article_tokenizer = ArticleTokenizer(tokenizer, max_seq_length, file_ext,
                                          input_packing_config,
                                          packing_boundary, attention_boundary,
                                          disable_space_separator,

@@ -60,15 +60,16 @@ def check_RAM(input_file_size_in_bytes: int):
     assert shuffle_on_RAM, err_msg
 
 
-def rename_files(split_dir: str, train_count: int, dev_count: int,
-                 test_count: int, num_splits: int, test_dir: str,
-                 overwrite_output_path: bool) -> List[str]:
+def rename_files(input_file_path: str, split_dir: str, train_count: int,
+                 dev_count: int, test_count: int, num_splits: int,
+                 test_dir: str, overwrite_output_path: bool) -> List[str]:
     """Take all the files in [split_dir] and renames them.
 
     Rename [train_count] of them to have train in the name, [dev_count] of them to have de in the name
     and places [test_count] of them into the test_dir
 
     Args:
+        input_file_path: path to the input file
         split_dir: input directory that contains split files
         train_count: number of files to rename with train
         dev_count: number of files to rename with dev
@@ -77,16 +78,17 @@ def rename_files(split_dir: str, train_count: int, dev_count: int,
         num_splits: number of splits that are in [split_dir]
         overwrite_output_path: If we can overwrite files
     """
+    file_ext = os.path.splitext(input_file_path)[1]
     # rename the files to include 'train' and 'test'
     files_to_tokenize = []
     num_digits = len(str(num_splits))
     for i in range(num_splits):
         if i < train_count:
-            new_name = f'train_{i+1}_of_{train_count}.jsonl'
+            new_name = f'train_{i+1}_of_{train_count}{file_ext}'
         elif i < train_count + test_count:
-            new_name = f'test_{i-train_count+1}_of_{test_count}.jsonl'
+            new_name = f'test_{i-train_count+1}_of_{test_count}{file_ext}'
         else:
-            new_name = f'dev_{i-train_count-test_count+1}_of_{dev_count}.jsonl'
+            new_name = f'dev_{i-train_count-test_count+1}_of_{dev_count}{file_ext}'
 
         new_file_path = os.path.join(split_dir, new_name)
 
@@ -212,7 +214,7 @@ def multiprocess_data_prep(
     sub_output_file_paths = list(
         map(
             lambda file_name: os.path.join(
-                hdf5_dir, file_name.replace('.jsonl', '.hdf5')),
+                hdf5_dir, f'{os.path.splitext(file_name)[0]}.hdf5'),
             files_to_tokenize))
     train_hdf5_files = list(
         filter(lambda file_name: 'train' in file_name, sub_output_file_paths))
@@ -317,7 +319,8 @@ def pipeline_main(
         check_RAM(input_file_size_in_bytes)
         print(SEP_STR)
         print('shuffling input file, please be patient')
-        shuffle_file_path = os.path.join(output_dir, "tmp_shuf.jsonl")
+        file_ext = os.path.splitext(input_file_path)[1]
+        shuffle_file_path = os.path.join(output_dir, f"tmp_shuf{file_ext}")
         shuffle_command = f'shuf {input_file_path} > {shuffle_file_path}'
         try:
             out = execute_and_return_stdout(shuffle_command)
@@ -372,9 +375,9 @@ def pipeline_main(
         split_file_linux(num_splits, input_file_path, split_dir)
 
     # rename files to include the corresponding names of 'test', 'dev' and 'train'
-    files_to_tokenize = rename_files(split_dir, train_count, dev_count,
-                                     test_count, num_splits, test_dir,
-                                     overwrite_output_path)
+    files_to_tokenize = rename_files(input_file_path, split_dir, train_count,
+                                     dev_count, test_count, num_splits,
+                                     test_dir, overwrite_output_path)
 
     train_hdf5_files, dev_hdf5_files = multiprocess_data_prep(
         files_to_tokenize, split_dir, hdf5_dir, max_seq_length,
