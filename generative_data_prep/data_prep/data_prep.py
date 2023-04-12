@@ -55,7 +55,7 @@ def data_prep_main(silent: bool, tokenizer: PreTrainedTokenizerBase,
     if silent:
         sys.stdout = open(os.devnull, 'w')
 
-    file_ext = FileExtension.from_value(os.path.splitext(input_file)[1])
+    file_ext = FileExtension(os.path.splitext(input_file)[1])
     article_tokenizer = ArticleTokenizer(tokenizer, max_seq_length, file_ext,
                                          input_packing_config,
                                          packing_boundary, attention_boundary,
