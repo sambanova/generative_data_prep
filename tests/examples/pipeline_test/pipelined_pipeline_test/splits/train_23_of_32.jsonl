@@ -1,0 +1,2 @@
+{"prompt": "TEXT: On 21 August 2013, the WeLiveSecurity blog, published by the ESET security company, reported that since version 4.1.1.15, Orbit Downloader includes a botnet-like module which performs DDoS attacks without the user's knowledge or permission. QUERY: The entity type of 'Orbit Downloader' is 'street'. 'True' or 'False'?", "completion": " False"}
+{"prompt": "TEXT: You are hot. QUERY: Pick the right part of speech for 'hot' in the context from the following: 'adjective', 'adverb', 'noun', 'verb'.", "completion": " adjective"}

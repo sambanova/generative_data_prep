@@ -14,17 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import h5py
-import numpy as np
 import os
-import torch
-
 from filecmp import cmpfiles
 from glob import glob
+
+import h5py
+import numpy as np
+import torch
 from torch.utils.data import Dataset
 
 
 class generative_dataset(Dataset):
+
     def __init__(self, input_file: str):
         self.input_file = input_file
         f = h5py.File(input_file, "r")
@@ -37,7 +38,10 @@ class generative_dataset(Dataset):
         return len(self.inputs[0])
 
     def __getitem__(self, index: int):
-        [input_ids, token_type_ids] = [torch.from_numpy(input[index].astype(np.int32)) for input in self.inputs]
+        [input_ids, token_type_ids] = [
+            torch.from_numpy(input[index].astype(np.int32))
+            for input in self.inputs
+        ]
         return [input_ids.long(), token_type_ids.long()]
 
 
@@ -54,20 +58,29 @@ def check_diff_hdf5(file_1: str, file_2: str):
             t1 = x1[j]
             t2 = x2[j]
             assert t1.shape == t2.shape, f'Mismatched example shape at index {j}, elt {i}!'
-            assert torch.sum(t1 - t2).item() == 0, f'Mismatched IDs at index {j}, elt {i}!'
+            assert torch.sum(
+                t1 - t2).item() == 0, f'Mismatched IDs at index {j}, elt {i}!'
 
 
 def check_pipeline(dir_1: str, dir_2: str):
-    assert os.listdir(dir_1).sort() == os.listdir(dir_2).sort() == ['hdf5', 'test_files', 'splits', 'logs'].sort()
+    assert os.listdir(dir_1).sort() == os.listdir(dir_2).sort() == [
+        'hdf5', 'test_files', 'splits', 'logs'
+    ].sort()
 
     jsonl_path_dir_1 = os.path.join(dir_1, 'splits')
     jsonl_path_dir_2 = os.path.join(dir_2, 'splits')
-    assert cmpfiles(jsonl_path_dir_1, jsonl_path_dir_2, os.listdir(jsonl_path_dir_1), shallow=False)
+    assert cmpfiles(jsonl_path_dir_1,
+                    jsonl_path_dir_2,
+                    os.listdir(jsonl_path_dir_1),
+                    shallow=False)
 
     test_path_dir1 = os.path.join(dir_1, 'test_files')
     test_path_dir2 = os.path.join(dir_2, 'test_files')
     if os.path.exists(test_path_dir1) or os.path.exists(test_path_dir1):
-        assert cmpfiles(test_path_dir1, test_path_dir2, os.listdir(test_path_dir1), shallow=False)
+        assert cmpfiles(test_path_dir1,
+                        test_path_dir2,
+                        os.listdir(test_path_dir1),
+                        shallow=False)
 
     hdf5_path_dir1 = os.path.join(dir_1, 'hdf5')
     hdf5_path_dir2 = os.path.join(dir_2, 'hdf5')
@@ -82,9 +95,17 @@ def check_pipeline(dir_1: str, dir_2: str):
         if '.hdf5' in hdf5_file:
             hdf5_files_2.append(hdf5_file)
 
-    assert len(hdf5_files_1) == len(hdf5_files_2)
+    hdf5_files_1.sort()
+    hdf5_files_2.sort()
+    assert hdf5_files_1 == hdf5_files_2
 
-    assert cmpfiles(hdf5_path_dir1, hdf5_path_dir2, hdf5_files_1, shallow=False)
+    hdf5_files_1 = list(
+        map(lambda x: os.path.join(hdf5_path_dir1, x), hdf5_files_1))
+    hdf5_files_2 = list(
+        map(lambda x: os.path.join(hdf5_path_dir2, x), hdf5_files_2))
+
+    for hdf5_file_1, hdf5_file_2 in zip(hdf5_files_1, hdf5_files_2):
+        check_diff_hdf5(hdf5_file_1, hdf5_file_2)
 
 
 def check_balance(hdf5_dir: str, split: str = ''):
