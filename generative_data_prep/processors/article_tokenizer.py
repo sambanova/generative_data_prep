@@ -42,6 +42,7 @@ class ArticleTokenizer:
     def __init__(self,
                  tokenizer: PreTrainedTokenizerBase,
                  max_seq_length: int,
+                 file_ext: str,
                  packing_config: PackingConfig = DEFAULT_PACKING_CONFIG,
                  packing_boundary: BoundaryType = BoundaryType.JSONL,
                  attention_boundary: BoundaryType = BoundaryType.JSONL,
@@ -54,6 +55,7 @@ class ArticleTokenizer:
             tokenizer: Huggingface tokenizer that inherits from PreTrainedTokenizerBase and contains an
                 encode function.
             max_seq_length: Maximum sequence length of model.
+            file_ext: The file extension of input, whether to load .jsonl of .txt lines
             packing_config: How to pack tokens into sequences. Refer to SequencePacker class.
                 Defaults to PackingStyleType.FULL.
             packing_boundary: Defines whether entire jsonl or prompt completion pair should be treated as
@@ -74,7 +76,7 @@ class ArticleTokenizer:
             ... ]
             >>> from transformers import GPT2Tokenizer
             >>> tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
-            >>> article_tokenizer = ArticleTokenizer(tokenizer, 3)
+            >>> article_tokenizer = ArticleTokenizer(tokenizer, 3, '.jsonl')
             >>> sequences = []
             >>> for text in input_text:
             ...     sequences += article_tokenizer(text)
@@ -86,6 +88,7 @@ class ArticleTokenizer:
             [(33847, <TokenTypeIds.COMPLETION: 1>) (50256, <TokenTypeIds.SEP: 3>) (50256, <TokenTypeIds.PADDING: 2>)]
         """
         self.tokenizer = tokenizer
+        self.file_ext = file_ext
         self.packing_boundary = packing_boundary
         self.attention_boundary = attention_boundary
         self.disable_space_separator = disable_space_separator
@@ -116,13 +119,16 @@ class ArticleTokenizer:
             return self.packer(article)
 
         tokenized_articles = []
-        try:
+        if self.file_ext == '.jsonl':
             # Load from json
             loaded_jsonl = json.loads(article)
             tokenized_articles += self.process_jsonl(loaded_jsonl)
-        except json.JSONDecodeError:
+        elif self.file_ext == '.txt':
             # Load from txt
             tokenized_articles += self.process_text(article)
+        else:
+            err_msg = f"Input file extension {self.file_ext} is invalid, must be .jsonl or .txt"
+            raise ValueError(err_msg)
 
         tokenized_sequences = self.packer(tokenized_articles)
 

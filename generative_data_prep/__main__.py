@@ -253,6 +253,9 @@ def get_output_dir(cmd, output_path, overwrite_output_path):
 
 if __name__ == '__main__':
     args = get_args()
+    err_msg = f'The input file is not a jsonl or txt file {args.input_file_path}'
+    assert os.path.splitext(args.input_file_path)[1] in ['.jsonl',
+                                                         '.txt'], err_msg
     verify_input_file(args.input_file_path)
     output_dir = get_output_dir(args.cmd, args.output_path,
                                 args.overwrite_output_path)
