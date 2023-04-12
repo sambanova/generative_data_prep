@@ -33,8 +33,9 @@ EXAMPLE_PATH = 'tests/examples'
 
 def get_input_path(test_name: str) -> str:
     """Create a absolute path to example input."""
+    ext = '.txt' if 'txt' in test_name else '.jsonl'
     return os.path.join(Path.cwd(), EXAMPLE_PATH, test_name,
-                        f'example_{test_name}_data.jsonl')
+                        f'example_{test_name}_data{ext}')
 
 
 def gold_data_prep_path(test_name: str) -> str:
@@ -52,6 +53,8 @@ def gold_pipeline_path(test_name: str) -> str:
 @pytest.mark.parametrize(
     'test_name,tokenizer,max_seq_length,input_packing_config,packing_boundary,attention_boundary',
     [('data_prep_test', TOKENIZER, 1024, PackingConfig.get_default(),
+      BoundaryType.JSONL, BoundaryType.JSONL),
+     ('pretraining_txt', TOKENIZER, 1024, PackingConfig.get_default(),
       BoundaryType.JSONL, BoundaryType.JSONL),
      ('pretraining', TOKENIZER, 1024, PackingConfig.get_default(),
       BoundaryType.JSONL, BoundaryType.JSONL),
@@ -111,6 +114,9 @@ def test_data_prep(tokenizer: PreTrainedTokenizerBase, test_name: str,
     [('pipeline_test', False, 'prompt', 'completion', 'False', True, 1024,
       PackingConfig.get_default(), BoundaryType.JSONL, BoundaryType.JSONL,
       None, None, None, 0.2, 0.1),
+     ('pretraining_txt', False, 'prompt', 'completion', 'False', False, 1024,
+      PackingConfig.get_default(), BoundaryType.JSONL, BoundaryType.JSONL, 32,
+      0, 0, None, None),
      ('pretraining', False, 'prompt', 'completion', 'False', False, 1024,
       PackingConfig.get_default(), BoundaryType.JSONL, BoundaryType.JSONL, 32,
       0, 0, None, None),

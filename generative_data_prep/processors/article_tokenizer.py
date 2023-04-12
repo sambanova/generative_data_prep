@@ -28,8 +28,8 @@ from transformers import PreTrainedTokenizerBase, logging
 
 from generative_data_prep.tokenized_line import (TokenizedArticle,
                                                  TokenizedSequence)
-from generative_data_prep.utils import (BoundaryType, PackingConfig,
-                                        TokenTypeIds)
+from generative_data_prep.utils import (BoundaryType, FileExtension,
+                                        PackingConfig, TokenTypeIds)
 
 from .sequence_packer import SequencePacker
 
@@ -42,7 +42,7 @@ class ArticleTokenizer:
     def __init__(self,
                  tokenizer: PreTrainedTokenizerBase,
                  max_seq_length: int,
-                 file_ext: str,
+                 file_ext: FileExtension,
                  packing_config: PackingConfig = DEFAULT_PACKING_CONFIG,
                  packing_boundary: BoundaryType = BoundaryType.JSONL,
                  attention_boundary: BoundaryType = BoundaryType.JSONL,
@@ -119,15 +119,16 @@ class ArticleTokenizer:
             return self.packer(article)
 
         tokenized_articles = []
-        if self.file_ext == '.jsonl':
+        if self.file_ext == FileExtension.JSONL:
             # Load from json
             loaded_jsonl = json.loads(article)
             tokenized_articles += self.process_jsonl(loaded_jsonl)
-        elif self.file_ext == '.txt':
+        elif self.file_ext == FileExtension.TXT:
             # Load from txt
             tokenized_articles += self.process_text(article)
         else:
-            err_msg = f"Input file extension {self.file_ext} is invalid, must be .jsonl or .txt"
+            err_msg = f"Input file extension {self.file_ext} is invalid,"
+            err_msg += f" must be {FileExtension.JSONL} or {FileExtension.TXT}"
             raise ValueError(err_msg)
 
         tokenized_sequences = self.packer(tokenized_articles)

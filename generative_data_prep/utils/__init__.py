@@ -16,8 +16,8 @@ limitations under the License.
 
 from .arg_configs import PackingConfig
 from .balance_hdf5_files import balance_hdf5_files
-from .constants import (BoundaryType, OverflowType, PackingStyleType,
-                        TokenTypeIds)
+from .constants import (BoundaryType, FileExtension, OverflowType,
+                        PackingStyleType, TokenTypeIds)
 from .large_file_shuffle import large_file_shuffle
 from .path_verify import (verify_input_file, verify_output_dir,
                           verify_output_file)

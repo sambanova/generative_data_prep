@@ -24,6 +24,13 @@ class BaseEnum(Enum):
     def as_list(cls):
         return [member.value for member in cls]
 
+    @classmethod
+    def from_value(cls, val):
+        for member in cls:
+            if member.value == val:
+                return member
+        raise ValueError(f"Invalid value {val}, not in enum {cls.as_list()}")
+
 
 class BoundaryType(str, BaseEnum):
     PROMPT_COMPLETION_PAIR = 'prompt_completion_pair'
@@ -47,3 +54,8 @@ class TokenTypeIds(int, BaseEnum):
     COMPLETION = 1
     PADDING = 2
     SEP = 3
+
+
+class FileExtension(str, BaseEnum):
+    TXT = '.txt'
+    JSONL = '.jsonl'
