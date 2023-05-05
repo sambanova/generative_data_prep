@@ -177,8 +177,8 @@ def multiprocess_data_prep(
         max_seq_length: int, input_packing_config: PackingConfig,
         packing_boundary: BoundaryType, attention_boundary: BoundaryType,
         prompt_keyword: str, completion_keyword: str,
-        disable_space_separator: bool, tokenizer: PreTrainedTokenizerBase,
-        num_workers: int,
+        disable_space_separator: bool, keep_prompt_only_sequences: bool,
+        tokenizer: PreTrainedTokenizerBase, num_workers: int,
         input_file_size_in_gb: float) -> Tuple[List[str], List[str]]:
     """Tokenizes all the files in files_to_tokenize efficiently using multirpocessing library.
 
@@ -193,6 +193,7 @@ def multiprocess_data_prep(
         prompt_keyword: The keyword used to extract prompt from jsonl.
         completion_keyword: The keyword used to extract completion from jsonl.
         disable_space_separator: If true do not add space separators.
+        keep_prompt_only_sequences: If true does not drop prompt-only sequences.
         tokenizer: The tokenizer to use for tokenizing text.
         num_workers: Number of workers to use for multiprocessing
         input_file_size_in_gb: Size of the input file in gigabytes.
@@ -225,10 +226,10 @@ def multiprocess_data_prep(
     for input_file_path, output_file_path in zip(sub_input_file_paths,
                                                  sub_output_file_paths):
         data_prep_main_args_list.append(
-            (True, tokenizer, input_file_path, output_file_path,
+             (True, tokenizer, input_file_path, output_file_path,
              max_seq_length, input_packing_config, packing_boundary,
-             attention_boundary, disable_space_separator, prompt_keyword,
-             completion_keyword))
+             attention_boundary, disable_space_separator, keep_prompt_only_sequences,
+             prompt_keyword, completion_keyword))
 
     with Pool(num_workers) as p:
         _ = p.starmap(data_prep_main, data_prep_main_args_list)
@@ -238,7 +239,8 @@ def multiprocess_data_prep(
 
 def pipeline_main(
         input_file_path: str, tokenizer: PreTrainedTokenizerBase,
-        output_dir: str, disable_space_separator: bool, prompt_keyword: str,
+        output_dir: str, disable_space_separator: bool,
+        keep_prompt_only_sequences: bool, prompt_keyword: str,
         completion_keyword: str, shuffle: str, overwrite_output_path: bool,
         num_workers: int, do_not_balance_hdf5: bool, max_seq_length: int,
         input_packing_config: PackingConfig, packing_boundary: BoundaryType,
@@ -252,6 +254,7 @@ def pipeline_main(
         tokenizer: Tokenizer used to tokenize text, with encode function.
         output_dir: Directory to output all the tokenized hdf5 and logs.
         disable_space_separator: If true do not add spaces between prompt and completion.
+        keep_prompt_only_sequences: If true does not drop sequences that only have prompt tokens.
         prompt_keyword: The keyword used to extract prompt from jsonl.
         completion_keyword: The keyword used to extract completion from jsonl.
         shuffle: What kind of shuffling to perform, from [on_RAM, large_file, False]
@@ -382,8 +385,8 @@ def pipeline_main(
     train_hdf5_files, dev_hdf5_files = multiprocess_data_prep(
         files_to_tokenize, split_dir, hdf5_dir, max_seq_length,
         input_packing_config, packing_boundary, attention_boundary,
-        prompt_keyword, completion_keyword, disable_space_separator, tokenizer,
-        num_workers, input_file_size_in_gb)
+        prompt_keyword, completion_keyword, disable_space_separator, keep_prompt_only_sequences
+        tokenizer, num_workers, input_file_size_in_gb)
 
     print(
         f'Tokenization is complete, the outputs are in {hdf5_dir}, the held out test files are located at {test_dir}'

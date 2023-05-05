@@ -47,6 +47,7 @@ class ArticleTokenizer:
                  packing_boundary: BoundaryType = BoundaryType.JSONL,
                  attention_boundary: BoundaryType = BoundaryType.JSONL,
                  disable_space_separator: bool = False,
+                 keep_prompt_only_sequences: bool = False,
                  prompt_keyword: str = 'prompt',
                  completion_keyword: str = 'completion'):
         """Create Article Tokenizer.
@@ -62,6 +63,8 @@ class ArticleTokenizer:
                 one unit when running packing.Defaults to BoundaryType.JSONL.
             attention_boundary: How to define the boundary when attending to other tokens
             disable_space_separator: If true, do NOT add spaces between prompt completion pairs.
+                Defaults to False.
+            keep_prompt_only_sequences: If true, do NOT remove sequences that only contain PROMPT/PADDING/SEP token type ids
                 Defaults to False.
             prompt_keyword: Keyword to index into loaded json dictionaries to get the prompting text.
                 Defaults to 'prompt'.
@@ -92,12 +95,15 @@ class ArticleTokenizer:
         self.packing_boundary = packing_boundary
         self.attention_boundary = attention_boundary
         self.disable_space_separator = disable_space_separator
+        self.keep_prompt_only_sequences = keep_prompt_only_sequences
         self.prompt_keyword = prompt_keyword
         self.completion_keyword = completion_keyword
         self.eos_token_id = tokenizer.eos_token_id
         self.packer = SequencePacker(max_seq_length, self.eos_token_id,
                                      packing_config)
         logging.set_verbosity_error()
+
+        self.logged_prompt_only_warn_msg = False
 
     def __call__(self, article: Optional[str]) -> List[TokenizedSequence]:
         """Tokenize and pack input text into tokenized sequence.
@@ -131,9 +137,36 @@ class ArticleTokenizer:
             err_msg += f" must be {FileExtension.JSONL} or {FileExtension.TXT}"
             raise ValueError(err_msg)
 
+        # Check if any article in tokenized_articles is all prompts
+        # Q: should we do this? or just check after packing?
+        if not self.keep_prompt_only_sequences:
+            tokenized_articles = self._remove_prompt_only_sequences(tokenized_articles)
+
         tokenized_sequences = self.packer(tokenized_articles)
 
+        # Check if any sequence in tokenized_sequences is all prompts
+        if not self.keep_prompt_only_sequences:
+            return self._remove_prompt_only_sequences(tokenized_sequences)
         return tokenized_sequences
+
+    def _remove_prompt_only_sequences(self, tokenized_lines: List[TokenizedLine]) -> List[TokenizedLine]:
+        """Takes a list of TokenizedLines, removes those that don't contain any COMPLETION TokenTypeIds.
+
+        Args:
+            tokenized_lines: List of TokenizedLines
+        Returns:
+            Original list with prompt-only sequences filtered out
+        
+        """
+        filtered_lines = []
+        for line in tokenized_lines:
+            if not any([token_type == TokenTypeIds.COMPLETION for token_type in line.token_type_ids()]):
+                if not self.logged_prompt_only_warn_msg:
+                    print('WARNING: --keep_prompt_only_sequences is not set and sequences with no COMPLETION TokenTypeIds will be thrown away. Will only print this warning once.')
+                    self.logged_prompt_only_warn_msg = True
+                continue
+            filtered_lines.append(line)
+        return filtered_lines
 
     def process_text(self, text_line: str) -> List[TokenizedArticle]:
         """Take an input string, tokenize it, and return the tokenized article representation.
