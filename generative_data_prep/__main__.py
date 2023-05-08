@@ -166,10 +166,10 @@ def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase,
     tokenizer.add_special_tokens(json.loads(dict_string))
 
 
-def get_tokenizer(
-        pretrained_tokenizer: Optional[str], tokenizer_class: Optional[str],
-        vocab_file: str, merges_file: str,
-        special_tokens_dict: Optional[str]) -> PreTrainedTokenizerBase:
+def get_tokenizer(pretrained_tokenizer: Optional[str],
+                  tokenizer_class: Optional[str], vocab_file: str,
+                  merges_file: str, special_tokens_dict: Optional[str]
+                  ) -> PreTrainedTokenizerBase:
     """Create a tokenizer based on input arguments.
 
     Args:
@@ -265,7 +265,7 @@ if __name__ == '__main__':
 
     if args.cmd == 'pipeline':
         pipeline_main(args.input_file_path, tokenizer, output_dir,
-                      args.disable_space_separator, 
+                      args.disable_space_separator,
                       args.keep_prompt_only_sequences, args.prompt_keyword,
                       args.completion_keyword, args.shuffle,
                       args.overwrite_output_path, args.num_workers,
@@ -279,5 +279,5 @@ if __name__ == '__main__':
                        args.output_path, args.max_seq_length,
                        args.input_packing_config, args.packing_boundary,
                        args.attention_boundary, args.disable_space_separator,
-                       args.keep_prompt_only_sequences,
-                       args.prompt_keyword, args.completion_keyword)
+                       args.keep_prompt_only_sequences, args.prompt_keyword,
+                       args.completion_keyword)

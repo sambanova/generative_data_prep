@@ -35,9 +35,8 @@ def data_prep_main(silent: bool, tokenizer: PreTrainedTokenizerBase,
                    input_packing_config: PackingConfig,
                    packing_boundary: BoundaryType,
                    attention_boundary: BoundaryType,
-                   disable_space_separator: bool, 
-                   keep_prompt_only_sequences: bool,
-                   prompt_keyword: str,
+                   disable_space_separator: bool,
+                   keep_prompt_only_sequences: bool, prompt_keyword: str,
                    completion_keyword: str):
     """Tokenize input_file into packed sequences stored in output_file.
 
@@ -52,6 +51,7 @@ def data_prep_main(silent: bool, tokenizer: PreTrainedTokenizerBase,
         attention_boundary: How to define the boundary when attending to other tokens.
         disable_space_separator: Disable adding space separator if true.
         keep_prompt_only_sequences: Keep sequences that only have prompt tokens if true.
+        prompt_keyword: Prompt keyword to use as key in jsonl.
         completion_keyword: Completion keyword to use as key in jsonl.
         disable_space_separator: Disable adding space separator if true.
     """

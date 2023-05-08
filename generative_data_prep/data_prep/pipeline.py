@@ -226,10 +226,10 @@ def multiprocess_data_prep(
     for input_file_path, output_file_path in zip(sub_input_file_paths,
                                                  sub_output_file_paths):
         data_prep_main_args_list.append(
-             (True, tokenizer, input_file_path, output_file_path,
+            (True, tokenizer, input_file_path, output_file_path,
              max_seq_length, input_packing_config, packing_boundary,
-             attention_boundary, disable_space_separator, keep_prompt_only_sequences,
-             prompt_keyword, completion_keyword))
+             attention_boundary, disable_space_separator,
+             keep_prompt_only_sequences, prompt_keyword, completion_keyword))
 
     with Pool(num_workers) as p:
         _ = p.starmap(data_prep_main, data_prep_main_args_list)
@@ -385,8 +385,9 @@ def pipeline_main(
     train_hdf5_files, dev_hdf5_files = multiprocess_data_prep(
         files_to_tokenize, split_dir, hdf5_dir, max_seq_length,
         input_packing_config, packing_boundary, attention_boundary,
-        prompt_keyword, completion_keyword, disable_space_separator, keep_prompt_only_sequences
-        tokenizer, num_workers, input_file_size_in_gb)
+        prompt_keyword, completion_keyword, disable_space_separator,
+        keep_prompt_only_sequences, tokenizer, num_workers,
+        input_file_size_in_gb)
 
     print(
         f'Tokenization is complete, the outputs are in {hdf5_dir}, the held out test files are located at {test_dir}'
