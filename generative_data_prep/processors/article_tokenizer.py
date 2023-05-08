@@ -162,7 +162,8 @@ class ArticleTokenizer:
                         into sequences, some sequences contain no COMPLETION tokens, either due \
                         to the original data containing empty completions, or the prompt text \
                         being too long to pack. Sequences with no COMPLETION tokens will be \
-                        thrown away. Will only print this warning once.")
+                        thrown away. Will only print this warning once."
+                    )
                     self.logged_prompt_only_warn_msg = True
                 continue
             filtered_lines.append(line)
