@@ -288,10 +288,10 @@ def test_multiple__call__(
      (BoundaryType.JSONL, FileExtension.JSONL,
       '[{"prompt": "hi", "completion": ""}, \
       {"prompt": "hi bye", "completion": ""}, \
-      {"prompt": "hi bye test", "completion": ""}]',
-      [[1, 0, 1, 2, 0, 1], [2, 3, 0, 0, 0, 0]], [[
-          PROMPT, COMP, PROMPT, PROMPT, COMP, PROMPT
-      ], [PROMPT, PROMPT, SEP, PAD, PAD, PAD]], False),
+      {"prompt": "hi bye test", "completion": ""}]', [[
+          1, 0, 1, 2, 0, 1
+      ], [2, 3, 0, 0, 0, 0]], [[PROMPT, COMP, PROMPT, PROMPT, COMP, PROMPT],
+                               [PROMPT, PROMPT, SEP, PAD, PAD, PAD]], False),
      (BoundaryType.JSONL, FileExtension.JSONL,
       '[{"prompt": "hi hi hi hi hi hi hi hi", "completion": "bye"}]',
       [[1, 1, 2, 0, 0, 0]], [[PROMPT, PROMPT, COMP, SEP, PAD, PAD]], False),

@@ -152,7 +152,7 @@ def data_prep_arg_builder(parser: argparse.ArgumentParser):
         "--keep_prompt_only_sequences",
         action='store_true',
         help=
-        'FOR ADVANCED USERS: If you include this flag, packed sequences that contain no COMPLETION tokens will be dropped. The output jsonl file may contain such sequences depending on 1) if the input file contains prompt-only articles, and 2) if a sequence is too long, and packing results in a packed sequence only containing prompt tokens. This flag is off by default because training with prompt-only sequences with prompt_loss_weight=0.0 may lead to training instability.'
+        'FOR ADVANCED USERS: If you include this flag, packed sequences with only prompt tokens will not be dropped. Data with only prompt will be dropped by default because training with prompt-only sequences with prompt_loss_weight=0.0 may lead to errors. Data is dropped because of one of the following conditions: 1. the input file data prompt completion pairs contains only a prompt. 2. If the sequence is truncated such that only prompt tokens remain'
     )
 
 

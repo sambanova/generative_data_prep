@@ -136,16 +136,21 @@ class ArticleTokenizer:
             err_msg += f" must be {FileExtension.JSONL} or {FileExtension.TXT}"
             raise ValueError(err_msg)
 
+        # Check if any sequence in tokenized_articles contains empty completions
+        if not self.keep_prompt_only_sequences:
+            tokenized_articles = self._remove_prompt_only_sequences(
+                tokenized_articles)
+
         tokenized_sequences = self.packer(tokenized_articles)
 
-        # Check if any sequence in tokenized_sequences is all prompts
+        # Check if any sequence in tokenized_sequences contains no completion tokens
         if not self.keep_prompt_only_sequences:
             return self._remove_prompt_only_sequences(tokenized_sequences)
         return tokenized_sequences
 
     def _remove_prompt_only_sequences(self,
-                                      tokenized_lines: List[TokenizedSequence]
-                                      ) -> List[TokenizedSequence]:
+                                      tokenized_lines: Union[List[TokenizedArticle], List[TokenizedSequence]]
+                                      ) -> Union[List[TokenizedArticle], List[TokenizedSequence]]:
         """Takes a list of TokenizedLines, removes those that don't contain any COMPLETION TokenTypeIds.
 
         Args:
@@ -162,8 +167,7 @@ class ArticleTokenizer:
                         into sequences, some sequences contain no COMPLETION tokens, either due \
                         to the original data containing empty completions, or the prompt text \
                         being too long to pack. Sequences with no COMPLETION tokens will be \
-                        thrown away. Will only print this warning once."
-                    )
+                        thrown away. Will only print this warning once.")
                     self.logged_prompt_only_warn_msg = True
                 continue
             filtered_lines.append(line)
