@@ -315,8 +315,5 @@ def test_prompt_only_sequences(
     sequences += article_tokenizer_for_prompt_sequences(None)
     token_ids = [seq.token_ids for seq in sequences]
     token_tids = [seq.token_type_ids for seq in sequences]
-    print(len(sequences))
-    print(token_ids)
-    print(token_tids)
     assert token_ids == gold_token_ids
     assert token_tids == gold_token_type_ids
