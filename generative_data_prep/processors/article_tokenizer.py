@@ -102,7 +102,8 @@ class ArticleTokenizer:
                                      packing_config)
         logging.set_verbosity_error()
 
-        self.logged_prompt_only_warn_msg = False
+        self.logged_prompt_only_warn_msg_prepack = False
+        self.logged_prompt_only_warn_msg_postpack = False
 
     def __call__(self, article: Optional[str]) -> List[TokenizedSequence]:
         """Tokenize and pack input text into tokenized sequence.
@@ -136,11 +137,6 @@ class ArticleTokenizer:
             err_msg += f" must be {FileExtension.JSONL} or {FileExtension.TXT}"
             raise ValueError(err_msg)
 
-        # Check if any sequence in tokenized_articles contains empty completions
-        if not self.keep_prompt_only_sequences:
-            tokenized_articles = self._remove_prompt_only_sequences(
-                tokenized_articles)
-
         tokenized_sequences = self.packer(tokenized_articles)
 
         # Check if any sequence in tokenized_sequences contains no completion tokens
@@ -149,8 +145,8 @@ class ArticleTokenizer:
         return tokenized_sequences
 
     def _remove_prompt_only_sequences(self,
-                                      tokenized_lines: Union[List[TokenizedArticle], List[TokenizedSequence]]
-                                      ) -> Union[List[TokenizedArticle], List[TokenizedSequence]]:
+                                      tokenized_lines: List[TokenizedSequence]
+                                      ) -> List[TokenizedSequence]:
         """Takes a list of TokenizedLines, removes those that don't contain any COMPLETION TokenTypeIds.
 
         Args:
@@ -161,14 +157,14 @@ class ArticleTokenizer:
         filtered_lines = []
         for line in tokenized_lines:
             if TokenTypeIds.COMPLETION not in line.token_type_ids:
-                if not self.logged_prompt_only_warn_msg:
+                if not self.logged_prompt_only_warn_msg_postpack:
                     print(
                         "WARNING: --keep_prompt_only_sequences is not set and after packing data \
-                        into sequences, some sequences contain no COMPLETION tokens, either due \
-                        to the original data containing empty completions, or the prompt text \
-                        being too long to pack. Sequences with no COMPLETION tokens will be \
-                        thrown away. Will only print this warning once.")
-                    self.logged_prompt_only_warn_msg = True
+                        into sequences, some sequences contain no COMPLETION tokens, due to the \
+                        prompt text being too long to pack. Sequences with no COMPLETION tokens \
+                        will be thrown away. Will only print this warning once."
+                    )
+                    self.logged_prompt_only_warn_msg_postpack = True
                 continue
             filtered_lines.append(line)
         return filtered_lines
@@ -221,6 +217,16 @@ class ArticleTokenizer:
                 err_msg = f'Completion keyword required in every jsonl, {self.completion_keyword} not found'
                 raise json.JSONDecodeError(err_msg, str(jsonl), 0)
             completion = prompt_completion[self.completion_keyword]
+
+            if not completion and not self.keep_prompt_only_sequences:
+                if not self.logged_prompt_only_warn_msg_prepack:
+                    print(
+                        "WARNING: --keep_prompt_only_sequences is not set and some articles from \
+                        the original JSONL data contain no COMPLETION text. Sequences with no \
+                        COMPLETION text will be thrown away. Will only print this warning once."
+                    )
+                    self.logged_prompt_only_warn_msg_prepack = True
+                continue
 
             completion, prompt = self._add_space_separator(completion, prompt)
             new_token_ids, new_token_type_ids = self.tokenize(

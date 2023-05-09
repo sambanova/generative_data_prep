@@ -126,29 +126,29 @@ def test_add_space_separator(article_tokenizer: ArticleTokenizer, prompt: str,
 
 
 @pytest.mark.parametrize(
-    'packing_boundary,ext_type,jsonl,gold_token_ids,gold_ttids',
+    'packing_boundary,ext_type,jsonl,gold_token_ids,gold_ttids,keep_prompt_only_sequences',
     [
         (BoundaryType.JSONL, FileExtension.JSONL, {
             "prompt": "",
             "completion": ""
-        }, [], []),  # single jsonl empty
+        }, [], [], True),  # single jsonl empty
         (BoundaryType.JSONL, FileExtension.JSONL, {
             "prompt": "hi",
             "completion": ""
-        }, [[1, 0]], [[PROMPT, SEP]]),
+        }, [[1, 0]], [[PROMPT, SEP]], True),
         (BoundaryType.JSONL, FileExtension.JSONL, {
             "prompt": "",
             "completion": "bye"
-        }, [[2, 0]], [[COMP, SEP]]),
+        }, [[2, 0]], [[COMP, SEP]], True),
         (BoundaryType.JSONL, FileExtension.JSONL, {
             "prompt": "hi test",
             "completion": "bye test"
         }, [[1, 3, 2, 3, 0]], [[PROMPT, PROMPT, COMP, COMP, SEP]
-                               ]),  # single jsonl prompt and completion
+                               ], True),  # single jsonl prompt and completion
         (BoundaryType.JSONL, FileExtension.JSONL, [{
             "prompt": "hi",
             "completion": "bye"
-        }], [[1, 2, 0]], [[PROMPT, COMP, SEP]]),  # list length 1
+        }], [[1, 2, 0]], [[PROMPT, COMP, SEP]], True),  # list length 1
         (BoundaryType.JSONL, FileExtension.JSONL, [{
             "prompt": "hi",
             "completion": "bye"
@@ -156,43 +156,44 @@ def test_add_space_separator(article_tokenizer: ArticleTokenizer, prompt: str,
             "prompt": "test",
             "completion": "test"
         }], [[1, 2, 0, 3, 3, 0]], [[PROMPT, COMP, COMP, PROMPT, COMP, SEP]
-                                   ]),  # list length 2
+                                   ], True),  # list length 2
         (BoundaryType.PROMPT_COMPLETION_PAIR, FileExtension.JSONL, {
             "prompt": "",
             "completion": ""
-        }, [], []),
+        }, [], [], True),
         (BoundaryType.PROMPT_COMPLETION_PAIR, FileExtension.JSONL, {
             "prompt": "hi",
             "completion": ""
-        }, [[1, 0]], [[PROMPT, SEP]]),
+        }, [[1, 0]], [[PROMPT, SEP]], True),
         (BoundaryType.PROMPT_COMPLETION_PAIR, FileExtension.JSONL, {
             "prompt": "",
             "completion": "bye"
-        }, [[2, 0]], [[COMP, SEP]]),
+        }, [[2, 0]], [[COMP, SEP]], True),
         (BoundaryType.PROMPT_COMPLETION_PAIR, FileExtension.JSONL, {
             "prompt": "hi test",
             "completion": "bye test"
-        }, [[1, 3, 2, 3, 0]], [[PROMPT, PROMPT, COMP, COMP, SEP]]),
+        }, [[1, 3, 2, 3, 0]], [[PROMPT, PROMPT, COMP, COMP, SEP]], True),
         (BoundaryType.PROMPT_COMPLETION_PAIR, FileExtension.JSONL,
          [{
              "prompt": "hi",
              "completion": "bye"
-         }], [[1, 2, 0]], [[PROMPT, COMP, SEP]]),
-        (BoundaryType.PROMPT_COMPLETION_PAIR, FileExtension.JSONL, [
-            {
-                "prompt": "hi",
-                "completion": "bye"
-            }, {
-                "prompt": "test",
-                "completion": "test"
-            }
-        ], [[1, 2, 0], [3, 3, 0]], [[PROMPT, COMP, COMP], [PROMPT, COMP, SEP]])
+         }], [[1, 2, 0]], [[PROMPT, COMP, SEP]], True),
+        (BoundaryType.PROMPT_COMPLETION_PAIR, FileExtension.JSONL,
+         [{
+             "prompt": "hi",
+             "completion": "bye"
+         }, {
+             "prompt": "test",
+             "completion": "test"
+         }], [[1, 2, 0], [3, 3, 0]], [[PROMPT, COMP, COMP],
+                                      [PROMPT, COMP, SEP]], True)
     ])
-def test_process_jsonl(article_tokenizer: ArticleTokenizer,
-                       jsonl: Union[dict, List],
-                       gold_token_ids: List[List[int]],
-                       gold_ttids: List[List[int]]):
-    tokenized_articles = article_tokenizer.process_jsonl(jsonl)
+def test_process_jsonl(
+        article_tokenizer_for_prompt_sequences: ArticleTokenizer,
+        jsonl: Union[dict, List], gold_token_ids: List[List[int]],
+        gold_ttids: List[List[int]], keep_prompt_only_sequences: bool):
+    tokenized_articles = article_tokenizer_for_prompt_sequences.process_jsonl(
+        jsonl)
     for tokenized_article, gold_token, gold_ttid in zip(
             tokenized_articles, gold_token_ids, gold_ttids):
         assert tokenized_article.token_ids == gold_token
@@ -278,9 +279,7 @@ def test_multiple__call__(
 @pytest.mark.parametrize(
     'packing_boundary,ext_type,articles,gold_token_ids,gold_token_type_ids,keep_prompt_only_sequences',
     [(BoundaryType.JSONL, FileExtension.JSONL,
-      '[{"prompt": "hi bye test hi bye", "completion": ""}]', [[
-          1, 2, 3, 1, 2, 0
-      ]], [[PROMPT, PROMPT, PROMPT, PROMPT, PROMPT, SEP]], False),
+      '[{"prompt": "hi bye test hi bye", "completion": ""}]', [], [], False),
      (BoundaryType.JSONL, FileExtension.JSONL,
       '[{"prompt": "hi bye test hi bye", "completion": ""}]', [[
           1, 2, 3, 1, 2, 0
@@ -288,10 +287,7 @@ def test_multiple__call__(
      (BoundaryType.JSONL, FileExtension.JSONL,
       '[{"prompt": "hi", "completion": ""}, \
       {"prompt": "hi bye", "completion": ""}, \
-      {"prompt": "hi bye test", "completion": ""}]', [[
-          1, 0, 1, 2, 0, 1
-      ], [2, 3, 0, 0, 0, 0]], [[PROMPT, COMP, PROMPT, PROMPT, COMP, PROMPT],
-                               [PROMPT, PROMPT, SEP, PAD, PAD, PAD]], False),
+      {"prompt": "hi bye test", "completion": ""}]', [], [], False),
      (BoundaryType.JSONL, FileExtension.JSONL,
       '[{"prompt": "hi hi hi hi hi hi hi hi", "completion": "bye"}]',
       [[1, 1, 2, 0, 0, 0]], [[PROMPT, PROMPT, COMP, SEP, PAD, PAD]], False),
@@ -303,9 +299,9 @@ def test_multiple__call__(
      (BoundaryType.JSONL, FileExtension.JSONL,
       '[{"prompt": "hi bye test hi bye test", "completion": ""}, \
             {"prompt": "hi bye test hi", "completion": "test hi"}]', [[
-          0, 1, 2, 3, 1, 3
-      ], [1, 0, 0, 0, 0, 0]], [[COMP, PROMPT, PROMPT, PROMPT, PROMPT, COMP],
-                               [COMP, SEP, PAD, PAD, PAD, PAD]], False)])
+          1, 2, 3, 1, 3, 1
+      ], [0, 0, 0, 0, 0, 0]], [[PROMPT, PROMPT, PROMPT, PROMPT, COMP, COMP],
+                               [SEP, PAD, PAD, PAD, PAD, PAD]], False)])
 def test_prompt_only_sequences(
         article_tokenizer_for_prompt_sequences: ArticleTokenizer,
         articles: Optional[str], gold_token_ids: List[int],
