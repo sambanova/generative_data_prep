@@ -148,6 +148,12 @@ def data_prep_arg_builder(parser: argparse.ArgumentParser):
         help=
         'FOR ADVANCED USERS: If you include this flag, NO spaces will be appended to the completion. (If you do not add this flag then a space is added to every completion if it does not already have a space) This flag is dangerous because if you have input data like {"prompt": hello. "completion": how are you?}, when the prompt and completion are combined it will look like "hello.how are you?" which will mess up the tokenization.'
     )
+    parser.add_argument(
+        "--keep_prompt_only_sequences",
+        action='store_true',
+        help=
+        'FOR ADVANCED USERS: If you include this flag, packed sequences with only prompt tokens will not be dropped. Data with only prompt will be dropped by default because training with prompt-only sequences with prompt_loss_weight=0.0 may lead to errors. Data is dropped because of one of the following conditions: 1. the input file data prompt completion pairs contains only a prompt. 2. If the sequence is truncated such that only prompt tokens remain'
+    )
 
 
 def execute_and_return_stdout(command):

@@ -38,7 +38,6 @@ DEFAULT_PACKING_CONFIG = PackingConfig.get_default()
 
 class ArticleTokenizer:
     """Tokenize and pack text into sequences used for training NLP models."""
-
     def __init__(self,
                  tokenizer: PreTrainedTokenizerBase,
                  max_seq_length: int,
@@ -47,6 +46,7 @@ class ArticleTokenizer:
                  packing_boundary: BoundaryType = BoundaryType.JSONL,
                  attention_boundary: BoundaryType = BoundaryType.JSONL,
                  disable_space_separator: bool = False,
+                 keep_prompt_only_sequences: bool = False,
                  prompt_keyword: str = 'prompt',
                  completion_keyword: str = 'completion'):
         """Create Article Tokenizer.
@@ -63,6 +63,8 @@ class ArticleTokenizer:
             attention_boundary: How to define the boundary when attending to other tokens
             disable_space_separator: If true, do NOT add spaces between prompt completion pairs.
                 Defaults to False.
+            keep_prompt_only_sequences: If true, do NOT remove sequences that do not contain COMPLETION tokens
+                Defaults to False.
             prompt_keyword: Keyword to index into loaded json dictionaries to get the prompting text.
                 Defaults to 'prompt'.
             completion_keyword: Keyword to index into loaded json dictionaries to get the completion text.
@@ -70,7 +72,7 @@ class ArticleTokenizer:
 
         Example:
             >>> input_text = [
-            ...      '{"prompt": "hello how are", "completion": "you"}',
+            ...      '{"prompt": "hello how", "completion": "are you"}',
             ...      '{"prompt": "hi", "completion": "bye"}',
             ...      None
             ... ]
@@ -83,7 +85,7 @@ class ArticleTokenizer:
             ...
             >>> sequences_str = '\\n'.join(map(str, sequences))
             >>> print(sequences_str)
-            [(31373, <TokenTypeIds.PROMPT: 0>) (703, <TokenTypeIds.PROMPT: 0>) (389, <TokenTypeIds.PROMPT: 0>)]
+            [(31373, <TokenTypeIds.PROMPT: 0>) (703, <TokenTypeIds.PROMPT: 0>) (389, <TokenTypeIds.COMPLETION: 1>)]
             [(345, <TokenTypeIds.COMPLETION: 1>) (50256, <TokenTypeIds.SEP: 3>) (5303, <TokenTypeIds.PROMPT: 0>)]
             [(33847, <TokenTypeIds.COMPLETION: 1>) (50256, <TokenTypeIds.SEP: 3>) (50256, <TokenTypeIds.PADDING: 2>)]
         """
@@ -92,12 +94,16 @@ class ArticleTokenizer:
         self.packing_boundary = packing_boundary
         self.attention_boundary = attention_boundary
         self.disable_space_separator = disable_space_separator
+        self.keep_prompt_only_sequences = keep_prompt_only_sequences
         self.prompt_keyword = prompt_keyword
         self.completion_keyword = completion_keyword
         self.eos_token_id = tokenizer.eos_token_id
         self.packer = SequencePacker(max_seq_length, self.eos_token_id,
                                      packing_config)
         logging.set_verbosity_error()
+
+        self.logged_prompt_only_warn_msg_prepack = False
+        self.logged_prompt_only_warn_msg_postpack = False
 
     def __call__(self, article: Optional[str]) -> List[TokenizedSequence]:
         """Tokenize and pack input text into tokenized sequence.
@@ -133,7 +139,35 @@ class ArticleTokenizer:
 
         tokenized_sequences = self.packer(tokenized_articles)
 
+        # Check if any sequence in tokenized_sequences contains no completion tokens
+        if not self.keep_prompt_only_sequences:
+            return self._remove_prompt_only_sequences(tokenized_sequences)
         return tokenized_sequences
+
+    def _remove_prompt_only_sequences(self,
+                                      tokenized_lines: List[TokenizedSequence]
+                                      ) -> List[TokenizedSequence]:
+        """Takes a list of TokenizedLines, removes those that don't contain any COMPLETION TokenTypeIds.
+
+        Args:
+            tokenized_lines: List of TokenizedLines
+        Returns:
+            Original list with prompt-only sequences filtered out
+        """
+        filtered_lines = []
+        for line in tokenized_lines:
+            if TokenTypeIds.COMPLETION not in line.token_type_ids:
+                if not self.logged_prompt_only_warn_msg_postpack:
+                    print(
+                        "WARNING: --keep_prompt_only_sequences is not set and after packing data \
+                        into sequences, some sequences contain no COMPLETION tokens, due to the \
+                        prompt text being too long to pack. Sequences with no COMPLETION tokens \
+                        will be thrown away. Will only print this warning once."
+                    )
+                    self.logged_prompt_only_warn_msg_postpack = True
+                continue
+            filtered_lines.append(line)
+        return filtered_lines
 
     def process_text(self, text_line: str) -> List[TokenizedArticle]:
         """Take an input string, tokenize it, and return the tokenized article representation.
@@ -154,8 +188,8 @@ class ArticleTokenizer:
         tokenized_article = TokenizedArticle(token_ids, token_type_ids)
         return [tokenized_article]
 
-    def process_jsonl(self, jsonl: Union[dict,
-                                         List]) -> List[TokenizedArticle]:
+    def process_jsonl(self,
+                      jsonl: Union[dict, List]) -> List[TokenizedArticle]:
         """Tokenize a loaded jsonl and store in a TokenizedArticle object.
 
         Takes in a loaded jsonl, and returns a List of tokenized articles based on self.BoundaryType.
@@ -183,6 +217,16 @@ class ArticleTokenizer:
                 err_msg = f'Completion keyword required in every jsonl, {self.completion_keyword} not found'
                 raise json.JSONDecodeError(err_msg, str(jsonl), 0)
             completion = prompt_completion[self.completion_keyword]
+
+            if not completion and not self.keep_prompt_only_sequences:
+                if not self.logged_prompt_only_warn_msg_prepack:
+                    print(
+                        "WARNING: --keep_prompt_only_sequences is not set and some articles from \
+                        the original JSONL data contain no COMPLETION text. Sequences with no \
+                        COMPLETION text will be thrown away. Will only print this warning once."
+                    )
+                    self.logged_prompt_only_warn_msg_prepack = True
+                continue
 
             completion, prompt = self._add_space_separator(completion, prompt)
             new_token_ids, new_token_type_ids = self.tokenize(
@@ -224,8 +268,7 @@ class ArticleTokenizer:
 
         return completion, prompt
 
-    def tokenize(self,
-                 completion: str,
+    def tokenize(self, completion: str,
                  prompt: Optional[str] = None) -> Tuple[List[int], List[int]]:
         """Tokenize the input prompt and completion.
 
