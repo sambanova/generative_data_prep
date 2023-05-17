@@ -28,8 +28,8 @@ from transformers import AutoTokenizer, PreTrainedTokenizerBase
 from generative_data_prep.data_prep import data_prep_main, pipeline_main
 from generative_data_prep.utils import (GPT2_KEY, SEP_STR, TOKENIZER_CLASSES,
                                         FileExtension, data_prep_arg_builder,
-                                        verify_input_file, verify_output_dir,
-                                        verify_output_file)
+                                        ShuffleType, verify_input_file,
+                                        verify_output_dir, verify_output_file)
 
 
 def add_data_prep_args(subparser: argparse.ArgumentParser):
@@ -103,16 +103,15 @@ def add_pipeline_args(subparser: argparse.ArgumentParser):
         also include the --num_dev_splits and --num_training_splits flags.")
     subparser.add_argument(
         "--shuffle",
-        default='False',
-        const='False',
-        nargs='?',
-        choices=['False', 'on_RAM', 'large_file'],
+        default=None,
+        type=ShuffleType,
+        choices=ShuffleType.as_list(),
         help=  # noqa: E251
         "Choose the on_RAM option if your file is small enough to fit on RAM (If you are not sure if it fits \
         on RAM, default to this flag). If you are running a linux operating system and your file is too large to fit \
         on RAM, please choose large_file option, this will run approximate file shuffling that can handle files of \
         any size. If you want to do large file shuffling but you are not on linux, please shuffle the file before \
-        using this script. If the input file should not be shuffled, do not include this flag, it defaults to False."
+        using this script. If the input file should not be shuffled, do not include this flag, it defaults to Not shuffling."
     )
     subparser.add_argument(
         "--do_not_balance_hdf5",

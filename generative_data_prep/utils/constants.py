@@ -52,3 +52,10 @@ class TokenTypeIds(int, BaseEnum):
 class FileExtension(str, BaseEnum):
     TXT = '.txt'
     JSONL = '.jsonl'
+
+
+class ShuffleType(str, BaseEnum):
+    ON_RAM = 'on_RAM'
+    LARGE_FILE = 'large_file'
+    FALSE = 'false'
+
