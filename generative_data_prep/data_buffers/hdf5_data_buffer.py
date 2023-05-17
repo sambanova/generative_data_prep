@@ -24,12 +24,12 @@ import numpy as np
 
 from generative_data_prep.tokenized_line import TokenizedSequence
 
-from .file_buffer import FileBuffer
+from .data_buffer import DataBuffer
 
 MEGABYTE = 1048576
 
 
-class Hdf5FileBuffer(FileBuffer):
+class Hdf5DataBuffer(DataBuffer):
     """Implementation of Hdf5TextBuffer to write tokenized sequences to hdf5 files."""
     def __init__(self, hdf5_file_path: str, max_seq_length: int, data_type: str = 'i4', max_chunk_size: int = MEGABYTE):
         """Initialize Hdf5TextBuffer.

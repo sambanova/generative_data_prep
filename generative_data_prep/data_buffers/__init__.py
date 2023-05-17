@@ -14,6 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from .hdf5_file_buffer import Hdf5FileBuffer
+from .hdf5_data_buffer import Hdf5DataBuffer
 
-__all__ = ['Hdf5FileBuffer']
+__all__ = ['Hdf5DataBuffer']

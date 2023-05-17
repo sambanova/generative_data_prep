@@ -24,7 +24,7 @@ import sys
 
 from transformers import PreTrainedTokenizerBase
 
-from generative_data_prep.data_buffers import Hdf5FileBuffer
+from generative_data_prep.data_buffers import Hdf5DataBuffer
 from generative_data_prep.processors import ArticleTokenizer
 from generative_data_prep.utils import (BoundaryType, FileExtension,
                                         PackingConfig)
@@ -66,7 +66,7 @@ def data_prep_main(silent: bool, tokenizer: PreTrainedTokenizerBase,
                                          keep_prompt_only_sequences,
                                          prompt_keyword, completion_keyword)
 
-    with Hdf5FileBuffer(output_file, max_seq_length) as hdf5_text_buffer:
+    with Hdf5DataBuffer(output_file, max_seq_length) as hdf5_text_buffer:
         with open(input_file, 'r') as reader:
             for line in reader:
                 hdf5_text_buffer.write(article_tokenizer(line))

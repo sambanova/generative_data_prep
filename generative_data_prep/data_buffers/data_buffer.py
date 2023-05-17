@@ -21,7 +21,7 @@ from abc import ABC, abstractmethod
 from typing import Any
 
 
-class FileBuffer(ABC):
+class DataBuffer(ABC):
     """Represent a data structure that stores text between pipeline processing stages."""
     @abstractmethod
     def read(self) -> str:

@@ -20,7 +20,7 @@ import os
 import pytest
 import tempfile
 
-from generative_data_prep.data_buffers import Hdf5FileBuffer
+from generative_data_prep.data_buffers import Hdf5DataBuffer
 from generative_data_prep.tokenized_line import TokenizedSequence
 
 MAX_SEQ_LENGTH = 4
@@ -56,7 +56,7 @@ def test_hfd5_text_buffer_write(max_seq_length1: int, tokenized_line: TokenizedS
                                 num_iterations: int, gold_input_ids: np.ndarray, gold_token_type_ids: np.ndarray):
     with tempfile.TemporaryDirectory() as output_dir:
         hdf5_file_path = os.path.join(output_dir, 'temp.hdf5')
-        with Hdf5FileBuffer(hdf5_file_path, max_seq_length1, DATA_TYPE, chunk_size) as f:
+        with Hdf5DataBuffer(hdf5_file_path, max_seq_length1, DATA_TYPE, chunk_size) as f:
             for i in range(num_iterations):
                 tokenized_line_copy = tokenized_line[:]
                 tokenized_line_copy._token_ids = list(map(lambda x: x + i, tokenized_line_copy._token_ids))
