@@ -177,10 +177,10 @@ def multiprocess_data_prep(
         max_seq_length: int, input_packing_config: PackingConfig,
         packing_boundary: BoundaryType, attention_boundary: BoundaryType,
         prompt_keyword: str, completion_keyword: str,
-        prompter_keyword: str, assistant_keyword: str,
         disable_space_separator: bool, keep_prompt_only_sequences: bool,
         tokenizer: PreTrainedTokenizerBase, num_workers: int,
-        input_file_size_in_gb: float) -> Tuple[List[str], List[str]]:
+        input_file_size_in_gb: float, prompter_keyword: Optional[str] = None,
+        assistant_keyword: Optional[str] = None) -> Tuple[List[str], List[str]]:
     """Tokenizes all the files in files_to_tokenize efficiently using multirpocessing library.
 
     Args:

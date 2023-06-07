@@ -267,14 +267,14 @@ if __name__ == '__main__':
         pipeline_main(args.input_file_path, tokenizer, output_dir,
                       args.disable_space_separator,
                       args.keep_prompt_only_sequences, args.prompt_keyword,
-                      args.completion_keyword, args.prompter_keyword,
-                      args.assistant_keyword, args.shuffle,
+                      args.completion_keyword, args.shuffle,
                       args.overwrite_output_path, args.num_workers,
                       args.do_not_balance_hdf5, args.max_seq_length,
                       args.input_packing_config, args.packing_boundary,
                       args.attention_boundary, args.num_training_splits,
                       args.num_dev_splits, args.num_test_splits,
-                      args.dev_ratio, args.test_ratio)
+                      args.dev_ratio, args.test_ratio,
+                      args.prompter_keyword, args.assistant_keyword, )
     elif args.cmd == 'data_prep':
         data_prep_main(args.silent, tokenizer, args.input_file_path,
                        args.output_path, args.max_seq_length,
