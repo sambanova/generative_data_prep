@@ -273,8 +273,8 @@ class ArticleTokenizer:
         return completion, prompt
 
     def tokenize(self, completion: str,
-                 prompt: Optional[str] = None, prompter_keyword = None,
-                 assistant_keyword = None) -> Tuple[List[int], List[int]]:
+                 prompt: Optional[str] = None, prompter_keyword: Optional[str] = None,
+                 assistant_keyword: Optional[str] = None) -> Tuple[List[int], List[int]]:
         """Tokenize the input prompt and completion.
 
         Call self.tokenizer.encode to convert the input prompt and completion into token ids.
