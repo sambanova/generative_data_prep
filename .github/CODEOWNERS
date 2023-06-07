@@ -1,0 +1,15 @@
+# Please use teams as codeowners and refrain from using individuals
+
+# Each line is a file pattern followed by one or more owners.
+
+# These owners will be the default owners for everything in
+# the repo. Unless a later match takes precedence
+
+*       @snova-virens 
+
+.github @snova-ranjanl @snova-mattw
+pyproject.toml @snova-ranjanl @snova-mattw
+setup.cfg @snova-ranjanl @snova-mattw
+.pre-commit-config.yaml @snova-ranjanl @snova-mattw
+.circleci @snova-ranjanl @snova-mattw
+docs @snova-ranjanl @snova-mattw
