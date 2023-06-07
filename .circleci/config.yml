@@ -1,0 +1,56 @@
+version: 2.1
+
+orbs:
+  python: circleci/python@2.1.1
+
+jobs:
+  test:
+    executor:
+      name: python/default
+      tag: "3.7.6"
+    resource_class: small
+    steps:
+      - checkout
+      - python/install-packages:
+          pip-dependency-file: requirements/requirements.txt
+          pkg-manager: pip
+      - run: pre-commit run --all-files
+      - run: pytest
+      - store_test_results:
+            path: test_reports/circleci
+      - store_artifacts:
+          path: test_reports
+      - when:
+          condition: << pipeline.git.tag >>
+          steps:
+            - persist_to_workspace:
+                root: .
+                paths:
+                  - dist
+  publish-python:
+    executor:
+      name: python/default
+      tag: "3.7.6"
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: .
+      - checkout
+      - python/dist
+      - run: pip install twine && twine upload dist/*
+  
+workflows:
+  test-build:
+    jobs:
+      - test:
+          filters:
+            tags:
+              only: /^v.*/
+      - publish-python:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              only: main
+          requires:
+            - test
