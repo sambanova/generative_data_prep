@@ -37,7 +37,8 @@ def data_prep_main(silent: bool, tokenizer: PreTrainedTokenizerBase,
                    attention_boundary: BoundaryType,
                    disable_space_separator: bool,
                    keep_prompt_only_sequences: bool, prompt_keyword: str,
-                   completion_keyword: str):
+                   completion_keyword: str, prompter_keyword: str,
+				   assistant_keyword: str):
     """Tokenize input_file into packed sequences stored in output_file.
 
     Args:
@@ -64,7 +65,9 @@ def data_prep_main(silent: bool, tokenizer: PreTrainedTokenizerBase,
                                          packing_boundary, attention_boundary,
                                          disable_space_separator,
                                          keep_prompt_only_sequences,
-                                         prompt_keyword, completion_keyword)
+                                         prompt_keyword, completion_keyword,
+                                         prompter_keyword,
+                                         assistant_keyword)
 
     with Hdf5FileBuffer(output_file, max_seq_length) as hdf5_text_buffer:
         with open(input_file, 'r') as reader:

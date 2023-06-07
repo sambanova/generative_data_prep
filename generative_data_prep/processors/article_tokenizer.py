@@ -48,7 +48,9 @@ class ArticleTokenizer:
                  disable_space_separator: bool = False,
                  keep_prompt_only_sequences: bool = False,
                  prompt_keyword: str = 'prompt',
-                 completion_keyword: str = 'completion'):
+                 completion_keyword: str = 'completion',
+                 prompter_keyword: str = None,
+                 assistant_keyword: str = None):
         """Create Article Tokenizer.
 
         Args:
@@ -100,6 +102,8 @@ class ArticleTokenizer:
         self.eos_token_id = tokenizer.eos_token_id
         self.packer = SequencePacker(max_seq_length, self.eos_token_id,
                                      packing_config)
+        self.prompter_keyword = prompter_keyword
+        self.assistant_keyword = assistant_keyword
         logging.set_verbosity_error()
 
         self.logged_prompt_only_warn_msg_prepack = False
@@ -230,7 +234,7 @@ class ArticleTokenizer:
 
             completion, prompt = self._add_space_separator(completion, prompt)
             new_token_ids, new_token_type_ids = self.tokenize(
-                completion, prompt)
+                completion, prompt, prompter_keyword=self.prompter_keyword,  assistant_keyword=self.assistant_keyword, )
             token_ids += new_token_ids
             token_type_ids += new_token_type_ids
 
@@ -269,7 +273,7 @@ class ArticleTokenizer:
         return completion, prompt
 
     def tokenize(self, completion: str,
-                 prompt: Optional[str] = None) -> Tuple[List[int], List[int]]:
+                 prompt: Optional[str] = None, prompter_keyword = None, assistant_keyword = None) -> Tuple[List[int], List[int]]:
         """Tokenize the input prompt and completion.
 
         Call self.tokenizer.encode to convert the input prompt and completion into token ids.
@@ -288,6 +292,8 @@ class ArticleTokenizer:
         token_type_ids: List[int] = []
 
         if prompt:
+            if prompter_keyword or assistant_keyword:
+                prompt = prompter_keyword + prompt + assistant_keyword
             token_ids += self.tokenizer.encode(prompt)
             token_type_ids += len(token_ids) * [TokenTypeIds.PROMPT]
 

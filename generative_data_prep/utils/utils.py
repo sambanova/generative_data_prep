@@ -142,6 +142,23 @@ def data_prep_arg_builder(parser: argparse.ArgumentParser):
         help=
         "keyword used in input json to specify completion, defaults to 'completion"
     )
+
+    parser.add_argument(
+        "--prompter_keyword",
+        default=None,
+        type=str,
+        required=False,
+        help=
+        "The keyword for prompter in chat ml style"
+    )
+    parser.add_argument(
+        "--assistant_keyword",
+        default=None,
+        type=str,
+        required=False,
+        help=
+        "The keyword for assistant in chat ml style"
+    )
     parser.add_argument(
         "--disable_space_separator",
         action='store_true',

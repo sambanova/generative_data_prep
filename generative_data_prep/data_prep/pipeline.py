@@ -177,6 +177,7 @@ def multiprocess_data_prep(
         max_seq_length: int, input_packing_config: PackingConfig,
         packing_boundary: BoundaryType, attention_boundary: BoundaryType,
         prompt_keyword: str, completion_keyword: str,
+        prompter_keyword: str, assistant_keyword: str,
         disable_space_separator: bool, keep_prompt_only_sequences: bool,
         tokenizer: PreTrainedTokenizerBase, num_workers: int,
         input_file_size_in_gb: float) -> Tuple[List[str], List[str]]:
@@ -229,7 +230,8 @@ def multiprocess_data_prep(
             (True, tokenizer, input_file_path, output_file_path,
              max_seq_length, input_packing_config, packing_boundary,
              attention_boundary, disable_space_separator,
-             keep_prompt_only_sequences, prompt_keyword, completion_keyword))
+             keep_prompt_only_sequences, prompt_keyword, completion_keyword,
+             prompter_keyword, assistant_keyword))
 
     with Pool(num_workers) as p:
         _ = p.starmap(data_prep_main, data_prep_main_args_list)
@@ -241,7 +243,7 @@ def pipeline_main(
         input_file_path: str, tokenizer: PreTrainedTokenizerBase,
         output_dir: str, disable_space_separator: bool,
         keep_prompt_only_sequences: bool, prompt_keyword: str,
-        completion_keyword: str, shuffle: str, overwrite_output_path: bool,
+        completion_keyword: str, prompter_keyword: str, assistant_keyword: str, shuffle: str, overwrite_output_path: bool,
         num_workers: int, do_not_balance_hdf5: bool, max_seq_length: int,
         input_packing_config: PackingConfig, packing_boundary: BoundaryType,
         attention_boundary: BoundaryType, num_training_splits: Optional[int],
@@ -385,7 +387,7 @@ def pipeline_main(
     train_hdf5_files, dev_hdf5_files = multiprocess_data_prep(
         files_to_tokenize, split_dir, hdf5_dir, max_seq_length,
         input_packing_config, packing_boundary, attention_boundary,
-        prompt_keyword, completion_keyword, disable_space_separator,
+        prompt_keyword, completion_keyword, prompter_keyword, assistant_keyword, disable_space_separator,
         keep_prompt_only_sequences, tokenizer, num_workers,
         input_file_size_in_gb)
 
