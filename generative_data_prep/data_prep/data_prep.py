@@ -38,7 +38,7 @@ def data_prep_main(silent: bool, tokenizer: PreTrainedTokenizerBase,
                    disable_space_separator: bool,
                    keep_prompt_only_sequences: bool, prompt_keyword: str,
                    completion_keyword: str, prompter_keyword: str,
-				   assistant_keyword: str):
+                   assistant_keyword: str):
     """Tokenize input_file into packed sequences stored in output_file.
 
     Args:
