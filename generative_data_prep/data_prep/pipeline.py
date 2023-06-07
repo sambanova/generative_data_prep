@@ -250,7 +250,7 @@ def pipeline_main(
         num_dev_splits: Optional[int], num_test_splits: Optional[int],
         dev_ratio: Optional[float], test_ratio: Optional[float],
         prompter_keyword: Optional[str] = None,
-        assistant_keyword: Optional[str]=None):
+        assistant_keyword: Optional[str] = None):
     """Endpoint for preparing data, shuffles, splits and tokenize input file.
 
     Args:
