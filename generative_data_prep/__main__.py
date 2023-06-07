@@ -281,5 +281,5 @@ if __name__ == '__main__':
                        args.input_packing_config, args.packing_boundary,
                        args.attention_boundary, args.disable_space_separator,
                        args.keep_prompt_only_sequences, args.prompt_keyword,
-                       args.completion_keyword, 
-                       args.prompter_keyword, args.assistant_keyword, args.shuffle)
+                       args.completion_keyword, args.prompter_keyword, args.assistant_keyword,
+                       args.shuffle)
