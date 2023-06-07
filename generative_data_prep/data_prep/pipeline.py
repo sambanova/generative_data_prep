@@ -243,13 +243,14 @@ def pipeline_main(
         input_file_path: str, tokenizer: PreTrainedTokenizerBase,
         output_dir: str, disable_space_separator: bool,
         keep_prompt_only_sequences: bool, prompt_keyword: str,
-        completion_keyword: str, prompter_keyword: str, assistant_keyword: str,
-        shuffle: str, overwrite_output_path: bool,
+        completion_keyword: str, shuffle: str, overwrite_output_path: bool,
         num_workers: int, do_not_balance_hdf5: bool, max_seq_length: int,
         input_packing_config: PackingConfig, packing_boundary: BoundaryType,
         attention_boundary: BoundaryType, num_training_splits: Optional[int],
         num_dev_splits: Optional[int], num_test_splits: Optional[int],
-        dev_ratio: Optional[float], test_ratio: Optional[float]):
+        dev_ratio: Optional[float], test_ratio: Optional[float],
+        prompter_keyword: Optional[str] = None,
+        assistant_keyword: Optional[str]=None):
     """Endpoint for preparing data, shuffles, splits and tokenize input file.
 
     Args:
