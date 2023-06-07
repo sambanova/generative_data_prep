@@ -389,9 +389,9 @@ def pipeline_main(
     train_hdf5_files, dev_hdf5_files = multiprocess_data_prep(
         files_to_tokenize, split_dir, hdf5_dir, max_seq_length,
         input_packing_config, packing_boundary, attention_boundary,
-        prompt_keyword, completion_keyword, prompter_keyword, assistant_keyword, disable_space_separator,
+        prompt_keyword, completion_keyword, disable_space_separator,
         keep_prompt_only_sequences, tokenizer, num_workers,
-        input_file_size_in_gb)
+        input_file_size_in_gb, prompter_keyword, assistant_keyword)
 
     print(
         f'Tokenization is complete, the outputs are in {hdf5_dir}, the held out test files are located at {test_dir}'
