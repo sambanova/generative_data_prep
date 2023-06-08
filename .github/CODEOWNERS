@@ -7,9 +7,9 @@
 
 *       @snova-virens 
 
-.github @snova-ranjanl @snova-mattw
-pyproject.toml @snova-ranjanl @snova-mattw
-setup.cfg @snova-ranjanl @snova-mattw
-.pre-commit-config.yaml @snova-ranjanl @snova-mattw
-.circleci @snova-ranjanl @snova-mattw
-docs @snova-ranjanl @snova-mattw
+.github @sambanova-ci
+pyproject.toml @sambanova-ci
+setup.cfg @sambanova-ci
+.pre-commit-config.yaml @sambanova-ci
+.circleci @sambanova-ci
+docs @sambanova-ci
