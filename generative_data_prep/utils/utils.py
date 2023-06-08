@@ -144,20 +144,20 @@ def data_prep_arg_builder(parser: argparse.ArgumentParser):
     )
 
     parser.add_argument(
-        "--prompter_keyword",
+        "--prompt_prefix",
         default=None,
         type=str,
         required=False,
         help=
-        "The keyword for prompter in chat ml style"
+        "Text to add before the prompt, for chatML conventions use"
     )
     parser.add_argument(
-        "--assistant_keyword",
+        "--prompt_postfix",
         default=None,
         type=str,
         required=False,
         help=
-        "The keyword for assistant in chat ml style"
+        "text to add after the prompt, for chatML conventions use"
     )
     parser.add_argument(
         "--disable_space_separator",

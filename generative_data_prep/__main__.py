@@ -274,7 +274,7 @@ if __name__ == '__main__':
                       args.attention_boundary, args.num_training_splits,
                       args.num_dev_splits, args.num_test_splits,
                       args.dev_ratio, args.test_ratio,
-                      args.prompter_keyword, args.assistant_keyword, )
+                      args.prompter_keyword, args.assistant_keyword)
     elif args.cmd == 'data_prep':
         data_prep_main(args.silent, tokenizer, args.input_file_path,
                        args.output_path, args.max_seq_length,

@@ -179,8 +179,8 @@ def multiprocess_data_prep(
         prompt_keyword: str, completion_keyword: str,
         disable_space_separator: bool, keep_prompt_only_sequences: bool,
         tokenizer: PreTrainedTokenizerBase, num_workers: int,
-        input_file_size_in_gb: float, prompter_keyword: Optional[str] = None,
-        assistant_keyword: Optional[str] = None) -> Tuple[List[str], List[str]]:
+        input_file_size_in_gb: float, prompt_prefix: Optional[str] = None,
+        prompt_postfix: Optional[str] = None) -> Tuple[List[str], List[str]]:
     """Tokenizes all the files in files_to_tokenize efficiently using multirpocessing library.
 
     Args:
@@ -198,6 +198,8 @@ def multiprocess_data_prep(
         tokenizer: The tokenizer to use for tokenizing text.
         num_workers: Number of workers to use for multiprocessing
         input_file_size_in_gb: Size of the input file in gigabytes.
+		prompt_prefix: text to add before the prompt, for chatML conventions use.
+        prompt_postfix: text to add before the prompt, for chatML conventions use.
 
     Returns:
         List of output training and dev hdf5 file paths
@@ -231,7 +233,7 @@ def multiprocess_data_prep(
              max_seq_length, input_packing_config, packing_boundary,
              attention_boundary, disable_space_separator,
              keep_prompt_only_sequences, prompt_keyword, completion_keyword,
-             prompter_keyword, assistant_keyword))
+             prompt_prefix, prompt_postfix))
 
     with Pool(num_workers) as p:
         _ = p.starmap(data_prep_main, data_prep_main_args_list)
@@ -249,8 +251,8 @@ def pipeline_main(
         attention_boundary: BoundaryType, num_training_splits: Optional[int],
         num_dev_splits: Optional[int], num_test_splits: Optional[int],
         dev_ratio: Optional[float], test_ratio: Optional[float],
-        prompter_keyword: Optional[str] = None,
-        assistant_keyword: Optional[str] = None):
+        prompt_prefix: Optional[str] = None,
+        prompt_postfix: Optional[str] = None):
     """Endpoint for preparing data, shuffles, splits and tokenize input file.
 
     Args:
@@ -282,6 +284,8 @@ def pipeline_main(
         num_test_splits: Number of test splits to create.
         dev_ratio: Ratio of data to use for dev (evaluation).
         test_ratio: Ratio of data to use as test.
+        prompt_prefix: text to add before the prompt, for chatML conventions use.
+        prompt_postfix: text to add before the prompt, for chatML conventions use.
     Raises:
         RuntimeError: If shuffling on RAM is not possible
     """
@@ -391,7 +395,7 @@ def pipeline_main(
         input_packing_config, packing_boundary, attention_boundary,
         prompt_keyword, completion_keyword, disable_space_separator,
         keep_prompt_only_sequences, tokenizer, num_workers,
-        input_file_size_in_gb, prompter_keyword, assistant_keyword)
+        input_file_size_in_gb, prompt_prefix, prompt_postfix)
 
     print(
         f'Tokenization is complete, the outputs are in {hdf5_dir}, the held out test files are located at {test_dir}'
