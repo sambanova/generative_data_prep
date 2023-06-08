@@ -210,8 +210,7 @@ def test_process_jsonl(
     'packing_boundary,ext_type,prompt_prefix,prompt_postfix,text,gold_token_ids,gold_ttids',
     [
         (BoundaryType.JSONL, FileExtension.JSONL, None, None, "", [], []),  # empty text
-        (BoundaryType.JSONL, FileExtension.TXT, None, None, "hi", [1, 0], [COMP, SEP
-                                                               ]),  # one word
+        (BoundaryType.JSONL, FileExtension.TXT, None, None, "hi", [1, 0], [COMP, SEP]),  # one word
         (BoundaryType.JSONL, FileExtension.TXT, None, None, "hi bye test", [1, 2, 3, 0],
          [COMP, COMP, COMP, SEP]),  # multiple word
     ])
