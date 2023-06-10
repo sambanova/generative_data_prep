@@ -57,7 +57,7 @@ def data_prep_main(silent: bool, tokenizer: PreTrainedTokenizerBase,
         completion_keyword: Completion keyword to use as key in jsonl.
         disable_space_separator: Disable adding space separator if true.
         prompt_prefix: text to add before the prompt, for chatML conventions use.
-        prompt_postfix: text to add before the prompt, for chatML conventions use.
+        prompt_postfix: text to add after the prompt, for chatML conventions use.
     """
     if silent:
         sys.stdout = open(os.devnull, 'w')

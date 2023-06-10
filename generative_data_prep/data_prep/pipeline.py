@@ -198,8 +198,8 @@ def multiprocess_data_prep(
         tokenizer: The tokenizer to use for tokenizing text.
         num_workers: Number of workers to use for multiprocessing
         input_file_size_in_gb: Size of the input file in gigabytes.
-		prompt_prefix: text to add before the prompt, for chatML conventions use.
-        prompt_postfix: text to add before the prompt, for chatML conventions use.
+        prompt_prefix: text to add before the prompt, for chatML conventions use.
+        prompt_postfix: text to add after the prompt, for chatML conventions use.
 
     Returns:
         List of output training and dev hdf5 file paths
@@ -285,7 +285,7 @@ def pipeline_main(
         dev_ratio: Ratio of data to use for dev (evaluation).
         test_ratio: Ratio of data to use as test.
         prompt_prefix: text to add before the prompt, for chatML conventions use.
-        prompt_postfix: text to add before the prompt, for chatML conventions use.
+        prompt_postfix: text to add after the prompt, for chatML conventions use.
     Raises:
         RuntimeError: If shuffling on RAM is not possible
     """
