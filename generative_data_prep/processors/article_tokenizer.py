@@ -48,7 +48,9 @@ class ArticleTokenizer:
                  disable_space_separator: bool = False,
                  keep_prompt_only_sequences: bool = False,
                  prompt_keyword: str = 'prompt',
-                 completion_keyword: str = 'completion'):
+                 completion_keyword: str = 'completion',
+                 prompt_prefix: Optional[str] = None,
+                 prompt_postfix: Optional[str] = None):
         """Create Article Tokenizer.
 
         Args:
@@ -69,6 +71,8 @@ class ArticleTokenizer:
                 Defaults to 'prompt'.
             completion_keyword: Keyword to index into loaded json dictionaries to get the completion text.
                 Defaults to 'completion'.
+            prompt_prefix: text to add before the prompt, for chatML conventions use.
+            prompt_postfix: text to add before the prompt, for chatML conventions use.
 
         Example:
             >>> input_text = [
@@ -100,6 +104,8 @@ class ArticleTokenizer:
         self.eos_token_id = tokenizer.eos_token_id
         self.packer = SequencePacker(max_seq_length, self.eos_token_id,
                                      packing_config)
+        self.prompt_prefix = prompt_prefix
+        self.prompt_postfix = prompt_postfix
         logging.set_verbosity_error()
 
         self.logged_prompt_only_warn_msg_prepack = False
@@ -288,6 +294,10 @@ class ArticleTokenizer:
         token_type_ids: List[int] = []
 
         if prompt:
+            if self.prompt_prefix:
+                prompt = self.prompt_prefix + prompt
+            if self.prompt_postfix:
+                prompt = prompt + self.prompt_postfix
             token_ids += self.tokenizer.encode(prompt)
             token_type_ids += len(token_ids) * [TokenTypeIds.PROMPT]
 

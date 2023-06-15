@@ -34,7 +34,7 @@ PAD = TokenTypeIds.PADDING
 
 
 def mock_tokenize(input_text: str) -> List[int]:
-    FAKE_TOKENIZER = {"hi": 1, "bye": 2, "test": 3}
+    FAKE_TOKENIZER = {"hi": 1, "bye": 2, "test": 3, "<human>": 4, "<bot>": 5}
     mock_token_ids = []
     for word in input_text.split(' '):
         if word:
@@ -45,13 +45,16 @@ def mock_tokenize(input_text: str) -> List[int]:
 
 @pytest.fixture
 def article_tokenizer(monkeypatch, packing_boundary: BoundaryType,
-                      ext_type: FileExtension) -> ArticleTokenizer:
+                      ext_type: FileExtension, prompt_prefix: str,
+                      prompt_postfix: str) -> ArticleTokenizer:
     """Creates a tokenized line."""
     monkeypatch.setattr(TOKENIZER, "encode", mock_tokenize)
     article_tokenizer = ArticleTokenizer(TOKENIZER,
                                          MAX_SEQ_LEN,
                                          ext_type,
-                                         packing_boundary=packing_boundary)
+                                         packing_boundary=packing_boundary,
+                                         prompt_prefix=prompt_prefix,
+                                         prompt_postfix=prompt_postfix)
     monkeypatch.setattr(article_tokenizer, "eos_token_id", EOS_TOKEN_ID)
     monkeypatch.setattr(article_tokenizer.packer, "eos_token_id", EOS_TOKEN_ID)
     return article_tokenizer
@@ -75,18 +78,21 @@ def article_tokenizer_for_prompt_sequences(
 
 
 @pytest.mark.parametrize(
-    'packing_boundary,ext_type,prompt,completion,gold_token_ids,gold_ttids',
+    'packing_boundary,ext_type,prompt_prefix,prompt_postfix,prompt,completion,gold_token_ids,gold_ttids',
     [
-        (BoundaryType.JSONL, FileExtension.JSONL, "", "", [],
+        (BoundaryType.JSONL, FileExtension.JSONL, None, None, "", "", [],
          []),  # empty prompt and completion
-        (BoundaryType.JSONL, FileExtension.JSONL, "", "bye", [2, 0],
+        (BoundaryType.JSONL, FileExtension.JSONL, None, None, "", "bye", [2, 0],
          [COMP, COMP]),  # empty prompt
-        (BoundaryType.JSONL, FileExtension.JSONL, "hi", "", [1, 0],
+        (BoundaryType.JSONL, FileExtension.JSONL, None, None, "hi", "", [1, 0],
          [PROMPT, COMP]),  # empty completion
-        (BoundaryType.JSONL, FileExtension.JSONL, "hi", "bye", [1, 2, 0],
+        (BoundaryType.JSONL, FileExtension.JSONL, None, None, "hi", "bye", [1, 2, 0],
          [PROMPT, COMP, COMP]),  # full prompt and completion
-        (BoundaryType.JSONL, FileExtension.JSONL, "hi test", "bye test",
-         [1, 3, 2, 3, 0], [PROMPT, PROMPT, COMP, COMP, COMP])
+        (BoundaryType.JSONL, FileExtension.JSONL, None, None, "hi test", "bye test",
+         [1, 3, 2, 3, 0], [PROMPT, PROMPT, COMP, COMP, COMP]),
+        (BoundaryType.JSONL, FileExtension.JSONL, "<human> ", " <bot>", "hi test", "bye test",
+         [4, 1, 3, 5, 2, 3, 0],
+         [PROMPT, PROMPT, PROMPT, PROMPT, COMP, COMP, COMP])     # full prompt and completion with chat-ml tag
     ])
 def test_tokenize(article_tokenizer: ArticleTokenizer, prompt: str,
                   completion: str, gold_token_ids: List[int],
@@ -98,21 +104,21 @@ def test_tokenize(article_tokenizer: ArticleTokenizer, prompt: str,
 
 
 @pytest.mark.parametrize(
-    'packing_boundary,ext_type,prompt,completion,gold_prompt,gold_completion',
+    'packing_boundary,ext_type,prompt_prefix,prompt_postfix,prompt,completion,gold_prompt,gold_completion',
     [
-        (BoundaryType.JSONL, FileExtension.JSONL, "hi", "bye", "hi",
+        (BoundaryType.JSONL, FileExtension.JSONL, None, None, "hi", "bye", "hi",
          " bye"),  # no spaces
-        (BoundaryType.JSONL, FileExtension.JSONL, " hi", "bye", " hi",
+        (BoundaryType.JSONL, FileExtension.JSONL, None, None, " hi", "bye", " hi",
          " bye"),  # space in front of prompt
-        (BoundaryType.JSONL, FileExtension.JSONL, "hi ", "bye", "hi",
+        (BoundaryType.JSONL, FileExtension.JSONL, None, None, "hi ", "bye", "hi",
          " bye"),  # space after prompt
-        (BoundaryType.JSONL, FileExtension.JSONL, "hi", " bye", "hi",
+        (BoundaryType.JSONL, FileExtension.JSONL, None, None, "hi", " bye", "hi",
          " bye"),  # space before completion
-        (BoundaryType.JSONL, FileExtension.JSONL, "hi", "bye ", "hi",
+        (BoundaryType.JSONL, FileExtension.JSONL, None, None, "hi", "bye ", "hi",
          " bye "),  # space after completion
-        (BoundaryType.JSONL, FileExtension.JSONL, "hi ", " bye", "hi",
+        (BoundaryType.JSONL, FileExtension.JSONL, None, None, "hi ", " bye", "hi",
          " bye"),  # space after prompt before completion
-        (BoundaryType.JSONL, FileExtension.JSONL, " h i ", " b y e ", " h i",
+        (BoundaryType.JSONL, FileExtension.JSONL, None, None, " h i ", " b y e ", " h i",
          " b y e ")  # spaces in other places
     ])
 def test_add_space_separator(article_tokenizer: ArticleTokenizer, prompt: str,
@@ -201,12 +207,11 @@ def test_process_jsonl(
 
 
 @pytest.mark.parametrize(
-    'packing_boundary,ext_type,text,gold_token_ids,gold_ttids',
+    'packing_boundary,ext_type,prompt_prefix,prompt_postfix,text,gold_token_ids,gold_ttids',
     [
-        (BoundaryType.JSONL, FileExtension.JSONL, "", [], []),  # empty text
-        (BoundaryType.JSONL, FileExtension.TXT, "hi", [1, 0], [COMP, SEP
-                                                               ]),  # one word
-        (BoundaryType.JSONL, FileExtension.TXT, "hi bye test", [1, 2, 3, 0],
+        (BoundaryType.JSONL, FileExtension.JSONL, None, None, "", [], []),  # empty text
+        (BoundaryType.JSONL, FileExtension.TXT, None, None, "hi", [1, 0], [COMP, SEP]),  # one word
+        (BoundaryType.JSONL, FileExtension.TXT, None, None, "hi bye test", [1, 2, 3, 0],
          [COMP, COMP, COMP, SEP]),  # multiple word
     ])
 def test_process_text(article_tokenizer: ArticleTokenizer, text: str,
@@ -223,16 +228,16 @@ def get_tokenized_seq(token_ids: List[int],
 
 
 @pytest.mark.parametrize(
-    'packing_boundary,ext_type,article,gold_tokenized_sequence,gold_unfinished_sequence',
+    'packing_boundary,ext_type,prompt_prefix,prompt_postfix,article,gold_tokenized_sequence,gold_unfinished_sequence',
     [
-        (BoundaryType.JSONL, FileExtension.JSONL, None, [],
+        (BoundaryType.JSONL, FileExtension.JSONL, None, None, None, [],
          get_tokenized_seq([], [])),  # test None passed in
-        (BoundaryType.JSONL, FileExtension.TXT, "hi bye test", [],
+        (BoundaryType.JSONL, FileExtension.TXT, None, None, "hi bye test", [],
          get_tokenized_seq([1, 2, 3, 0], [COMP, COMP, COMP, SEP])),
-        (BoundaryType.JSONL, FileExtension.JSONL,
+        (BoundaryType.JSONL, FileExtension.JSONL, None, None,
          '{"prompt": "hi", "completion": "bye"}', [],
          get_tokenized_seq([1, 2, 0], [PROMPT, COMP, SEP])),
-        (BoundaryType.JSONL, FileExtension.JSONL,
+        (BoundaryType.JSONL, FileExtension.JSONL, None, None,
          '[{"prompt": "hi", "completion": "bye"}, {"prompt": "test", "completion": "test"}, \
         {"prompt": "test", "completion": "test"}]', [
              get_tokenized_seq([1, 2, 0, 3, 3, 0],
@@ -248,14 +253,14 @@ def test__call__(article_tokenizer: ArticleTokenizer, article: Optional[str],
 
 
 @pytest.mark.parametrize(
-    'packing_boundary,ext_type,articles,gold_tokenized_sequences,gold_unfinished_sequence',
-    [(BoundaryType.JSONL, FileExtension.TXT, ["hi bye", "hi bye", "hi hi"],
+    'packing_boundary,ext_type,prompt_prefix,prompt_postfix,articles,gold_tokenized_sequences,gold_unfinished_sequence',
+    [(BoundaryType.JSONL, FileExtension.TXT, None, None, ["hi bye", "hi bye", "hi hi"],
       [[], [],
        [
            get_tokenized_seq([1, 2, 0, 1, 2, 0],
                              [COMP, COMP, SEP, COMP, COMP, SEP])
        ]], get_tokenized_seq([1, 1, 0], [COMP, COMP, SEP])),
-     (BoundaryType.JSONL, FileExtension.JSONL, [
+     (BoundaryType.JSONL, FileExtension.JSONL, None, None, [
          '{"prompt": "hi", "completion": "bye"}',
          '{"prompt": "hi", "completion": "bye"}', '{ \
         "prompt": "hi", "completion": "hi"}'

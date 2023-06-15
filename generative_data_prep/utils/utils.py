@@ -142,6 +142,23 @@ def data_prep_arg_builder(parser: argparse.ArgumentParser):
         help=
         "keyword used in input json to specify completion, defaults to 'completion"
     )
+
+    parser.add_argument(
+        "--prompt_prefix",
+        default=None,
+        type=str,
+        required=False,
+        help=
+        "Text to add before the prompt, for chatML conventions use"
+    )
+    parser.add_argument(
+        "--prompt_postfix",
+        default=None,
+        type=str,
+        required=False,
+        help=
+        "text to add after the prompt, for chatML conventions use"
+    )
     parser.add_argument(
         "--disable_space_separator",
         action='store_true',
