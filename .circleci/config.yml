@@ -1,25 +1,59 @@
 version: 2.1
 
 orbs:
-  python: circleci/python@2.1.1
+  docker: circleci/docker@2.2.0
 
+executors:
+  python-docker:
+    docker:
+      - image: cimg/python:3.9.13
+    resource_class: small
+
+# Define the jobs we want to run for this project
 jobs:
   test:
-    executor:
-      name: python/default
-      tag: "3.7.6"
-    resource_class: small
+    executor: python-docker
     steps:
       - checkout
-      - python/install-packages:
-          pip-dependency-file: requirements/requirements.txt
-          pkg-manager: pip
-      - run: pre-commit run --all-files
-      - run: pytest
+      - run:
+          name: Generate Cache Key
+          command: |
+            echo date +%Y-%V > circleci_cache_key
+            echo python -V >> circleci_cache_key
+      - restore_cache:
+          key: v2-{{ arch }}-{{ checksum "pyproject.toml" }}-{{ checksum "circleci_cache_key" }}
+      - run:
+          name: Instantiate Python Virtual Environment
+          command: |
+            test -d "venv" || python -m venv venv
+            . venv/bin/activate
+            pip install --upgrade pip
+            pip install ".[build,docs,tests]"
+      - run:
+          name: Run Pre-commit
+          command: . venv/bin/activate && pre-commit run --all-files --hook-stage manual
+      - save_cache:
+          key: v2-{{ arch }}-{{ checksum "pyproject.toml" }}-{{ checksum "circleci_cache_key" }}
+          paths:
+            - venv
+            - ~/.cache/pip
+            - ~/.cache/pre-commit
+      - run:
+          name: Generate Sphix Docs
+          command: . venv/bin/activate && cd docs && make html
+      - run:
+          name: Run Pytest
+          command: . venv/bin/activate && pytest
+      - run:
+          name: Build Python Package
+          command: . venv/bin/activate && python -m build
       - store_test_results:
-            path: test_reports/circleci
+          path: test_reports/circleci
       - store_artifacts:
           path: test_reports
+      - store_artifacts:
+          path: docs/build/html
+
       - when:
           condition: << pipeline.git.tag >>
           steps:
@@ -28,19 +62,28 @@ jobs:
                 paths:
                   - dist
   publish-python:
-    executor:
-      name: python/default
-      tag: "3.7.6"
-    resource_class: small
+    executor: python-docker
     steps:
-      - attach_workspace:
-          at: .
-      - checkout
-      - python/dist
-      - run: pip install twine && twine upload dist/*
-  
+      - when:
+          condition: << pipeline.git.tag >>
+          steps:
+            - attach_workspace:
+                at: .
+            - attach_workspace:
+                at: $CIRCLE_WORKING_DIRECTORY
+            - run:
+                name: Publish Python Package
+                command: 'echo "TODO: Enable once package is ready to be published to pypi'
+                # TODO: Enable once package is ready to be published to pypi
+                # command: pip install twine && twine upload dist/*
+      - unless:
+          condition: << pipeline.git.tag >>
+          steps:
+            - run: echo "Python package will not be published since this is not a tagged build."
+
+# Orchestrate our job run sequence
 workflows:
-  test-build:
+  build_and_test:
     jobs:
       - test:
           filters:
@@ -54,3 +97,13 @@ workflows:
               only: main
           requires:
             - test
+  weekly_cron:
+    triggers:
+      - schedule:
+          cron: "0 0 * * 6"
+          filters:
+            branches:
+              only:
+                - main
+    jobs:
+      - test

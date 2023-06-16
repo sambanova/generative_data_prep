@@ -1,3 +1,5 @@
+default_install_hook_types: [pre-commit, pre-push]
+
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v2.3.0
@@ -8,15 +10,10 @@ repos:
     - id: check-json
     - id: end-of-file-fixer
     - id: trailing-whitespace
--   repo: https://github.com/PyCQA/autoflake
-    rev: v2.1.1
-    hooks:
-    -   id: autoflake
 - repo: https://github.com/psf/black
-  rev: 23.3.0
+  rev: 22.8.0
   hooks:
     - id: black
-      line-length: 120
 - repo: https://github.com/PyCQA/flake8
   rev: 5.0.4
   hooks:
@@ -36,26 +33,19 @@ repos:
     hooks:
     - id: mypy
       exclude: ^(tests\/.*|docs\/.*)$
-- repo: https://github.com/jazzband/pip-tools
-  rev: 6.8.0
-  hooks:
-  - id: pip-compile
-    name: Generate Requirements
-    args: [pyproject.toml, -o, requirements/requirements.txt]
-    files: ^(setup\.cfg|pyproject\.toml)$
-  - id: pip-compile
-    name: Generate Tests Requirements
-    args: [pyproject.toml, --extra, tests, -o, requirements/requirements_tests.txt]
-    files: ^(setup\.cfg|pyproject\.toml)$
-  - id: pip-compile
-    name: Generate Dev Requirements
-    args: [pyproject.toml, --extra, tests, -o, requirements/requirements_dev.txt]
-    files: ^(setup\.cfg|pyproject\.toml)$
 - repo: local
   hooks:
-  - id: pytest
-    name: Run Pytest
+  - id: pip-tools-compile
+    name: Generate Requirements Files for Python Package
+    stages: [push, manual]
     language: system
-    entry: venv/bin/pytest -m fast
+    entry: bash -c
+      'export PYTHON_VER=3.9.13 && export PIP_TOOLS_VER=6.13.0
+      && ./.circleci/generate_requirements.sh'
+    files: ^(setup\.cfg|pyproject\.toml)$
+  - id: pytest
+    name: Run Pytest (using venv if it exists, otherwise use default system)
+    language: system
+    entry: bash -c 'test -x "venv/bin/pytest" && venv/bin/pytest -m fast || pytest -m fast'
     always_run: true
     pass_filenames: false

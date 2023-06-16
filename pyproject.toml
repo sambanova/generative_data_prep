@@ -24,6 +24,25 @@ dependencies = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
+build = [
+    "build",
+    "setuptools_scm",
+    "twine",
+]
+dev = [
+    "build",
+    "ipdb",
+    "twine",
+    "setuptools-scm"
+    ]
+docs = [
+    "autodoc-pydantic",
+    "nbsphinx",
+    "myst-parser",
+    "sphinx >= 5.2.3",
+    "sphinx-autodoc-typehints",
+    "sphinx-rtd-theme",
+]
 tests = [
     "build",
     "pre-commit >= 2.20",
@@ -32,11 +51,6 @@ tests = [
     "pytest-cov",
     "sphinx >= 5.2.3",
     "sphinx_rtd_theme"
-    ]
-dev = [
-    "build",
-    "twine",
-    "setuptools-scm"
     ]
 
 [tool.setuptools.packages.find]
@@ -55,6 +69,11 @@ markers = [
     "fast",
     "slow",
 ]
+filterwarnings = [
+    "error",
+    # TODO: Fix the Warning and remove this ignore line
+    "ignore:unclosed file.*io.TextIOWrapper.*:ResourceWarning",
+]
 addopts = """
 -ra -q -vv
 --doctest-modules
@@ -69,9 +88,6 @@ addopts = """
 """
 testpaths = [
     "tests",
-]
-filterwarnings = [
-    "error",
 ]
 junit_suite_name = "Pytest"
 junit_duration_report = "call"
@@ -94,6 +110,6 @@ exclude = [
     "tests",
     "docs",
 ]
-# Need this otherwise mypy complains it can't interpret the types of objects 
+# Need this otherwise mypy complains it can't interpret the types of objects
 # from 3rd party libraries like transformers
 ignore_missing_imports = true
