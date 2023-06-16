@@ -5,11 +5,11 @@
 # These owners will be the default owners for everything in
 # the repo. Unless a later match takes precedence
 
-*       @snova-virens 
+*                   @snova-virens
 
-.github @sambanova-ci
-pyproject.toml @sambanova-ci
-setup.cfg @sambanova-ci
-.pre-commit-config.yaml @sambanova-ci
-.circleci @sambanova-ci
-docs @sambanova-ci
+.github                     @sambanova/sambanova-ci
+pyproject.toml              @sambanova-ci
+setup.cfg                   @sambanova-ci
+.pre-commit-config.yaml     @sambanova-ci
+.circleci                   @sambanova/sambanova-ci
+docs                        @sambanova/sambanova-ci
