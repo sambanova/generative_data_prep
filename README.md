@@ -1,3 +1,5 @@
+# TODO: ADD BADGES BEFORE MERGING PR
+
 <a href="https://sambanova.ai/">
     <img src="./img/SambaNova-dark-logo-1.png" title="SambaNova" height="60" />
 </a>
