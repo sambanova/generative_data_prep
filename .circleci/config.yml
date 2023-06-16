@@ -31,9 +31,9 @@ jobs:
             pip install ".[build,docs,tests]"
       - run:
           name: Run Pre-commit
-          # TODO: Fix existing issues and change to: pre-commit run --all-files --hook-stage manual
-          command: |
-            . venv/bin/activate && pre-commit run --hook-stage manual
+          # TODO: Fix existing issues with flake8 and bandit and update command to:
+          # pre-commit run --all-files --hook-stage manual
+          command: . venv/bin/activate && pre-commit run --hook-stage manual
       - save_cache:
           key: v2-{{ arch }}-{{ checksum "pyproject.toml" }}-{{ checksum "circleci_cache_key" }}
           paths:
