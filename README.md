@@ -20,9 +20,10 @@ This software package is designed for preparing data that can be used to train g
     - [Meta in context learning](#meta-in-context-learning)
 
 ## Installation
-```git clone https://github.com/sambanova/generative_data_prep.git
-cd to the repo
-pip install -r requirements.txt
+```
+git clone https://github.com/sambanova/generative_data_prep.git
+cd generative_data_prep
+pip install .
 ```
 
 ## Requirements
@@ -49,7 +50,7 @@ The `generative_data_prep/data_prep/pipeline.py` script takes a single jsonline 
 
 ### Example
 ```python
-python3 -m generative_data_prep pipeline --input_file_path=path_to_jsonl.jsonl --output_path=path_to_output_directory --pretrained_tokenizer=gpt2 --max_seq_length=1024 --shuffle=on_RAM 
+python3 -m generative_data_prep pipeline --input_file_path=path_to_jsonl.jsonl --output_path=path_to_output_directory --pretrained_tokenizer=gpt2 --max_seq_length=1024 --shuffle=on_RAM
 ```
 
 ### Output
@@ -142,8 +143,9 @@ The output hdf5 files contains two datasets:
 </details>
 
 ## Running tests
-```python
-./test.sh
+```
+pip install ".[tests]"
+pytest
 ```
 
 ## View decoded hdf5 files in human readable text format
