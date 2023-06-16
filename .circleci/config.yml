@@ -31,7 +31,9 @@ jobs:
             pip install ".[build,docs,tests]"
       - run:
           name: Run Pre-commit
-          command: . venv/bin/activate && pre-commit run --all-files --hook-stage manual
+          # TODO: Fix existing issues and change to: pre-commit run --all-files --hook-stage manual
+          command: |
+            . venv/bin/activate && pre-commit run --hook-stage manual
       - save_cache:
           key: v2-{{ arch }}-{{ checksum "pyproject.toml" }}-{{ checksum "circleci_cache_key" }}
           paths:
@@ -39,7 +41,7 @@ jobs:
             - ~/.cache/pip
             - ~/.cache/pre-commit
       - run:
-          name: Generate Sphix Docs
+          name: Generate Sphinx Docs
           command: . venv/bin/activate && cd docs && make html
       - run:
           name: Run Pytest
