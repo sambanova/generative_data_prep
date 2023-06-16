@@ -8,8 +8,8 @@
 *                   @snova-virens
 
 .github                     @sambanova/sambanova-ci
-pyproject.toml              @sambanova-ci
-setup.cfg                   @sambanova-ci
-.pre-commit-config.yaml     @sambanova-ci
+pyproject.toml              @sambanova/sambanova-ci
+setup.cfg                   @sambanova/sambanova-ci
+.pre-commit-config.yaml     @sambanova/sambanova-ci
 .circleci                   @sambanova/sambanova-ci
 docs                        @sambanova/sambanova-ci
