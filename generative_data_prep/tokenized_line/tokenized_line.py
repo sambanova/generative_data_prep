@@ -184,7 +184,7 @@ class TokenizedSequence(TokenizedLine):
     @classmethod
     def get_empty(cls, max_seq_length: int, eos_token_id: int) -> "TokenizedSequence":
         """See base class."""
-        return cls.from_article(
+        return cls.from_article(  # type: ignore
             TokenizedArticle.get_empty(), max_seq_length, eos_token_id
         )
 
@@ -260,6 +260,6 @@ class TokenizedSequence(TokenizedLine):
         tokenized_article = TokenizedArticle(
             self.token_ids[slice_index], self.token_type_ids[slice_index]
         )
-        return TokenizedSequence.from_article(
+        return TokenizedSequence.from_article(  # type: ignore
             tokenized_article, self.max_seq_length, self.eos_token_id
         )

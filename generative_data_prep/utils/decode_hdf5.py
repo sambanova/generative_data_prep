@@ -51,7 +51,7 @@ def decode_hdf5(
                 wf.write(SEP_STR)
                 input_ids = file_h5["input_ids"][seq_i]
                 token_type_ids = file_h5["token_type_ids"][seq_i]
-                curr_prompt = []
+                curr_prompt = []  # type: ignore
                 curr_completion = []
                 curr_state = token_type_ids[0]
                 for i, token, id in zip(range(seq_length), input_ids, token_type_ids):
