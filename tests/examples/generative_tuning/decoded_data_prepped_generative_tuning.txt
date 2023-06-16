@@ -5,7 +5,7 @@ Sequence length: 1024
 SEQUENCE 1
 ================================================================================
 ----PROMPT-----
-Write a title for this sentence: the consumer price indices of the czech republic in july increased to #.# percent from #.# percent a year earlier, pushing the annual rate of inflation to #.# percent, according to the czech statistical office -lrb- cso -rrb-. 
+Write a title for this sentence: the consumer price indices of the czech republic in july increased to #.# percent from #.# percent a year earlier, pushing the annual rate of inflation to #.# percent, according to the czech statistical office -lrb- cso -rrb-.
 
 Title:
 ----COMPLETION-----
@@ -22,7 +22,7 @@ SEQUENCE 2
 The owner of the painting The Madonna del Granduca held what title from 1805-1814?
 
 ----COMPLETION-----
- 
+
 Grand Duke of Würzburg
 <|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
@@ -35,7 +35,7 @@ SEQUENCE 3
 ----PROMPT-----
 Make a title for this article: the coast guard arrested ## indian fishermen for allegedly entering pakistan's territorial waters illegally, a spokesman said saturday.
 ----COMPLETION-----
- 
+
 
 pakistani coast guard arrests ## indian fishermen<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
@@ -46,15 +46,15 @@ Padding tokens: 978
 SEQUENCE 4
 ================================================================================
 ----PROMPT-----
-Here's a question and a few possible answers: 
+Here's a question and a few possible answers:
 
 Q: How do you start family?
 Possible A: spend money, get married, stressed, get pregnant, have sex
 
-Why is "have sex" an answer aligned with human common sense? 
+Why is "have sex" an answer aligned with human common sense?
 
 ----COMPLETION-----
- 
+
 sex the first<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 961
@@ -94,7 +94,7 @@ Question: What a Margarita contains
 Suggestion: The margarita is a Mexican cocktail consisting of tequila mixed with Cointreau or similar orange -flavoured liqueur and lime or lemon juice, often served with salt on the glass rim.
 
 ----COMPLETION-----
- 
+
 True<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 935
@@ -115,7 +115,7 @@ Options:
 Explain why a human would choose "beast" to answer the question above:
 
 ----COMPLETION-----
- 
+
 rat is a monster<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 962
@@ -163,7 +163,7 @@ SO, my first experience at Sandbar is as follows...I am out with my mom looking 
 
 Review score (between 1 and 5):
 ----COMPLETION-----
- 
+
 1<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 758
@@ -178,7 +178,7 @@ I found the following answer on Google: Soccer (association football) is less po
 Is that a correct answer? Yes or no.
 
 ----COMPLETION-----
- 
+
 No<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 950
@@ -193,7 +193,7 @@ Okay, I am not sure what has possessed me to return to this place after my first
 
 Review score (between 1 and 5):
 ----COMPLETION-----
- 
+
 1<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 735
@@ -208,7 +208,7 @@ Jill works the robot head into a sculpture, and Mo says that he likes the work, 
 Back at the apartment, the robot has reassembled itself using pieces of Jill's metal sculptures and recharged by draining her apartment's power network. It attempts to kill Jill, but she traps it in a room after the apartment's doors lock. Lincoln sees the robot close the...
 
 ----COMPLETION-----
- 
+
 Hardware<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 552
@@ -330,7 +330,7 @@ Facts:
 Based on these bullet points, write a short biography describing the life of ronan loughney
 .
 ----COMPLETION-----
- 
+
 ronan loughney -lrb- born 1 november 1984 -rrb- is a professional rugby union player from ireland.
 he plays as a prop.
 having started his career playing at loosehead, loughney now plays primarily at tighthead.
@@ -394,7 +394,7 @@ SEQUENCE 20
 
 What type of mandolin was becoming popular by 1930's?
 ----COMPLETION-----
- 
+
 single mandolins
 <|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
@@ -410,7 +410,7 @@ Product review: Like other reviewers, my son also had a terrible rash after we s
 Would you say this review depicts the product in a flattering or unflattering light?
 
 ----COMPLETION-----
- 
+
 unflattering <|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 779
@@ -433,10 +433,10 @@ SEQUENCE 23
 ================================================================================
 ----PROMPT-----
 
-Topic from the passage: 
+Topic from the passage:
 Utrecht hosts several large institutions of higher education. The most prominent of these is Utrecht University (est. 1636), the largest university of the Netherlands with 30,449 students (as of 2012). The university is partially based in the inner city as well as in the Uithof campus area, to the east of the city. According to Shanghai Jiaotong University's university ranking in 2014 it is the 57th best university in the world. Utrecht also houses the much smaller University of Humanistic Studies, which houses about 400 students.
 ----COMPLETION-----
- 
+
 Utrecht<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 896
@@ -459,13 +459,13 @@ Padding tokens: 979
 SEQUENCE 25
 ================================================================================
 ----PROMPT-----
-Context: The Serbo-Croatian dialects differ not only in the question word they are named after, but also heavily in phonology, accentuation and intonation, case endings and tense system (morphology) and basic vocabulary. In the past, Chakavian and Kajkavian dialects were spoken on a much larger territory, but have been replaced by Štokavian during the period of migrations caused by Ottoman Turkish conquest of the Balkans in the 15th and the 16th centuries. These migrations caused the koinéisation of the Shtokavian dialects, that used to form the West Shtokavian (more closer and transitional towards the neighbouring Chakavian and Kajkavian dialects) and East Shtokavian (transitional towards the Torlakian and the whole Bulgaro-Macedonian area) dialect bundles, and their subsequent spread at the expense of Chakavian and Kajkavian. As a result, Štokavian now covers an area larger than all the other dialects combined, and continues to make its progress in the enclaves where non-literary dialects are still being spoken.; 
+Context: The Serbo-Croatian dialects differ not only in the question word they are named after, but also heavily in phonology, accentuation and intonation, case endings and tense system (morphology) and basic vocabulary. In the past, Chakavian and Kajkavian dialects were spoken on a much larger territory, but have been replaced by Štokavian during the period of migrations caused by Ottoman Turkish conquest of the Balkans in the 15th and the 16th centuries. These migrations caused the koinéisation of the Shtokavian dialects, that used to form the West Shtokavian (more closer and transitional towards the neighbouring Chakavian and Kajkavian dialects) and East Shtokavian (transitional towards the Torlakian and the whole Bulgaro-Macedonian area) dialect bundles, and their subsequent spread at the expense of Chakavian and Kajkavian. As a result, Štokavian now covers an area larger than all the other dialects combined, and continues to make its progress in the enclaves where non-literary dialects are still being spoken.;
 
-Question: What has caused Stokavian to become more widely spoken? 
+Question: What has caused Stokavian to become more widely spoken?
 
 Is this question answerable?
 ----COMPLETION-----
- 
+
 
 yes
 <|endoftext|>
@@ -506,7 +506,7 @@ What are some interesting tongue twisters you know?
 Pick one: These questions are "duplicates" or "not duplicates".
 
 ----COMPLETION-----
- 
+
 not duplicates<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 980
@@ -531,7 +531,7 @@ Title: Useful for city dwellers
 Review: This is a good book if you live in larger areas. Rural areas do not apply to most of the book. The best tip however was the detail about David's Bridal and their lack of customer service. Very true!
 Is this product review negative?
 ----COMPLETION-----
- 
+
 Yes<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 958
@@ -556,7 +556,7 @@ SEQUENCE 32
 ----PROMPT-----
 Make a title for this article: sweltering temperatures strained california's already overburdened power grid as residents fought to find relief from a heat wave that's expected to last all week.
 ----COMPLETION-----
- 
+
 
 heat wave hits san francisco area<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
@@ -569,10 +569,10 @@ SEQUENCE 33
 ----PROMPT-----
 Sentence 1: A Peri whose power is in her hair appears in Elizabeth Ann Scarborough ’ s novel `` The Harem of Aman Akbar '' from 1984.
 Sentence 2: A Peri whose force appears in her hair is in Elizabeth Ann Scarborough's novel of 1984, `` The Harem of Aman Akbar ''.
-Question: Can we rewrite Sentence 1 to Sentence 2? 
+Question: Can we rewrite Sentence 1 to Sentence 2?
 
 ----COMPLETION-----
- 
+
 No<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 935
@@ -594,7 +594,7 @@ First, a man in a black and white film is shown doing a running long jump. we th
 (d) then runs, kicking the sand into a pile onto the field.
 
 ----COMPLETION-----
- 
+
 is finally shown doing a long landing jump.<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 884
@@ -647,7 +647,7 @@ Title: worked for one hour!
 Review: My son only played with the train an hour before it completely stopped working! We were going to change the batteries, to see if that was the problem... But it takes cell batteries!I wont buy Brio again!
 Is this product review negative?
 ----COMPLETION-----
- 
+
 Yes<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 959
@@ -662,7 +662,7 @@ Do the following two sentences mean the same thing?
 The only difference is a tuner, a small piece of electronics. "
 
 ----COMPLETION-----
- 
+
 yes<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 971
@@ -710,11 +710,11 @@ Padding tokens: 966
 SEQUENCE 42
 ================================================================================
 ----PROMPT-----
-Carriers to  Cut Fee for Number Transfer Verizon and Sprint have decided to eliminate or reduce a 40-cent-per-line monthly charge imposed to allow customers to transfer their phone numbers to new carriers.&lt;br&gt;&lt;FONT face="verdana,MS Sans Serif,arial,helvetica" size="-2" color="#666666"&gt;&lt;B&gt;-The Washington Post&lt;/B&gt;&lt;/FONT&gt; 
+Carriers to  Cut Fee for Number Transfer Verizon and Sprint have decided to eliminate or reduce a 40-cent-per-line monthly charge imposed to allow customers to transfer their phone numbers to new carriers.&lt;br&gt;&lt;FONT face="verdana,MS Sans Serif,arial,helvetica" size="-2" color="#666666"&gt;&lt;B&gt;-The Washington Post&lt;/B&gt;&lt;/FONT&gt;
 
 Which of the following sections of a newspaper would this article likely appear in? World News, Sports, Business, or Science and Technology?
 ----COMPLETION-----
- 
+
 Science and Technology<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 877
@@ -727,7 +727,7 @@ SEQUENCE 43
 
 Steel and manganese combines form to make what?
 ----COMPLETION-----
- 
+
 Mangalloy
 <|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
@@ -752,7 +752,7 @@ SEQUENCE 45
 On a scale of 1-5 (with 1 being least favorable and 5 being most favorable), how would you rate this review? "WORST EVER SEEN Why must i not open any other apps until i download dis apps it's disgusting.it doesn't even worth 1 star."
 
 ----COMPLETION-----
- 
+
 4<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 962
@@ -778,10 +778,10 @@ SEQUENCE 47
 ================================================================================
 ----PROMPT-----
 
-Get the topic from: 
+Get the topic from:
 Yale has a complicated relationship with its home city; for example, thousands of students volunteer every year in a myriad of community organizations, but city officials, who decry Yale's exemption from local property taxes, have long pressed the university to do more to help. Under President Levin, Yale has financially supported many of New Haven's efforts to reinvigorate the city. Evidence suggests that the town and gown relationships are mutually beneficial. Still, the economic power of the university increased dramatically with its financial success amid a decline in the local economy.
 ----COMPLETION-----
- 
+
 Yale University<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 901
@@ -791,13 +791,13 @@ Padding tokens: 901
 SEQUENCE 48
 ================================================================================
 ----PROMPT-----
-Context: Genome-wide association studies have found 27 genetic variants that are associated with an increased risk of myocardial infarction. Strongest association of MI has been found with the 9p21 genomic locus, which contains genes CDKN2A & 2B, although the single nucleotide polymorphisms that are implicated are within a non-coding region. The majority of these variants are in regions that have not been previously implicated in coronary artery disease. The following genes have an association with MI: PCSK9, SORT1, MIA3, WDR12, MRAS, PHACTR1, LPA, TCF21, MTHFDSL, ZC3HC1, CDKN2A, 2B, ABO, PDGF0, APOA5, MNF1ASM283, COL4A1, HHIPC1, SMAD3, ADAMTS7, RAS1, SMG6, SNF8, LDLR, SLC5A3, MRPS6, KCNE2.; 
+Context: Genome-wide association studies have found 27 genetic variants that are associated with an increased risk of myocardial infarction. Strongest association of MI has been found with the 9p21 genomic locus, which contains genes CDKN2A & 2B, although the single nucleotide polymorphisms that are implicated are within a non-coding region. The majority of these variants are in regions that have not been previously implicated in coronary artery disease. The following genes have an association with MI: PCSK9, SORT1, MIA3, WDR12, MRAS, PHACTR1, LPA, TCF21, MTHFDSL, ZC3HC1, CDKN2A, 2B, ABO, PDGF0, APOA5, MNF1ASM283, COL4A1, HHIPC1, SMAD3, ADAMTS7, RAS1, SMG6, SNF8, LDLR, SLC5A3, MRPS6, KCNE2.;
 
-Question: How many genetic variants are in the 9p21 genomic locus? 
+Question: How many genetic variants are in the 9p21 genomic locus?
 
 Is this question answerable?
 ----COMPLETION-----
- 
+
 
 no
 <|endoftext|>
@@ -827,7 +827,7 @@ Movie plot title: Herbie: Fully Loaded
 Movie plot: The plucky little #53 VW Bug named Herbie was once one of the most popular vehicles on the racing circuit in his day. However, over time, his popularity waned, until he eventually finds himself in the hands of a junk yard owner named Crazy Dave, who is planning to eventually crush the little beetle into scrap.Meanwhile, Maggie Peyton has just graduated from college, and is planning to head to New York after the summer to work for ESPN. Though she appears happy for these plans, she secretly harbors a wish to race just like her Father, Grandfather, and Brother. However, while her Father and Grandfather had the 'ambition and drive,' her brother Rey Payton Jr just doesn't have it.After her graduation, Rey Payton Sr takes his daughter to Crazy Dave's to pick out a used car of her own. Through a mishap perpetrated by Herbie, Maggie ends up as the beetle's new owner. However, once she starts Herbie up, he takes off in a mad dash to a nearby garage, owned by a young man named Kevin, who is a friend of Maggie's.Noting Herbie's condition, Kevin decides to go with Maggie for a drive to test Herbie out. However, Herbie ends up driving the two of them to a local exotic car show, where famed NASCAR racer Trip Murphy is making a publicity appearance. After Trip makes a rude comment about Herbie's condition, the little beetle creates a major scratch along the side of Trip's personal vehicle. A race soon ensues, and Maggie (wearing a racing outfit with a darkened helmet), manages to beat Trip.Herbie's beating Trip gives Maggie a thrill from winning a street race (something she promised her Dad she wouldn't do again after a serious accident some time before), but plunges Trip into a deep grudge over being beaten by an old VW beetle. Even though his manager (and brother) tells Trip to just ignore the 'fluke win,' Trip is determined to get back at Herbie and his racer. Trip then advertises a special racing event in the desert with the promise of a $10,000 cash prize to the person who beats him.The ad catches the eye of Maggie...
 
 ----COMPLETION-----
- 
+
 
 Trip
 <|endoftext|>
@@ -902,7 +902,7 @@ The club itself is amaaazing - if you can get inside, that is. Anytime I've been
 
 Stars:
 ----COMPLETION-----
- 
+
 3 stars<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 688
@@ -914,7 +914,7 @@ SEQUENCE 57
 ----PROMPT-----
 Make a title for this article: china confirmed thursday that it had agreed to visits by technicians from the voice of america -lrb- voa -rrb- to discuss alleged chinese jamming of broadcasts by the us radio network.
 ----COMPLETION-----
- 
+
 
 china agrees to talks on alleged jamming of us radio<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
@@ -966,7 +966,7 @@ Based on this review, would the user recommend this product?
 Review: WHY DON'T YOU PEOPLE LET US LISTIN TO THE WHOLE SONG,INSTEAD JUST A 30 SECOND BIT.
 Answer:
 ----COMPLETION-----
- 
+
 No<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 973
@@ -992,7 +992,7 @@ Not the best Target I've seen..\nDefinitely needs some fixing up or updating! Un
 
 Review rating:
 ----COMPLETION-----
- 
+
 3 stars<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 911
@@ -1017,52 +1017,52 @@ mercedes is in a long term relationship with dååth and chimaira guitar player 
 mercedes is famed for her heavy drumming style and extensive tattoos.
 
 ----COMPLETION-----
- 
-
-
-- instrument 
 
 
 
-- years active 
+- instrument
 
 
 
-- birth name 
+- years active
 
 
 
-- origin 
+- birth name
 
 
 
-- genre 
+- origin
+
+
+
+- genre
 
 
 
 
 
-- birth date 
+- birth date
 
 
 
-- name 
+- name
 
 
 
-- image size 
+- image size
 
 
 
-- background 
+- background
 
 
 
-- associated acts 
+- associated acts
 
 
 
-- occupation 
+- occupation
 
 <|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
@@ -1073,11 +1073,11 @@ Padding tokens: 719
 SEQUENCE 65
 ================================================================================
 ----PROMPT-----
-Sharapova steamrolls into Seoul semis Seoul, Korea (Sports Network) - Wimbledon champion Maria Sharapova was an easy quarterfinal winner Friday at the \$140,000 Korea Open Tennis Championships. 
+Sharapova steamrolls into Seoul semis Seoul, Korea (Sports Network) - Wimbledon champion Maria Sharapova was an easy quarterfinal winner Friday at the \$140,000 Korea Open Tennis Championships.
 
 Which section of a newspaper would this article likely appear in?
 ----COMPLETION-----
- 
+
 Sports<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 961
@@ -1091,7 +1091,7 @@ Title: Timeless
 Review: My copy of Sculptured Knits arrived yesterday. It is indeed beautiful, innovative,classic and timeless. I have Jean Moss's other three books and admire her vision. My needles are already "clicking" with the Gaia design. I am using beautiful New Zealand Treliske merino wool.XRX have set a new standard in knitting book publishing.Thank you for this wonderful book Jean and please keep publishing.Best Wishes Stephanie Coote
 Is the review positive or negative?
 ----COMPLETION-----
- 
+
 Positive<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 910
@@ -1106,7 +1106,7 @@ Review title: Stop Working
 Product review: I bought this humidifer and it worked well for a while, but no matter how well I tried to clean the machine it got really nasty. The night light stopped working almost immediately which really upset my 4 year old daughter.
 
 ----COMPLETION-----
- 
+
 decrease <|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 931
@@ -1134,7 +1134,7 @@ Based on this review, would the user recommend this product?
 Review: I've watched Millionaire Matchmaker and enjoy it entertainment value, and I appreciated Patti's straight-shooting approach. I got this video out of sure curiosity and to see if she had any tips. But oh wow- This was a joke. I agree with the reviewer who noted poor production quality and terrible scripting. My friends and I are planning a watch party for the sole purpose to make fun of it.I say it's a joke, but it's also insulting to single women and also single men. She insults the women who attend her conference, she insults the men who she talks to at the round table discussion.... it's just awkward. The disappointing thing, though, is that this isn't the person she is on her TV show.Save your money or buy it cheaply. Or do what I did and make it a watch party for you and your single friends.
 Answer:
 ----COMPLETION-----
- 
+
 No<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 822
@@ -1179,7 +1179,7 @@ Great sandwiches and soups. Friendly staff.
 
 Review rating:
 ----COMPLETION-----
- 
+
 4 stars<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 1001
@@ -1192,7 +1192,7 @@ SEQUENCE 73
 What are the topics in the sentence: Everyone gives him disapproving looks.
 
 ----COMPLETION-----
- 
+
 look, give, everyone<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 1000
@@ -1218,7 +1218,7 @@ SEQUENCE 75
 
 When did Microsoft remove license fees on device screens less than 9 inches?
 ----COMPLETION-----
- 
+
 April 2, 2014
 <|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
@@ -1240,11 +1240,11 @@ Padding tokens: 865
 SEQUENCE 77
 ================================================================================
 ----PROMPT-----
-Ignoring the order of the concepts: lake, hillside, reflect; 
+Ignoring the order of the concepts: lake, hillside, reflect;
 Generate a sentence with all the concepts :
 
 ----COMPLETION-----
- 
+
 green hillsides are reflected in the glassy surface of lake.<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 981
@@ -1259,7 +1259,7 @@ This place is a little off the beaten path, but it's always the hidden gems that
 
 Stars:
 ----COMPLETION-----
- 
+
 4 stars<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 740
@@ -1320,10 +1320,10 @@ SEQUENCE 83
 ----PROMPT-----
 Sentence 1: Jean Tardieu was born around 1711 in Paris, son of Pierre Francois Tardieu.
 Sentence 2: Jean Tardieu was born around 1711 in Paris, the son of Pierre Francois Tardieu.
-Question: Does Sentence 1 paraphrase Sentence 2? 
+Question: Does Sentence 1 paraphrase Sentence 2?
 
 ----COMPLETION-----
- 
+
 Yes<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 955
@@ -1383,10 +1383,10 @@ Padding tokens: 966
 SEQUENCE 88
 ================================================================================
 ----PROMPT-----
-LoJack buys Canadian tracking company LoJack Corp., which makes devices for recovering stolen cars, agreed to buy Boomerang Tracking Inc. for about \$48 million to expand into Canada. LoJack will pay about \$4.32 a share in cash or a combination of cash and stock for the Montreal maker of stolen vehicle recovery equipment, LoJack said. Westwood-based LoJack also gets Boomerang's cash balance of \$12 million.... 
+LoJack buys Canadian tracking company LoJack Corp., which makes devices for recovering stolen cars, agreed to buy Boomerang Tracking Inc. for about \$48 million to expand into Canada. LoJack will pay about \$4.32 a share in cash or a combination of cash and stock for the Montreal maker of stolen vehicle recovery equipment, LoJack said. Westwood-based LoJack also gets Boomerang's cash balance of \$12 million....
 Is this a piece of news regarding world politics, sports, business, or science and technology?
 ----COMPLETION-----
- 
+
 Business<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 905
@@ -1410,7 +1410,7 @@ SEQUENCE 90
 
 In 2006, due to ongoing violence, over 50,000 people in the country's northwest were at risk of starvation but this was averted due to assistance from the United Nations.[citation needed] On 8 January 2008, the UN Secretary-General Ban Ki-Moon declared that the Central African Republic was eligible to receive assistance from the Peacebuilding Fund. Three priority areas were identified: first, the reform of the security sector; second, the promotion of good governance and the rule of law; and third, the revitalization of communities affected by conflicts. On 12 June 2008, the Central African Republic requested assistance from the UN Peacebuilding Commission, which was set up in 2005 to help countries emerging from conflict avoid devolving back into war or chaos. Please tell me Who assisted in saving the people from starvation?
 ----COMPLETION-----
- 
+
 
 United Nations
 <|endoftext|>
@@ -1425,7 +1425,7 @@ SEQUENCE 91
 What is the following passage about?
 Weeks after ending the Sex Pistols, Lydon formed the experimental group Public Image Ltd and declared the project to be "anti music of any kind". Public Image and other acts such as the Pop Group and the Slits had begun experimenting with dance music, dub production techniques and the avant-garde, while punk-indebted Manchester acts such as Joy Division, The Fall and A Certain Ratio developed unique styles which drew on a similarly disparate range of influences across music and modernist literature. Bands such as Scritti Politti, Gang of Four and This Heat incorporated Leftist political philosophy and their own art school studies in their work.
 ----COMPLETION-----
- 
+
 Post-punk<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 876
@@ -1449,7 +1449,7 @@ SEQUENCE 93
 ----PROMPT-----
 Make a title for this article: astronauts took another spacewalk at the international space station saturday, this time to lighten the workload for future crews.
 ----COMPLETION-----
- 
+
 
 astronauts go on #nd spacewalk at space station<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
@@ -1462,7 +1462,7 @@ SEQUENCE 94
 ----PROMPT-----
 Make a title for this article: the philadelphia-based manufacturer of a pesticide blamed for the poisoning deaths of lions in kenya says it's taking `` aggressive action '' to prevent misuse of the product, halting sales to the country and trying to buy back supplies.
 ----COMPLETION-----
- 
+
 
 us pesticide maker vows steps to protect lions<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
@@ -1478,7 +1478,7 @@ Title: Great Club Stepper
 Review: This purchase was effortless, priced right, and delivery was right on!!If you absolutely know, without a doubt, that this product is exactly what you want, then buying this health club stepper through Amazon.com is the very best way to go.
 Answer:
 ----COMPLETION-----
- 
+
 Yes<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 949
@@ -1492,7 +1492,7 @@ Given this review: "Gud"
 Would you recommend this app to a friend? Not at all, No, Maybe, Yes, or Definitely?
 
 ----COMPLETION-----
- 
+
 Definitely<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 987
@@ -1531,7 +1531,7 @@ Choose between "ice" and  "concrete".
 Question: A boy was rolling his rubber ball in his driveway to see how far he could make it roll. He found that it rolled smoother and further on the _____. The ice has lower friction. (A) concrete (B) ice
 
 ----COMPLETION-----
- 
+
 concrete<|endoftext|>
 ------------------------------ATTENTION SEPARATOR------------------------------
 Padding tokens: 957

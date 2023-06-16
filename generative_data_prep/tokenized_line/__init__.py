@@ -16,4 +16,4 @@ limitations under the License.
 
 from .tokenized_line import TokenizedArticle, TokenizedLine, TokenizedSequence
 
-__all__ = ['TokenizedArticle', 'TokenizedLine', 'TokenizedSequence']
+__all__ = ["TokenizedArticle", "TokenizedLine", "TokenizedSequence"]

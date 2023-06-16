@@ -23,17 +23,16 @@ long, we need to sometimes split up long blocks of text into multiple sequences.
 
 from typing import List, Optional, Tuple
 
-from generative_data_prep.tokenized_line import (TokenizedArticle,
-                                                 TokenizedSequence)
-from generative_data_prep.utils import (OverflowType, PackingConfig,
-                                        PackingStyleType)
+from generative_data_prep.tokenized_line import TokenizedArticle, TokenizedSequence
+from generative_data_prep.utils import OverflowType, PackingConfig, PackingStyleType
 
 
 class SequencePacker:
     """Takes articles and packs them into fixed length sequences."""
 
-    def __init__(self, max_seq_length: int, eos_token_id: int,
-                 packing_config: PackingConfig):
+    def __init__(
+        self, max_seq_length: int, eos_token_id: int, packing_config: PackingConfig
+    ):
         """Create the SequencePacker.
 
         Args:
@@ -99,7 +98,8 @@ class SequencePacker:
         self.packing_config = packing_config
 
         self.unfinished_sequence = TokenizedSequence.get_empty(
-            self.max_seq_length, self.eos_token_id)
+            self.max_seq_length, self.eos_token_id
+        )
 
     def __call__(
         self, tokenized_articles: Optional[List[TokenizedArticle]]
@@ -119,7 +119,8 @@ class SequencePacker:
             if not self.unfinished_sequence.is_empty():
                 unfinished_sequence.pad()
                 self.unfinished_sequence = TokenizedSequence.get_empty(
-                    self.max_seq_length, self.eos_token_id)
+                    self.max_seq_length, self.eos_token_id
+                )
                 return [unfinished_sequence]
             return []
 
@@ -127,7 +128,8 @@ class SequencePacker:
         packed_sequences = []
         for tokenized_article in tokenized_articles:
             newly_packed_sequences, unfinished_sequence = self._get_packed_sequences(
-                tokenized_article, unfinished_sequence)
+                tokenized_article, unfinished_sequence
+            )
             packed_sequences += newly_packed_sequences
 
         # Store any unfinished sequences to prepend to the next tokenized article which will be passed in when
@@ -135,10 +137,12 @@ class SequencePacker:
         self.unfinished_sequence = unfinished_sequence
         return packed_sequences
 
-    def _handle_overflow(self, tokenized_article: TokenizedArticle,
-                         unfinished_sequence: TokenizedSequence):
-        num_overflow_tokens = len(
-            tokenized_article) - unfinished_sequence.free_tokens
+    def _handle_overflow(
+        self,
+        tokenized_article: TokenizedArticle,
+        unfinished_sequence: TokenizedSequence,
+    ):
+        num_overflow_tokens = len(tokenized_article) - unfinished_sequence.free_tokens
         if num_overflow_tokens <= 0:
             return tokenized_article
 
@@ -150,11 +154,13 @@ class SequencePacker:
             return tokenized_article[:-num_overflow_tokens]
         else:
             raise ValueError(
-                f'Invalid Overflow Type {self.packing_config.overflow_type}')
+                f"Invalid Overflow Type {self.packing_config.overflow_type}"
+            )
 
     def _get_packed_sequences(
-        self, tokenized_article: TokenizedArticle,
-        unfinished_sequence: TokenizedSequence
+        self,
+        tokenized_article: TokenizedArticle,
+        unfinished_sequence: TokenizedSequence,
     ) -> Tuple[List[TokenizedSequence], TokenizedSequence]:
         """Packs the tokenized article into sequences.
         Args:
@@ -169,19 +175,20 @@ class SequencePacker:
         if self.packing_config.packing_style == PackingStyleType.SINGLE:
             # Put each article in its own sequence
             assert unfinished_sequence.is_empty()
-            tokenized_article = self._handle_overflow(tokenized_article,
-                                                      unfinished_sequence)
+            tokenized_article = self._handle_overflow(
+                tokenized_article, unfinished_sequence
+            )
             unfinished_sequence += tokenized_article
             if not unfinished_sequence.is_empty():
                 unfinished_sequence.pad()
                 newly_packed_sequences.append(unfinished_sequence)
                 unfinished_sequence = TokenizedSequence.get_empty(
-                    self.max_seq_length, self.eos_token_id)
+                    self.max_seq_length, self.eos_token_id
+                )
 
         elif self.packing_config.packing_style == PackingStyleType.GREEDY:
             # if it fits in the unfinished sequence, then add it
-            if len(unfinished_sequence) + len(
-                    tokenized_article) <= self.max_seq_length:
+            if len(unfinished_sequence) + len(tokenized_article) <= self.max_seq_length:
                 unfinished_sequence += tokenized_article
             else:
                 # complete the previous sequence
@@ -189,9 +196,11 @@ class SequencePacker:
                 newly_packed_sequences.append(unfinished_sequence)
                 # try and fit the tokenized article in the next sequence
                 unfinished_sequence = TokenizedSequence.get_empty(
-                    self.max_seq_length, self.eos_token_id)
+                    self.max_seq_length, self.eos_token_id
+                )
                 tokenized_article = self._handle_overflow(
-                    tokenized_article, unfinished_sequence)
+                    tokenized_article, unfinished_sequence
+                )
                 unfinished_sequence += tokenized_article
 
         elif self.packing_config.packing_style == PackingStyleType.FULL:
@@ -200,11 +209,13 @@ class SequencePacker:
             while not remainder_article.is_empty():
                 newly_packed_sequences.append(unfinished_sequence)
                 unfinished_sequence = TokenizedSequence.get_empty(
-                    self.max_seq_length, self.eos_token_id)
+                    self.max_seq_length, self.eos_token_id
+                )
                 remainder_article = unfinished_sequence.pack(remainder_article)
 
         else:
             raise ValueError(
-                f'Invalid packing style {self.packing_config.packing_style}')
+                f"Invalid packing style {self.packing_config.packing_style}"
+            )
 
         return newly_packed_sequences, unfinished_sequence

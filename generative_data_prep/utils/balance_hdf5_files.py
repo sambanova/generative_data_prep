@@ -55,7 +55,9 @@ def balance_hdf5_files(hdf5_file_paths: List[str]) -> None:
     num_files = len(hdf5_file_paths)
     avg_seqs = int(tot_seqs / num_files)
     remainder = tot_seqs % num_files
-    assert avg_seqs * num_files + remainder == tot_seqs, f'avg_seqs * num_files + remainder = {avg_seqs * num_files + remainder} but tot_seqs = {tot_seqs}, not equal!'
+    assert (
+        avg_seqs * num_files + remainder == tot_seqs
+    ), f"avg_seqs * num_files + remainder = {avg_seqs * num_files + remainder} but tot_seqs = {tot_seqs}, not equal!"
 
     # Remove and save sequences from files with more than the average
     # Determine how many more sequences files with less than the average need
@@ -63,7 +65,7 @@ def balance_hdf5_files(hdf5_file_paths: List[str]) -> None:
     extra_token_seqs = []
     extra_ttid_seqs = []
     for file_path in hdf5_file_paths:
-        with h5py.File(file_path, 'r+') as curr_hdf5_file:
+        with h5py.File(file_path, "r+") as curr_hdf5_file:
             curr_num_seq = curr_hdf5_file["input_ids"].shape[0]
             seq_len = curr_hdf5_file["input_ids"].shape[1]
             # If file has more than the average number of sequences
@@ -76,17 +78,14 @@ def balance_hdf5_files(hdf5_file_paths: List[str]) -> None:
                         continue
                 curr_num_seq -= num_extra_seq
                 # save extra token sequences, and update hdf5 file
-                curr_extra_token_seqs = curr_hdf5_file['input_ids'][
-                    -num_extra_seq:]
+                curr_extra_token_seqs = curr_hdf5_file["input_ids"][-num_extra_seq:]
                 extra_token_seqs.append(curr_extra_token_seqs)
-                curr_hdf5_file['input_ids'].resize((curr_num_seq, seq_len))
+                curr_hdf5_file["input_ids"].resize((curr_num_seq, seq_len))
 
                 # save extra token type id sequences, and update hdf5 file
-                curr_extra_ttid_seqs = curr_hdf5_file['token_type_ids'][
-                    -num_extra_seq:]
+                curr_extra_ttid_seqs = curr_hdf5_file["token_type_ids"][-num_extra_seq:]
                 extra_ttid_seqs.append(curr_extra_ttid_seqs)
-                curr_hdf5_file['token_type_ids'].resize(
-                    (curr_num_seq, seq_len))
+                curr_hdf5_file["token_type_ids"].resize((curr_num_seq, seq_len))
 
             # If file has less than the average number of sequences
             elif curr_num_seq < avg_seqs:
@@ -109,38 +108,42 @@ def balance_hdf5_files(hdf5_file_paths: List[str]) -> None:
     else:
         extra_token_seqs_np = np.zeros((0, 0))
         extra_ttid_seqs_np = np.zeros((0, 0))
-        assert len(
-            file_path_to_num_needed_seqs
-        ) == 0, f'No extra sequences found, but these files need extra sequences {file_path_to_num_needed_seqs}'
+        assert (
+            len(file_path_to_num_needed_seqs) == 0
+        ), f"No extra sequences found, but these files need extra sequences {file_path_to_num_needed_seqs}"
 
     # Iterate through all the files that need more sequences
     for file_path, num_needed_seq in file_path_to_num_needed_seqs.items():
-        with h5py.File(file_path, 'r+') as curr_hdf5_file:
+        with h5py.File(file_path, "r+") as curr_hdf5_file:
             # new shape for hdf5 file after sequences have been added
-            new_shape = (curr_hdf5_file['input_ids'].shape[0] + num_needed_seq,
-                         curr_hdf5_file['input_ids'].shape[1])
+            new_shape = (
+                curr_hdf5_file["input_ids"].shape[0] + num_needed_seq,
+                curr_hdf5_file["input_ids"].shape[1],
+            )
 
             # add extra token sequences to hdf5 file
-            curr_hdf5_file['input_ids'].resize(new_shape)
-            curr_hdf5_file['input_ids'][
-                -num_needed_seq:] = extra_token_seqs_np[:num_needed_seq]
+            curr_hdf5_file["input_ids"].resize(new_shape)
+            curr_hdf5_file["input_ids"][-num_needed_seq:] = extra_token_seqs_np[
+                :num_needed_seq
+            ]
             # remove saved token sequences so they are not used again
             extra_token_seqs_np = extra_token_seqs_np[num_needed_seq:]
 
             # add extra token_type_ids to hdf5 file
-            curr_hdf5_file['token_type_ids'].resize(new_shape)
-            curr_hdf5_file['token_type_ids'][
-                -num_needed_seq:] = extra_ttid_seqs_np[:num_needed_seq]
+            curr_hdf5_file["token_type_ids"].resize(new_shape)
+            curr_hdf5_file["token_type_ids"][-num_needed_seq:] = extra_ttid_seqs_np[
+                :num_needed_seq
+            ]
             # remove saved token_type_ids sequences so they are not used again
             extra_ttid_seqs_np = extra_ttid_seqs_np[num_needed_seq:]
-            
+
     assert len(extra_token_seqs_np) == 0
     assert remainder == 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     start_time = time.time()
-    hdf5_files = glob(sys.argv[1] + '/train*')
+    hdf5_files = glob(sys.argv[1] + "/train*")
     balance_hdf5_files(hdf5_files)
     total_time = time.time() - start_time
-    print(f'total time to run re-balancing: {total_time}')
+    print(f"total time to run re-balancing: {total_time}")

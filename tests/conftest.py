@@ -17,10 +17,17 @@ limitations under the License.
 from typing import Optional
 
 import pytest
-from generative_data_prep.tokenized_line import TokenizedArticle, TokenizedLine, TokenizedSequence
+
+from generative_data_prep.tokenized_line import (
+    TokenizedArticle,
+    TokenizedLine,
+    TokenizedSequence,
+)
 
 
-def get_tokenized_line(length: int, max_seq_length: Optional[int], eos_token_id: Optional[int]) -> TokenizedLine:
+def get_tokenized_line(
+    length: int, max_seq_length: Optional[int], eos_token_id: Optional[int]
+) -> TokenizedLine:
     """Create either a tokenized article or a tokenized sequence based on the arguments.
 
     The token_ids are initialized to be [0, 1, 2, ... length - 1]
@@ -35,15 +42,21 @@ def get_tokenized_line(length: int, max_seq_length: Optional[int], eos_token_id:
     elif not any(are_nones):
         # required for mypy
         assert max_seq_length is not None and eos_token_id is not None
-        tokenized_line = TokenizedSequence(token_ids, token_type_ids, max_seq_length, eos_token_id)
+        tokenized_line = TokenizedSequence(
+            token_ids, token_type_ids, max_seq_length, eos_token_id
+        )
     else:
-        raise ValueError('Both max_seq_length and eos_token_id must be None or both must be non-None')
+        raise ValueError(
+            "Both max_seq_length and eos_token_id must be None or both must be non-None"
+        )
 
     return tokenized_line
 
 
 @pytest.fixture
-def tokenized_line(length: int, max_seq_length: Optional[int], eos_token_id: Optional[int]) -> TokenizedLine:
+def tokenized_line(
+    length: int, max_seq_length: Optional[int], eos_token_id: Optional[int]
+) -> TokenizedLine:
     """Creates a tokenized line."""
     return get_tokenized_line(length, max_seq_length, eos_token_id)
 
