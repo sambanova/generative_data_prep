@@ -36,7 +36,7 @@ jobs:
           command: |
             . venv/bin/activate
             pre-commit run --hook-stage manual
-            pre-commit run --all-files pip-tools-compile
+            pre-commit run --all-files --hook-stage manual pip-tools-compile
       - save_cache:
           key: v2-{{ arch }}-{{ checksum "pyproject.toml" }}-{{ checksum "circleci_cache_key" }}
           paths:
