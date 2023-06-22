@@ -34,16 +34,12 @@ EXAMPLE_PATH = "tests/examples"
 def get_input_path(test_name: str) -> str:
     """Create a absolute path to example input."""
     ext = ".txt" if "txt" in test_name else ".jsonl"
-    return os.path.join(
-        Path.cwd(), EXAMPLE_PATH, test_name, f"example_{test_name}_data{ext}"
-    )
+    return os.path.join(Path.cwd(), EXAMPLE_PATH, test_name, f"example_{test_name}_data{ext}")
 
 
 def gold_data_prep_path(test_name: str) -> str:
     """Create a absolute path to example gold file."""
-    return os.path.join(
-        Path.cwd(), EXAMPLE_PATH, test_name, f"data_prepped_{test_name}.hdf5"
-    )
+    return os.path.join(Path.cwd(), EXAMPLE_PATH, test_name, f"data_prepped_{test_name}.hdf5")
 
 
 def gold_pipeline_path(test_name: str) -> str:

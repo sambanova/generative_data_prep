@@ -38,9 +38,7 @@ def packing_config(packing_style: PackingStyleType, overflow_type: OverflowType)
 
 
 @pytest.fixture
-def sequence_packer(
-    max_seq_length: int, eos_token_id: int, packing_config: PackingConfig
-) -> SequencePacker:
+def sequence_packer(max_seq_length: int, eos_token_id: int, packing_config: PackingConfig) -> SequencePacker:
     """Create the sequence packer."""
     return SequencePacker(max_seq_length, eos_token_id, packing_config)
 
@@ -83,9 +81,7 @@ def test_handle_overflow(
     unfinished_sequence, tokenized_article = tokenized_line, tokenized_line_2
     assert isinstance(unfinished_sequence, TokenizedSequence)
     assert isinstance(tokenized_article, TokenizedArticle)
-    tokenized_article = sequence_packer._handle_overflow(
-        tokenized_article, unfinished_sequence
-    )
+    tokenized_article = sequence_packer._handle_overflow(tokenized_article, unfinished_sequence)
     assert tokenized_article.token_ids == expected_token_ids
 
 
@@ -164,9 +160,7 @@ def test_sequence_packer(
     number_of_completion_tokens + number_of_padding_tokens == max_seq_length must be True.
     """
     err_msg = "Test is invalid, read the note in the docstring"
-    assert all(
-        max_seq_length == sum(expected_tuple) for expected_tuple in expected
-    ), err_msg
+    assert all(max_seq_length == sum(expected_tuple) for expected_tuple in expected), err_msg
 
     # create the articles
     articles = []

@@ -247,9 +247,7 @@ def test_add_space_separator(
     gold_prompt: List[int],
     gold_completion: List[int],
 ):
-    completion_test, prompt_test = article_tokenizer._add_space_separator(
-        completion, prompt
-    )
+    completion_test, prompt_test = article_tokenizer._add_space_separator(completion, prompt)
 
     assert completion_test == gold_completion
     assert prompt_test == gold_prompt
@@ -370,9 +368,7 @@ def test_process_jsonl(
     keep_prompt_only_sequences: bool,
 ):
     tokenized_articles = article_tokenizer_for_prompt_sequences.process_jsonl(jsonl)
-    for tokenized_article, gold_token, gold_ttid in zip(
-        tokenized_articles, gold_token_ids, gold_ttids
-    ):
+    for tokenized_article, gold_token, gold_ttid in zip(tokenized_articles, gold_token_ids, gold_ttids):
         assert tokenized_article.token_ids == gold_token
         assert tokenized_article.token_type_ids == gold_ttid
 
@@ -412,9 +408,7 @@ def test_process_text(
     assert tokenized_articles[0].token_type_ids == gold_ttids
 
 
-def get_tokenized_seq(
-    token_ids: List[int], token_type_ids: List[int]
-) -> TokenizedSequence:
+def get_tokenized_seq(token_ids: List[int], token_type_ids: List[int]) -> TokenizedSequence:
     return TokenizedSequence(token_ids, token_type_ids, MAX_SEQ_LEN, EOS_TOKEN_ID)
 
 
@@ -455,11 +449,7 @@ def get_tokenized_seq(
             None,
             '[{"prompt": "hi", "completion": "bye"}, {"prompt": "test", "completion": "test"}, \
         {"prompt": "test", "completion": "test"}]',
-            [
-                get_tokenized_seq(
-                    [1, 2, 0, 3, 3, 0], [PROMPT, COMP, COMP, PROMPT, COMP, COMP]
-                )
-            ],
+            [get_tokenized_seq([1, 2, 0, 3, 3, 0], [PROMPT, COMP, COMP, PROMPT, COMP, COMP])],
             get_tokenized_seq([3, 3, 0], [PROMPT, COMP, SEP]),
         ),
     ],
@@ -487,11 +477,7 @@ def test__call__(
             [
                 [],
                 [],
-                [
-                    get_tokenized_seq(
-                        [1, 2, 0, 1, 2, 0], [COMP, COMP, SEP, COMP, COMP, SEP]
-                    )
-                ],
+                [get_tokenized_seq([1, 2, 0, 1, 2, 0], [COMP, COMP, SEP, COMP, COMP, SEP])],
             ],
             get_tokenized_seq([1, 1, 0], [COMP, COMP, SEP]),
         ),
@@ -509,11 +495,7 @@ def test__call__(
             [
                 [],
                 [],
-                [
-                    get_tokenized_seq(
-                        [1, 2, 0, 1, 2, 0], [PROMPT, COMP, SEP, PROMPT, COMP, SEP]
-                    )
-                ],
+                [get_tokenized_seq([1, 2, 0, 1, 2, 0], [PROMPT, COMP, SEP, PROMPT, COMP, SEP])],
             ],
             get_tokenized_seq([1, 1, 0], [PROMPT, COMP, SEP]),
         ),

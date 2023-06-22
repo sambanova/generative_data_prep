@@ -41,9 +41,7 @@ class PackingConfig:
             ValueError: Invalid combination of PackingStyle and OverflowType.  Not all overflow types are compatible
                 with all packing styles.
         """
-        self._overflow_type = (
-            OverflowType(overflow_type) if overflow_type is not None else None
-        )
+        self._overflow_type = OverflowType(overflow_type) if overflow_type is not None else None
         self._packing_style = PackingStyleType(packing_style)
 
         # error handling
@@ -73,9 +71,7 @@ class PackingConfig:
             # error handling
             if len(split_name) != 2:
                 err_msg_1 = 'Packing config name must be formatted as "<packing_style> <overflow_type>"'
-                err_msg_2 = (
-                    "<packing_style> and <overflow_type> may not contain any spaces."
-                )
+                err_msg_2 = "<packing_style> and <overflow_type> may not contain any spaces."
                 raise ValueError(f"{err_msg_1} {err_msg_2}")
 
             packing_style, overflow_type = tuple(split_name)
@@ -102,9 +98,7 @@ class PackingConfig:
 
     def __str__(self) -> str:
         """Return a string representation of the PackingConfig."""
-        config_tuple = (
-            typ for typ in [self.packing_style, self.overflow_type] if typ is not None
-        )
+        config_tuple = (typ for typ in [self.packing_style, self.overflow_type] if typ is not None)
         return PackingConfig.DELIM.join(config_tuple)
 
     @staticmethod

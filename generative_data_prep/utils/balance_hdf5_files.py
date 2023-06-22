@@ -123,17 +123,13 @@ def balance_hdf5_files(hdf5_file_paths: List[str]) -> None:
 
             # add extra token sequences to hdf5 file
             curr_hdf5_file["input_ids"].resize(new_shape)
-            curr_hdf5_file["input_ids"][-num_needed_seq:] = extra_token_seqs_np[
-                :num_needed_seq
-            ]
+            curr_hdf5_file["input_ids"][-num_needed_seq:] = extra_token_seqs_np[:num_needed_seq]
             # remove saved token sequences so they are not used again
             extra_token_seqs_np = extra_token_seqs_np[num_needed_seq:]
 
             # add extra token_type_ids to hdf5 file
             curr_hdf5_file["token_type_ids"].resize(new_shape)
-            curr_hdf5_file["token_type_ids"][-num_needed_seq:] = extra_ttid_seqs_np[
-                :num_needed_seq
-            ]
+            curr_hdf5_file["token_type_ids"][-num_needed_seq:] = extra_ttid_seqs_np[:num_needed_seq]
             # remove saved token_type_ids sequences so they are not used again
             extra_ttid_seqs_np = extra_ttid_seqs_np[num_needed_seq:]
 

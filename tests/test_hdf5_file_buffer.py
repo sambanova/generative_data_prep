@@ -138,17 +138,11 @@ def test_hfd5_text_buffer_write(
 ):
     with tempfile.TemporaryDirectory() as output_dir:
         hdf5_file_path = os.path.join(output_dir, "temp.hdf5")
-        with Hdf5FileBuffer(
-            hdf5_file_path, max_seq_length1, DATA_TYPE, chunk_size
-        ) as f:
+        with Hdf5FileBuffer(hdf5_file_path, max_seq_length1, DATA_TYPE, chunk_size) as f:
             for i in range(num_iterations):
                 tokenized_line_copy = tokenized_line[:]
-                tokenized_line_copy._token_ids = list(
-                    map(lambda x: x + i, tokenized_line_copy._token_ids)
-                )
-                tokenized_line_copy._token_type_ids = list(
-                    map(lambda x: x + i, tokenized_line_copy._token_type_ids)
-                )
+                tokenized_line_copy._token_ids = list(map(lambda x: x + i, tokenized_line_copy._token_ids))
+                tokenized_line_copy._token_type_ids = list(map(lambda x: x + i, tokenized_line_copy._token_type_ids))
                 f.write([tokenized_line_copy])
         with h5py.File(hdf5_file_path, "r") as f:
             assert str(f.keys()) == "<KeysViewHDF5 ['input_ids', 'token_type_ids']>"
@@ -156,7 +150,5 @@ def test_hfd5_text_buffer_write(
             for input_ids_i, gold_input_ids_i in zip(f["input_ids"], gold_input_ids):
                 assert all(input_ids_i == gold_input_ids_i)
             assert f["token_type_ids"].shape == gold_token_type_ids.shape
-            for token_type_ids_i, gold_token_type_ids_i in zip(
-                f["token_type_ids"], gold_token_type_ids
-            ):
+            for token_type_ids_i, gold_token_type_ids_i in zip(f["token_type_ids"], gold_token_type_ids):
                 assert all(token_type_ids_i == gold_token_type_ids_i)

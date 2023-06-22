@@ -26,9 +26,7 @@ from generative_data_prep.tokenized_line import (
 from generative_data_prep.utils import TokenTypeIds
 
 
-@pytest.mark.parametrize(
-    "length,max_seq_length,eos_token_id", [(5, None, None), (2, 6, -1), (0, 6, -1)]
-)
+@pytest.mark.parametrize("length,max_seq_length,eos_token_id", [(5, None, None), (2, 6, -1), (0, 6, -1)])
 def test_len(tokenized_line: TokenizedLine, length: int):
     """Basic length test."""
     assert len(tokenized_line) == length
@@ -73,9 +71,7 @@ def test_illegal_add(tokenized_line: TokenizedLine, tokenized_line_2: TokenizedL
         tokenized_line += tokenized_line_2
 
 
-@pytest.mark.parametrize(
-    "length,max_seq_length,eos_token_id,index", [(10, None, None, 4), (10, 12, -1, 0)]
-)
+@pytest.mark.parametrize("length,max_seq_length,eos_token_id,index", [(10, None, None, 4), (10, 12, -1, 0)])
 def test_get_item(tokenized_line: TokenizedLine, index: int):
     """Test integer indexing of the tokenized line."""
     token, token_type_id = tokenized_line[index]
@@ -105,9 +101,7 @@ def test_get_slice(tokenized_line: TokenizedLine, index_slice: slice):
     token_type_ids = tokenized_line_slice.token_type_ids
     # as mentioned before, this is based on the way we initialized token_ids in the
     # tokenized_line fixture.
-    for i, index in enumerate(
-        range(index_slice.start, index_slice.stop, index_slice.step)
-    ):
+    for i, index in enumerate(range(index_slice.start, index_slice.stop, index_slice.step)):
         assert token_ids[i] == index
         assert token_type_ids[i] == -index
 
@@ -147,16 +141,12 @@ def test_pack(
     """Test that one tokenized line can be packed into another tokenized line."""
     assert isinstance(tokenized_line, TokenizedSequence)
     orig_tokenized_line_len = len(tokenized_line)
-    new_tokenized_line_len = min(
-        max_seq_length, len(tokenized_line) + len(tokenized_line_2)
-    )
+    new_tokenized_line_len = min(max_seq_length, len(tokenized_line) + len(tokenized_line_2))
     remainder_line = tokenized_line.pack(tokenized_line_2)
     if new_tokenized_line_len == max_seq_length:
         assert tokenized_line.is_packed()
     assert len(tokenized_line) == new_tokenized_line_len
-    assert len(
-        remainder_line
-    ) + new_tokenized_line_len == orig_tokenized_line_len + len(tokenized_line_2)
+    assert len(remainder_line) + new_tokenized_line_len == orig_tokenized_line_len + len(tokenized_line_2)
 
 
 def test_get_empty():

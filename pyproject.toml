@@ -113,3 +113,7 @@ exclude = [
 # Need this otherwise mypy complains it can't interpret the types of objects
 # from 3rd party libraries like transformers
 ignore_missing_imports = true
+
+# Configure black
+[tool.black]
+line-length = 120

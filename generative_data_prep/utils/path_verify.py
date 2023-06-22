@@ -59,9 +59,7 @@ def verify_output_file(output_file: str, overwrite_output_dir: bool):
             raise ValueError(err_msg)
 
     if not os.path.exists(os.path.dirname(output_file)):
-        raise ValueError(
-            f"The output path {output_file} is not valid - {os.path.dirname(output_file)} does not exist"
-        )
+        raise ValueError(f"The output path {output_file} is not valid - {os.path.dirname(output_file)} does not exist")
 
     if not os.access(os.path.dirname(output_file), os.W_OK):
         raise ValueError(f"The output path {output_file} is not writeable")
@@ -94,13 +92,9 @@ def verify_output_dir(
                         shutil.rmtree(file_path)
         elif raise_warning_if_exists:
             print(SEP_STR)
-            print(
-                f"WARNING: {output_dir} already exists, new files will be written here"
-            )
+            print(f"WARNING: {output_dir} already exists, new files will be written here")
     else:
         os.makedirs(output_dir)
 
     if not os.access(output_dir, os.W_OK):
-        raise ValueError(
-            f"The cache directory you provided {output_dir} is not writeable"
-        )
+        raise ValueError(f"The cache directory you provided {output_dir} is not writeable")

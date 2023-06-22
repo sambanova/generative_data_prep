@@ -155,9 +155,7 @@ def get_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def add_special_tokens_dict(
-    tokenizer: PreTrainedTokenizerBase, special_tokens_dict: str
-):
+def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase, special_tokens_dict: str):
     """Add the special tokens dictionary to tokenizer.
 
     Args:
@@ -197,9 +195,7 @@ def get_tokenizer(
     if pretrained_tokenizer is None and tokenizer_class is None:
         pretrained_tokenizer = GPT2_KEY
 
-    if not pretrained_tokenizer and not (
-        merges_file and vocab_file and tokenizer_class
-    ):
+    if not pretrained_tokenizer and not (merges_file and vocab_file and tokenizer_class):
         err_msg = "You must include either --pretrained_tokenizer, \
         or all three flags: --merges_file, --vocab_file and --tokenizer_class"
 

@@ -81,9 +81,7 @@ def large_file_shuffle(
     print("splitting file")
     split_command = f"split -d -n r/{num_splits} {input_file_path} {split_dir}/"
     os.system(split_command)
-    print(
-        f"splitting took {time.time() - prev_time} seconds (used round robin splitting)"
-    )
+    print(f"splitting took {time.time() - prev_time} seconds (used round robin splitting)")
 
     prev_time = time.time()
     print(f"shuffling {num_splits} files")
@@ -92,9 +90,7 @@ def large_file_shuffle(
         curr_file_path = os.path.join(split_dir, file)
         shuf_command = f"shuf {curr_file_path} --output={curr_file_path}"
         os.system(shuf_command)
-    print(
-        f"finished shuffling {num_splits} files. Took {time.time() - prev_time} seconds"
-    )
+    print(f"finished shuffling {num_splits} files. Took {time.time() - prev_time} seconds")
 
     if concat_splits:
         random_split_list = list(range(num_splits))

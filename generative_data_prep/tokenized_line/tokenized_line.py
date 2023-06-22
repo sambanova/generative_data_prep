@@ -50,9 +50,7 @@ class TokenizedLine(ABC):
         self._token_ids = token_ids
         self._token_type_ids = token_type_ids
 
-    def __iadd__(
-        self: TokenizedLineSubClass, tokenized_line: "TokenizedLine"
-    ) -> TokenizedLineSubClass:
+    def __iadd__(self: TokenizedLineSubClass, tokenized_line: "TokenizedLine") -> TokenizedLineSubClass:
         """Implement += for a tokenized line."""
         self._token_type_ids += tokenized_line.token_type_ids
         self._token_ids += tokenized_line.token_ids
@@ -99,10 +97,7 @@ class TokenizedLine(ABC):
         """Return whether or not another TokenizedLine is equal to this one."""
         if not isinstance(obj, TokenizedLine):
             return False
-        return (
-            self.token_type_ids == obj.token_type_ids
-            and self.token_ids == obj.token_ids
-        )
+        return self.token_type_ids == obj.token_type_ids and self.token_ids == obj.token_ids
 
     @property
     def token_ids(self) -> List[int]:
@@ -119,9 +114,7 @@ class TokenizedLine(ABC):
         return len(self) == 0
 
     @abstractmethod
-    def _get_slice(
-        self: TokenizedLineSubClass, slice_index: slice
-    ) -> TokenizedLineSubClass:
+    def _get_slice(self: TokenizedLineSubClass, slice_index: slice) -> TokenizedLineSubClass:
         """Return a slice of the TokenizedLine.
 
         Args:
@@ -144,9 +137,7 @@ class TokenizedArticle(TokenizedLine):
 
     def _get_slice(self, slice_index: slice) -> "TokenizedArticle":
         """See base class."""
-        return TokenizedArticle(
-            self.token_ids[slice_index], self.token_type_ids[slice_index]
-        )
+        return TokenizedArticle(self.token_ids[slice_index], self.token_type_ids[slice_index])
 
 
 class TokenizedSequence(TokenizedLine):
@@ -184,14 +175,10 @@ class TokenizedSequence(TokenizedLine):
     @classmethod
     def get_empty(cls, max_seq_length: int, eos_token_id: int) -> "TokenizedSequence":
         """See base class."""
-        return cls.from_article(  # type: ignore
-            TokenizedArticle.get_empty(), max_seq_length, eos_token_id
-        )
+        return cls.from_article(TokenizedArticle.get_empty(), max_seq_length, eos_token_id)  # type: ignore
 
     @classmethod
-    def from_article(
-        cls, tokenized_article: TokenizedArticle, max_seq_length: int, eos_token_id: int
-    ):
+    def from_article(cls, tokenized_article: TokenizedArticle, max_seq_length: int, eos_token_id: int):
         """Create a TokenizedLine from a TokenizedArticle.
 
         Args:
@@ -221,9 +208,7 @@ class TokenizedSequence(TokenizedLine):
         """
         err_msg_1 = f"Tokenized line with length: {len(tokenized_line)} is too long to be added to"
         err_msg_2 = f"sequence with length: {len(self)} and max sequence length: {self.max_seq_length}"
-        assert (
-            len(self) + len(tokenized_line) <= self.max_seq_length
-        ), f"{err_msg_1} {err_msg_2}"
+        assert len(self) + len(tokenized_line) <= self.max_seq_length, f"{err_msg_1} {err_msg_2}"
         return super().__iadd__(tokenized_line)
 
     @property
@@ -257,9 +242,5 @@ class TokenizedSequence(TokenizedLine):
 
     def _get_slice(self, slice_index: slice) -> "TokenizedSequence":
         """See base class."""
-        tokenized_article = TokenizedArticle(
-            self.token_ids[slice_index], self.token_type_ids[slice_index]
-        )
-        return TokenizedSequence.from_article(  # type: ignore
-            tokenized_article, self.max_seq_length, self.eos_token_id
-        )
+        tokenized_article = TokenizedArticle(self.token_ids[slice_index], self.token_type_ids[slice_index])
+        return TokenizedSequence.from_article(tokenized_article, self.max_seq_length, self.eos_token_id)  # type: ignore

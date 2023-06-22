@@ -107,13 +107,9 @@ def rename_files(
         err_msg += " To fix this error either specify --overwrite_output_path or move the conflicting file"
         assert not os.path.exists(new_file_path) or overwrite_output_path, err_msg
 
-        os.rename(
-            os.path.join(split_dir, str(i).zfill(max(2, num_digits))), new_file_path
-        )
+        os.rename(os.path.join(split_dir, str(i).zfill(max(2, num_digits))), new_file_path)
         if train_count <= i < train_count + test_count:
-            os.rename(
-                os.path.join(split_dir, new_name), os.path.join(test_dir, new_name)
-            )
+            os.rename(os.path.join(split_dir, new_name), os.path.join(test_dir, new_name))
         else:
             files_to_tokenize.append(new_name)
     return files_to_tokenize
@@ -148,17 +144,9 @@ def get_split_counts(
     Returns:
         train_count, dev_count, test_count, num_splits
     """
-    if (
-        num_training_splits is not None
-        and num_test_splits is not None
-        and num_dev_splits is not None
-    ):
-        assert (
-            test_ratio is None
-        ), "you included the flag num_test_splits, so you can not specify the flag --test_ratio"
-        assert (
-            dev_ratio is None
-        ), "you included the flag num_dev_splits, so you can not specify the flag --dev_ratio"
+    if num_training_splits is not None and num_test_splits is not None and num_dev_splits is not None:
+        assert test_ratio is None, "you included the flag num_test_splits, so you can not specify the flag --test_ratio"
+        assert dev_ratio is None, "you included the flag num_dev_splits, so you can not specify the flag --dev_ratio"
         train_count = num_training_splits
         test_count = num_test_splits
         dev_count = num_dev_splits
@@ -235,35 +223,23 @@ def multiprocess_data_prep(
         List of output training and dev hdf5 file paths
     """
     print(SEP_STR)
-    print(
-        f"Running tokenization jobs locally, There are {num_workers} processes working on it"
-    )
+    print(f"Running tokenization jobs locally, There are {num_workers} processes working on it")
     if input_file_size_in_gb > 10:
         warning_msg = f"your input file size is {input_file_size_in_gb} GB, "
         warning_msg += "this is large and may take up a lot of your machines resources for a long time"
         print(warning_msg)
-    sub_input_file_paths = list(
-        map(lambda file_name: os.path.join(split_dir, file_name), files_to_tokenize)
-    )
+    sub_input_file_paths = list(map(lambda file_name: os.path.join(split_dir, file_name), files_to_tokenize))
     sub_output_file_paths = list(
         map(
-            lambda file_name: os.path.join(
-                hdf5_dir, f"{os.path.splitext(file_name)[0]}.hdf5"
-            ),
+            lambda file_name: os.path.join(hdf5_dir, f"{os.path.splitext(file_name)[0]}.hdf5"),
             files_to_tokenize,
         )
     )
-    train_hdf5_files = list(
-        filter(lambda file_name: "train" in file_name, sub_output_file_paths)
-    )
-    dev_hdf5_files = list(
-        filter(lambda file_name: "dev" in file_name, sub_output_file_paths)
-    )
+    train_hdf5_files = list(filter(lambda file_name: "train" in file_name, sub_output_file_paths))
+    dev_hdf5_files = list(filter(lambda file_name: "dev" in file_name, sub_output_file_paths))
 
     data_prep_main_args_list = []
-    for input_file_path, output_file_path in zip(
-        sub_input_file_paths, sub_output_file_paths
-    ):
+    for input_file_path, output_file_path in zip(sub_input_file_paths, sub_output_file_paths):
         data_prep_main_args_list.append(
             (
                 True,
@@ -358,9 +334,7 @@ def pipeline_main(
             input_file_size_in_gb, input_file_size_in_bytes / (1024**2)
         )
     )
-    assert (
-        input_file_size_in_bytes > 1
-    ), f"your inputted file {input_file_path} is empty"
+    assert input_file_size_in_bytes > 1, f"your inputted file {input_file_path} is empty"
 
     train_count, dev_count, test_count, num_splits = get_split_counts(
         input_file_size_in_gb,
@@ -479,9 +453,7 @@ def pipeline_main(
         prompt_postfix,
     )
 
-    print(
-        f"Tokenization is complete, the outputs are in {hdf5_dir}, the held out test files are located at {test_dir}"
-    )
+    print(f"Tokenization is complete, the outputs are in {hdf5_dir}, the held out test files are located at {test_dir}")
     print(SEP_STR)
 
     # Balance hdf5 files so they all have the same number of sequences to within 1

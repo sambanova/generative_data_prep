@@ -155,9 +155,7 @@ class ArticleTokenizer:
             return self._remove_prompt_only_sequences(tokenized_sequences)
         return tokenized_sequences
 
-    def _remove_prompt_only_sequences(
-        self, tokenized_lines: List[TokenizedSequence]
-    ) -> List[TokenizedSequence]:
+    def _remove_prompt_only_sequences(self, tokenized_lines: List[TokenizedSequence]) -> List[TokenizedSequence]:
         """Takes a list of TokenizedLines, removes those that don't contain any COMPLETION TokenTypeIds.
 
         Args:
@@ -220,11 +218,7 @@ class ArticleTokenizer:
         tokenized_articles = []
         token_ids, token_type_ids = [], []
         for i, prompt_completion in enumerate(jsonl):
-            prompt = (
-                prompt_completion[self.prompt_keyword]
-                if self.prompt_keyword in prompt_completion
-                else ""
-            )
+            prompt = prompt_completion[self.prompt_keyword] if self.prompt_keyword in prompt_completion else ""
             if self.completion_keyword not in prompt_completion:
                 err_msg = f"Completion keyword required in every jsonl, {self.completion_keyword} not found"
                 raise json.JSONDecodeError(err_msg, str(jsonl), 0)
@@ -245,15 +239,9 @@ class ArticleTokenizer:
             token_ids += new_token_ids
             token_type_ids += new_token_type_ids
 
-            if (
-                self.attention_boundary == BoundaryType.PROMPT_COMPLETION_PAIR
-                and len(token_type_ids) > 0
-            ):
+            if self.attention_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and len(token_type_ids) > 0:
                 token_type_ids[-1] = TokenTypeIds.SEP
-            if (
-                self.packing_boundary == BoundaryType.PROMPT_COMPLETION_PAIR
-                and i != len(jsonl) - 1
-            ):
+            if self.packing_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and i != len(jsonl) - 1:
                 tokenized_article = TokenizedArticle(token_ids, token_type_ids)
                 tokenized_articles.append(tokenized_article)
                 token_ids, token_type_ids = [], []
@@ -282,9 +270,7 @@ class ArticleTokenizer:
 
         return completion, prompt
 
-    def tokenize(
-        self, completion: str, prompt: Optional[str] = None
-    ) -> Tuple[List[int], List[int]]:
+    def tokenize(self, completion: str, prompt: Optional[str] = None) -> Tuple[List[int], List[int]]:
         """Tokenize the input prompt and completion.
 
         Call self.tokenizer.encode to convert the input prompt and completion into token ids.
