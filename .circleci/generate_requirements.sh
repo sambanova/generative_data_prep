@@ -6,14 +6,17 @@ set -eo pipefail
 PWD=$(pwd)
 PIP_CACHE_DIR=$(pip cache dir)
 
+# pip-compile options
+PC_OPTS="--resolver=backtracking --allow-unsafe pyproject.toml --output-file=requirements"
+
 # Construct pip-compile commands
 PIP_COMMAND="pip install -U pip && pip install -U pip-tools==${PIP_TOOLS_VER}"
 PIP_COMPILE_COMMAND="\
-    pip-compile --resolver=backtracking --output-file=requirements/requirements.txt pyproject.toml \
-    && pip-compile --resolver=backtracking --extra=build --output-file=requirements/requirements_build.txt pyproject.toml \
-    && pip-compile --resolver=backtracking --extra=dev --output-file=requirements/requirements_dev.txt pyproject.toml \
-    && pip-compile --resolver=backtracking --extra=docs --output-file=requirements/requirements_docs.txt pyproject.toml \
-    && pip-compile --resolver=backtracking --extra=tests --output-file=requirements/requirements_tests.txt pyproject.toml"
+    pip-compile ${PC_OPTS}/requirements.txt \
+    && pip-compile --extra=build ${PC_OPTS}/build-requirements.txt \
+    && pip-compile --extra=dev ${PC_OPTS}/dev-requirements.txt \
+    && pip-compile --extra=docs ${PC_OPTS}/docs-requirements.txt \
+    && pip-compile --extra=tests ${PC_OPTS}/tests-requirements.txt"
 PLAIN_COMMAND="${PIP_COMMAND} && ${PIP_COMPILE_COMMAND}"
 DOCKER_COMMAND="docker run --rm -v ${PWD}:/app -v ${PIP_CACHE_DIR}:/root/.cache/pip -w /app python:${PYTHON_VER} bash -c '${PLAIN_COMMAND}'"
 
