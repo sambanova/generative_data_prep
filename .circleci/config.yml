@@ -22,7 +22,7 @@ jobs:
             echo python -V >> circleci_cache_key
             sha256sum pyproject.toml >> circleci_cache_key
       - restore_cache:
-          key: v1-{{ arch }}-{{ .Branch }}-{{ checksum "circleci_cache_key" }}
+          key: v2-{{ arch }}-{{ .Branch }}-{{ checksum "circleci_cache_key" }}
       - run:
           name: Instantiate Python Virtual Environment
           command: |
@@ -36,7 +36,7 @@ jobs:
           # pre-commit run --all-files --hook-stage manual
           command: . ~/venv/bin/activate && pre-commit run --hook-stage manual
       - save_cache:
-          key: v1-{{ arch }}-{{ .Branch }}-{{ checksum "circleci_cache_key" }}
+          key: v2-{{ arch }}-{{ .Branch }}-{{ checksum "circleci_cache_key" }}
           paths:
             - ~/venv
             - ~/.cache/pip
