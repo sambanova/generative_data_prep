@@ -40,6 +40,7 @@ jobs:
             - venv
             - ~/.cache/pip
             - ~/.cache/pre-commit
+            - ~/.cache/pip-tools
       - run:
           name: Generate Sphinx Docs
           # TODO: Fix "make-html" issues and re-enable this flow
