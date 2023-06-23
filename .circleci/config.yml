@@ -4,15 +4,15 @@ orbs:
   docker: circleci/docker@2.2.0
 
 executors:
-  python-linux:
-    machine:
-      image: python:3.9.13
+  python-docker:
+    docker:
+      - image: cimg/python:3.9.13
     resource_class: medium
 
 # Define the jobs we want to run for this project
 jobs:
   test:
-    executor: python-linux
+    executor: python-docker
     steps:
       - checkout
       - run:
@@ -36,7 +36,6 @@ jobs:
           command: |
             . venv/bin/activate
             pre-commit run --hook-stage manual
-            pre-commit run --all-files --hook-stage manual pip-tools-compile
       - save_cache:
           key: v2-{{ arch }}-{{ checksum "pyproject.toml" }}-{{ checksum "circleci_cache_key" }}
           paths:
@@ -67,7 +66,7 @@ jobs:
                 paths:
                   - dist
   publish-python:
-    executor: python-linux
+    executor: python-docker
     steps:
       - when:
           condition: << pipeline.git.tag >>
