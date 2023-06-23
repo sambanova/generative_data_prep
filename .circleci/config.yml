@@ -110,4 +110,4 @@ workflows:
               only:
                 - main
     jobs:
-      - test
+      - build-test
