@@ -37,7 +37,6 @@ jobs:
       - save_cache:
           key: v2-{{ arch }}-{{ checksum "pyproject.toml" }}-{{ checksum "circleci_cache_key" }}
           paths:
-            - venv
             - ~/.cache/pip
             - ~/.cache/pre-commit
             - ~/.cache/pip-tools
