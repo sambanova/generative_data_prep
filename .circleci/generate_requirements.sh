@@ -9,7 +9,7 @@ PIP_CACHE_DIR=$(pip cache dir)
 # Construct pip-compile commands
 PIP_COMMAND="pip install -U pip && pip install -U pip-tools==${PIP_TOOLS_VER}"
 PIP_COMPILE_COMMAND="\
-    pip-compile --output-file=requirements/requirements.txt pyproject.toml \
+    pip-compile --resolver=backtracking --output-file=requirements/requirements.txt pyproject.toml \
     && pip-compile --resolver=backtracking --extra=build --output-file=requirements/requirements_build.txt pyproject.toml \
     && pip-compile --resolver=backtracking --extra=dev --output-file=requirements/requirements_dev.txt pyproject.toml \
     && pip-compile --resolver=backtracking --extra=docs --output-file=requirements/requirements_docs.txt pyproject.toml \
