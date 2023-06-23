@@ -26,15 +26,15 @@ jobs:
       - run:
           name: Instantiate Python Virtual Environment
           command: |
-            test -d "venv" || python -m venv venv
-            . venv/bin/activate
+            test -d "venv" || python -m venv ~/venv
+            . ~/venv/bin/activate
             pip install --upgrade pip
             pip install ".[build,docs,tests]"
       - run:
           name: Run Pre-commit
           # TODO: DEVV-329, DEVV-330, DEVV-333; Fix existing issues with flake8, bandit, & pip-tools
           # pre-commit run --all-files --hook-stage manual
-          command: . venv/bin/activate && pre-commit run --hook-stage manual
+          command: . ~/venv/bin/activate && pre-commit run --hook-stage manual
       - save_cache:
           key: v1-{{ arch }}-{{ .Branch }}-{{ checksum "circleci_cache_key" }}
           paths:
@@ -45,14 +45,14 @@ jobs:
       - run:
           name: Generate Sphinx Docs
           # TODO: DEVV-332; Fix "make-html" issues and re-enable this flow
-          # . venv/bin/activate && cd docs && make html
+          # . ~/venv/bin/activate && cd docs && make html
           command: 'echo "TODO: Fix make-html issues in Sphinx"'
       - run:
           name: Run Pytest
-          command: . venv/bin/activate && pytest
+          command: . ~/venv/bin/activate && pytest
       - run:
           name: Build Python Package
-          command: . venv/bin/activate && python -m build
+          command: . ~/venv/bin/activate && python -m build
       - store_test_results:
           path: test_reports/circleci
       - store_artifacts:
