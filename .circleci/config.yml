@@ -20,8 +20,9 @@ jobs:
           command: |
             echo date +%Y-%V > circleci_cache_key
             echo python -V >> circleci_cache_key
+            checksum pyproject.toml >> circleci_cache_key
       - restore_cache:
-          key: v1-{{ arch }}-{{ checksum "pyproject.toml" }}-{{ checksum "circleci_cache_key" }}
+          key: v1-{{ arch }}-{{ .Branch }}-{{ checksum "circleci_cache_key" }}
       - run:
           name: Instantiate Python Virtual Environment
           command: |
@@ -35,7 +36,7 @@ jobs:
           # pre-commit run --all-files --hook-stage manual
           command: . venv/bin/activate && pre-commit run --hook-stage manual
       - save_cache:
-          key: v1-{{ arch }}-{{ checksum "pyproject.toml" }}-{{ checksum "circleci_cache_key" }}
+          key: v1-{{ arch }}-{{ .Branch }}-{{ checksum "circleci_cache_key" }}
           paths:
             - ~/venv
             - ~/.cache/pip
