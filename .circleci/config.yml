@@ -33,10 +33,7 @@ jobs:
           name: Run Pre-commit
           # TODO: Fix existing issues with flake8 and bandit and update command to:
           # pre-commit run --all-files --hook-stage manual
-          command: |
-            . venv/bin/activate
-            pip-sync requirements/tests-requirements.txt
-            pre-commit run --hook-stage manual
+          command: . venv/bin/activate && pre-commit run --hook-stage manual
       - save_cache:
           key: v2-{{ arch }}-{{ checksum "pyproject.toml" }}-{{ checksum "circleci_cache_key" }}
           paths:
@@ -46,20 +43,14 @@ jobs:
       - run:
           name: Generate Sphinx Docs
           # TODO: Fix "make-html" issues and re-enable this flow
-          # cd docs && make html
-          command: |
-            . venv/bin/activate
-            pip-sync requirements/docs-requirements.txt
-            echo "TODO: Fix make-html issues in Sphinx"
+          # . venv/bin/activate && cd docs && make html
+          command: 'echo "TODO: Fix make-html issues in Sphinx"'
       - run:
           name: Run Pytest
           command: . venv/bin/activate && pytest
       - run:
           name: Build Python Package
-          command: |
-            . venv/bin/activate
-            pip-sync requirements/build-requirements.txt
-            python -m build
+          command: . venv/bin/activate && python -m build
       - store_test_results:
           path: test_reports/circleci
       - store_artifacts:
