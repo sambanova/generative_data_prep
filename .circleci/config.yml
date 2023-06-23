@@ -11,7 +11,7 @@ executors:
 
 # Define the jobs we want to run for this project
 jobs:
-  test:
+  build-test:
     executor: python-docker
     steps:
       - checkout
@@ -88,9 +88,9 @@ jobs:
 
 # Orchestrate our job run sequence
 workflows:
-  build-and-test:
+  pr-check:
     jobs:
-      - test:
+      - build-test:
           filters:
             tags:
               only: /^v.*/
