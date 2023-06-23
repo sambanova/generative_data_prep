@@ -25,6 +25,7 @@ release = get_version(package_path)
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones
 extensions = [
+    "sphinx.ext.napoleon",
     "sphinx.ext.autodoc",  # Core Sphinx library for auto html doc generation from docstrings
     "sphinx.ext.autosummary",  # Create neat summary tables for modules/classes/methods etc
     "sphinx.ext.intersphinx",  # Link to other project's documentation (see mapping below)
@@ -34,7 +35,6 @@ extensions = [
     "IPython.sphinxext.ipython_console_highlighting",
     "sphinxcontrib.autodoc_pydantic",
     "sphinx.ext.coverage",
-    "sphinx.ext.napoleon",
     "myst_parser",
 ]
 
