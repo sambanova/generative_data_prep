@@ -7,7 +7,7 @@ executors:
   python-docker:
     docker:
       - image: cimg/python:3.9.13
-    resource_class: small
+    resource_class: medium
 
 # Define the jobs we want to run for this project
 jobs:
