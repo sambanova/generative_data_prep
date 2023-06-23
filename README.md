@@ -58,7 +58,7 @@ Each line in the input file must be either plain text or [jsonline](https://json
 Each line in the input file can be formatted as one of the following:
 - Plain text
 - `{"prompt": "", "completion": ""}`
-- `[{"prompt": "text...", "completion": "text..."}, {"prompt": "text...", "completion": "text..."}, {"prompt": "text...", "completion": "text..."}, ...]}`
+- `[{"prompt": "text...", "completion": "text..."}, {"prompt": "text...", "completion": "text..."}, {"prompt": "text...", "completion": "text..."}, ...]`
 
 
 ## End to end data preparation
