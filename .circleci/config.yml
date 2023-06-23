@@ -31,7 +31,7 @@ jobs:
             pip install ".[build,docs,tests]"
       - run:
           name: Run Pre-commit
-          # TODO: Fix existing issues with flake8 and bandit and update command to:
+          # TODO: DEVV-329, DEVV-330, DEVV-333; Fix existing issues with flake8, bandit, & pip-tools
           # pre-commit run --all-files --hook-stage manual
           command: . venv/bin/activate && pre-commit run --hook-stage manual
       - save_cache:
@@ -43,7 +43,7 @@ jobs:
             - ~/.cache/pip-tools
       - run:
           name: Generate Sphinx Docs
-          # TODO: Fix "make-html" issues and re-enable this flow
+          # TODO: DEVV-332; Fix "make-html" issues and re-enable this flow
           # . venv/bin/activate && cd docs && make html
           command: 'echo "TODO: Fix make-html issues in Sphinx"'
       - run:
