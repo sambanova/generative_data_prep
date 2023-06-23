@@ -100,7 +100,7 @@ workflows:
             branches:
               only: main
           requires:
-            - test
+            - build-test
   weekly_cron:
     triggers:
       - schedule:
