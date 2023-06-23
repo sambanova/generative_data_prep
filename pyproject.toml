@@ -37,6 +37,7 @@ dev = [
     ]
 docs = [
     "autodoc-pydantic",
+    "ipython",
     "nbsphinx",
     "myst-parser",
     "sphinx >= 5.2.3",
