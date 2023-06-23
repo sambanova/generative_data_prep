@@ -4,15 +4,15 @@ orbs:
   docker: circleci/docker@2.2.0
 
 executors:
-  python-docker:
-    docker:
-      - image: cimg/python:3.9.13
+  python-linux:
+    machine:
+      image: python:3.9.13
     resource_class: medium
 
 # Define the jobs we want to run for this project
 jobs:
   test:
-    executor: python-docker
+    executor: python-linux
     steps:
       - checkout
       - run:
@@ -67,7 +67,7 @@ jobs:
                 paths:
                   - dist
   publish-python:
-    executor: python-docker
+    executor: python-linux
     steps:
       - when:
           condition: << pipeline.git.tag >>
