@@ -20,7 +20,7 @@ jobs:
           command: |
             echo date +%Y-%V > circleci_cache_key
             echo python -V >> circleci_cache_key
-            md5 pyproject.toml >> circleci_cache_key
+            sha256sum pyproject.toml >> circleci_cache_key
       - restore_cache:
           key: v1-{{ arch }}-{{ .Branch }}-{{ checksum "circleci_cache_key" }}
       - run:
