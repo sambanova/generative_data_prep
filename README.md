@@ -8,7 +8,7 @@
 [![mypy](https://img.shields.io/badge/mypy-checked-green.svg)](http://mypy-lang.org/)
 
 
-# TODO: UPDATE CIRCLECI BADGES BEFORE MERGING PR
+# TODO: ADD CIRCLECI INSIGHT BADGES AFTER MERGING TO MAIN
 
 <a href="https://sambanova.ai/">
     <img src="./img/SambaNova-dark-logo-1.png" title="SambaNova" height="60" />
