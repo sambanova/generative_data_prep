@@ -9,12 +9,15 @@ executors:
       - image: cimg/python:3.9.13
     resource_class: medium
 
+
 # Define the jobs we want to run for this project
 jobs:
   build-test:
     executor: python-docker
     steps:
       - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: Generate Cache Key
           command: |
