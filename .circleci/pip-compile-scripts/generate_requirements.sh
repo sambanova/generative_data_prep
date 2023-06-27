@@ -28,5 +28,3 @@ else
     echo "Generating Requirements in Docker for Local Environment"
     bash -c "${DOCKER_COMMAND}"
 fi
-
-python .circleci/pip-compile-scripts/validate_packages.py

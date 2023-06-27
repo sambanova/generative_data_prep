@@ -42,7 +42,7 @@ repos:
     entry: bash -c
       'export PYTHON_VER=3.9.13
       && export PIP_TOOLS_VER=6.13.0
-      && ./.circleci/generate_requirements.sh'
+      && ./.circleci/pip-compile-scripts/generate_requirements.sh'
     files: ^(setup\.cfg|pyproject\.toml)$
   - id: pytest
     name: Run Pytest (using venv if it exists, otherwise use default system)
