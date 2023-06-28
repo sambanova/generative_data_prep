@@ -54,18 +54,22 @@ def verify_output_file(output_file: str, overwrite_output_dir: bool):
     """
     if os.path.exists(output_file):
         if not overwrite_output_dir:
-            err_msg = f'Your output path {output_file} already exists - '
-            err_msg += 'if you want to over-write this file please use the argument --overwrite_output_path'
+            err_msg = f"Your output path {output_file} already exists - "
+            err_msg += "if you want to over-write this file please use the argument --overwrite_output_path"
             raise ValueError(err_msg)
 
     if not os.path.exists(os.path.dirname(output_file)):
-        raise ValueError(f'The output path {output_file} is not valid - {os.path.dirname(output_file)} does not exist')
+        raise ValueError(f"The output path {output_file} is not valid - {os.path.dirname(output_file)} does not exist")
 
     if not os.access(os.path.dirname(output_file), os.W_OK):
-        raise ValueError(f'The output path {output_file} is not writeable')
+        raise ValueError(f"The output path {output_file} is not writeable")
 
 
-def verify_output_dir(output_dir: str, overwrite_output_dir: bool, raise_warning_if_exists: Optional[bool] = True):
+def verify_output_dir(
+    output_dir: str,
+    overwrite_output_dir: bool,
+    raise_warning_if_exists: Optional[bool] = True,
+):
     """Verify that the output directory is valid and writable.
 
     Args:
@@ -80,7 +84,7 @@ def verify_output_dir(output_dir: str, overwrite_output_dir: bool, raise_warning
     if os.path.exists(output_dir):
         if overwrite_output_dir:
             for file_name in os.listdir(output_dir):
-                if 'cache' not in file_name:
+                if "cache" not in file_name:
                     file_path = os.path.join(output_dir, file_name)
                     if os.path.isfile(file_path):
                         os.remove(file_path)
@@ -88,9 +92,9 @@ def verify_output_dir(output_dir: str, overwrite_output_dir: bool, raise_warning
                         shutil.rmtree(file_path)
         elif raise_warning_if_exists:
             print(SEP_STR)
-            print(f'WARNING: {output_dir} already exists, new files will be written here')
+            print(f"WARNING: {output_dir} already exists, new files will be written here")
     else:
         os.makedirs(output_dir)
 
     if not os.access(output_dir, os.W_OK):
-        raise ValueError(f'The cache directory you provided {output_dir} is not writeable')
+        raise ValueError(f"The cache directory you provided {output_dir} is not writeable")

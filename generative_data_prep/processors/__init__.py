@@ -20,4 +20,4 @@ This package contains utility classes for tokenization and packing.
 from .article_tokenizer import ArticleTokenizer
 from .sequence_packer import SequencePacker
 
-__all__ = ['ArticleTokenizer', 'SequencePacker']
+__all__ = ["ArticleTokenizer", "SequencePacker"]

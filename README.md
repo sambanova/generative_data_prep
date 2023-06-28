@@ -1,3 +1,15 @@
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/sambanova/generative_data_prep/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/sambanova/generative_data_prep/tree/main)
+[![Python](https://img.shields.io/badge/python-%3E=3.7-blue.svg)](https://www.python.org/)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![flake8](https://img.shields.io/badge/pep8-flake8-blue.svg)](https://github.com/PyCQA/flake8)
+[![bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
+[![isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
+[![mypy](https://img.shields.io/badge/mypy-checked-green.svg)](http://mypy-lang.org/)
+
+
+# TODO: ADD CIRCLECI INSIGHT BADGES AFTER MERGING TO MAIN
+
 <a href="https://sambanova.ai/">
     <img src="./img/SambaNova-dark-logo-1.png" title="SambaNova" height="60" />
 </a>
@@ -6,6 +18,7 @@
 This software package is designed for preparing data that can be used to train generative models. It offers an efficient way to convert input text files into tokenized sequences that are packed into a fixed sequence length. The resulting output directory can be directly used for training with SambaStudio. This package features many styles of packing text of any length into tokenized sequences, compressed hdf5 file outputs, efficient multiprocessing, shuffling any sized dataset, splitting your data into train/dev/test, and specifying what tokens are attended to during training.
 
 ## Table of contents
+- [Contributing](#Contributing)
 - [Installation](#installation)
 - [Requirements](#requirements)
 - [Introduction](#introduction)
@@ -19,10 +32,14 @@ This software package is designed for preparing data that can be used to train g
     - [Dialogue](#dialogue)
     - [Meta in context learning](#meta-in-context-learning)
 
+## Contributing
+Please follow the [contribution guide](.github/CONTRIBUTING.rst).
+
 ## Installation
-```git clone https://github.com/sambanova/generative_data_prep.git
-cd to the repo
-pip install -r requirements.txt
+```
+git clone https://github.com/sambanova/generative_data_prep.git
+cd generative_data_prep
+pip install .
 ```
 
 ## Requirements
@@ -49,7 +66,7 @@ The `generative_data_prep/data_prep/pipeline.py` script takes a single jsonline 
 
 ### Example
 ```python
-python3 -m generative_data_prep pipeline --input_file_path=path_to_jsonl.jsonl --output_path=path_to_output_directory --pretrained_tokenizer=gpt2 --max_seq_length=1024 --shuffle=on_RAM 
+python3 -m generative_data_prep pipeline --input_file_path=path_to_jsonl.jsonl --output_path=path_to_output_directory --pretrained_tokenizer=gpt2 --max_seq_length=1024 --shuffle=on_RAM
 ```
 
 ### Output
@@ -142,8 +159,9 @@ The output hdf5 files contains two datasets:
 </details>
 
 ## Running tests
-```python
-./test.sh
+```
+pip install ".[tests]"
+pytest
 ```
 
 ## View decoded hdf5 files in human readable text format

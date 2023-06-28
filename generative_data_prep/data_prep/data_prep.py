@@ -21,25 +21,31 @@ from __future__ import absolute_import
 
 import os
 import sys
+from typing import Optional
 
 from transformers import PreTrainedTokenizerBase
 
 from generative_data_prep.data_buffers import Hdf5FileBuffer
 from generative_data_prep.processors import ArticleTokenizer
-from generative_data_prep.utils import (BoundaryType, FileExtension,
-                                        PackingConfig)
-from typing import Optional
+from generative_data_prep.utils import BoundaryType, FileExtension, PackingConfig
 
 
-def data_prep_main(silent: bool, tokenizer: PreTrainedTokenizerBase,
-                   input_file: str, output_file: str, max_seq_length: int,
-                   input_packing_config: PackingConfig,
-                   packing_boundary: BoundaryType,
-                   attention_boundary: BoundaryType,
-                   disable_space_separator: bool,
-                   keep_prompt_only_sequences: bool, prompt_keyword: str,
-                   completion_keyword: str, prompt_prefix: Optional[str] = None,
-                   prompt_postfix: Optional[str] = None):
+def data_prep_main(
+    silent: bool,
+    tokenizer: PreTrainedTokenizerBase,
+    input_file: str,
+    output_file: str,
+    max_seq_length: int,
+    input_packing_config: PackingConfig,
+    packing_boundary: BoundaryType,
+    attention_boundary: BoundaryType,
+    disable_space_separator: bool,
+    keep_prompt_only_sequences: bool,
+    prompt_keyword: str,
+    completion_keyword: str,
+    prompt_prefix: Optional[str] = None,
+    prompt_postfix: Optional[str] = None,
+):
     """Tokenize input_file into packed sequences stored in output_file.
 
     Args:
@@ -60,20 +66,26 @@ def data_prep_main(silent: bool, tokenizer: PreTrainedTokenizerBase,
         prompt_postfix: text to add after the prompt, for chatML conventions use.
     """
     if silent:
-        sys.stdout = open(os.devnull, 'w')
+        sys.stdout = open(os.devnull, "w")
 
     file_ext = FileExtension(os.path.splitext(input_file)[1])
-    article_tokenizer = ArticleTokenizer(tokenizer, max_seq_length, file_ext,
-                                         input_packing_config,
-                                         packing_boundary, attention_boundary,
-                                         disable_space_separator,
-                                         keep_prompt_only_sequences,
-                                         prompt_keyword, completion_keyword,
-                                         prompt_prefix,
-                                         prompt_postfix)
+    article_tokenizer = ArticleTokenizer(
+        tokenizer,
+        max_seq_length,
+        file_ext,
+        input_packing_config,
+        packing_boundary,
+        attention_boundary,
+        disable_space_separator,
+        keep_prompt_only_sequences,
+        prompt_keyword,
+        completion_keyword,
+        prompt_prefix,
+        prompt_postfix,
+    )
 
     with Hdf5FileBuffer(output_file, max_seq_length) as hdf5_text_buffer:
-        with open(input_file, 'r') as reader:
+        with open(input_file, "r") as reader:
             for line in reader:
                 hdf5_text_buffer.write(article_tokenizer(line))
             hdf5_text_buffer.write(article_tokenizer(None))

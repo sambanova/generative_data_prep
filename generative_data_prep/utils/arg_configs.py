@@ -24,11 +24,13 @@ from .constants import OverflowType, PackingStyleType
 class PackingConfig:
     """Options to specify how the input articles should be packed into sequences."""
 
-    DELIM = '::'  # delimiter between packing style name and overflow type name in the packing config name.
+    DELIM = "::"  # delimiter between packing style name and overflow type name in the packing config name.
 
-    def __init__(self,
-                 packing_style: Union[PackingStyleType, str],
-                 overflow_type: Optional[Union[OverflowType, str]] = None):
+    def __init__(
+        self,
+        packing_style: Union[PackingStyleType, str],
+        overflow_type: Optional[Union[OverflowType, str]] = None,
+    ):
         """Create the PackingConfig.
 
         Args:
@@ -39,15 +41,14 @@ class PackingConfig:
             ValueError: Invalid combination of PackingStyle and OverflowType.  Not all overflow types are compatible
                 with all packing styles.
         """
-        self._overflow_type = OverflowType(
-            overflow_type) if overflow_type is not None else None
+        self._overflow_type = OverflowType(overflow_type) if overflow_type is not None else None
         self._packing_style = PackingStyleType(packing_style)
 
         # error handling
         if self.packing_style is PackingStyleType.FULL and self.overflow_type:
             err_msg_1 = 'No overflow type cannot be specified for "FULL" packing style.'
-            err_msg_2 = f'Found overflow type: {self.overflow_type}'
-            raise ValueError(f'{err_msg_1} {err_msg_2}')
+            err_msg_2 = f"Found overflow type: {self.overflow_type}"
+            raise ValueError(f"{err_msg_1} {err_msg_2}")
 
     @classmethod
     def from_str(cls, packing_config_name: str):
@@ -70,8 +71,8 @@ class PackingConfig:
             # error handling
             if len(split_name) != 2:
                 err_msg_1 = 'Packing config name must be formatted as "<packing_style> <overflow_type>"'
-                err_msg_2 = '<packing_style> and <overflow_type> may not contain any spaces.'
-                raise ValueError(f'{err_msg_1} {err_msg_2}')
+                err_msg_2 = "<packing_style> and <overflow_type> may not contain any spaces."
+                raise ValueError(f"{err_msg_1} {err_msg_2}")
 
             packing_style, overflow_type = tuple(split_name)
         # only packing style is specified
@@ -81,7 +82,7 @@ class PackingConfig:
         return cls(packing_style, overflow_type)
 
     @classmethod
-    def get_default(cls) -> 'PackingConfig':
+    def get_default(cls) -> "PackingConfig":
         """Return the default PackingConfig."""
         return cls(PackingStyleType.FULL)
 
@@ -97,13 +98,11 @@ class PackingConfig:
 
     def __str__(self) -> str:
         """Return a string representation of the PackingConfig."""
-        config_tuple = (typ
-                        for typ in [self.packing_style, self.overflow_type]
-                        if typ is not None)
+        config_tuple = (typ for typ in [self.packing_style, self.overflow_type] if typ is not None)
         return PackingConfig.DELIM.join(config_tuple)
 
     @staticmethod
-    def get_choices() -> List['PackingConfig']:
+    def get_choices() -> List["PackingConfig"]:
         """Return the names of the different PackingConfig choices."""
         choices = []
         for packing_style_type in list(PackingStyleType):
@@ -112,8 +111,7 @@ class PackingConfig:
                 choices.append(PackingConfig(packing_style_type))
             else:
                 for overflow_type in list(OverflowType):
-                    choices.append(
-                        PackingConfig(packing_style_type, overflow_type))
+                    choices.append(PackingConfig(packing_style_type, overflow_type))
 
         return choices
 
