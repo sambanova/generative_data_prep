@@ -7,8 +7,7 @@
 [![isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 [![mypy](https://img.shields.io/badge/mypy-checked-green.svg)](http://mypy-lang.org/)
 
-
-# TODO: ADD CIRCLECI INSIGHT BADGES AFTER MERGING TO MAIN
+[![CircleCI](https://dl.circleci.com/insights-snapshot/gh/sambanova/generative_data_prep/main/pr-check/badge.svg?window=30d)](https://app.circleci.com/insights/github/sambanova/generative_data_prep/workflows/pr-check/overview?branch=main&reporting-window=last-30-days&insights-snapshot=true)
 
 <a href="https://sambanova.ai/">
     <img src="./img/SambaNova-dark-logo-1.png" title="SambaNova" height="60" />
