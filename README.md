@@ -7,9 +7,6 @@
 [![isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 [![mypy](https://img.shields.io/badge/mypy-checked-green.svg)](http://mypy-lang.org/)
 
-
-# TODO: ADD CIRCLECI INSIGHT BADGES AFTER MERGING TO MAIN
-
 <a href="https://sambanova.ai/">
     <img src="./img/SambaNova-dark-logo-1.png" title="SambaNova" height="60" />
 </a>
