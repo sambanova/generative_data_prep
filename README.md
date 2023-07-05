@@ -177,7 +177,7 @@ For pretraining you can have your data in two formats.
 
 > [text separated by newlines.](tests/examples/pretraining_txt/example_pretraining_data.txt)
 
-> [jsonlines with empty prompts and text in the completions.](tests/examples/pretraining/example_pretraining_data.jsonl)
+> [jsonlines with empty prompts and text in the completions.](tests/examples/pretraining/example_pretraining_txt_data.jsonl)
 
 We recommend to use jsonlines with empty prompts and all the text in the completion, this is so that newlines in the text do not separate semantically related articles.
 #### Example command
