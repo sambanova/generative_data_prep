@@ -39,10 +39,9 @@ repos:
     name: Generate Requirements Files for Python Package
     stages: [push, manual]
     language: system
-    entry: bash -c
-      'export PYTHON_VER=3.9.13
-      && export PIP_TOOLS_VER=6.13.0
-      && ./.circleci/pip-compile-scripts/generate_requirements.sh'
+    entry: bash -c 'python .circleci/pip-compile-scripts/generate_requirements.py
+              --python-version=3.9.13
+              --options=build,dev,docs,tests'
     files: ^(setup\.cfg|pyproject\.toml)$
   - id: pytest
     name: Run Pytest (using venv if it exists, otherwise use default system)
