@@ -32,12 +32,12 @@ jobs:
           # NOTE: Requires redundant "pip install -U pip" command to avoid OSError
           name: Run Pre-commit
           # TODO: DEVV-329, DEVV-330, DEVV-333; Fix existing issues with flake8, bandit, & pip-tools
-          # pre-commit run --all-files --hook-stage manual
+          # pre-commit run --all-files
           command: |
             pip install -U pip
             pip install ".[tests]"
-            pre-commit run --hook-stage manual
-            pre-commit run --all-files --hook-stage manual pip-tools-compile
+            pre-commit run
+            pre-commit run --hook-stage manual pip-tools-compile
       - save_cache:
           key: v1-{{ arch }}-{{ checksum "pyproject.toml" }}-{{ checksum "circleci_cache_key" }}
           paths:

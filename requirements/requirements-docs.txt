@@ -27,6 +27,8 @@ certifi==2023.5.7
     # via requests
 charset-normalizer==3.1.0
     # via requests
+cmake==3.26.4
+    # via triton
 decorator==5.1.1
     # via ipython
 defusedxml==0.7.1
@@ -45,6 +47,7 @@ filelock==3.12.2
     #   huggingface-hub
     #   torch
     #   transformers
+    #   triton
 fsspec==2023.6.0
     # via huggingface-hub
 h5py==3.9.0
@@ -87,6 +90,8 @@ jupyter-core==5.3.1
     #   nbformat
 jupyterlab-pygments==0.2.2
     # via nbconvert
+lit==16.0.6
+    # via triton
 markdown-it-py==3.0.0
     # via
     #   mdit-py-plugins
@@ -125,6 +130,31 @@ numpy==1.25.0
     #   h5py
     #   sambanova-generative-data-prep (pyproject.toml)
     #   transformers
+nvidia-cublas-cu11==11.10.3.66
+    # via
+    #   nvidia-cudnn-cu11
+    #   nvidia-cusolver-cu11
+    #   torch
+nvidia-cuda-cupti-cu11==11.7.101
+    # via torch
+nvidia-cuda-nvrtc-cu11==11.7.99
+    # via torch
+nvidia-cuda-runtime-cu11==11.7.99
+    # via torch
+nvidia-cudnn-cu11==8.5.0.96
+    # via torch
+nvidia-cufft-cu11==10.9.0.58
+    # via torch
+nvidia-curand-cu11==10.2.10.91
+    # via torch
+nvidia-cusolver-cu11==11.4.0.1
+    # via torch
+nvidia-cusparse-cu11==11.7.4.91
+    # via torch
+nvidia-nccl-cu11==2.14.3
+    # via torch
+nvidia-nvtx-cu11==11.7.91
+    # via torch
 packaging==23.1
     # via
     #   huggingface-hub
@@ -231,7 +261,9 @@ tokenizers==0.13.3
 tomli==2.0.1
     # via setuptools-scm
 torch==2.0.1
-    # via sambanova-generative-data-prep (pyproject.toml)
+    # via
+    #   sambanova-generative-data-prep (pyproject.toml)
+    #   triton
 tornado==6.3.2
     # via jupyter-client
 tqdm==4.65.0
@@ -251,6 +283,8 @@ traitlets==5.9.0
     #   nbsphinx
 transformers==4.30.2
     # via sambanova-generative-data-prep (pyproject.toml)
+triton==2.0.0
+    # via torch
 typing-extensions==4.7.1
     # via
     #   huggingface-hub
@@ -267,9 +301,24 @@ webencodings==0.5.1
     # via
     #   bleach
     #   tinycss2
+wheel==0.40.0
+    # via
+    #   nvidia-cublas-cu11
+    #   nvidia-cuda-cupti-cu11
+    #   nvidia-cuda-runtime-cu11
+    #   nvidia-curand-cu11
+    #   nvidia-cusparse-cu11
+    #   nvidia-nvtx-cu11
 zipp==3.15.0
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 setuptools==68.0.0
-    # via setuptools-scm
+    # via
+    #   nvidia-cublas-cu11
+    #   nvidia-cuda-cupti-cu11
+    #   nvidia-cuda-runtime-cu11
+    #   nvidia-curand-cu11
+    #   nvidia-cusparse-cu11
+    #   nvidia-nvtx-cu11
+    #   setuptools-scm

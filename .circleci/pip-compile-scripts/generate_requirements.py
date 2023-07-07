@@ -38,7 +38,9 @@ def main():
     pip_cmd = f"pip install pip=={pip_version} && pip install pip-tools=={pip_tools_version}"
 
     combo_pip_compile_cmd = f'bash -c \'{" && ".join([pip_cmd] + pip_compile_cmds)}\''
-    docker_command = f"docker run --rm -v {pwd}:/app -w /app \
+    docker_command = f"docker run \
+        -e DOCKER_DEFAULT_PLATFORM=linux/amd64 \
+        --rm -v {pwd}:/app -w /app \
         python:{args.python_version} {combo_pip_compile_cmd}"
 
     # Run pip-compile commands according to environment
