@@ -40,7 +40,7 @@ docs = [
     "nbsphinx",
     "myst-parser",
     "setuptools_scm",
-    "sphinx >= 7",
+    "sphinx >= 6.2",
     "sphinx-autodoc-typehints",
     "pydantic-settings",
 ]
