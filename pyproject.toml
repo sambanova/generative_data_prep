@@ -36,22 +36,21 @@ dev = [
     "setuptools-scm"
     ]
 docs = [
-    "autodoc-pydantic",
     "ipython",
     "nbsphinx",
     "myst-parser",
-    "sphinx >= 5.2.3",
+    "setuptools_scm",
+    "sphinx >= 6.2",
     "sphinx-autodoc-typehints",
-    "sphinx-rtd-theme",
+    "pydantic-settings",
 ]
 tests = [
-    "build",
+    "pip == 23.1.2",
+    "pip-tools == 6.13.0",
     "pre-commit >= 2.20",
     "pytest >= 7.1",
     "pytest-html",
     "pytest-cov",
-    "sphinx >= 5.2.3",
-    "sphinx_rtd_theme"
     ]
 
 [tool.setuptools.packages.find]
