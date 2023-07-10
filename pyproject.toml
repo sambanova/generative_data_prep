@@ -40,7 +40,7 @@ docs = [
     "nbsphinx",
     "myst-parser",
     "setuptools_scm",
-    "sphinx >= 5.2.3",
+    "sphinx >= 7",
     "sphinx-autodoc-typehints",
     "pydantic-settings",
 ]
@@ -51,8 +51,6 @@ tests = [
     "pytest >= 7.1",
     "pytest-html",
     "pytest-cov",
-    "sphinx >= 5.2.3",
-    "sphinx_rtd_theme"
     ]
 
 [tool.setuptools.packages.find]

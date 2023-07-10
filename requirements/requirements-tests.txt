@@ -27,9 +27,7 @@ coverage==7.2.7
 distlib==0.3.6
     # via virtualenv
 docutils==0.18.1
-    # via
-    #   sphinx
-    #   sphinx-rtd-theme
+    # via sphinx
 exceptiongroup==1.1.2
     # via pytest
 filelock==3.12.2
@@ -152,12 +150,7 @@ safetensors==0.3.1
     # via transformers
 snowballstemmer==2.2.0
     # via sphinx
-sphinx==6.2.1
-    # via
-    #   sambanova-generative-data-prep (pyproject.toml)
-    #   sphinx-rtd-theme
-    #   sphinxcontrib-jquery
-sphinx-rtd-theme==1.2.2
+sphinx==7.0.1
     # via sambanova-generative-data-prep (pyproject.toml)
 sphinxcontrib-applehelp==1.0.4
     # via sphinx
@@ -165,8 +158,6 @@ sphinxcontrib-devhelp==1.0.2
     # via sphinx
 sphinxcontrib-htmlhelp==2.0.1
     # via sphinx
-sphinxcontrib-jquery==4.1
-    # via sphinx-rtd-theme
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
 sphinxcontrib-qthelp==1.0.3
