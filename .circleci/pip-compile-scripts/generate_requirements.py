@@ -46,14 +46,14 @@ def main():
     # Run pip-compile commands according to environment
     if os.getenv("CIRCLECI") == "true":
         check_diff = 'git diff --name-only HEAD^ HEAD | grep -E "^(pyproject\.toml|setup\.cfg|requirements/)"'  # noqa
-        try:
-            _ = subprocess.check_output(check_diff, shell=True, text=True)  # nosec
-            subprocess.run(shlex.split(combo_pip_compile_cmd), check=True)  # nosec
-        except subprocess.CalledProcessError as e:
-            if e.returncode == 1:
-                print(f"Requirements Files won't be updated. No changes detected using command:\n\t{check_diff}")
+        result = subprocess.run(check_diff, shell=True, text=True, capture_output=True)  # nosec
+        if result.returncode == 0:
+            if result.stdout.strip():
+                subprocess.run(shlex.split(combo_pip_compile_cmd), check=True)  # nosec
             else:
-                raise Exception(e)
+                print(f"Requirements Files won't be updated. No changes detected using command:\n\t{check_diff}")
+        else:
+            raise Exception(RuntimeError(f"Command failed with return code {result.returncode}"))
     else:
         subprocess.run(shlex.split(docker_command), check=True)  # nosec
 
