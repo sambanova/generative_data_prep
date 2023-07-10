@@ -43,6 +43,7 @@ repos:
               --python-version=3.9.13
               --options=build,dev,docs,tests'
     files: ^(setup\.cfg|pyproject\.toml|requirements/.*\.txt)$
+    verbose: true
   - id: pytest
     name: Run Pytest (using venv if it exists, otherwise use default system)
     language: system
