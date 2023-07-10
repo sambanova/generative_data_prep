@@ -45,11 +45,14 @@ def main():
 
     # Run pip-compile commands according to environment
     if os.getenv("CIRCLECI") == "true":
-        pre_commit_command = combo_pip_compile_cmd
+        check_diff = 'git diff --name-only HEAD^ HEAD | grep -E "^(pyproject\.toml|setup\.cfg|requirements/)"'  # noqa
+        output = subprocess.check_output(check_diff, shell=True, text=True)  # nosec
+        if output.strip():
+            subprocess.run(shlex.split(combo_pip_compile_cmd), check=True)  # nosec
+        else:
+            print(f"Requirements Files won't be updated. No changes detected using command:\n\t{check_diff}")
     else:
-        pre_commit_command = docker_command
-
-    subprocess.run(shlex.split(pre_commit_command), check=True)  # nosec
+        subprocess.run(shlex.split(docker_command), check=True)  # nosec
 
 
 if __name__ == "__main__":
