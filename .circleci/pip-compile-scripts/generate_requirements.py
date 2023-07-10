@@ -47,11 +47,11 @@ def main():
     if os.getenv("CIRCLECI") == "true":
         check_diff = 'git diff --name-only HEAD^ HEAD | grep -E "^(pyproject\.toml|setup\.cfg|requirements/)"'  # noqa
         result = subprocess.run(check_diff, shell=True, text=True, capture_output=True)  # nosec
-        if result.returncode == 0:
-            if result.stdout.strip():
-                subprocess.run(shlex.split(combo_pip_compile_cmd), check=True)  # nosec
-            else:
-                print(f"Requirements Files won't be updated. No changes detected using command:\n\t{check_diff}")
+        diff_output = result.stdout.strip()
+        if result.returncode == 0 and diff_output:
+            subprocess.run(shlex.split(combo_pip_compile_cmd), check=True)  # nosec
+        elif result.returncode == 1:
+            print(f"Requirements Files won't be updated. No changes detected using command:\n\t{check_diff}")
         else:
             raise Exception(RuntimeError(f"Command failed with return code {result.returncode}"))
     else:
