@@ -22,7 +22,7 @@ the SequencePacker class.
 """
 
 import json
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union, Dict
 
 from transformers import PreTrainedTokenizerBase, logging
 
@@ -32,7 +32,7 @@ from generative_data_prep.utils import (
     FileExtension,
     PackingConfig,
     TokenTypeIds,
-    CATEGORY_ID_JSON_KEY
+    CATEGORY_JSON_KEY
 )
 
 from .sequence_packer import SequencePacker
@@ -55,6 +55,7 @@ class ArticleTokenizer:
         keep_prompt_only_sequences: bool = False,
         prompt_keyword: str = "prompt",
         completion_keyword: str = "completion",
+        category_name_to_id: Dict[str, int] = None,
         prompt_prefix: Optional[str] = None,
         prompt_postfix: Optional[str] = None,
     ):
@@ -116,6 +117,7 @@ class ArticleTokenizer:
 
         self.logged_prompt_only_warn_msg_prepack = False
         self.logged_prompt_only_warn_msg_postpack = False
+        self.category_name_to_id = category_name_to_id
 
     def __call__(self, article: Optional[str]) -> List[TokenizedSequence]:
         """Tokenize and pack input text into tokenized sequence.
@@ -240,10 +242,15 @@ class ArticleTokenizer:
             token_ids += new_token_ids
             token_type_ids += new_token_type_ids
 
-            if CATEGORY_ID_JSON_KEY in prompt_completion:
+            if CATEGORY_JSON_KEY in prompt_completion:
                 if category_ids is None:
                     category_ids = []
-                category_ids += len(token_type_ids) * [prompt_completion[CATEGORY_ID_JSON_KEY]]
+                category_name = prompt_completion[CATEGORY_JSON_KEY]
+                if category_name not in self.category_name_to_id:
+                    err = f"jsonl found with key {CATEGORY_JSON_KEY} and value {category_name}, but this category name is not in inputted --categories flag {self.category_name_to_id}"
+                    raise ValueError(err)
+                category_id = self.category_name_to_id[category_name]
+                category_ids += len(token_type_ids) * [category_id]
 
             if self.attention_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and len(token_type_ids) > 0:
                 token_type_ids[-1] = TokenTypeIds.SEP

@@ -21,10 +21,11 @@ import os
 import random
 from multiprocessing import Pool
 from sys import platform
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Dict
 
 import numpy as np
 import psutil
+import json
 from transformers import PreTrainedTokenizerBase
 
 from generative_data_prep.data_prep import data_prep_main
@@ -36,6 +37,7 @@ from generative_data_prep.utils import (
     execute_and_return_stdout,
     large_file_shuffle,
     verify_output_dir,
+    verify_output_file
 )
 
 
@@ -196,6 +198,7 @@ def multiprocess_data_prep(
     tokenizer: PreTrainedTokenizerBase,
     num_workers: int,
     input_file_size_in_gb: float,
+    category_to_id: Dict[str, int],
     prompt_prefix: Optional[str] = None,
     prompt_postfix: Optional[str] = None,
 ) -> Tuple[List[str], List[str]]:
@@ -254,6 +257,7 @@ def multiprocess_data_prep(
                 keep_prompt_only_sequences,
                 prompt_keyword,
                 completion_keyword,
+                category_to_id,
                 prompt_prefix,
                 prompt_postfix,
             )
@@ -286,6 +290,7 @@ def pipeline_main(
     num_test_splits: Optional[int],
     dev_ratio: Optional[float],
     test_ratio: Optional[float],
+    category_to_id: Dict[str, int],
     prompt_prefix: Optional[str] = None,
     prompt_postfix: Optional[str] = None,
 ):
@@ -320,6 +325,7 @@ def pipeline_main(
         num_test_splits: Number of test splits to create.
         dev_ratio: Ratio of data to use for dev (evaluation).
         test_ratio: Ratio of data to use as test.
+        category_to_id: Dictionary that maps category strings to ids
         prompt_prefix: text to add before the prompt, for chatML conventions use.
         prompt_postfix: text to add after the prompt, for chatML conventions use.
     Raises:
@@ -354,6 +360,12 @@ def pipeline_main(
     tokenizer_dir = os.path.join(hdf5_dir, "tokenizer")
     verify_output_dir(tokenizer_dir, True)
     tokenizer.save_pretrained(tokenizer_dir)
+
+    if category_to_id != {}:
+        category_to_id_output_file_path = os.path.join(hdf5_dir, "category_to_id.json")
+        verify_output_file(category_to_id_output_file_path, overwrite_output_path)
+        with open(category_to_id_output_file_path, 'w') as f:
+            json.dump(category_to_id, f)
 
     test_dir = os.path.join(output_dir, "test_files")
     if test_count > 0:
@@ -449,6 +461,7 @@ def pipeline_main(
         tokenizer,
         num_workers,
         input_file_size_in_gb,
+        category_to_id,
         prompt_prefix,
         prompt_postfix,
     )

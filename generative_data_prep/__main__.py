@@ -253,6 +253,27 @@ def get_output_dir(cmd, output_path, overwrite_output_path):
 
     return output_dir
 
+def get_categories(categories: str):
+    """Returns a dictionary mapping each category to the corresponding ID
+
+    Args:
+        categories: Either a comma separated list of categories or a file path 
+        to a text file with newlines separated categories list
+    """
+    category_to_id = {}
+    if categories is not None:
+        if os.path.exists(categories):
+            with open(categories, 'r') as categories_file:
+                categories_list = categories_file.readlines()
+        else:
+            categories_list = categories.split(',')
+        
+        for id, category in enumerate(categories_list):
+            category_to_id[category] = id
+
+    return category_to_id
+    
+
 
 if __name__ == "__main__":
     args = get_args()
@@ -267,6 +288,8 @@ if __name__ == "__main__":
         args.merges_file,
         args.special_tokens_dict,
     )
+
+    category_to_id = get_categories(args.categories)
 
     if args.cmd == "pipeline":
         pipeline_main(
@@ -290,6 +313,7 @@ if __name__ == "__main__":
             args.num_test_splits,
             args.dev_ratio,
             args.test_ratio,
+            category_to_id,
             args.prompt_prefix,
             args.prompt_postfix,
         )
@@ -307,6 +331,7 @@ if __name__ == "__main__":
             args.keep_prompt_only_sequences,
             args.prompt_keyword,
             args.completion_keyword,
+            category_to_id,
             args.prompt_prefix,
             args.prompt_postfix,
         )

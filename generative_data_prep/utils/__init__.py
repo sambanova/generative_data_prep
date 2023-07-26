@@ -22,7 +22,7 @@ from .constants import (
     OverflowType,
     PackingStyleType,
     TokenTypeIds,
-    CATEGORY_ID_JSON_KEY
+    CATEGORY_JSON_KEY
 )
 from .large_file_shuffle import large_file_shuffle
 from .path_verify import verify_input_file, verify_output_dir, verify_output_file
