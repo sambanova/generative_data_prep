@@ -155,11 +155,6 @@ def data_prep_arg_builder(parser: argparse.ArgumentParser):
         action="store_true",
         help="FOR ADVANCED USERS: If you include this flag, packed sequences with only prompt tokens will not be dropped. Data with only prompt will be dropped by default because training with prompt-only sequences with prompt_loss_weight=0.0 may lead to errors. Data is dropped because of one of the following conditions: 1. the input file data prompt completion pairs contains only a prompt. 2. If the sequence is truncated such that only prompt tokens remain",
     )
-    parser.add_argument(
-        "--add_category_metadata",
-        action="store_true",
-        help="FOR ADVANCED USERS: If you include this flag, then the 'category' field from your input jsonls will be stored in the 'category_id' dataset in your output hdf5 files. This labels each tokens category and allows you to view training loss curves for each individual category.",
-    )
 
 
 

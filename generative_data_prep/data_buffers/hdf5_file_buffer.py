@@ -109,8 +109,18 @@ class Hdf5FileBuffer(FileBuffer):
         for tokenized_seq in chunk:
             assert len(tokenized_seq) == self.max_seq_length
 
-        dump_token_ids = list(map(lambda seq: seq.token_ids, chunk))
-        dump_token_type_ids = list(map(lambda seq: seq.token_type_ids, chunk))
+        dump_token_ids = []
+        dump_token_type_ids = []
+        dump_category_ids = None
+
+        for seq in chunk:
+            dump_token_ids.append(seq.token_ids)
+            dump_token_type_ids.append(seq.token_type_ids)
+            if seq.category_ids is not None:
+                if dump_category_ids is None: 
+                    dump_category_ids = []
+                dump_category_ids.append(seq.category_ids)
+        
 
         if self.first_dump:
             self.hdf5_file.create_dataset(
@@ -127,6 +137,14 @@ class Hdf5FileBuffer(FileBuffer):
                 compression="gzip",
                 maxshape=(None, self.max_seq_length),
             )
+            if dump_category_ids is not None:
+                self.hdf5_file.create_dataset(
+                    "category_ids",
+                    data=dump_category_ids,
+                    dtype=self.data_type,
+                    compression="gzip",
+                    maxshape=(None, self.max_seq_length),
+                )
         else:
             num_dump_seq = len(chunk)
             new_shape = (
@@ -136,6 +154,8 @@ class Hdf5FileBuffer(FileBuffer):
 
             self._dump_data("input_ids", new_shape, dump_token_ids)
             self._dump_data("token_type_ids", new_shape, dump_token_type_ids)
+            if dump_category_ids is not None:
+                self._dump_data("category_ids", new_shape, dump_category_ids)
 
         self.first_dump = False
 

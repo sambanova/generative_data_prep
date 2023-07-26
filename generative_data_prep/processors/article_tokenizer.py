@@ -32,6 +32,7 @@ from generative_data_prep.utils import (
     FileExtension,
     PackingConfig,
     TokenTypeIds,
+    CATEGORY_ID_JSON_KEY
 )
 
 from .sequence_packer import SequencePacker
@@ -216,7 +217,7 @@ class ArticleTokenizer:
             jsonl = [jsonl]
 
         tokenized_articles = []
-        token_ids, token_type_ids = [], []
+        token_ids, token_type_ids, category_ids = [], [], None
         for i, prompt_completion in enumerate(jsonl):
             prompt = prompt_completion[self.prompt_keyword] if self.prompt_keyword in prompt_completion else ""
             if self.completion_keyword not in prompt_completion:
@@ -239,16 +240,21 @@ class ArticleTokenizer:
             token_ids += new_token_ids
             token_type_ids += new_token_type_ids
 
+            if CATEGORY_ID_JSON_KEY in prompt_completion:
+                if category_ids is None:
+                    category_ids = []
+                category_ids += len(token_type_ids) * [prompt_completion[CATEGORY_ID_JSON_KEY]]
+
             if self.attention_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and len(token_type_ids) > 0:
                 token_type_ids[-1] = TokenTypeIds.SEP
             if self.packing_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and i != len(jsonl) - 1:
-                tokenized_article = TokenizedArticle(token_ids, token_type_ids)
+                tokenized_article = TokenizedArticle(token_ids, token_type_ids, category_ids)
                 tokenized_articles.append(tokenized_article)
                 token_ids, token_type_ids = [], []
 
         if len(token_type_ids) > 0:
             token_type_ids[-1] = TokenTypeIds.SEP
-        tokenized_articles.append(TokenizedArticle(token_ids, token_type_ids))
+        tokenized_articles.append(TokenizedArticle(token_ids, token_type_ids, category_ids))
 
         return tokenized_articles
 

@@ -52,3 +52,5 @@ class TokenTypeIds(int, BaseEnum):
 class FileExtension(str, BaseEnum):
     TXT = ".txt"
     JSONL = ".jsonl"
+
+CATEGORY_ID_JSON_KEY = 'category_id'
