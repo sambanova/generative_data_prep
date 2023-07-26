@@ -19,7 +19,6 @@ from enum import Enum
 
 class BaseEnum(Enum):
     """Contains additional utility methods for the custom Enums"""
-
     @classmethod
     def as_list(cls):
         return [member.value for member in cls]
@@ -52,5 +51,6 @@ class TokenTypeIds(int, BaseEnum):
 class FileExtension(str, BaseEnum):
     TXT = ".txt"
     JSONL = ".jsonl"
+
 
 CATEGORY_JSON_KEY = 'category'

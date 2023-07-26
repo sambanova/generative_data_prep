@@ -65,7 +65,8 @@ def add_pipeline_args(subparser: argparse.ArgumentParser):
         default=None,
         type=int,
         required=False,
-        help="The number of training files to split input data into. If you specify the --dev_ratio and --test_ratio \
+        help=
+        "The number of training files to split input data into. If you specify the --dev_ratio and --test_ratio \
         flags, The total number of splits will be (num_training_splits / (1-dev_ratio-test_ratio)), and the number \
         of dev and test splits are calculated accordingly. If you specify --num_dev_splits and --num_test_splits \
         flags then those will  directory define the number of splits and therefore the ratios. We recommend you do \
@@ -79,7 +80,8 @@ def add_pipeline_args(subparser: argparse.ArgumentParser):
         default=None,
         type=float,
         required=False,
-        help="The ratio of data that should be excluded from train set and used for evaluation, defaults to 10%%. If \
+        help=
+        "The ratio of data that should be excluded from train set and used for evaluation, defaults to 10%%. If \
         you specify this flag, do not specify --num_dev_splits or --num_test_splits.",  # noqa: E251
     )
     subparser.add_argument(
@@ -87,7 +89,8 @@ def add_pipeline_args(subparser: argparse.ArgumentParser):
         default=None,
         type=int,
         required=False,
-        help="If you do not specify --dev_ratio, you may specify num_dev_splits. If you include this flag, you must \
+        help=
+        "If you do not specify --dev_ratio, you may specify num_dev_splits. If you include this flag, you must \
         also include the --num_dev_splits and --num_training_splits flags",  # noqa: E251
     )
     subparser.add_argument(
@@ -95,7 +98,8 @@ def add_pipeline_args(subparser: argparse.ArgumentParser):
         default=None,
         type=float,
         required=False,
-        help="The ratio of data that should be excluded from train set and is saved for testing. This data is not \
+        help=
+        "The ratio of data that should be excluded from train set and is saved for testing. This data is not \
         tokenized and left in jsonl format, defaults to 0%%. If you specify this flag, do not specify \
         --num_dev_splits or --num_test_splits.",  # noqa: E251
     )
@@ -104,7 +108,8 @@ def add_pipeline_args(subparser: argparse.ArgumentParser):
         default=None,
         type=int,
         required=False,
-        help="If you do not specify --test_ratio, you may specify num_dev_splits. If you include this flag, you must \
+        help=
+        "If you do not specify --test_ratio, you may specify num_dev_splits. If you include this flag, you must \
         also include the --num_dev_splits and --num_training_splits flags.",  # noqa: E251
     )
     subparser.add_argument(
@@ -113,7 +118,8 @@ def add_pipeline_args(subparser: argparse.ArgumentParser):
         const="False",
         nargs="?",
         choices=["False", "on_RAM", "large_file"],
-        help="Choose the on_RAM option if your file is small enough to fit on RAM (If you are not sure if it fits \
+        help=
+        "Choose the on_RAM option if your file is small enough to fit on RAM (If you are not sure if it fits \
         on RAM, default to this flag). If you are running a linux operating system and your file is too large to fit \
         on RAM, please choose large_file option, this will run approximate file shuffling that can handle files of \
         any size. If you want to do large file shuffling but you are not on linux, please shuffle the file before \
@@ -122,7 +128,8 @@ def add_pipeline_args(subparser: argparse.ArgumentParser):
     subparser.add_argument(
         "--do_not_balance_hdf5",
         action="store_true",
-        help="If you DO NOT want to balance hdf5 files, this is not recommended unless the you are dealing with a \
+        help=
+        "If you DO NOT want to balance hdf5 files, this is not recommended unless the you are dealing with a \
         huge amount of data (many terabytes), or do not want shuffling among splits.",  # noqa: E251
     )
     subparser.add_argument(
@@ -130,7 +137,8 @@ def add_pipeline_args(subparser: argparse.ArgumentParser):
         default=cpu_count(),
         type=int,
         required=False,
-        help="The number of CPU workers to multi-process run tokenization over, if the previous run failed you need to \
+        help=
+        "The number of CPU workers to multi-process run tokenization over, if the previous run failed you need to \
         decrease this number.",  # noqa: E251
     )
 
@@ -155,7 +163,8 @@ def get_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase, special_tokens_dict: str):
+def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase,
+                            special_tokens_dict: str):
     """Add the special tokens dictionary to tokenizer.
 
     Args:
@@ -170,11 +179,11 @@ def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase, special_tokens_d
 
 
 def get_tokenizer(
-    pretrained_tokenizer: Optional[str],
-    tokenizer_class: Optional[str],
-    vocab_file: str,
-    merges_file: str,
-    special_tokens_dict: Optional[str],
+        pretrained_tokenizer: Optional[str],
+        tokenizer_class: Optional[str],
+        vocab_file: str,
+        merges_file: str,
+        special_tokens_dict: Optional[str],
 ) -> PreTrainedTokenizerBase:
     """Create a tokenizer based on input arguments.
 
@@ -195,7 +204,8 @@ def get_tokenizer(
     if pretrained_tokenizer is None and tokenizer_class is None:
         pretrained_tokenizer = GPT2_KEY
 
-    if not pretrained_tokenizer and not (merges_file and vocab_file and tokenizer_class):
+    if not pretrained_tokenizer and not (merges_file and vocab_file
+                                         and tokenizer_class):
         err_msg = "You must include either --pretrained_tokenizer, \
         or all three flags: --merges_file, --vocab_file and --tokenizer_class"
 
@@ -248,10 +258,12 @@ def get_output_dir(cmd, output_path, overwrite_output_path):
     elif args.cmd == "data_prep":
         verify_output_file(output_path, overwrite_output_path)
         if os.path.splitext(output_path)[-1] != ".hdf5":
-            raise ValueError(f"The output path {output_path} does not end with .hdf5")
+            raise ValueError(
+                f"The output path {output_path} does not end with .hdf5")
         output_dir = os.path.dirname(output_path)
 
     return output_dir
+
 
 def get_categories(categories: str):
     """Returns a dictionary mapping each category to the corresponding ID
@@ -266,21 +278,23 @@ def get_categories(categories: str):
             with open(categories, 'r') as categories_file:
                 categories_list = json.load(categories_file)
         else:
+            assert ',' in categories, '--categories argument formatted incorrect, no comma'
             categories_list = categories.split(',')
-        
+
         for id, category in enumerate(categories_list):
             category_to_id[category] = id
 
     return category_to_id
-    
 
 
 if __name__ == "__main__":
     args = get_args()
     err_msg = f"The input file is not a jsonl or txt file {args.input_file_path}"
-    assert os.path.splitext(args.input_file_path)[1] in FileExtension.as_list(), err_msg
+    assert os.path.splitext(
+        args.input_file_path)[1] in FileExtension.as_list(), err_msg
     verify_input_file(args.input_file_path)
-    output_dir = get_output_dir(args.cmd, args.output_path, args.overwrite_output_path)
+    output_dir = get_output_dir(args.cmd, args.output_path,
+                                args.overwrite_output_path)
     tokenizer = get_tokenizer(
         args.pretrained_tokenizer,
         args.tokenizer_class,

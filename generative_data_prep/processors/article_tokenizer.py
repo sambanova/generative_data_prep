@@ -22,17 +22,17 @@ the SequencePacker class.
 """
 
 import json
-from typing import List, Optional, Tuple, Union, Dict
+from typing import Dict, List, Optional, Tuple, Union
 
 from transformers import PreTrainedTokenizerBase, logging
 
 from generative_data_prep.tokenized_line import TokenizedArticle, TokenizedSequence
 from generative_data_prep.utils import (
+    CATEGORY_JSON_KEY,
     BoundaryType,
     FileExtension,
     PackingConfig,
     TokenTypeIds,
-    CATEGORY_JSON_KEY
 )
 
 from .sequence_packer import SequencePacker
@@ -42,22 +42,21 @@ DEFAULT_PACKING_CONFIG = PackingConfig.get_default()
 
 class ArticleTokenizer:
     """Tokenize and pack text into sequences used for training NLP models."""
-
     def __init__(
-        self,
-        tokenizer: PreTrainedTokenizerBase,
-        max_seq_length: int,
-        file_ext: FileExtension,
-        packing_config: PackingConfig = DEFAULT_PACKING_CONFIG,
-        packing_boundary: BoundaryType = BoundaryType.JSONL,
-        attention_boundary: BoundaryType = BoundaryType.JSONL,
-        disable_space_separator: bool = False,
-        keep_prompt_only_sequences: bool = False,
-        prompt_keyword: str = "prompt",
-        completion_keyword: str = "completion",
-        category_name_to_id: Dict[str, int] = None,
-        prompt_prefix: Optional[str] = None,
-        prompt_postfix: Optional[str] = None,
+            self,
+            tokenizer: PreTrainedTokenizerBase,
+            max_seq_length: int,
+            file_ext: FileExtension,
+            packing_config: PackingConfig = DEFAULT_PACKING_CONFIG,
+            packing_boundary: BoundaryType = BoundaryType.JSONL,
+            attention_boundary: BoundaryType = BoundaryType.JSONL,
+            disable_space_separator: bool = False,
+            keep_prompt_only_sequences: bool = False,
+            prompt_keyword: str = "prompt",
+            completion_keyword: str = "completion",
+            category_name_to_id: Dict[str, int] = None,
+            prompt_prefix: Optional[str] = None,
+            prompt_postfix: Optional[str] = None,
     ):
         """Create Article Tokenizer.
 
@@ -110,7 +109,8 @@ class ArticleTokenizer:
         self.prompt_keyword = prompt_keyword
         self.completion_keyword = completion_keyword
         self.eos_token_id = tokenizer.eos_token_id
-        self.packer = SequencePacker(max_seq_length, self.eos_token_id, packing_config)
+        self.packer = SequencePacker(max_seq_length, self.eos_token_id,
+                                     packing_config)
         self.prompt_prefix = prompt_prefix
         self.prompt_postfix = prompt_postfix
         logging.set_verbosity_error()
@@ -158,7 +158,9 @@ class ArticleTokenizer:
             return self._remove_prompt_only_sequences(tokenized_sequences)
         return tokenized_sequences
 
-    def _remove_prompt_only_sequences(self, tokenized_lines: List[TokenizedSequence]) -> List[TokenizedSequence]:
+    def _remove_prompt_only_sequences(self,
+                                      tokenized_lines: List[TokenizedSequence]
+                                      ) -> List[TokenizedSequence]:
         """Takes a list of TokenizedLines, removes those that don't contain any COMPLETION TokenTypeIds.
 
         Args:
@@ -200,7 +202,8 @@ class ArticleTokenizer:
         tokenized_article = TokenizedArticle(token_ids, token_type_ids)
         return [tokenized_article]
 
-    def process_jsonl(self, jsonl: Union[dict, List]) -> List[TokenizedArticle]:
+    def process_jsonl(self,
+                      jsonl: Union[dict, List]) -> List[TokenizedArticle]:
         """Tokenize a loaded jsonl and store in a TokenizedArticle object.
 
         Takes in a loaded jsonl, and returns a List of tokenized articles based on self.BoundaryType.
@@ -221,7 +224,9 @@ class ArticleTokenizer:
         tokenized_articles = []
         token_ids, token_type_ids, category_ids = [], [], None
         for i, prompt_completion in enumerate(jsonl):
-            prompt = prompt_completion[self.prompt_keyword] if self.prompt_keyword in prompt_completion else ""
+            prompt = prompt_completion[
+                self.
+                prompt_keyword] if self.prompt_keyword in prompt_completion else ""
             if self.completion_keyword not in prompt_completion:
                 err_msg = f"Completion keyword required in every jsonl, {self.completion_keyword} not found"
                 raise json.JSONDecodeError(err_msg, str(jsonl), 0)
@@ -238,7 +243,8 @@ class ArticleTokenizer:
                 continue
 
             completion, prompt = self._add_space_separator(completion, prompt)
-            new_token_ids, new_token_type_ids = self.tokenize(completion, prompt)
+            new_token_ids, new_token_type_ids = self.tokenize(
+                completion, prompt)
             token_ids += new_token_ids
             token_type_ids += new_token_type_ids
 
@@ -252,20 +258,25 @@ class ArticleTokenizer:
                 category_id = self.category_name_to_id[category_name]
                 category_ids += len(token_type_ids) * [category_id]
 
-            if self.attention_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and len(token_type_ids) > 0:
+            if self.attention_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and len(
+                    token_type_ids) > 0:
                 token_type_ids[-1] = TokenTypeIds.SEP
-            if self.packing_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and i != len(jsonl) - 1:
-                tokenized_article = TokenizedArticle(token_ids, token_type_ids, category_ids)
+            if self.packing_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and i != len(
+                    jsonl) - 1:
+                tokenized_article = TokenizedArticle(token_ids, token_type_ids,
+                                                     category_ids)
                 tokenized_articles.append(tokenized_article)
                 token_ids, token_type_ids = [], []
 
         if len(token_type_ids) > 0:
             token_type_ids[-1] = TokenTypeIds.SEP
-        tokenized_articles.append(TokenizedArticle(token_ids, token_type_ids, category_ids))
+        tokenized_articles.append(
+            TokenizedArticle(token_ids, token_type_ids, category_ids))
 
         return tokenized_articles
 
-    def _add_space_separator(self, completion: str, prompt: str) -> Tuple[str, str]:
+    def _add_space_separator(self, completion: str,
+                             prompt: str) -> Tuple[str, str]:
         """Remove any spaces between the prompt and completion and add a space before the completion.
 
         Args:
@@ -283,7 +294,8 @@ class ArticleTokenizer:
 
         return completion, prompt
 
-    def tokenize(self, completion: str, prompt: Optional[str] = None) -> Tuple[List[int], List[int]]:
+    def tokenize(self, completion: str,
+                 prompt: Optional[str] = None) -> Tuple[List[int], List[int]]:
         """Tokenize the input prompt and completion.
 
         Call self.tokenizer.encode to convert the input prompt and completion into token ids.
@@ -312,7 +324,9 @@ class ArticleTokenizer:
         if completion:
             completion_token_ids = self.tokenizer.encode(completion)
             token_ids += completion_token_ids
-            token_type_ids += len(completion_token_ids) * [TokenTypeIds.COMPLETION]
+            token_type_ids += len(completion_token_ids) * [
+                TokenTypeIds.COMPLETION
+            ]
 
         if len(token_ids) >= 1:
             token_ids.append(self.eos_token_id)

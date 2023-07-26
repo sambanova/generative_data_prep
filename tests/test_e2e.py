@@ -17,11 +17,10 @@ limitations under the License.
 import os
 import tempfile
 from pathlib import Path
+from typing import Dict
 
 import pytest
 from transformers import GPT2Tokenizer, PreTrainedTokenizerBase
-
-from typing import Dict
 
 from generative_data_prep.data_prep import data_prep_main, pipeline_main
 from generative_data_prep.utils import BoundaryType, PackingConfig
@@ -36,17 +35,20 @@ EXAMPLE_PATH = "tests/examples"
 def get_input_path(test_name: str) -> str:
     """Create a absolute path to example input."""
     ext = ".txt" if "txt" in test_name else ".jsonl"
-    return os.path.join(Path.cwd(), EXAMPLE_PATH, test_name, f"example_{test_name}_data{ext}")
+    return os.path.join(Path.cwd(), EXAMPLE_PATH, test_name,
+                        f"example_{test_name}_data{ext}")
 
 
 def gold_data_prep_path(test_name: str) -> str:
     """Create a absolute path to example gold file."""
-    return os.path.join(Path.cwd(), EXAMPLE_PATH, test_name, f"data_prepped_{test_name}.hdf5")
+    return os.path.join(Path.cwd(), EXAMPLE_PATH, test_name,
+                        f"data_prepped_{test_name}.hdf5")
 
 
 def gold_pipeline_path(test_name: str) -> str:
     """Create a absolute path to example gold file."""
-    return os.path.join(Path.cwd(), EXAMPLE_PATH, test_name, f"pipelined_{test_name}")
+    return os.path.join(Path.cwd(), EXAMPLE_PATH, test_name,
+                        f"pipelined_{test_name}")
 
 
 @pytest.mark.parametrize(
@@ -109,13 +111,13 @@ def gold_pipeline_path(test_name: str) -> str:
     ],
 )
 def test_data_prep(
-    tokenizer: PreTrainedTokenizerBase,
-    test_name: str,
-    max_seq_length: int,
-    input_packing_config: PackingConfig,
-    category_to_id: Dict[str, int],
-    packing_boundary: BoundaryType,
-    attention_boundary: BoundaryType,
+        tokenizer: PreTrainedTokenizerBase,
+        test_name: str,
+        max_seq_length: int,
+        input_packing_config: PackingConfig,
+        category_to_id: Dict[str, int],
+        packing_boundary: BoundaryType,
+        attention_boundary: BoundaryType,
 ):
     input_path = get_input_path(test_name)
     gold_path = gold_data_prep_path(test_name)
@@ -156,8 +158,6 @@ def test_data_prep(
      PackingConfig.from_str('greedy::drop'),
       BoundaryType.PROMPT_COMPLETION_PAIR, BoundaryType.JSONL, 32, 0, 0, None, None)
 """
-
-
 @pytest.mark.parametrize(
     "test_name,disable_space_separator,keep_prompt_only_sequences,prompt_keyword,completion_keyword,\
     shuffle,do_not_balance_hdf5,max_seq_length,input_packing_config,packing_boundary,attention_boundary,\
@@ -280,23 +280,23 @@ def test_data_prep(
     ],
 )
 def test_pipeline(
-    test_name: str,
-    disable_space_separator: bool,
-    keep_prompt_only_sequences: bool,
-    prompt_keyword: str,
-    completion_keyword: str,
-    shuffle: str,
-    do_not_balance_hdf5: bool,
-    max_seq_length: int,
-    input_packing_config: PackingConfig,
-    packing_boundary: BoundaryType,
-    attention_boundary: BoundaryType,
-    num_training_splits: int,
-    num_dev_splits: int,
-    num_test_splits: int,
-    category_to_id: Dict[str, int],
-    dev_ratio: float,
-    test_ratio: float,
+        test_name: str,
+        disable_space_separator: bool,
+        keep_prompt_only_sequences: bool,
+        prompt_keyword: str,
+        completion_keyword: str,
+        shuffle: str,
+        do_not_balance_hdf5: bool,
+        max_seq_length: int,
+        input_packing_config: PackingConfig,
+        packing_boundary: BoundaryType,
+        attention_boundary: BoundaryType,
+        num_training_splits: int,
+        num_dev_splits: int,
+        num_test_splits: int,
+        category_to_id: Dict[str, int],
+        dev_ratio: float,
+        test_ratio: float,
 ):
     num_workers = os.cpu_count()
     if num_workers is None:

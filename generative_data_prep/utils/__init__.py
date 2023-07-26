@@ -17,12 +17,12 @@ limitations under the License.
 from .arg_configs import PackingConfig
 from .balance_hdf5_files import balance_hdf5_files
 from .constants import (
+    CATEGORY_JSON_KEY,
     BoundaryType,
     FileExtension,
     OverflowType,
     PackingStyleType,
     TokenTypeIds,
-    CATEGORY_JSON_KEY
 )
 from .large_file_shuffle import large_file_shuffle
 from .path_verify import verify_input_file, verify_output_dir, verify_output_file
@@ -31,5 +31,5 @@ from .utils import (
     SEP_STR,
     TOKENIZER_CLASSES,
     data_prep_arg_builder,
-    execute_and_return_stdout
-    )
+    execute_and_return_stdout,
+)

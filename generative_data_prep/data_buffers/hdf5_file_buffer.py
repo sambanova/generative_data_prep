@@ -31,13 +31,12 @@ MEGABYTE = 1048576
 
 class Hdf5FileBuffer(FileBuffer):
     """Implementation of Hdf5TextBuffer to write tokenized sequences to hdf5 files."""
-
     def __init__(
-        self,
-        hdf5_file_path: str,
-        max_seq_length: int,
-        data_type: str = "i4",
-        max_chunk_size: int = MEGABYTE,
+            self,
+            hdf5_file_path: str,
+            max_seq_length: int,
+            data_type: str = "i4",
+            max_chunk_size: int = MEGABYTE,
     ):
         """Initialize Hdf5TextBuffer.
 
@@ -51,7 +50,8 @@ class Hdf5FileBuffer(FileBuffer):
         self.max_seq_length = max_seq_length
         self.data_type = data_type
         data_type_size = np.dtype(data_type).itemsize
-        self.max_chunk_length = int(max_chunk_size / (max_seq_length * data_type_size))
+        self.max_chunk_length = int(max_chunk_size /
+                                    (max_seq_length * data_type_size))
         self._chunk: List[TokenizedSequence] = []
         self.first_dump = True
 
@@ -95,7 +95,7 @@ class Hdf5FileBuffer(FileBuffer):
             data: Data to add into self.hdf5_file['dataset_name']
         """
         self.hdf5_file[dataset_name].resize(new_shape)
-        self.hdf5_file[dataset_name][-len(data) :] = data
+        self.hdf5_file[dataset_name][-len(data):] = data
 
     def _dump_chunk(self, chunk):
         """Add the data from chunk into self.hdf5_file.
@@ -117,10 +117,9 @@ class Hdf5FileBuffer(FileBuffer):
             dump_token_ids.append(seq.token_ids)
             dump_token_type_ids.append(seq.token_type_ids)
             if seq.category_ids is not None:
-                if dump_category_ids is None: 
+                if dump_category_ids is None:
                     dump_category_ids = []
                 dump_category_ids.append(seq.category_ids)
-        
 
         if self.first_dump:
             self.hdf5_file.create_dataset(
@@ -171,8 +170,8 @@ class Hdf5FileBuffer(FileBuffer):
         """
         self._chunk += tokenized_sequences
         while len(self._chunk) >= self.max_chunk_length:
-            self._dump_chunk(self._chunk[: self.max_chunk_length])
-            self._chunk = self._chunk[self.max_chunk_length :]
+            self._dump_chunk(self._chunk[:self.max_chunk_length])
+            self._chunk = self._chunk[self.max_chunk_length:]
 
     @property
     def is_concurrent(self) -> bool:

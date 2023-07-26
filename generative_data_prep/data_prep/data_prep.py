@@ -21,7 +21,7 @@ from __future__ import absolute_import
 
 import os
 import sys
-from typing import Optional, Dict
+from typing import Dict, Optional
 
 from transformers import PreTrainedTokenizerBase
 
@@ -31,21 +31,21 @@ from generative_data_prep.utils import BoundaryType, FileExtension, PackingConfi
 
 
 def data_prep_main(
-    silent: bool,
-    tokenizer: PreTrainedTokenizerBase,
-    input_file: str,
-    output_file: str,
-    max_seq_length: int,
-    input_packing_config: PackingConfig,
-    packing_boundary: BoundaryType,
-    attention_boundary: BoundaryType,
-    disable_space_separator: bool,
-    keep_prompt_only_sequences: bool,
-    prompt_keyword: str,
-    completion_keyword: str,
-    category_to_id: Optional[Dict[str, int]],
-    prompt_prefix: Optional[str] = None,
-    prompt_postfix: Optional[str] = None,
+        silent: bool,
+        tokenizer: PreTrainedTokenizerBase,
+        input_file: str,
+        output_file: str,
+        max_seq_length: int,
+        input_packing_config: PackingConfig,
+        packing_boundary: BoundaryType,
+        attention_boundary: BoundaryType,
+        disable_space_separator: bool,
+        keep_prompt_only_sequences: bool,
+        prompt_keyword: str,
+        completion_keyword: str,
+        category_to_id: Optional[Dict[str, int]],
+        prompt_prefix: Optional[str] = None,
+        prompt_postfix: Optional[str] = None,
 ):
     """Tokenize input_file into packed sequences stored in output_file.
 
