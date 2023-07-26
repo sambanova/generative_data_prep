@@ -43,7 +43,7 @@ def data_prep_main(
     keep_prompt_only_sequences: bool,
     prompt_keyword: str,
     completion_keyword: str,
-    category_to_id: Dict[str, int],
+    category_to_id: Optional[Dict[str, int]],
     prompt_prefix: Optional[str] = None,
     prompt_postfix: Optional[str] = None,
 ):

@@ -290,7 +290,7 @@ def pipeline_main(
     num_test_splits: Optional[int],
     dev_ratio: Optional[float],
     test_ratio: Optional[float],
-    category_to_id: Dict[str, int],
+    category_to_id: Optional[Dict[str, int]],
     prompt_prefix: Optional[str] = None,
     prompt_postfix: Optional[str] = None,
 ):
