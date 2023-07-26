@@ -160,7 +160,7 @@ def data_prep_arg_builder(parser: argparse.ArgumentParser):
         default=None,
         type=str,
         required=False,
-        help="If you include this flag, then the 'category' field from your input jsonls will be stored in the 'category_id' dataset in your output hdf5 files. This labels each tokens category and allows you to view training loss curves for each individual category.",
+        help="If you include this flag, then the 'category' field from your input jsonls will be stored in the 'category_id' dataset in your output hdf5 files. You need to specify all the possible categories each data point could be classified as by its 'category' key. You can pass this in as a string that is a comma separated list where each element is a category, or a path to a json file that is a list where each element is the string name of a category.",
     )
 
 def execute_and_return_stdout(command):

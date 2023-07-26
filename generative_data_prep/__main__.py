@@ -264,7 +264,7 @@ def get_categories(categories: str):
     if categories is not None:
         if os.path.exists(categories):
             with open(categories, 'r') as categories_file:
-                categories_list = categories_file.readlines()
+                categories_list = json.load(categories_file)
         else:
             categories_list = categories.split(',')
         
