@@ -21,6 +21,8 @@ from pathlib import Path
 import pytest
 from transformers import GPT2Tokenizer, PreTrainedTokenizerBase
 
+from typing import Dict
+
 from generative_data_prep.data_prep import data_prep_main, pipeline_main
 from generative_data_prep.utils import BoundaryType, PackingConfig
 
@@ -48,13 +50,14 @@ def gold_pipeline_path(test_name: str) -> str:
 
 
 @pytest.mark.parametrize(
-    "test_name,tokenizer,max_seq_length,input_packing_config,packing_boundary,attention_boundary",
+    "test_name,tokenizer,max_seq_length,input_packing_config,category_to_id,packing_boundary,attention_boundary",
     [
         (
             "data_prep_test",
             TOKENIZER,
             1024,
             PackingConfig.get_default(),
+            None,
             BoundaryType.JSONL,
             BoundaryType.JSONL,
         ),
@@ -63,6 +66,7 @@ def gold_pipeline_path(test_name: str) -> str:
             TOKENIZER,
             1024,
             PackingConfig.get_default(),
+            None,
             BoundaryType.JSONL,
             BoundaryType.JSONL,
         ),
@@ -71,6 +75,7 @@ def gold_pipeline_path(test_name: str) -> str:
             TOKENIZER,
             1024,
             PackingConfig.get_default(),
+            None,
             BoundaryType.JSONL,
             BoundaryType.JSONL,
         ),
@@ -79,6 +84,7 @@ def gold_pipeline_path(test_name: str) -> str:
             TOKENIZER,
             1024,
             PackingConfig.from_str("single::drop"),
+            None,
             BoundaryType.JSONL,
             BoundaryType.JSONL,
         ),
@@ -87,6 +93,7 @@ def gold_pipeline_path(test_name: str) -> str:
             TOKENIZER,
             1024,
             PackingConfig.from_str("single::truncate_right"),
+            None,
             BoundaryType.JSONL,
             BoundaryType.JSONL,
         ),
@@ -95,6 +102,7 @@ def gold_pipeline_path(test_name: str) -> str:
             TOKENIZER,
             1024,
             PackingConfig.from_str("greedy::drop"),
+            None,
             BoundaryType.PROMPT_COMPLETION_PAIR,
             BoundaryType.JSONL,
         ),
@@ -105,6 +113,7 @@ def test_data_prep(
     test_name: str,
     max_seq_length: int,
     input_packing_config: PackingConfig,
+    category_to_id: Dict[str, int],
     packing_boundary: BoundaryType,
     attention_boundary: BoundaryType,
 ):
@@ -123,6 +132,7 @@ def test_data_prep(
             attention_boundary=attention_boundary,
             disable_space_separator=False,
             keep_prompt_only_sequences=True,
+            category_to_id=category_to_id,
             prompt_keyword="prompt",
             completion_keyword="completion",
         )
@@ -151,7 +161,7 @@ def test_data_prep(
 @pytest.mark.parametrize(
     "test_name,disable_space_separator,keep_prompt_only_sequences,prompt_keyword,completion_keyword,\
     shuffle,do_not_balance_hdf5,max_seq_length,input_packing_config,packing_boundary,attention_boundary,\
-    num_training_splits,num_dev_splits,num_test_splits,dev_ratio,test_ratio",
+    num_training_splits,num_dev_splits,num_test_splits,category_to_id,dev_ratio,test_ratio",
     [
         (
             "pipeline_test",
@@ -165,6 +175,7 @@ def test_data_prep(
             PackingConfig.get_default(),
             BoundaryType.JSONL,
             BoundaryType.JSONL,
+            None,
             None,
             None,
             None,
@@ -188,6 +199,7 @@ def test_data_prep(
             0,
             None,
             None,
+            None,
         ),
         (
             "pretraining",
@@ -204,6 +216,7 @@ def test_data_prep(
             32,
             0,
             0,
+            None,
             None,
             None,
         ),
@@ -224,6 +237,7 @@ def test_data_prep(
             0,
             None,
             None,
+            None,
         ),
         (
             "dialogue",
@@ -240,6 +254,7 @@ def test_data_prep(
             32,
             0,
             0,
+            None,
             None,
             None,
         ),
@@ -260,6 +275,7 @@ def test_data_prep(
             0,
             None,
             None,
+            None,
         ),
     ],
 )
@@ -278,6 +294,7 @@ def test_pipeline(
     num_training_splits: int,
     num_dev_splits: int,
     num_test_splits: int,
+    category_to_id: Dict[str, int],
     dev_ratio: float,
     test_ratio: float,
 ):
@@ -306,6 +323,7 @@ def test_pipeline(
             num_training_splits=num_training_splits,
             num_dev_splits=num_dev_splits,
             num_test_splits=num_test_splits,
+            category_to_id=category_to_id,
             dev_ratio=dev_ratio,
             test_ratio=test_ratio,
         )
