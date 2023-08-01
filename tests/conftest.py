@@ -19,6 +19,7 @@ from typing import Optional
 import pytest
 
 from generative_data_prep.tokenized_line import (
+    Token,
     TokenizedArticle,
     TokenizedLine,
     TokenizedSequence,
@@ -35,12 +36,13 @@ def get_tokenized_line(length: int, max_seq_length: Optional[int], eos_token_id:
     token_ids = list(range(length))
     token_type_ids = list(range(0, -length, -1))
 
+    tokens = list(map(lambda x: Token(x[0], x[1]), zip(token_ids, token_type_ids)))
     if all(are_nones):
-        tokenized_line: TokenizedLine = TokenizedArticle(token_ids, token_type_ids)
+        tokenized_line: TokenizedLine = TokenizedArticle(tokens)
     elif not any(are_nones):
         # required for mypy
         assert max_seq_length is not None and eos_token_id is not None
-        tokenized_line = TokenizedSequence(token_ids, token_type_ids, max_seq_length, eos_token_id)
+        tokenized_line = TokenizedSequence(tokens, max_seq_length, eos_token_id)
     else:
         raise ValueError("Both max_seq_length and eos_token_id must be None or both must be non-None")
 

@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+from .token import Token
 from .tokenized_line import TokenizedArticle, TokenizedLine, TokenizedSequence
 
-__all__ = ["TokenizedArticle", "TokenizedLine", "TokenizedSequence"]
+__all__ = ["TokenizedArticle", "TokenizedLine", "TokenizedSequence", "Token"]

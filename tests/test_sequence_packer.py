@@ -20,6 +20,7 @@ import pytest
 
 from generative_data_prep.processors import SequencePacker
 from generative_data_prep.tokenized_line import (
+    Token,
     TokenizedArticle,
     TokenizedLine,
     TokenizedSequence,
@@ -82,7 +83,7 @@ def test_handle_overflow(
     assert isinstance(unfinished_sequence, TokenizedSequence)
     assert isinstance(tokenized_article, TokenizedArticle)
     tokenized_article = sequence_packer._handle_overflow(tokenized_article, unfinished_sequence)
-    assert tokenized_article.token_ids == expected_token_ids
+    assert tokenized_article.dump_token_ids() == expected_token_ids
 
 
 @pytest.mark.fast
@@ -165,23 +166,20 @@ def test_sequence_packer(
     # create the articles
     articles = []
     for length in article_lengths:
-        tokens = list(range(length))
-        token_type_ids = [TokenTypeIds.COMPLETION.value] * length
-        articles.append(TokenizedArticle(tokens, token_type_ids))
+        tokens = []
+        for token_id, token_type_id in zip(list(range(length)), [TokenTypeIds.COMPLETION.value] * length):
+            tokens.append(Token(token_id, token_type_id))
 
+        articles.append(TokenizedArticle(tokens))
     # pack the sequences
     sequences = sequence_packer(articles)
     assert sequences is not None
     unfinished_sequences = sequence_packer(None)
     sequences += unfinished_sequences
-
     assert len(sequences) == len(expected)
     assert all(len(sequence) == max_seq_length for sequence in sequences)
     for sequence, (num_compl_tokens, num_pad_tokens) in zip(sequences, expected):
         for i in range(num_compl_tokens):
-            assert sequence.token_type_ids[i] == TokenTypeIds.COMPLETION.value
+            assert sequence.tokens[i].token_type_id == TokenTypeIds.COMPLETION.value
         for i in range(num_pad_tokens):
-            assert sequence[i + num_compl_tokens] == (
-                eos_token_id,
-                TokenTypeIds.PADDING,
-            )
+            assert sequence.tokens[i + num_compl_tokens] == Token(eos_token_id, TokenTypeIds.PADDING)

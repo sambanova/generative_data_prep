@@ -17,7 +17,8 @@ limitations under the License.
 Implement a Text Buffer for writing tokenized sequences to hdf5 files.
 """
 
-from typing import List
+from types import TracebackType
+from typing import Dict, List, Optional, Tuple, Type
 
 import h5py
 import numpy as np
@@ -31,12 +32,13 @@ MEGABYTE = 1048576
 
 class Hdf5FileBuffer(FileBuffer):
     """Implementation of Hdf5TextBuffer to write tokenized sequences to hdf5 files."""
+
     def __init__(
-            self,
-            hdf5_file_path: str,
-            max_seq_length: int,
-            data_type: str = "i4",
-            max_chunk_size: int = MEGABYTE,
+        self,
+        hdf5_file_path: str,
+        max_seq_length: int,
+        data_type: str = "i4",
+        max_chunk_size: int = MEGABYTE,
     ):
         """Initialize Hdf5TextBuffer.
 
@@ -50,8 +52,7 @@ class Hdf5FileBuffer(FileBuffer):
         self.max_seq_length = max_seq_length
         self.data_type = data_type
         data_type_size = np.dtype(data_type).itemsize
-        self.max_chunk_length = int(max_chunk_size /
-                                    (max_seq_length * data_type_size))
+        self.max_chunk_length = int(max_chunk_size / (max_seq_length * data_type_size))
         self._chunk: List[TokenizedSequence] = []
         self.first_dump = True
 
@@ -64,7 +65,12 @@ class Hdf5FileBuffer(FileBuffer):
         self.hdf5_file = h5py.File(self.hdf5_file_path, "w")
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> bool:
         """When the with Hdf5TextBuffer() as ... is exited, flush and close hdf5 file.
 
         Args:
@@ -85,8 +91,9 @@ class Hdf5FileBuffer(FileBuffer):
 
         self.hdf5_file.flush()
         self.hdf5_file.close()
+        return True
 
-    def _dump_data(self, dataset_name, new_shape, data):
+    def _dump_data(self, data_dump: Dict[str, List[List[int]]], new_shape: Tuple[int, int]):
         """Resizes self.hdf5_file to new_shape then dumps data into it.
 
         Args:
@@ -94,10 +101,21 @@ class Hdf5FileBuffer(FileBuffer):
             new_shape: New shape to resize dataset
             data: Data to add into self.hdf5_file['dataset_name']
         """
-        self.hdf5_file[dataset_name].resize(new_shape)
-        self.hdf5_file[dataset_name][-len(data):] = data
+        for hdf5_dataset_name, data in data_dump.items():
+            self.hdf5_file[hdf5_dataset_name].resize(new_shape)
+            self.hdf5_file[hdf5_dataset_name][-len(data) :] = data
 
-    def _dump_chunk(self, chunk):
+    def _first_dump_data(self, data_dump: Dict[str, List[List[int]]]):
+        for hdf5_dataset_name, data in data_dump.items():
+            self.hdf5_file.create_dataset(
+                hdf5_dataset_name,
+                data=data,
+                dtype=self.data_type,
+                compression="gzip",
+                maxshape=(None, self.max_seq_length),
+            )
+
+    def _dump_chunk(self, chunk: List[TokenizedSequence]):
         """Add the data from chunk into self.hdf5_file.
 
         Args:
@@ -109,52 +127,22 @@ class Hdf5FileBuffer(FileBuffer):
         for tokenized_seq in chunk:
             assert len(tokenized_seq) == self.max_seq_length
 
-        dump_token_ids = []
-        dump_token_type_ids = []
-        dump_category_ids = None
+        data_dump: Dict[str, List[List[int]]] = {"input_ids": [], "token_type_ids": [], "category_ids": []}
 
         for seq in chunk:
-            dump_token_ids.append(seq.token_ids)
-            dump_token_type_ids.append(seq.token_type_ids)
-            if seq.category_ids is not None:
-                if dump_category_ids is None:
-                    dump_category_ids = []
-                dump_category_ids.append(seq.category_ids)
+            data_dump["input_ids"].append(seq.dump_token_ids())
+            data_dump["token_type_ids"].append(seq.dump_token_type_ids())
+            data_dump["category_ids"].append(seq.dump_category_ids())
 
         if self.first_dump:
-            self.hdf5_file.create_dataset(
-                "input_ids",
-                data=dump_token_ids,
-                dtype=self.data_type,
-                compression="gzip",
-                maxshape=(None, self.max_seq_length),
-            )
-            self.hdf5_file.create_dataset(
-                "token_type_ids",
-                data=dump_token_type_ids,
-                dtype=self.data_type,
-                compression="gzip",
-                maxshape=(None, self.max_seq_length),
-            )
-            if dump_category_ids is not None:
-                self.hdf5_file.create_dataset(
-                    "category_ids",
-                    data=dump_category_ids,
-                    dtype=self.data_type,
-                    compression="gzip",
-                    maxshape=(None, self.max_seq_length),
-                )
+            self._first_dump_data(data_dump)
         else:
             num_dump_seq = len(chunk)
             new_shape = (
                 self.hdf5_file["input_ids"].shape[0] + num_dump_seq,
                 self.max_seq_length,
             )
-
-            self._dump_data("input_ids", new_shape, dump_token_ids)
-            self._dump_data("token_type_ids", new_shape, dump_token_type_ids)
-            if dump_category_ids is not None:
-                self._dump_data("category_ids", new_shape, dump_category_ids)
+            self._dump_data(data_dump, new_shape)
 
         self.first_dump = False
 
@@ -170,8 +158,8 @@ class Hdf5FileBuffer(FileBuffer):
         """
         self._chunk += tokenized_sequences
         while len(self._chunk) >= self.max_chunk_length:
-            self._dump_chunk(self._chunk[:self.max_chunk_length])
-            self._chunk = self._chunk[self.max_chunk_length:]
+            self._dump_chunk(self._chunk[: self.max_chunk_length])
+            self._chunk = self._chunk[self.max_chunk_length :]
 
     @property
     def is_concurrent(self) -> bool:

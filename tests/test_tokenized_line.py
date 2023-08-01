@@ -30,14 +30,13 @@ from generative_data_prep.utils import TokenTypeIds
 def test_len(tokenized_line: TokenizedLine, length: int):
     """Basic length test."""
     assert len(tokenized_line) == length
-    assert len(tokenized_line.token_ids) == length
-    assert len(tokenized_line.token_type_ids) == length
+    assert len(tokenized_line.tokens) == length
 
 
 @pytest.mark.parametrize(
     "length,max_seq_length,eos_token_id,expected",
     [
-        (3, None, None, "[(0, 0) (1, -1) (2, -2)]"),
+        (3, None, None, "[(0, 0, -1) (1, -1, -1) (2, -2, -1)]"),
     ],
 )
 def test_str(tokenized_line: TokenizedLine, expected: str):
@@ -74,12 +73,12 @@ def test_illegal_add(tokenized_line: TokenizedLine, tokenized_line_2: TokenizedL
 @pytest.mark.parametrize("length,max_seq_length,eos_token_id,index", [(10, None, None, 4), (10, 12, -1, 0)])
 def test_get_item(tokenized_line: TokenizedLine, index: int):
     """Test integer indexing of the tokenized line."""
-    token, token_type_id = tokenized_line[index]
+    token = tokenized_line[index]
     # this is based on the way we initialized token_ids in the
     # tokenized_line fixture, in reality the token_ids and token type ids
     # could be anything
-    assert token == index
-    assert token_type_id == -index
+    assert token.token_id == index
+    assert token.token_type_id == -index
 
 
 @pytest.mark.fast
@@ -97,8 +96,8 @@ def test_get_slice(tokenized_line: TokenizedLine, index_slice: slice):
         index_slice = slice(index_slice.start, index_slice.stop, 1)
 
     tokenized_line_slice = tokenized_line[index_slice]
-    token_ids = tokenized_line_slice.token_ids
-    token_type_ids = tokenized_line_slice.token_type_ids
+    token_ids = tokenized_line_slice.dump_token_ids()
+    token_type_ids = tokenized_line_slice.dump_token_type_ids()
     # as mentioned before, this is based on the way we initialized token_ids in the
     # tokenized_line fixture.
     for i, index in enumerate(range(index_slice.start, index_slice.stop, index_slice.step)):
@@ -122,8 +121,8 @@ def test_pad(
     """Verify that the tokenized line can be padded with Padding token_ids"""
     assert isinstance(tokenized_line, TokenizedSequence)
     tokenized_line.pad()
-    assert tokenized_line.token_ids == expected_token_ids
-    assert tokenized_line.token_type_ids == expected_token_type_ids
+    assert tokenized_line.dump_token_ids() == expected_token_ids
+    assert tokenized_line.dump_token_type_ids() == expected_token_type_ids
 
 
 @pytest.mark.fast

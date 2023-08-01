@@ -26,7 +26,11 @@ from typing import Dict, List, Optional, Tuple, Union
 
 from transformers import PreTrainedTokenizerBase, logging
 
-from generative_data_prep.tokenized_line import TokenizedArticle, TokenizedSequence
+from generative_data_prep.tokenized_line import (
+    Token,
+    TokenizedArticle,
+    TokenizedSequence,
+)
 from generative_data_prep.utils import (
     CATEGORY_JSON_KEY,
     BoundaryType,
@@ -42,21 +46,22 @@ DEFAULT_PACKING_CONFIG = PackingConfig.get_default()
 
 class ArticleTokenizer:
     """Tokenize and pack text into sequences used for training NLP models."""
+
     def __init__(
-            self,
-            tokenizer: PreTrainedTokenizerBase,
-            max_seq_length: int,
-            file_ext: FileExtension,
-            packing_config: PackingConfig = DEFAULT_PACKING_CONFIG,
-            packing_boundary: BoundaryType = BoundaryType.JSONL,
-            attention_boundary: BoundaryType = BoundaryType.JSONL,
-            disable_space_separator: bool = False,
-            keep_prompt_only_sequences: bool = False,
-            prompt_keyword: str = "prompt",
-            completion_keyword: str = "completion",
-            category_name_to_id: Dict[str, int] = None,
-            prompt_prefix: Optional[str] = None,
-            prompt_postfix: Optional[str] = None,
+        self,
+        tokenizer: PreTrainedTokenizerBase,
+        max_seq_length: int,
+        file_ext: FileExtension,
+        packing_config: PackingConfig = DEFAULT_PACKING_CONFIG,
+        packing_boundary: BoundaryType = BoundaryType.JSONL,
+        attention_boundary: BoundaryType = BoundaryType.JSONL,
+        disable_space_separator: bool = False,
+        keep_prompt_only_sequences: bool = False,
+        prompt_keyword: str = "prompt",
+        completion_keyword: str = "completion",
+        category_name_to_id: Optional[Dict[str, int]] = None,
+        prompt_prefix: Optional[str] = None,
+        prompt_postfix: Optional[str] = None,
     ):
         """Create Article Tokenizer.
 
@@ -109,8 +114,7 @@ class ArticleTokenizer:
         self.prompt_keyword = prompt_keyword
         self.completion_keyword = completion_keyword
         self.eos_token_id = tokenizer.eos_token_id
-        self.packer = SequencePacker(max_seq_length, self.eos_token_id,
-                                     packing_config)
+        self.packer = SequencePacker(max_seq_length, self.eos_token_id, packing_config)
         self.prompt_prefix = prompt_prefix
         self.prompt_postfix = prompt_postfix
         logging.set_verbosity_error()
@@ -158,9 +162,7 @@ class ArticleTokenizer:
             return self._remove_prompt_only_sequences(tokenized_sequences)
         return tokenized_sequences
 
-    def _remove_prompt_only_sequences(self,
-                                      tokenized_lines: List[TokenizedSequence]
-                                      ) -> List[TokenizedSequence]:
+    def _remove_prompt_only_sequences(self, tokenized_lines: List[TokenizedSequence]) -> List[TokenizedSequence]:
         """Takes a list of TokenizedLines, removes those that don't contain any COMPLETION TokenTypeIds.
 
         Args:
@@ -170,7 +172,7 @@ class ArticleTokenizer:
         """
         filtered_lines = []
         for line in tokenized_lines:
-            if TokenTypeIds.COMPLETION not in line.token_type_ids:
+            if TokenTypeIds.COMPLETION not in line.dump_token_type_ids():
                 if not self.logged_prompt_only_warn_msg_postpack:
                     print(
                         "WARNING: --keep_prompt_only_sequences is not set and after packing data \
@@ -194,16 +196,15 @@ class ArticleTokenizer:
         Returns:
             List with one element, that is the tokenized article representing the text_line
         """
-        token_ids, token_type_ids = self.tokenize(text_line)
+        tokens = self.tokenize(text_line)
 
-        if len(token_type_ids) >= 1:
-            token_type_ids[-1] = TokenTypeIds.SEP
+        if len(tokens) >= 1:
+            tokens[-1].make_article_boundary()
 
-        tokenized_article = TokenizedArticle(token_ids, token_type_ids)
+        tokenized_article = TokenizedArticle(tokens)
         return [tokenized_article]
 
-    def process_jsonl(self,
-                      jsonl: Union[dict, List]) -> List[TokenizedArticle]:
+    def process_jsonl(self, jsonl: Union[dict, List]) -> List[TokenizedArticle]:
         """Tokenize a loaded jsonl and store in a TokenizedArticle object.
 
         Takes in a loaded jsonl, and returns a List of tokenized articles based on self.BoundaryType.
@@ -222,11 +223,9 @@ class ArticleTokenizer:
             jsonl = [jsonl]
 
         tokenized_articles = []
-        token_ids, token_type_ids, category_ids = [], [], None
+        tokens = []
         for i, prompt_completion in enumerate(jsonl):
-            prompt = prompt_completion[
-                self.
-                prompt_keyword] if self.prompt_keyword in prompt_completion else ""
+            prompt = prompt_completion[self.prompt_keyword] if self.prompt_keyword in prompt_completion else ""
             if self.completion_keyword not in prompt_completion:
                 err_msg = f"Completion keyword required in every jsonl, {self.completion_keyword} not found"
                 raise json.JSONDecodeError(err_msg, str(jsonl), 0)
@@ -242,41 +241,34 @@ class ArticleTokenizer:
                     self.logged_prompt_only_warn_msg_prepack = True
                 continue
 
-            completion, prompt = self._add_space_separator(completion, prompt)
-            new_token_ids, new_token_type_ids = self.tokenize(
-                completion, prompt)
-            token_ids += new_token_ids
-            token_type_ids += new_token_type_ids
-
-            if CATEGORY_JSON_KEY in prompt_completion:
-                if category_ids is None:
-                    category_ids = []
+            category_id = -1
+            if self.category_name_to_id is not None and CATEGORY_JSON_KEY in prompt_completion:
                 category_name = prompt_completion[CATEGORY_JSON_KEY]
                 if category_name not in self.category_name_to_id:
-                    err = f"jsonl found with key {CATEGORY_JSON_KEY} and value {category_name}, but this category name is not in inputted --categories flag {self.category_name_to_id}"
+                    err = f"jsonl found with key {CATEGORY_JSON_KEY} and value {category_name},"
+                    err += (
+                        f" but this category name is not in inputted --categories_path flag {self.category_name_to_id}"
+                    )
                     raise ValueError(err)
                 category_id = self.category_name_to_id[category_name]
-                category_ids += len(token_type_ids) * [category_id]
 
-            if self.attention_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and len(
-                    token_type_ids) > 0:
-                token_type_ids[-1] = TokenTypeIds.SEP
-            if self.packing_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and i != len(
-                    jsonl) - 1:
-                tokenized_article = TokenizedArticle(token_ids, token_type_ids,
-                                                     category_ids)
+            completion, prompt = self._add_space_separator(completion, prompt)
+            tokens += self.tokenize(completion, prompt, category_id)
+
+            if self.attention_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and len(tokens) > 0:
+                tokens[-1].make_article_boundary()
+            if self.packing_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and i != len(jsonl) - 1:
+                tokenized_article = TokenizedArticle(tokens)
                 tokenized_articles.append(tokenized_article)
-                token_ids, token_type_ids = [], []
+                tokens = []
 
-        if len(token_type_ids) > 0:
-            token_type_ids[-1] = TokenTypeIds.SEP
-        tokenized_articles.append(
-            TokenizedArticle(token_ids, token_type_ids, category_ids))
+        if len(tokens) > 0:
+            tokens[-1].make_article_boundary()
+        tokenized_articles.append(TokenizedArticle(tokens))
 
         return tokenized_articles
 
-    def _add_space_separator(self, completion: str,
-                             prompt: str) -> Tuple[str, str]:
+    def _add_space_separator(self, completion: str, prompt: str) -> Tuple[str, str]:
         """Remove any spaces between the prompt and completion and add a space before the completion.
 
         Args:
@@ -294,8 +286,7 @@ class ArticleTokenizer:
 
         return completion, prompt
 
-    def tokenize(self, completion: str,
-                 prompt: Optional[str] = None) -> Tuple[List[int], List[int]]:
+    def tokenize(self, completion: str, prompt: Optional[str] = None, category_id: Optional[int] = -1) -> List[Token]:
         """Tokenize the input prompt and completion.
 
         Call self.tokenizer.encode to convert the input prompt and completion into token ids.
@@ -310,26 +301,21 @@ class ArticleTokenizer:
             each element represents the type (prompt, completion, eos, padding) of the
             token at the corresponding index in token_ids
         """
-        token_ids: List[int] = []
-        token_type_ids: List[int] = []
+        tokens = []
 
         if prompt:
             if self.prompt_prefix:
                 prompt = self.prompt_prefix + prompt
             if self.prompt_postfix:
                 prompt = prompt + self.prompt_postfix
-            token_ids += self.tokenizer.encode(prompt)
-            token_type_ids += len(token_ids) * [TokenTypeIds.PROMPT]
+            prompt_token_ids = self.tokenizer.encode(prompt)
+            tokens += list(map(lambda x: Token(x, TokenTypeIds.PROMPT, category_id), prompt_token_ids))
 
         if completion:
             completion_token_ids = self.tokenizer.encode(completion)
-            token_ids += completion_token_ids
-            token_type_ids += len(completion_token_ids) * [
-                TokenTypeIds.COMPLETION
-            ]
+            tokens += list(map(lambda x: Token(x, TokenTypeIds.COMPLETION, category_id), completion_token_ids))
 
-        if len(token_ids) >= 1:
-            token_ids.append(self.eos_token_id)
-            token_type_ids.append(TokenTypeIds.COMPLETION)
+        if len(tokens) >= 1:
+            tokens.append(Token(self.eos_token_id, TokenTypeIds.COMPLETION, category_id))
 
-        return token_ids, token_type_ids
+        return tokens

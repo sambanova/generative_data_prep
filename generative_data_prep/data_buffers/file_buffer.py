@@ -18,7 +18,8 @@ Abstract class for text buffers, which allow the reading and writing of text.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any
+from types import TracebackType
+from typing import Any, Optional, Type
 
 
 class FileBuffer(ABC):
@@ -50,6 +51,11 @@ class FileBuffer(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def __exit__(self):
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> bool:
         """Called when you exit the text buffer by exiting the with block"""
         raise NotImplementedError
