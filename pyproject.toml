@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 # Use "sambanova_" prefix in the package name i.e. the root folder for the source-code
-name = "sambanova_generative_data_prep"
+name = "sambanova-generative-data-prep"
 description = "Prepare data that can be used to train generative models."
 readme = "README.md"
 requires-python = ">=3.7"
@@ -22,36 +22,6 @@ dependencies = [
     "transformers",
 ]
 dynamic = ["version"]
-
-[project.optional-dependencies]
-build = [
-    "build",
-    "setuptools_scm",
-    "twine",
-]
-dev = [
-    "build",
-    "ipdb",
-    "twine",
-    "setuptools-scm"
-    ]
-docs = [
-    "ipython",
-    "nbsphinx",
-    "myst-parser",
-    "setuptools_scm",
-    "sphinx >= 6.2",
-    "sphinx-autodoc-typehints",
-    "pydantic-settings",
-]
-tests = [
-    "pip == 23.1.2",
-    "pip-tools == 6.13.0",
-    "pre-commit >= 2.20",
-    "pytest >= 7.1",
-    "pytest-html",
-    "pytest-cov",
-    ]
 
 [tool.setuptools.packages.find]
 where = ["generative_data_prep"]
