@@ -35,18 +35,32 @@ repos:
       exclude: ^(tests\/.*|docs\/.*)$
 - repo: local
   hooks:
-  - id: pip-tools-compile
-    name: Generate Requirements Files for Python Package
-    stages: [push, manual]
+  - id: pipenv-lock
+    name: Generate pipenv Lock Files for Python Package
     language: system
-    entry: bash -c 'python .circleci/pip-compile-scripts/generate_requirements.py
-              --python-version=3.9.13
-              --options=build,dev,docs,tests'
-    files: ^(setup\.cfg|pyproject\.toml|requirements/.*\.txt)$
-    verbose: true
+    entry: bash -c 'source .circleci/VERSIONS &&
+            test ${CIRCLECI} = "true" &&
+              pipenv lock ||
+              docker run
+                -e DOCKER_DEFAULT_PLATFORM=${PLATFORM}
+                --rm -v ${PWD}:/app -w /app ${DOCKER_IMAGE} bash -c "
+                  pip install pipenv==${PIPENV_VERSION} && pipenv lock"'
+    files: ^(Pipfile.lock)$
+  - id: generate-requirements
+    name: Generate requirements files using the Pipfile.lock
+    language: system
+    entry: bash -c '
+      pipenv requirements > requirements/requirements.txt &&
+      pipenv requirements --categories=default,build-packages,dev-packages,docs-packages,tests-packages > requirements/all-requirements.txt &&
+      pipenv requirements --categories build-packages > requirements/build-requirements.txt &&
+      pipenv requirements --categories dev-packages > requirements/dev-requirements.txt &&
+      pipenv requirements --categories docs-packages > requirements/docs-requirements.txt &&
+      pipenv requirements --categories tests-packages > requirements/tests-requirements.txt'
+    files: ^(setup\.cfg|pyproject\.toml|Pipfile.*|requirements.*\.txt)$
   - id: pytest
-    name: Run Pytest (using venv if it exists, otherwise use default system)
+    name: Run Pytest using pipenv
+    stages: [manual]
     language: system
-    entry: bash -c 'test -x "venv/bin/pytest" && venv/bin/pytest -m fast || pytest -m fast'
+    entry: bash -c 'pipenv run pytest -m fast'
     always_run: true
     pass_filenames: false
