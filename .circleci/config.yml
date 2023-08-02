@@ -1,9 +1,13 @@
 version: 2.1
 
+orbs:
+  slack: circleci/slack@4.12.5
+
 executors:
   python-docker:
     docker:
       - image: cimg/python:3.9.13
+    # resource_class: sambanova-software/btd-medium
     resource_class: medium
   pip-tools-docker:
     docker:
@@ -21,6 +25,7 @@ jobs:
     executor: pip-tools-docker
     steps:
       - checkout
+      - setup_ssh
       - run:
           name: Generate Cache Key
           command: |
@@ -34,10 +39,10 @@ jobs:
           # TODO: DEVV-329, DEVV-330, DEVV-333; Fix existing issues with flake8, bandit, & pip-tools
           # pre-commit run --all-files
           command: |
-            pip install -U pip
-            pip install ".[tests]"
-            pre-commit run
-            pre-commit run --all-files --hook-stage manual pip-tools-compile
+            source .circleci/VERSIONS && pip install pipenv==${PIPENV_VERSION}
+            pipenv sync --categories tests-packages
+            pipenv run pre-commit run
+            pipenv check
       - save_cache:
           key: v1-{{ arch }}-{{ checksum "pyproject.toml" }}-{{ checksum "circleci_cache_key" }}
           paths:
@@ -58,25 +63,23 @@ jobs:
       - run:
           name: Instantiate Python Virtual Environment
           command: |
-            test -d "venv" || python -m venv ~/venv
-            . ~/venv/bin/activate
-            pip install --upgrade pip
-            pip install ".[build,docs,tests]" -c requirements/requirements.txt
+            source .circleci/VERSIONS && pip install pipenv==${PIPENV_VERSION}
+            pipenv sync --categories=default,build-packages,docs-packages,tests-packages
       - save_cache:
           key: v2-{{ arch }}-{{ .Branch }}-{{ checksum "circleci_cache_key" }}
           paths:
-            - ~/venv
             - ~/.cache/pip
+          when: always
       - run:
-          name: Generate Sphinx Docs
-          command: . ~/venv/bin/activate && sphinx-build -b html docs/source docs/build/html
+          name: Generate Sphix Docs
+          command: pipenv run sphinx-build -b html docs/source docs/build/html
       - run:
           name: Run Pytest
-          command: . ~/venv/bin/activate && pytest
+          command: pipenv run pytest
           when: always
       - run:
           name: Build Python Package
-          command: . ~/venv/bin/activate && python -m build
+          command: pipenv run python -m build
       - store_test_results:
           path: test_reports/circleci
       - store_artifacts:
@@ -93,22 +96,78 @@ jobs:
   publish-python:
     executor: python-docker
     steps:
-      - when:
-          condition: << pipeline.git.tag >>
-          steps:
-            - attach_workspace:
-                at: .
-            - attach_workspace:
-                at: $CIRCLE_WORKING_DIRECTORY
-            - run:
-                name: Publish Python Package
-                command: 'echo "TODO: Enable once package is ready to be published to pypi'
+      - attach_workspace:
+          at: .
+      - attach_workspace:
+          at: $CIRCLE_WORKING_DIRECTORY
+      - run:
+          name: Publish Python Package
+          command: 'echo "TODO: Enable once package is ready to be published to pypi'
                 # TODO: Enable once package is ready to be published to pypi
-                # command: pip install twine && twine upload dist/*
-      - unless:
-          condition: << pipeline.git.tag >>
-          steps:
-            - run: echo "Python package will not be published since this is not a tagged build."
+          # command: pipenv run pip install twine && pipenv run twine upload dist/*
+  notify:
+    executor:
+      name: base
+    steps:
+      - slack/notify:
+          custom: |
+            {
+              "text": "Tagged Build Successful",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "${CIRCLE_PROJECT_REPONAME}: ${CIRCLE_TAG} :tada:",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Project*: ${CIRCLE_PROJECT_REPONAME}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Tag*: ${CIRCLE_TAG}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*UTC*: $(date +'%m/%d/%Y %H:%M')"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*PST*: $(TZ='America/Los_Angeles' date +'%m/%d/%Y %H:%M')"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "action_id": "success_tagged_deploy_view",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Job"
+                      },
+                      "url": "${CIRCLE_BUILD_URL}"
+                    },
+                    {
+                      "type": "button",
+                      "action_id": "build_release_notes",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Release Notes"
+                      },
+                      "url": "<< pipeline.project.git_url >>/releases/tag/${CIRCLE_TAG}"
+                    }
+                  ]
+                }
+              ]
+            }
 
 # Orchestrate our job run sequence
 workflows:
@@ -134,6 +193,12 @@ workflows:
           requires:
             - pre-commit
             - test
+      - notify:
+          context:
+            - slack
+          requires:
+            - publish-python
+
   weekly_cron:
     triggers:
       - schedule:
