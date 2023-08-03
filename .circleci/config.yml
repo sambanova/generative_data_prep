@@ -25,7 +25,6 @@ jobs:
     executor: pip-tools-docker
     steps:
       - checkout
-      - setup_ssh
       - run:
           name: Generate Cache Key
           command: |
