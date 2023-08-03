@@ -6,12 +6,12 @@ orbs:
 executors:
   python-docker:
     docker:
-      - image: cimg/python:3.9.13
+      - image: cimg/python:3.9
     # resource_class: sambanova-software/btd-medium
     resource_class: medium
   pip-tools-docker:
     docker:
-      - image: python:3.9.13
+      - image: python:3.9
     resource_class: medium
   base:
     docker:
