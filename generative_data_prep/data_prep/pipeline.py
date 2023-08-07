@@ -38,6 +38,9 @@ from generative_data_prep.utils import (
     verify_output_dir,
 )
 
+from samba_tools.logging.logging import attach_nlp_prefix, setup_app_logger
+import logging
+app_logger = logging.getLogger(attach_nlp_prefix(__name__))
 
 def split_file_linux(num_splits: int, input_file_path: str, split_dir: str) -> None:
     """Split the [input_file_path] into num_splits and places it in [split_dir].
