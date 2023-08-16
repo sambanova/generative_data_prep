@@ -1,5 +1,4 @@
-"""
-Copyright 2023 SambaNova Systems, Inc.
+"""Copyright 2023 SambaNova Systems, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -31,23 +30,25 @@ class SequencePacker:
     """Takes articles and packs them into fixed length sequences."""
 
     def __init__(self, max_seq_length: int, eos_token_id: int, packing_config: PackingConfig):
-        """Create the SequencePacker.
+        r"""Create the SequencePacker.
 
         Args:
             max_seq_length:  The maximum length of the tokenized sequences.
             eos_token_id:   The end of text token.  This is used by the tokenized sequences for padding.
-            packing_style:  The method we use to 'pack' the tokenized articles into tokenized sequences.  We currently
-                support 4 different packing styles:
-                    FULL:  Completely fill sequences with tokens, as soon as sequences is full start packing into
-                        new sequence. Ignore article boundaries, they may be split across multiple sequences
-                    GREEDY:  Fit as many articles as possible into a sequence, make sure no article is split
-                        across multiple sequences. Fill the left over space in each sequence with padding.
-                        If an article is longer than the maximum sequence length, throw it out.
-                    SINGLE_DROP_OVERFLOW:  Each sequence contains only 1 article.  Fill the rest of the sequence with
-                        padding.  If an article is longer than the maximum sequence length, throw out the article.
-                    SINGLE_TRUNCATE_OVERFLOW:  Each sequence contains only 1 article.  Fill the rest of the sequence
-                        with padding.  If an article is longer than the maximum sequence length truncate it, and throw
-                        the remaining portion of the article out.
+            packing_config:  The method we use to 'pack' the tokenized articles into tokenized sequences.
+                The first argument in the packing config defines the method of placing text into sequences,
+                the second argument defines how to handle jsonls that do not fit within the max_seq_length.
+                'full': Defines the entire packing config, Completely fill sequences with tokens,
+                as soon as sequences is full start packing into new sequence. Ignore article boundaries,
+                they may be split across multiple sequences. 'greedy': Fit as many articles as possible
+                into a sequence, make sure no article is split across multiple sequences. Fill the left
+                over space in each sequence with padding. 'single': Each sequence contains only 1 article.
+                Fill the rest of the sequence with padding.  'drop': Drop the entire article if there are
+                any tokens that overflow beyond the max sequence length.
+                'truncate_left':  Truncate the article from the left if there are any tokens that overflow
+                beyond the max sequence length.
+                'truncate_right':  Truncate the article from the right if there are any tokens that overflow
+                beyond the max sequence length.
 
         Example:
             >>> from generative_data_prep.utils import TokenTypeIds
@@ -98,7 +99,7 @@ class SequencePacker:
         self.unfinished_sequence = TokenizedSequence.get_empty(self.max_seq_length, self.eos_token_id)
 
     def __call__(self, tokenized_articles: Optional[List[TokenizedArticle]]) -> List[TokenizedSequence]:
-        """Call the SequencePacker
+        """Call the SequencePacker.
 
         Args:
             tokenized_articles:  The tokenized articles that will be packed.
@@ -153,10 +154,12 @@ class SequencePacker:
         unfinished_sequence: TokenizedSequence,
     ) -> Tuple[List[TokenizedSequence], TokenizedSequence]:
         """Packs the tokenized article into sequences.
+
         Args:
             tokenized_article:   The tokenized article to be packed.
             unfinished_sequence: A sequence that is not at its maximum length just yet.  Depending on the packing
                 style we might try and fit the tokenized article into this sequence.
+
         Returns:
             A tuple with the packed sequences and any leftover tokens in an unfinished token sequence
         """
@@ -164,7 +167,9 @@ class SequencePacker:
 
         if self.packing_config.packing_style == PackingStyleType.SINGLE:
             # Put each article in its own sequence
-            assert unfinished_sequence.is_empty()
+            if not unfinished_sequence.is_empty():
+                err_msg = "Sequence Packer performing single packing, but sequence is not empty"
+                raise ValueError(err_msg)
             tokenized_article = self._handle_overflow(tokenized_article, unfinished_sequence)
             unfinished_sequence += tokenized_article
             if not unfinished_sequence.is_empty():
