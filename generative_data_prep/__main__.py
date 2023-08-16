@@ -1,5 +1,4 @@
-"""
-Copyright 2023 SambaNova Systems, Inc.
+"""Copyright 2023 SambaNova Systems, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -117,7 +116,7 @@ def add_pipeline_args(subparser: argparse.ArgumentParser):
         on RAM, default to this flag). If you are running a linux operating system and your file is too large to fit \
         on RAM, please choose large_file option, this will run approximate file shuffling that can handle files of \
         any size. If you want to do large file shuffling but you are not on linux, please shuffle the file before \
-        using this script. If the input file should not be shuffled, do not include this flag, it defaults to False.",  # noqa: E251
+        using this script. If the input file should not be shuffled, do not include this flag, it defaults to False.",
     )
     subparser.add_argument(
         "--do_not_balance_hdf5",
@@ -256,8 +255,9 @@ def get_output_dir(cmd, output_path, overwrite_output_path):
 
 if __name__ == "__main__":
     args = get_args()
-    err_msg = f"The input file is not a jsonl or txt file {args.input_file_path}"
-    assert os.path.splitext(args.input_file_path)[1] in FileExtension.as_list(), err_msg
+    if os.path.splitext(args.input_file_path)[1] not in FileExtension.as_list():
+        err_msg = f"The input file is not a jsonl or txt file {args.input_file_path}"
+        raise ValueError(err_msg)
     verify_input_file(args.input_file_path)
     output_dir = get_output_dir(args.cmd, args.output_path, args.overwrite_output_path)
     tokenizer = get_tokenizer(
