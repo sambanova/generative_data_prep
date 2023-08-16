@@ -1,5 +1,4 @@
-"""
-Copyright 2023 SambaNova Systems, Inc.
+"""Copyright 2023 SambaNova Systems, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -57,7 +56,7 @@ class ArticleTokenizer:
         prompt_prefix: Optional[str] = None,
         prompt_postfix: Optional[str] = None,
     ):
-        """Create Article Tokenizer.
+        r"""Create Article Tokenizer.
 
         Args:
             tokenizer: Huggingface tokenizer that inherits from PreTrainedTokenizerBase and contains an
@@ -209,6 +208,7 @@ class ArticleTokenizer:
         Args:
             jsonl: The loaded input jsonl, in the form of {"prompt":"...", "completion":"..."}
             or [{"prompt":"...", "completion":"..."}, {"prompt":"...", "completion":"..."}, ...]
+
         Returns:
             Tokenized articles that represent input jsonl
         """
