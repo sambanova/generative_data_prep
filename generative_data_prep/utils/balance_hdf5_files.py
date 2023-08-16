@@ -1,5 +1,4 @@
-"""
-Copyright 2023 SambaNova Systems, Inc.
+"""Copyright 2023 SambaNova Systems, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -25,7 +24,7 @@ import h5py
 import numpy as np
 
 
-def balance_hdf5_files(hdf5_file_paths: List[str]) -> None:
+def balance_hdf5_files(hdf5_file_paths: List[str]) -> None:  # noqa: C901
     """Balances all the files in hdf5_file_paths, to have the same number fo sequences (within 1).
 
     This is done by first calculating the average number of sequences per file,
@@ -55,9 +54,10 @@ def balance_hdf5_files(hdf5_file_paths: List[str]) -> None:
     num_files = len(hdf5_file_paths)
     avg_seqs = int(tot_seqs / num_files)
     remainder = tot_seqs % num_files
-    assert (
-        avg_seqs * num_files + remainder == tot_seqs
-    ), f"avg_seqs * num_files + remainder = {avg_seqs * num_files + remainder} but tot_seqs = {tot_seqs}, not equal!"
+    if avg_seqs * num_files + remainder != tot_seqs:
+        err_msg = f"avg_seqs * num_files + remainder = {avg_seqs * num_files + remainder} "
+        err_msg += f"but tot_seqs = {tot_seqs}, not equal!"
+        raise ValueError(err_msg)
 
     # Remove and save sequences from files with more than the average
     # Determine how many more sequences files with less than the average need
@@ -102,15 +102,18 @@ def balance_hdf5_files(hdf5_file_paths: List[str]) -> None:
                     file_path_to_num_needed_seqs[file_path] = 1
 
     if len(extra_token_seqs) > 0:
-        assert len(extra_token_seqs) == len(extra_ttid_seqs)
+        if len(extra_token_seqs) != len(extra_ttid_seqs):
+            raise ValueError("extra token seqs does not match extra ttid seqs")
+
         extra_token_seqs_np = np.vstack(extra_token_seqs)
         extra_ttid_seqs_np = np.vstack(extra_ttid_seqs)
     else:
         extra_token_seqs_np = np.zeros((0, 0))
         extra_ttid_seqs_np = np.zeros((0, 0))
-        assert (
-            len(file_path_to_num_needed_seqs) == 0
-        ), f"No extra sequences found, but these files need extra sequences {file_path_to_num_needed_seqs}"
+        if len(file_path_to_num_needed_seqs) != 0:
+            raise ValueError(
+                f"No extra sequences found, but these files need extra sequences {file_path_to_num_needed_seqs}"
+            )
 
     # Iterate through all the files that need more sequences
     for file_path, num_needed_seq in file_path_to_num_needed_seqs.items():
@@ -133,8 +136,10 @@ def balance_hdf5_files(hdf5_file_paths: List[str]) -> None:
             # remove saved token_type_ids sequences so they are not used again
             extra_ttid_seqs_np = extra_ttid_seqs_np[num_needed_seq:]
 
-    assert len(extra_token_seqs_np) == 0
-    assert remainder == 0
+    if len(extra_token_seqs_np) != 0:
+        raise ValueError("extra_token_seqs_np is non zero at the end of rebalancing")
+    if remainder != 0:
+        raise ValueError("remaineder is not 0 after finishing rebalancing")
 
 
 if __name__ == "__main__":
