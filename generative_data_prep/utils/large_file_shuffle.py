@@ -19,7 +19,6 @@ import shutil
 import time
 
 from tqdm import tqdm
-from utils import execute_and_return_stdout
 
 
 def large_file_shuffle(
@@ -83,7 +82,7 @@ def large_file_shuffle(
     prev_time = time.time()
     print("splitting file")
     split_command = f"split -d -n r/{num_splits} {input_file_path} {split_dir}/"
-    execute_and_return_stdout(split_command)
+    os.system(split_command)  # nosec
     print(f"splitting took {time.time() - prev_time} seconds (used round robin splitting)")
 
     prev_time = time.time()
@@ -92,7 +91,7 @@ def large_file_shuffle(
     for file in tqdm(file_list):
         curr_file_path = os.path.join(split_dir, file)
         shuf_command = f"shuf {curr_file_path} --output={curr_file_path}"
-        execute_and_return_stdout(shuf_command)
+        os.system(shuf_command)  # nosec
     print(f"finished shuffling {num_splits} files. Took {time.time() - prev_time} seconds")
 
     if concat_splits:
@@ -103,7 +102,7 @@ def large_file_shuffle(
         for rand_ind in tqdm(random_split_list):
             curr_file_path = os.path.join(split_dir, file_list[rand_ind])
             concat_command = f"cat {curr_file_path} >> {output_path}"
-            execute_and_return_stdout(concat_command)
+            os.system(concat_command)  # nosec
             os.remove(curr_file_path)
         print(f"Finished concatenating files. Took {time.time() - prev_time} seconds")
         shutil.rmtree(split_dir)
