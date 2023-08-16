@@ -1,5 +1,4 @@
-"""
-Copyright 2023 SambaNova Systems, Inc.
+"""Copyright 2023 SambaNova Systems, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -48,7 +47,7 @@ def split_file_linux(num_splits: int, input_file_path: str, split_dir: str) -> N
         split_dir (str): The directory to place all the outputted splits
     """
     split_command = f"split -d -n r/{num_splits} {input_file_path} {split_dir}/"
-    os.system(split_command)
+    execute_and_return_stdout(split_command)
 
 
 def check_RAM(input_file_size_in_bytes: int):
@@ -61,7 +60,8 @@ def check_RAM(input_file_size_in_bytes: int):
     shuffle_on_RAM = available_RAM_in_bytes > input_file_size_in_bytes
     err_msg = "you specified --shuffle=on_RAM, but there is not enough space on RAM to shuffle your file, available"
     err_msg += f"_RAM_in_bytes: {available_RAM_in_bytes} < input_file_size_in_bytes: {input_file_size_in_bytes}"
-    assert shuffle_on_RAM, err_msg
+    if not shuffle_on_RAM:
+        raise MemoryError("Not enough memory to shuffle load data onto RAM")
 
 
 def rename_files(
@@ -103,9 +103,10 @@ def rename_files(
 
         new_file_path = os.path.join(split_dir, new_name)
 
-        err_msg = f"{new_file_path} already exists, and you are trying to overwrite it."
-        err_msg += " To fix this error either specify --overwrite_output_path or move the conflicting file"
-        assert not os.path.exists(new_file_path) or overwrite_output_path, err_msg
+        if os.path.exists(new_file_path) or overwrite_output_path:
+            err_msg = f"{new_file_path} already exists, and you are trying to overwrite it."
+            err_msg += " To fix this error either specify --overwrite_output_path or move the conflicting file"
+            raise ValueError(err_msg)
 
         os.rename(os.path.join(split_dir, str(i).zfill(max(2, num_digits))), new_file_path)
         if train_count <= i < train_count + test_count:
@@ -145,19 +146,23 @@ def get_split_counts(
         train_count, dev_count, test_count, num_splits
     """
     if num_training_splits is not None and num_test_splits is not None and num_dev_splits is not None:
-        assert test_ratio is None, "you included the flag num_test_splits, so you can not specify the flag --test_ratio"
-        assert dev_ratio is None, "you included the flag num_dev_splits, so you can not specify the flag --dev_ratio"
+        if test_ratio is not None:
+            raise ValueError("you included the flag num_test_splits, so you can not specify the flag --test_ratio")
+        if dev_ratio is not None:
+            raise ValueError("you included the flag num_dev_splits, so you can not specify the flag --dev_ratio")
         train_count = num_training_splits
         test_count = num_test_splits
         dev_count = num_dev_splits
         num_splits = train_count + test_count + dev_count
     else:
-        err_msg = "You included the flag --num_test_splits, but did not include --num_dev_splits, or"
-        err_msg += " --num_training_splits. If you want to use any of these flags, you must include all of them."
-        assert num_test_splits is None, err_msg
-        err_msg = "You included the flag --num_dev_splits, but did not include --num_training_splits, "
-        err_msg += "or --num_test_splits. If you want to use any of these flags, you must include all of them."
-        assert num_dev_splits is None, err_msg
+        if num_test_splits is not None:
+            err_msg = "You included the flag --num_test_splits, but did not include --num_dev_splits, or"
+            err_msg += " --num_training_splits. If you want to use any of these flags, you must include all of them."
+            raise ValueError(err_msg)
+        if num_dev_splits is not None:
+            err_msg = "You included the flag --num_dev_splits, but did not include --num_training_splits, "
+            err_msg += "or --num_test_splits. If you want to use any of these flags, you must include all of them."
+            raise ValueError(err_msg)
 
         dev_ratio = dev_ratio if dev_ratio is not None else 0.0
         test_ratio = test_ratio if test_ratio is not None else 0.0
@@ -265,7 +270,7 @@ def multiprocess_data_prep(
     return train_hdf5_files, dev_hdf5_files
 
 
-def pipeline_main(
+def pipeline_main(  # noqa: C901
     input_file_path: str,
     tokenizer: PreTrainedTokenizerBase,
     output_dir: str,
@@ -322,6 +327,7 @@ def pipeline_main(
         test_ratio: Ratio of data to use as test.
         prompt_prefix: text to add before the prompt, for chatML conventions use.
         prompt_postfix: text to add after the prompt, for chatML conventions use.
+
     Raises:
         RuntimeError: If shuffling on RAM is not possible
     """
@@ -334,7 +340,8 @@ def pipeline_main(
             input_file_size_in_gb, input_file_size_in_bytes / (1024**2)
         )
     )
-    assert input_file_size_in_bytes > 1, f"your inputted file {input_file_path} is empty"
+    if input_file_size_in_bytes <= 1:
+        raise ValueError(f"your inputted file {input_file_path} is empty")
 
     train_count, dev_count, test_count, num_splits = get_split_counts(
         input_file_size_in_gb,
@@ -365,7 +372,8 @@ def pipeline_main(
     if shuffle == "large_file":
         err_msg = "You specified --shuffle=large_file, but this is only supported on linux operating systems, "
         err_msg += f"your operating system is {platform}. Please change the flag to --shuffle=on_RAM or --shuffle=False"
-        assert "linux" in platform.lower(), err_msg
+        if "linux" in platform.lower():
+            raise OSError(err_msg)
         split_dir = large_file_shuffle(input_file_path, output_dir, False, num_splits)
 
     # Case 2: Shuffling on RAM with linux OS
@@ -379,7 +387,8 @@ def pipeline_main(
         try:
             out = execute_and_return_stdout(shuffle_command)
             err_msg = f"Shuffle command killed, with print stdout:{out.stdout} stderr:{out.stderr}"
-            assert "killed" not in out.stdout and "killed" not in out.stderr, err_msg
+            if "killed" in out.stdout or "killed" in out.stderr:
+                raise MemoryError(err_msg)
         except Exception as e:
             err_msg = f"Failed with exception {e}, shuffling on RAM is not possible,"
             err_msg += " try specifying argument --shuffle=large_file"
