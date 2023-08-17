@@ -25,7 +25,10 @@ from torch.utils.data import Dataset
 
 
 class generative_dataset(Dataset):
+    """Object to reprent a generative dataset given an input hdf5 file."""
+
     def __init__(self, input_file: str):
+        """Initialize a generative dataset."""
         self.input_file = input_file
         f = h5py.File(input_file, "r")
         keys = ["input_ids", "token_type_ids"]
@@ -33,15 +36,17 @@ class generative_dataset(Dataset):
         f.close()
 
     def __len__(self):
-        "Denotes the total number of samples"
+        """Denotes the total number of samples"""
         return len(self.inputs[0])
 
     def __getitem__(self, index: int):
+        """Overwride the git item function to just return token and type id."""
         [input_ids, token_type_ids] = [torch.from_numpy(input[index].astype(np.int32)) for input in self.inputs]
         return [input_ids.long(), token_type_ids.long()]
 
 
 def check_diff_hdf5(file_1: str, file_2: str):
+    """Check if two hdf5 output directories are the same."""
     ds1 = generative_dataset(file_1)
     ds2 = generative_dataset(file_2)
 
@@ -58,6 +63,7 @@ def check_diff_hdf5(file_1: str, file_2: str):
 
 
 def check_pipeline(dir_1: str, dir_2: str):
+    """Check if two output directories are the same."""
     assert os.listdir(dir_1).sort() == os.listdir(dir_2).sort() == ["hdf5", "test_files", "splits", "logs"].sort()
 
     jsonl_path_dir_1 = os.path.join(dir_1, "splits")

@@ -1,5 +1,4 @@
-"""
-Copyright 2023 SambaNova Systems, Inc.
+"""Copyright 2023 SambaNova Systems, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -46,10 +45,10 @@ class FileBuffer(ABC):
 
     @abstractmethod
     def __enter__(self):
-        """Called when you enter the text buffer using "with TextBuffer() as f:" """
+        """Called when you enter the text buffer using 'with TextBuffer() as f:'."""
         raise NotImplementedError
 
     @abstractmethod
     def __exit__(self):
-        """Called when you exit the text buffer by exiting the with block"""
+        """Called when you exit the text buffer by exiting the with block."""
         raise NotImplementedError
