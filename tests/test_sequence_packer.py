@@ -34,6 +34,7 @@ from generative_data_prep.utils import (
 
 @pytest.fixture
 def packing_config(packing_style: PackingStyleType, overflow_type: OverflowType):
+    """Return a packing config object."""
     return PackingConfig(packing_style, overflow_type)
 
 
@@ -78,6 +79,7 @@ def test_handle_overflow(
     tokenized_line_2: TokenizedLine,
     expected_token_ids: List[int],
 ):
+    """Test handling overflow function in sequence packer."""
     unfinished_sequence, tokenized_article = tokenized_line, tokenized_line_2
     assert isinstance(unfinished_sequence, TokenizedSequence)
     assert isinstance(tokenized_article, TokenizedArticle)
