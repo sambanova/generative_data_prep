@@ -33,6 +33,7 @@ PAD = TokenTypeIds.PADDING
 
 
 def mock_tokenize(input_text: str) -> List[int]:
+    """Fake tokenizer that takes in fake text and assigns fake token ids."""
     FAKE_TOKENIZER = {"hi": 1, "bye": 2, "test": 3, "<human>": 4, "<bot>": 5}
     mock_token_ids = []
     for word in input_text.split(" "):
@@ -159,6 +160,7 @@ def test_tokenize(
     gold_token_ids: List[int],
     gold_ttids: List[int],
 ):
+    """Test the tokenize function."""
     token_ids, ttids = article_tokenizer.tokenize(completion, prompt)
 
     assert token_ids == gold_token_ids
@@ -247,6 +249,7 @@ def test_add_space_separator(
     gold_prompt: List[int],
     gold_completion: List[int],
 ):
+    """Test adding the add_space_separator function."""
     completion_test, prompt_test = article_tokenizer._add_space_separator(completion, prompt)
 
     assert completion_test == gold_completion
@@ -367,6 +370,7 @@ def test_process_jsonl(
     gold_ttids: List[List[int]],
     keep_prompt_only_sequences: bool,
 ):
+    """Test process_jsonl function to make sure it correctly process jsonl."""
     tokenized_articles = article_tokenizer_for_prompt_sequences.process_jsonl(jsonl)
     for tokenized_article, gold_token, gold_ttid in zip(tokenized_articles, gold_token_ids, gold_ttids):
         assert tokenized_article.token_ids == gold_token
@@ -403,12 +407,14 @@ def test_process_text(
     gold_token_ids: List[int],
     gold_ttids: List[int],
 ):
+    """Test process text to make sure it returns the correct tokenized articles."""
     tokenized_articles = article_tokenizer.process_text(text)
     assert tokenized_articles[0].token_ids == gold_token_ids
     assert tokenized_articles[0].token_type_ids == gold_ttids
 
 
 def get_tokenized_seq(token_ids: List[int], token_type_ids: List[int]) -> TokenizedSequence:
+    """Return a toeknized sequence object version of given token ids and ttids."""
     return TokenizedSequence(token_ids, token_type_ids, MAX_SEQ_LEN, EOS_TOKEN_ID)
 
 
@@ -460,6 +466,7 @@ def test__call__(
     gold_tokenized_sequence: List[TokenizedSequence],
     gold_unfinished_sequence: List[TokenizedSequence],
 ):
+    """Test calling article tokenizer."""
     tokenized_sequence = article_tokenizer(article)
     assert tokenized_sequence == gold_tokenized_sequence
     assert article_tokenizer.packer.unfinished_sequence == gold_unfinished_sequence
@@ -507,6 +514,7 @@ def test_multiple__call__(
     gold_tokenized_sequences: List[List[TokenizedSequence]],
     gold_unfinished_sequence: List[TokenizedSequence],
 ):
+    """Test calling article tokenizer multiple times."""
     for article, gold_tokenized_sequence in zip(articles, gold_tokenized_sequences):
         tokenized_sequence = article_tokenizer(article)
         assert tokenized_sequence == gold_tokenized_sequence
@@ -583,6 +591,7 @@ def test_prompt_only_sequences(
     gold_token_type_ids: List[int],
     keep_prompt_only_sequences: bool,
 ):
+    """Test using only prompt sequences to make sure they are dropped."""
     sequences = []
     sequences += article_tokenizer_for_prompt_sequences(articles)
     sequences += article_tokenizer_for_prompt_sequences(None)

@@ -1,5 +1,4 @@
-"""
-Copyright 2023 SambaNova Systems, Inc.
+"""Copyright 2023 SambaNova Systems, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -25,6 +24,7 @@ ATTENTION_SEPARATOR = "-" * 30 + "ATTENTION SEPARATOR" + "-" * 30 + "\n"
 
 
 def print_tokens(tokenizer, curr_prompt, curr_completion, wf):
+    """Prints the decoded tokens from the prompts completion pair."""
     if curr_prompt != []:
         wf.write(f"----PROMPT-----\n{tokenizer.decode(curr_prompt)}\n")
     if curr_completion != []:
@@ -32,6 +32,13 @@ def print_tokens(tokenizer, curr_prompt, curr_completion, wf):
 
 
 def decode_hdf5(hdf5_file_path: str, output_decoded_file_path: str, pretrained_tokenizer: str):
+    """Decode hdf5 files so they are in a human readable format.
+
+    Args:
+        hdf5_file_path (str): Path to input hdf5 file.
+        output_decoded_file_path (str): Path to output the decoded text.
+        pretrained_tokenizer (bool): Tokenizer to use to decode the text.
+    """
     tokenizer = AutoTokenizer.from_pretrained(pretrained_tokenizer)
 
     with h5py.File(hdf5_file_path, "r") as file_h5:

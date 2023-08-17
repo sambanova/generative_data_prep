@@ -1,5 +1,4 @@
-"""
-Copyright 2023 SambaNova Systems, Inc.
+"""Copyright 2023 SambaNova Systems, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -28,7 +27,8 @@ def large_file_shuffle(
     concat_splits: bool = True,
     num_splits: int = 150000,
 ) -> str:
-    """Fast approximate shuffling for massive files. This function
+    """Fast approximate shuffling for massive files.
+
     1. splits the input file into [num_splits]
     2. shuffles each split
     3. If yous set concat_splits=True, then the splits are concatenated in a random order
@@ -63,24 +63,26 @@ def large_file_shuffle(
         output_path = split_dir
 
     if os.path.isdir(split_dir):
-        print(
-            f"WARNING - the split directory {split_dir} exists, if you do not manually abort this run in 5 seconds, it will be deleted and over-written"
-        )
+        warning = f"WARNING - the split directory {split_dir} exists, if you do not manually abort this "
+        warning += "run in 5 seconds, it will be deleted and over-written"
+        print(warning)
         time.sleep(5)
         shutil.rmtree(split_dir)
     os.mkdir(split_dir)
 
     if os.path.isfile(output_path):
-        print(
-            f"WARNING - the output file path {output_path} exists, if you do not manually abort this run in 5 seconds, it will be deleted and over-written"
+        warning_msg = (
+            f"WARNING - the output file path {output_path} exists, if you do not manually abort this run in 5 seconds, "
         )
+        warning_msg += "it will be deleted and over-written"
+        print(warning_msg)
         time.sleep(5)
         os.remove(output_path)
 
     prev_time = time.time()
     print("splitting file")
     split_command = f"split -d -n r/{num_splits} {input_file_path} {split_dir}/"
-    os.system(split_command)
+    os.system(split_command)  # nosec
     print(f"splitting took {time.time() - prev_time} seconds (used round robin splitting)")
 
     prev_time = time.time()
@@ -89,18 +91,18 @@ def large_file_shuffle(
     for file in tqdm(file_list):
         curr_file_path = os.path.join(split_dir, file)
         shuf_command = f"shuf {curr_file_path} --output={curr_file_path}"
-        os.system(shuf_command)
+        os.system(shuf_command)  # nosec
     print(f"finished shuffling {num_splits} files. Took {time.time() - prev_time} seconds")
 
     if concat_splits:
         random_split_list = list(range(num_splits))
         random.shuffle(random_split_list)
         prev_time = time.time()
-        print(f"concatenating shuffled splits")
+        print("concatenating shuffled splits")
         for rand_ind in tqdm(random_split_list):
             curr_file_path = os.path.join(split_dir, file_list[rand_ind])
             concat_command = f"cat {curr_file_path} >> {output_path}"
-            os.system(concat_command)
+            os.system(concat_command)  # nosec
             os.remove(curr_file_path)
         print(f"Finished concatenating files. Took {time.time() - prev_time} seconds")
         shutil.rmtree(split_dir)

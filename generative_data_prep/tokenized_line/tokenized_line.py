@@ -1,5 +1,4 @@
-"""
-Copyright 2023 SambaNova Systems, Inc.
+"""Copyright 2023 SambaNova Systems, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -45,8 +44,10 @@ class TokenizedLine(ABC):
                 of each corresponding token.  Some examples of token type ids include 'Prompt', 'Completion, and 'End
                 of Sequence'.
         """
-        err_msg = f"Length of Token IDs {len(token_ids)} must match length of Token Type IDs {len(token_type_ids)}"
-        assert len(token_ids) == len(token_type_ids), err_msg
+        if len(token_ids) != len(token_type_ids):
+            err_msg = f"Length of Token IDs {len(token_ids)} must match length of Token Type IDs {len(token_type_ids)}"
+            raise ValueError(err_msg)
+
         self._token_ids = token_ids
         self._token_type_ids = token_type_ids
 
@@ -58,12 +59,12 @@ class TokenizedLine(ABC):
 
     @overload
     def __getitem__(self: TokenizedLineSubClass, index: slice) -> TokenizedLineSubClass:
-        """See __getitem__ docstring below, this is just a type hint."""
+        """See __getitem__ docstring below, this is just a type hint."""  # noqa: D418
         ...
 
     @overload
     def __getitem__(self: TokenizedLineSubClass, index: int) -> Tuple[int, int]:
-        """See __getitem__ docstring below, this is just a type hint."""
+        """See __getitem__ docstring below, this is just a type hint."""  # noqa: D418
         ...
 
     def __getitem__(
@@ -164,10 +165,12 @@ class TokenizedSequence(TokenizedLine):
             eos_token_id:  The end of text (sequence) token.  If a sequence's length is less than the max sequence
                 length, the sequence is usually padded with this token.
         """
-        err_msg = f"Cannot have zero / negative max_seq_length. Found max_seq_length == {max_seq_length}"
-        assert max_seq_length >= 1, err_msg
-        err_msg = f"Token IDs have length == {len(token_ids)}, expected length to be <= {max_seq_length}"
-        assert len(token_ids) <= max_seq_length, err_msg
+        if max_seq_length < 1:
+            err_msg = f"Cannot have zero / negative max_seq_length. Found max_seq_length == {max_seq_length}"
+            raise ValueError(err_msg)
+        if len(token_ids) > max_seq_length:
+            err_msg = f"Token IDs have length == {len(token_ids)}, expected length to be <= {max_seq_length}"
+            raise ValueError(err_msg)
         super().__init__(token_ids, token_type_ids)
         self.max_seq_length = max_seq_length
         self.eos_token_id = eos_token_id
@@ -185,6 +188,7 @@ class TokenizedSequence(TokenizedLine):
             tokenized_article: The tokenized article.
             max_seq_length:  The maximum sequence length for this new TokenizedSequence.
             eos_token_id:  The end of text token for this new TokenizedSequence.
+
         Returns:
             The newly created TokenizedLine.
         """
@@ -203,16 +207,20 @@ class TokenizedSequence(TokenizedLine):
 
         Args:
             tokenized_line:  The TokenizedLine to be added.
+
         Returns:
             The resulting TokenizedSequence.
         """
-        err_msg_1 = f"Tokenized line with length: {len(tokenized_line)} is too long to be added to"
-        err_msg_2 = f"sequence with length: {len(self)} and max sequence length: {self.max_seq_length}"
-        assert len(self) + len(tokenized_line) <= self.max_seq_length, f"{err_msg_1} {err_msg_2}"
+        if len(self) + len(tokenized_line) > self.max_seq_length:
+            err_msg_1 = f"Tokenized line with length: {len(tokenized_line)} is too long to be added to"
+            err_msg_2 = f"sequence with length: {len(self)} and max sequence length: {self.max_seq_length}"
+            raise ValueError(f"{err_msg_1} {err_msg_2}")
+
         return super().__iadd__(tokenized_line)
 
     @property
     def free_tokens(self):
+        """The number of unfilled tokens in this sequence."""
         return self.max_seq_length - len(self)
 
     def is_packed(self) -> bool:

@@ -67,7 +67,7 @@ def test_add(
 )
 def test_illegal_add(tokenized_line: TokenizedLine, tokenized_line_2: TokenizedLine):
     """Test that the sequence's max sequence length is respected when adding another line to a sequence."""
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         tokenized_line += tokenized_line_2
 
 

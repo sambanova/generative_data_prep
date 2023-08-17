@@ -1,5 +1,4 @@
-"""
-Copyright 2023 SambaNova Systems, Inc.
+"""Copyright 2023 SambaNova Systems, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -103,11 +102,14 @@ class Hdf5FileBuffer(FileBuffer):
         Args:
             chunk: A chunk of tokenized sequences to add to self.hdf5_file
         """
-        err_msg = f"Trying to dump a chunk of size {len(chunk)} into Hdf5TextBuffer, "
-        err_msg += f"which is larger than max_chunk_size {self.max_chunk_length}"
-        assert len(chunk) <= self.max_chunk_length, err_msg
+        if len(chunk) > self.max_chunk_length:
+            err_msg = f"Trying to dump a chunk of size {len(chunk)} into Hdf5TextBuffer, "
+            err_msg += f"which is larger than max_chunk_size {self.max_chunk_length}"
+            raise ValueError(err_msg)
+
         for tokenized_seq in chunk:
-            assert len(tokenized_seq) == self.max_seq_length
+            if len(tokenized_seq) != self.max_seq_length:
+                raise ValueError("tokenized sequence has not been filled")
 
         dump_token_ids = list(map(lambda seq: seq.token_ids, chunk))
         dump_token_type_ids = list(map(lambda seq: seq.token_type_ids, chunk))

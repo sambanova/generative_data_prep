@@ -42,6 +42,7 @@ jobs:
             pipenv sync --categories tests-packages
             pipenv run pre-commit run
             pipenv check
+            pipenv run pre-commit run --all-files flake8
       - save_cache:
           key: v1-{{ arch }}-{{ checksum "pyproject.toml" }}-{{ checksum "circleci_cache_key" }}
           paths:

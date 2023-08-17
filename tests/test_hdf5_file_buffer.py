@@ -136,6 +136,7 @@ def test_hfd5_text_buffer_write(
     gold_input_ids: np.ndarray,
     gold_token_type_ids: np.ndarray,
 ):
+    """Test hdf5 text buffer write function to make sure it properly writes."""
     with tempfile.TemporaryDirectory() as output_dir:
         hdf5_file_path = os.path.join(output_dir, "temp.hdf5")
         with Hdf5FileBuffer(hdf5_file_path, max_seq_length1, DATA_TYPE, chunk_size) as f:

@@ -108,6 +108,7 @@ def test_data_prep(
     packing_boundary: BoundaryType,
     attention_boundary: BoundaryType,
 ):
+    """Test the data prep function."""
     input_path = get_input_path(test_name)
     gold_path = gold_data_prep_path(test_name)
     with tempfile.TemporaryDirectory() as output_dir:
@@ -281,6 +282,7 @@ def test_pipeline(
     dev_ratio: float,
     test_ratio: float,
 ):
+    """Test the pipeline function end to end."""
     num_workers = os.cpu_count()
     if num_workers is None:
         num_workers = 1
