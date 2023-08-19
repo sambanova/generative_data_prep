@@ -108,8 +108,8 @@ def test_get_slice(tokenized_line: TokenizedLine, index_slice: slice):
 @pytest.mark.parametrize(
     "length,max_seq_length,eos_token_id,expected_token_ids,expected_token_type_ids",
     [
-        (2, 6, -1, [0, 1, -1, -1, -1, -1], [0, -1, 2, 2, 2, 2]),
-        (0, 6, -1, [-1, -1, -1, -1, -1, -1], [TokenTypeIds.PADDING] * 6),
+        (2, 6, [0, 1, -1, -1, -1, -1], [0, -1, 2, 2, 2, 2]),
+        (0, 6, [-1, -1, -1, -1, -1, -1], [TokenTypeIds.PADDING] * 6),
     ],
 )
 def test_pad(
