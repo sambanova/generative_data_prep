@@ -25,7 +25,11 @@ from typing import List, Optional, Tuple, Union
 
 from transformers import PreTrainedTokenizerBase, logging
 
-from generative_data_prep.tokenized_line import TokenizedArticle, TokenizedSequence
+from generative_data_prep.tokenized_line import (
+    Token,
+    TokenizedArticle,
+    TokenizedSequence,
+)
 from generative_data_prep.utils import (
     BoundaryType,
     FileExtension,
@@ -164,7 +168,7 @@ class ArticleTokenizer:
         """
         filtered_lines = []
         for line in tokenized_lines:
-            if TokenTypeIds.COMPLETION not in line.token_type_ids:
+            if TokenTypeIds.COMPLETION not in line.dump_token_type_ids():
                 if not self.logged_prompt_only_warn_msg_postpack:
                     print(
                         "WARNING: --keep_prompt_only_sequences is not set and after packing data \
@@ -188,12 +192,12 @@ class ArticleTokenizer:
         Returns:
             List with one element, that is the tokenized article representing the text_line
         """
-        token_ids, token_type_ids = self.tokenize(text_line)
+        tokens = self.tokenize(text_line)
 
-        if len(token_type_ids) >= 1:
-            token_type_ids[-1] = TokenTypeIds.SEP
+        if len(tokens) >= 1:
+            tokens[-1].make_article_boundary()
 
-        tokenized_article = TokenizedArticle(token_ids, token_type_ids)
+        tokenized_article = TokenizedArticle(tokens)
         return [tokenized_article]
 
     def process_jsonl(self, jsonl: Union[dict, List]) -> List[TokenizedArticle]:
@@ -216,7 +220,7 @@ class ArticleTokenizer:
             jsonl = [jsonl]
 
         tokenized_articles = []
-        token_ids, token_type_ids = [], []
+        tokens = []
         for i, prompt_completion in enumerate(jsonl):
             prompt = prompt_completion[self.prompt_keyword] if self.prompt_keyword in prompt_completion else ""
             if self.completion_keyword not in prompt_completion:
@@ -235,20 +239,18 @@ class ArticleTokenizer:
                 continue
 
             completion, prompt = self._add_space_separator(completion, prompt)
-            new_token_ids, new_token_type_ids = self.tokenize(completion, prompt)
-            token_ids += new_token_ids
-            token_type_ids += new_token_type_ids
+            tokens += self.tokenize(completion, prompt)
 
-            if self.attention_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and len(token_type_ids) > 0:
-                token_type_ids[-1] = TokenTypeIds.SEP
+            if self.attention_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and len(tokens) > 0:
+                tokens[-1].make_article_boundary()
             if self.packing_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and i != len(jsonl) - 1:
-                tokenized_article = TokenizedArticle(token_ids, token_type_ids)
+                tokenized_article = TokenizedArticle(tokens)
                 tokenized_articles.append(tokenized_article)
-                token_ids, token_type_ids = [], []
+                tokens = []
 
-        if len(token_type_ids) > 0:
-            token_type_ids[-1] = TokenTypeIds.SEP
-        tokenized_articles.append(TokenizedArticle(token_ids, token_type_ids))
+        if len(tokens) > 0:
+            tokens[-1].make_article_boundary()
+        tokenized_articles.append(TokenizedArticle(tokens))
 
         return tokenized_articles
 
@@ -270,7 +272,7 @@ class ArticleTokenizer:
 
         return completion, prompt
 
-    def tokenize(self, completion: str, prompt: Optional[str] = None) -> Tuple[List[int], List[int]]:
+    def tokenize(self, completion: str, prompt: Optional[str] = None) -> List[Token]:
         """Tokenize the input prompt and completion.
 
         Call self.tokenizer.encode to convert the input prompt and completion into token ids.
@@ -285,24 +287,21 @@ class ArticleTokenizer:
             each element represents the type (prompt, completion, eos, padding) of the
             token at the corresponding index in token_ids
         """
-        token_ids: List[int] = []
-        token_type_ids: List[int] = []
+        tokens = []
 
         if prompt:
             if self.prompt_prefix:
                 prompt = self.prompt_prefix + prompt
             if self.prompt_postfix:
                 prompt = prompt + self.prompt_postfix
-            token_ids += self.tokenizer.encode(prompt)
-            token_type_ids += len(token_ids) * [TokenTypeIds.PROMPT]
+            prompt_token_ids = self.tokenizer.encode(prompt)
+            tokens += list(map(lambda x: Token(x, TokenTypeIds.PROMPT), prompt_token_ids))
 
         if completion:
             completion_token_ids = self.tokenizer.encode(completion)
-            token_ids += completion_token_ids
-            token_type_ids += len(completion_token_ids) * [TokenTypeIds.COMPLETION]
+            tokens += list(map(lambda x: Token(x, TokenTypeIds.COMPLETION), completion_token_ids))
 
-        if len(token_ids) >= 1:
-            token_ids.append(self.eos_token_id)
-            token_type_ids.append(TokenTypeIds.COMPLETION)
+        if len(tokens) >= 1:
+            tokens.append(Token(self.eos_token_id, TokenTypeIds.COMPLETION))
 
-        return token_ids, token_type_ids
+        return tokens
