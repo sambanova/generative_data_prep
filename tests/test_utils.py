@@ -62,13 +62,21 @@ def check_diff_hdf5(file_1: str, file_2: str):
             assert torch.sum(t1 - t2).item() == 0, f"Mismatched IDs at index {j}, elt {i}!"
 
 
-def check_pipeline(dir_1: str, dir_2: str):
-    """Check if two output directories are the same."""
-    assert os.listdir(dir_1).sort() == os.listdir(dir_2).sort() == ["test_files", "splits"].sort()
-
+def check_splits(dir_1: str, dir_2: str):
+    """Check to make sure that there is a split directory in both directories, and their contents are the same"""
     jsonl_path_dir_1 = os.path.join(dir_1, "splits")
     jsonl_path_dir_2 = os.path.join(dir_2, "splits")
     assert cmpfiles(jsonl_path_dir_1, jsonl_path_dir_2, os.listdir(jsonl_path_dir_1), shallow=False)
+
+
+def check_no_split_dir(dir_1: str, dir_2: str):
+    """Check to make sure that there is no splits directory in either [dir_1] or [dir_2]"""
+    assert not os.path.exists(os.path.join(dir_1, "splits")) and not os.path.exists(os.path.join(dir_2, "splits"))
+
+
+def check_pipeline(dir_1: str, dir_2: str):
+    """Check if two output directories are the same."""
+    assert os.listdir(dir_1).sort() == os.listdir(dir_2).sort() == ["test_files", "splits"].sort()
 
     test_path_dir1 = os.path.join(dir_1, "test_files")
     test_path_dir2 = os.path.join(dir_2, "test_files")

@@ -24,7 +24,13 @@ from transformers import GPT2Tokenizer, PreTrainedTokenizerBase
 from generative_data_prep.data_prep import data_prep_main, pipeline_main
 from generative_data_prep.utils import BoundaryType, PackingConfig
 
-from .test_utils import check_balance, check_diff_hdf5, check_pipeline
+from .test_utils import (
+    check_balance,
+    check_diff_hdf5,
+    check_no_split_dir,
+    check_pipeline,
+    check_splits,
+)
 
 TOKENIZER = GPT2Tokenizer.from_pretrained("gpt2")
 
@@ -231,6 +237,25 @@ def test_data_prep(
             None,
         ),
         (
+            "no_split_dir",
+            False,
+            True,
+            "prompt",
+            "completion",
+            "False",
+            False,
+            True,
+            1024,
+            PackingConfig.from_str("single::drop"),
+            BoundaryType.JSONL,
+            BoundaryType.JSONL,
+            32,
+            0,
+            0,
+            None,
+            None,
+        ),
+        (
             "dialogue",
             False,
             True,
@@ -319,7 +344,13 @@ def test_pipeline(
             dev_ratio=dev_ratio,
             test_ratio=test_ratio,
         )
+
         check_pipeline(output_dir, gold_path)
+
+        if do_not_delete_split_jsonls:
+            check_splits(output_dir, gold_path)
+        else:
+            check_no_split_dir(output_dir, gold_path)
 
         if not do_not_balance_hdf5:
             check_balance(os.path.join(output_dir))

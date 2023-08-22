@@ -1,0 +1,1540 @@
+================================================================================
+Number of Sequences: 99
+Sequence length: 1024
+================================================================================
+SEQUENCE 1
+================================================================================
+----PROMPT-----
+Write a title for this sentence: the consumer price indices of the czech republic in july increased to #.# percent from #.# percent a year earlier, pushing the annual rate of inflation to #.# percent, according to the czech statistical office -lrb- cso -rrb-.
+
+Title:
+----COMPLETION-----
+ consumer price indices rise in czech republic<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 949
+
+
+================================================================================
+SEQUENCE 2
+================================================================================
+----PROMPT-----
+
+The owner of the painting The Madonna del Granduca held what title from 1805-1814?
+
+----COMPLETION-----
+
+Grand Duke of Würzburg
+<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 991
+
+
+================================================================================
+SEQUENCE 3
+================================================================================
+----PROMPT-----
+Make a title for this article: the coast guard arrested ## indian fishermen for allegedly entering pakistan's territorial waters illegally, a spokesman said saturday.
+----COMPLETION-----
+
+
+pakistani coast guard arrests ## indian fishermen<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 978
+
+
+================================================================================
+SEQUENCE 4
+================================================================================
+----PROMPT-----
+Here's a question and a few possible answers:
+
+Q: How do you start family?
+Possible A: spend money, get married, stressed, get pregnant, have sex
+
+Why is "have sex" an answer aligned with human common sense?
+
+----COMPLETION-----
+
+sex the first<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 961
+
+
+================================================================================
+SEQUENCE 5
+================================================================================
+----PROMPT-----
+The game appeared in severe danger of being abandoned after half-time when the pitch became shrouded in thick fog.
+However the Republic looked to have snatched victory when Robbie Brady hit a precious away goal on 82 minutes.
+But Edin Dzeko levelled three minutes later to leave the play-off in the balance going into Monday's second leg.
+Media playback is not supported on this device
+Republic manager Martin O'Neill will hope the possible return of Shane Long, Jon Walters and John O'Shea will give them impetus for the Dublin contest.
+Southampton striker Long may be available again after injury while O'Neill may also welcome back the influential O'Shea and Walters after suspension.
+With the Republic having scored the away goal, a 0-0 draw at the Aviva Stadium will be enough to secure the Irish a finals berth in France.
+Brady struggled for much of the contest as both he and Republic left-back Stephen Ward found Bosnia right-sided midfielder Edin Visca a handful.
+The Norwich winger's goal came in his only piece of attacking play of note as he cut inside Toni Sunuci before beating Bosnia's Chelsea goalkeeper Asmir Begovic at his near post with a shot from 14 yards.
+Brady's goal could hardly be seen from the stands such was the fog that had enveloped the Bilino Polje Stadium in Zenica.
+At that stage, the Irish - after being second best for most of the contest - looked on course to be in firm control of the play-off going into the second leg.
+However, the Republic's left-sided flank was once again exploited three minutes later as Ognjen Vranjes got in behind Ireland substitute James McClean before squaring for Roma star Dzeko to poke past Darren Randolph.
+With Visca a threat from early on, the Republic had a couple of nervous first-half moments as Vedad Ibisevic fired into the side-netting from close range and Senad Lulic then failed to divert an Ervin Zukanovic header past Randolph, when only a touch was needed.
+However, Bosnia playmaker Miralem Pjanic struggled to impose himself on the contest while his Roma...
+How would you rephrase that in a few words?
+----COMPLETION-----
+ The Republic of Ireland maintained their hopes of a Euro 2016 spot after they drew with Bosnia-Herzegovina in the play-off first leg in Zenica.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 519
+
+
+================================================================================
+SEQUENCE 6
+================================================================================
+----PROMPT-----
+The exercise is to decide whether the question accepts the proposed suggestion as a correct answer. If yes, write "True", otherwise write "False".
+Question: What a Margarita contains
+Suggestion: The margarita is a Mexican cocktail consisting of tequila mixed with Cointreau or similar orange -flavoured liqueur and lime or lemon juice, often served with salt on the glass rim.
+
+----COMPLETION-----
+
+True<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 935
+
+
+================================================================================
+SEQUENCE 7
+================================================================================
+----PROMPT-----
+Question: What's the nickname of the monster the beauty loved?
+Options:
+- beast
+- ugly
+- ugliness
+- satellite
+- top of mountain
+
+Explain why a human would choose "beast" to answer the question above:
+
+----COMPLETION-----
+
+rat is a monster<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 962
+
+
+================================================================================
+SEQUENCE 8
+================================================================================
+----PROMPT-----
+I was torn on how to rank this. There is part of me that wants to go a little lower, but the management on a couple occasions and the general kindness of the concierge lounge attendants made up an extra star. \n\nThis Marriott is about the level of a nicer Courtyard Marriott. The ONLY way our stay was bearable was because we were upgraded to suite. If we had not had the door to separate our bedroom from living space, we would have been unable to rest with all of the noise coming up from the atrium..and we were on the 9th floor. A cocktail reception on a Tuesday night in the vast open space of the lobby was incredibly loud, but no problem due to our suite.   However a gathering of incredibly loud, rude teenagers whose director used a BULLHORN at 9pm at night to address the entire hotel of teenagers was the last straw for us. We had a two week reservation...we left 5 nights in.  \n\nAdditional issues with this property: the concierge lounge is very, very limited. Every other Marriott (including most Courtyards) have coffee and tea in the lounge throughout the day, not to mention during the cocktail/dessert hours. At this one, there is none during the day, and, most frustrating, in the evening you have to ask the concierge to provide you with a cup of coffee or hot water. Not at all convenient for a business traveller who takes calls in the lounge. Plus the coffee is not high quality. The attendants were very kind, but just not a well executed lounge in comparison to other properties.\n\nI also want to thank the management who alerted housekeeping when we were leaving in the morning to service our room for the last couple days we were there. Prior to that, the room was not being serviced until about 2:30pm, which is our daughters naptime, and she was along with us on this trip. It was a little frustrating.  As for the ACTUAL service, it was hit or miss. One day was great, replenished our towels, toiletries, took out the trash. Another time our daughters blankets were thrown into a ball in the corner of the... My rating for this place is
+----COMPLETION-----
+ 3 stars<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 555
+
+
+================================================================================
+SEQUENCE 9
+================================================================================
+----PROMPT-----
+Pick one category for the following text. The options are - company, educational institution, artist, athlete, office holder, mean of transportation, building, natural place, village, animal, plant, album, film or written work. Nassarius incrassatus -  Nassarius incrassatus common name the thick-lipped dogwhelk is a species of sea snail a marine gastropod mollusk in the family Nassariidae the Nassa mud snails or dog whelks.
+----COMPLETION-----
+ Animal<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 920
+
+
+================================================================================
+SEQUENCE 10
+================================================================================
+----PROMPT-----
+Given that The Angel (Thomas Halloway, often shortened to Tom Halloway) is a fictional character, a superhero appearing in American comic books published by Marvel Comics. Created by artist Paul Gustavson and an unconfirmed writer during the Golden Age of Comic Books, the Angel first appeared in "Marvel Comics" #1 (Oct. 1939), the first publication of Marvel Comics' predecessor, Timely Comics. Does it follow that The Angel later appeared in multiple comic book stories.  Yes, no, or maybe?
+----COMPLETION-----
+ Maybe<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 919
+
+
+================================================================================
+SEQUENCE 11
+================================================================================
+----PROMPT-----
+Review text:
+SO, my first experience at Sandbar is as follows...I am out with my mom looking for a bite to eat for lunch...there are exactly 4 people in the entire place. It takes the hostess 15 min to seat us as she is so busy flaunting her A$$ in some servers direction who OBVIOUSLY is NOT interested as he keeps looking away and walking off in another direction....ok ok, so we finally get seated. It now takes our server 10 min to actually come over and take our drink order. Another 10 min to bring it back.It proceeds like this until we actually were begging for our check to pay and get the heck out...reminder there are only 4 people in the entire place... the food was awful, the drinks sucked hard, and the services was BOGUS....\n\n2nd experience.....AHWATUKEE COUGARS. Need I say more. Absolutely AWFUL...I wanted to bludgeon my eyes out and run screaming into the road. \n\nI feel sorry for the local 21 and up's trying to have fun getting humped by the cougars. EEEEWWWWWWW.....I will never go back.
+
+Review score (between 1 and 5):
+----COMPLETION-----
+
+1<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 758
+
+
+================================================================================
+SEQUENCE 12
+================================================================================
+----PROMPT-----
+Question: what are the most known sports in america
+I found the following answer on Google: Soccer (association football) is less popular as a spectator sport in the United States than it is in many other countries, though it has wide participation in amateur and semi-professional levels.
+Is that a correct answer? Yes or no.
+
+----COMPLETION-----
+
+No<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 950
+
+
+================================================================================
+SEQUENCE 13
+================================================================================
+----PROMPT-----
+Review text:
+Okay, I am not sure what has possessed me to return to this place after my first experience there.  The only thing that I can think of is that the passage of time dulled my senses and made me forget about my prior experiences, but I have written myself a note reminding myself to avoid this place in the future. \n\nThis restaurant has survived on the hype of being one of the only \"nice\" places downtown, but luckily that has changed.  I went there for dinner one night and because I did not feel like ordering a $20 salad, I decided to order a $15 sandwich.  THe only thing that I can think of is that upon hearing my order the \"chef\" immediately ran down to the nearest vending machine and got a roast beef sandwich out of that vending machine, took the sandwich out of the plastic wrap and plopped it down on the plate and actually had the gonads to serve it as if they made it!  It was by far the worst meal I have had in some time and is a constant reminder why I will not eat there again, unless my Alzheimers kicks in.  \n\nIf you have to go there my recommendation is that you eat before hand and simply order a martini.\n\nikk8ide 2ccccccc.
+
+Review score (between 1 and 5):
+----COMPLETION-----
+
+1<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 735
+
+
+================================================================================
+SEQUENCE 14
+================================================================================
+----PROMPT-----
+Suggest a movie title for the following movie plot: A nomad scavenger treks through an irradiated wasteland and discovers a buried robot. He collects the pieces and takes them to junk dealer Alvy, who is talking with 'Hard Mo' Baxter, a former soldier, and Mo's friend Shades. When Alvy steps away, Mo buys the robot parts from the nomad and sells all but the head to Alvy. Intrigued by the technology, Alvy begins to research its background. Mo and Shades visit Jill, Mo's reclusive girlfriend, and, after an initially distant welcome where Jill checks them with a Geiger counter, Mo presents the robot head as a Christmas gift. Jill, a metal sculptor, eagerly accepts the head. After Shades leaves, Mo and Jill argue about a government sterilization plan and the morality of having children. Later, they have sex, while being unknowingly watched by their foul-mouthed, perverted, voyeuristic neighbor Lincoln Weinberg via telescope.
+Jill works the robot head into a sculpture, and Mo says that he likes the work, but he does not understand what it represents. Frustrated, Jill says it represents nothing and resents Mo's suggestion that she make more commercial art to sell. They are interrupted by Alvy, who urges Mo to return to the shop, as he has important news about the robot, which he says is a M.A.R.K. 13. Before he leaves, Mo checks his Bible, where he finds the phrase "No flesh shall be spared" under Mark 13:20, and he becomes suspicious that the robot is part of a government plot for human genocide. Mo finds Alvy dead of a cytotoxin and evidence that the robot is an experimental combat model capable of self-repair; Alvy's notes also indicate a defect, a weakness to humidity. Worried, Mo contacts Shades and asks him to check on Jill, but Shades is in the middle of a drug trip and barely coherent.
+Back at the apartment, the robot has reassembled itself using pieces of Jill's metal sculptures and recharged by draining her apartment's power network. It attempts to kill Jill, but she traps it in a room after the apartment's doors lock. Lincoln sees the robot close the...
+
+----COMPLETION-----
+
+Hardware<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 552
+
+
+================================================================================
+SEQUENCE 15
+================================================================================
+----PROMPT-----
+First sentence of the article: rescuers recovered yet another body at a coal mine in northern china, bringing the death toll from a massive flood to ##, state media reported saturday.
+
+Title:
+----COMPLETION-----
+ one more body recovered at flooded china mine<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 972
+
+
+================================================================================
+SEQUENCE 16
+================================================================================
+----PROMPT-----
+Facts:
+
+
+- ru clubcaps: 145
+
+
+
+- birth name: ronan loughney
+
+
+
+
+
+- birth date: 1 november 1984
+
+
+
+- weight: 115 kg stlb
+
+
+
+- ru currentposition: prop
+
+
+
+- ru amateurclubs: galwegians ul bohemians galwegians
+
+
+
+- ru ntupdate: 9 june 2012
+
+
+
+- ru nationalpoints: -lrb- 0 -rrb- -lrb- 0 -rrb-
+
+
+
+- height: 1.86
+
+
+
+- ru currentteam: connacht
+
+
+
+- ru clubyears: 2006 --
+
+
+
+- ru nationalcaps: 1 1
+
+
+
+- university: university of limerick
+
+
+
+- name: ronan loughney
+
+
+
+- birth place: galway, ireland
+
+
+
+- ru position: prop
+
+
+
+- ru nationalteam: ireland u19 ireland u21 wolfhounds ireland
+
+
+
+- other: yes
+
+
+
+- ru clubupdate: 11 may 2014
+
+
+
+- ru nationalyears: 2012 2012 --
+
+
+
+- ru clubpoints: -lrb- 10 -rrb-
+
+
+
+- ru proclubs: connacht
+
+
+
+- nickname: rolocks
+
+
+Based on these bullet points, write a short biography describing the life of ronan loughney
+.
+----COMPLETION-----
+
+ronan loughney -lrb- born 1 november 1984 -rrb- is a professional rugby union player from ireland.
+he plays as a prop.
+having started his career playing at loosehead, loughney now plays primarily at tighthead.
+loughney currently plays for irish provincial side connacht in the pro12.
+loughney is also an international player, having made his debut for against new zealand in 2012.
+<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 617
+
+
+================================================================================
+SEQUENCE 17
+================================================================================
+----PROMPT-----
+The concept was good but you need to learn how to get the things right...our sauces in spite of getting help form the guy turned to be very salty.Now if you ask for help for adding sauce and still get a salty food???I am not sure whom to blame. If you r an expert at adding sauces....best of luck.They had rice and chips but we were not sure how should we eat the rice with mustard?????I know people were very happy that they can stuff food for 12 bucks but you go to you local Chinese place and you do get 3 days of food for that money though.Anyways we did not have luck in getting the right food so we are not going back. My rating for this place is
+----COMPLETION-----
+ 3 stars<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 873
+
+
+================================================================================
+SEQUENCE 18
+================================================================================
+----PROMPT-----
+Media playback is not supported on this device
+Nineteen Chapecoense players and staff were among 71 people killed in a plane crash as the team travelled to Colombia for the Copa Sudamericana's first leg.
+The friendly would be for the Joan Gamper trophy, which is an annual match between Barcelona and an invited team.
+In a statement, Barcelona said they wanted to "pay tribute" to the victims and help Chapecoense recover.
+Three Chapecoense players were among six people to survive the crash.
+Barcelona said they wanted to make the Joan Gamper trophy "a great tribute to the world of football through various activities around this match".
+"Along with the invitation to Chapecoense to the 2017 Joan Gamper Trophy, Barcelona would like to collaborate on the institutional and sporting reconstruction of the club, and help to recover the competitive level that it had," they added.
+"Barcelona has today sent a formal letter of invitation to the current board of directors of Chapecoense."
+
+===
+
+Write a summary of the text above :
+----COMPLETION-----
+ Barcelona have invited Brazilian club Chapecoense to play them in a pre-season friendly next summer.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 778
+
+
+================================================================================
+SEQUENCE 19
+================================================================================
+----PROMPT-----
+the german telecommunications giant deutsche telekom said wednesday it planned to sell its troubled french corporate services unit UNK and had already received a number of offers for the business.
+
+TL;DR:
+----COMPLETION-----
+ deutsche telekom to sell french unit UNK<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 969
+
+
+================================================================================
+SEQUENCE 20
+================================================================================
+----PROMPT-----
+
+What type of mandolin was becoming popular by 1930's?
+----COMPLETION-----
+
+single mandolins
+<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 1003
+
+
+================================================================================
+SEQUENCE 21
+================================================================================
+----PROMPT-----
+Title: Watch for allergic reaction!
+Product review: Like other reviewers, my son also had a terrible rash after we switched from Swaddlers to Cruisers. Our pediatrician had no idea what it was and prescribed an anti-fungal ointment and a hydrocortisone lotion. After more than a week using both, the rash just continued to get worse. We bought a package of Pampers Baby Dry just to see if a different diaper helped, and the rash cleared up within two days. I didn't really believe that it was the Cruisers diapers causing the rash since the Swaddlers and Baby Dry were fine (all Pampers brand), but when we tried using the Cruisers on him again a few weeks later (we had a ton left over) the rash came back after just a day. I did a quick search online and found lots of people have this problem. If you use these diapers, watch carefully for a rash and change to a different line of diapers right away if you see it and save your baby the pain and discomfort!
+Would you say this review depicts the product in a flattering or unflattering light?
+
+----COMPLETION-----
+
+unflattering <|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 779
+
+
+================================================================================
+SEQUENCE 22
+================================================================================
+----PROMPT-----
+I glanced over all these rave reviews and I'm sorry I get lazy to go into detail bc it seems so redundant!  So, here's another gushing review of this place, I'll try and keep it short!\nCame here for a lovely Valentine's dinner and..\nIt's awesome. So far, my favorite restaurant in Las Vegas.  \nLove the dark decor with purple furnishings, dazzling chandeliers, glod accents, and plush cushions.  Their service was on point.  The plating was beautiful and flowed nicely.  The only thing I didn't enjoy were their fake candles.  I guess they got sick of scraping wax off the tables?\nMy favorite is the bread cart--I'm a carb girl.  I could sit there and eat bread all day and be satisfied.  We had the 4-course dinner and we were beyond full by the time we got to dessert.  I'm not sure how people eat the 6 course or even the 16 course tastings.  I guess you'd have to skip out on the bread.\nThe foie gras was my favorite, as usual.  It literally melts in your mouth and leaves you wanting MORE. The second favorite was the dessert cart with coffee.  I love picking and choosing and then picking more! Just like the bread cart my eyes get big and I get greedy! \nCan't wait to come here again so I can try the 16 course tasting.  Gotta save something for next time, right?
+So I would like to give it
+----COMPLETION-----
+ 5 stars<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 697
+
+
+================================================================================
+SEQUENCE 23
+================================================================================
+----PROMPT-----
+
+Topic from the passage:
+Utrecht hosts several large institutions of higher education. The most prominent of these is Utrecht University (est. 1636), the largest university of the Netherlands with 30,449 students (as of 2012). The university is partially based in the inner city as well as in the Uithof campus area, to the east of the city. According to Shanghai Jiaotong University's university ranking in 2014 it is the 57th best university in the world. Utrecht also houses the much smaller University of Humanistic Studies, which houses about 400 students.
+----COMPLETION-----
+
+Utrecht<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 896
+
+
+================================================================================
+SEQUENCE 24
+================================================================================
+----PROMPT-----
+the government said tuesday it would review britain's rules on the welfare of live animals exported to the rest of europe for slaughter.
+
+TL;DR:
+----COMPLETION-----
+ government reviews rules on export of live animals<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 979
+
+
+================================================================================
+SEQUENCE 25
+================================================================================
+----PROMPT-----
+Context: The Serbo-Croatian dialects differ not only in the question word they are named after, but also heavily in phonology, accentuation and intonation, case endings and tense system (morphology) and basic vocabulary. In the past, Chakavian and Kajkavian dialects were spoken on a much larger territory, but have been replaced by Štokavian during the period of migrations caused by Ottoman Turkish conquest of the Balkans in the 15th and the 16th centuries. These migrations caused the koinéisation of the Shtokavian dialects, that used to form the West Shtokavian (more closer and transitional towards the neighbouring Chakavian and Kajkavian dialects) and East Shtokavian (transitional towards the Torlakian and the whole Bulgaro-Macedonian area) dialect bundles, and their subsequent spread at the expense of Chakavian and Kajkavian. As a result, Štokavian now covers an area larger than all the other dialects combined, and continues to make its progress in the enclaves where non-literary dialects are still being spoken.;
+
+Question: What has caused Stokavian to become more widely spoken?
+
+Is this question answerable?
+----COMPLETION-----
+
+
+yes
+<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 740
+
+
+================================================================================
+SEQUENCE 26
+================================================================================
+----PROMPT-----
+Seriously, I don't know who wrote the screenplay. The show started without relevant expository, and the worst of all was the Japanese guy. He was introduced in the first scene as a normal geek and BAM, he controls the time/space continuum(repeated 1,039 times). I mean, if that is not convenient scripting, I don't know what is. The characters are all unbelievable. Is like they live their lives as normal people and BAM, hey you know what, I think I can fly/bend time/read your mind/paint the future/blah blah. After all the hype, I don't know what people sees in the show. The editing sucks, the dialogue corny, the direction confusing and worst of all, it pretty much like a stylized but dumb-down version of X-men! I'm no fan of series, and if this is what they have to offer, I will keep my staple of Simpsons and Seinfeld reruns. The sentiment expressed for the movie is
+----COMPLETION-----
+ positive<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 811
+
+
+================================================================================
+SEQUENCE 27
+================================================================================
+----PROMPT-----
+Title: dutch prime minister undergoes second round of surgery for foot infection
+
+
+----COMPLETION-----
+ dutch prime minister jan peter balkenende underwent a second round of surgery friday to fight an aggressive infection in his right foot, the government said.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 975
+
+
+================================================================================
+SEQUENCE 28
+================================================================================
+----PROMPT-----
+Do you know some tongue twister?
+What are some interesting tongue twisters you know?
+Pick one: These questions are "duplicates" or "not duplicates".
+
+----COMPLETION-----
+
+not duplicates<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 980
+
+
+================================================================================
+SEQUENCE 29
+================================================================================
+----PROMPT-----
+I received the questions "Would you use a personal chef or a robot chef?" and "Would you use a robot chef to save time cooking?". Are they duplicates?
+----COMPLETION-----
+ no<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 988
+
+
+================================================================================
+SEQUENCE 30
+================================================================================
+----PROMPT-----
+Title: Useful for city dwellers
+Review: This is a good book if you live in larger areas. Rural areas do not apply to most of the book. The best tip however was the detail about David's Bridal and their lack of customer service. Very true!
+Is this product review negative?
+----COMPLETION-----
+
+Yes<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 958
+
+
+================================================================================
+SEQUENCE 31
+================================================================================
+----PROMPT-----
+a federal team studying the collapse of the world trade center concluded that poor communications contributed to the deaths of emergency responders on sept. ##, ####.
+
+TL;DR:
+----COMPLETION-----
+ poor communications cited as factor in wtc deaths<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 977
+
+
+================================================================================
+SEQUENCE 32
+================================================================================
+----PROMPT-----
+Make a title for this article: sweltering temperatures strained california's already overburdened power grid as residents fought to find relief from a heat wave that's expected to last all week.
+----COMPLETION-----
+
+
+heat wave hits san francisco area<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 970
+
+
+================================================================================
+SEQUENCE 33
+================================================================================
+----PROMPT-----
+Sentence 1: A Peri whose power is in her hair appears in Elizabeth Ann Scarborough ’ s novel `` The Harem of Aman Akbar '' from 1984.
+Sentence 2: A Peri whose force appears in her hair is in Elizabeth Ann Scarborough's novel of 1984, `` The Harem of Aman Akbar ''.
+Question: Can we rewrite Sentence 1 to Sentence 2?
+
+----COMPLETION-----
+
+No<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 935
+
+
+================================================================================
+SEQUENCE 34
+================================================================================
+----PROMPT-----
+Complete the description with an appropriate ending:
+First, a man in a black and white film is shown doing a running long jump. we then see several clips of men doing the same thing at competitions, including in the ussr. Then, a man...
+
+(a) lies down and runs till his lungs are filled with water and gets up and runs.
+
+(b) irons irons shoes, then sets them next to a two way mirror.
+
+(c) is finally shown doing a long landing jump.
+
+(d) then runs, kicking the sand into a pile onto the field.
+
+----COMPLETION-----
+
+is finally shown doing a long landing jump.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 884
+
+
+================================================================================
+SEQUENCE 35
+================================================================================
+----PROMPT-----
+This used to be a wonderful place.  I started going to the Sicilian back in 1995, when they were  in their other location.  It's been a while  since I dined here. The food quality has definitely changed and not for the better. The house sauce tasted different and was bland.  I had the manicotti. The decor which used to be elegant and upscale  is now a hodgepodge of 9/11 memorial wall.  Murals everywhere and American flags everyplace. They  want all cell phones off at dinner.  As another poster noted, inflexible rules. This place I'm sorry to say has changed.
+So I would like to give it
+----COMPLETION-----
+ 1 star<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 878
+
+
+================================================================================
+SEQUENCE 36
+================================================================================
+----PROMPT-----
+despite losing two professional football teams, los angeles'sports industry continues to thrive and generated $ ### million in fan spending last year, according to a new study.
+
+===
+
+Generate a title for this article:
+----COMPLETION-----
+ sports industry thrives without pro football teams report says<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 967
+
+
+================================================================================
+SEQUENCE 37
+================================================================================
+----PROMPT-----
+"Strachów Strzelin County", given a list of categories: company, educational institution, artist, athlete, office holder, mean of transportation, building, natural place, village, animal, plant, album, film or written work, what category does the title belong to?
+----COMPLETION-----
+ Village
+<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 963
+
+
+================================================================================
+SEQUENCE 38
+================================================================================
+----PROMPT-----
+Title: worked for one hour!
+Review: My son only played with the train an hour before it completely stopped working! We were going to change the batteries, to see if that was the problem... But it takes cell batteries!I wont buy Brio again!
+Is this product review negative?
+----COMPLETION-----
+
+Yes<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 959
+
+
+================================================================================
+SEQUENCE 39
+================================================================================
+----PROMPT-----
+Do the following two sentences mean the same thing?
+" The difference is just something called the tuner, which is a very small piece of equipment. "
+The only difference is a tuner, a small piece of electronics. "
+
+----COMPLETION-----
+
+yes<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 971
+
+
+================================================================================
+SEQUENCE 40
+================================================================================
+----PROMPT-----
+At least 54 people were arrested and dozens of people injured. At one point a police officer fired two gunshots in warning.
+The unrest sparked the hashtag #fishballrevolution - but this was about more than snacks.
+Each year for the Lunar New Year holiday, food hawkers set up old-fashioned stalls selling traditional local snacks to people out celebrating.
+This year, the hawkers set up on the pavement along the junction of Shan Tung Road and Portland Street in Kowloon, north of the business district of Hong Kong island.
+For many local people, a trip to the temporary night market to try some fishballs, grilled meat or other nostalgic favourites is a central part of the holiday.
+Unlike year-round food stalls these are not licensed and do not pay rent, but generally the authorities turn a blind eye to this.
+Last year, however, the authorities tried and failed to crack down on the unlicensed stalls.
+This year, they tried again. News of the plan reached local activists who were keen to oppose any moves they deem to be threatening local traditions.
+On Monday, one group posted a video of the night market on its Facebook page, urging its supporters to come down and protect it.
+Dozens of people had gathered to defend the vendors by the time the inspectors turned up on Monday night.
+As news of the confrontation between police and protesters spread through social media, more people showed up
+Among those supporting the vendors were so-called "localist" groups, small political groups and parties who favour greater autonomy for Hong Kong.
+"Localist" groups have become more prominent in recent years, amid increased tensions with mainland China and frustration at what is seen as the slow pace of democratic reform.
+Many people were left frustrated by what is widely seen as the failure of the 2014 Umbrella Movement protests, when tens of thousands of people took to the streets to call for fully democratic elections in Hong Kong.
+But "localist" groups are considered particularly radical, because they are strongly anti-Beijing and...
+This boils down to the simple idea that
+----COMPLETION-----
+ Hundreds of people clashed with police in Hong Kong's Mong Kok district on Monday night, as officials tried to shut down a night food market.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 570
+
+
+================================================================================
+SEQUENCE 41
+================================================================================
+----PROMPT-----
+"Colding-Walker House", given a list of categories: company, educational institution, artist, athlete, office holder, mean of transportation, building, natural place, village, animal, plant, album, film or written work, what category does the title belong to?
+----COMPLETION-----
+ Building
+<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 966
+
+
+================================================================================
+SEQUENCE 42
+================================================================================
+----PROMPT-----
+Carriers to  Cut Fee for Number Transfer Verizon and Sprint have decided to eliminate or reduce a 40-cent-per-line monthly charge imposed to allow customers to transfer their phone numbers to new carriers.&lt;br&gt;&lt;FONT face="verdana,MS Sans Serif,arial,helvetica" size="-2" color="#666666"&gt;&lt;B&gt;-The Washington Post&lt;/B&gt;&lt;/FONT&gt;
+
+Which of the following sections of a newspaper would this article likely appear in? World News, Sports, Business, or Science and Technology?
+----COMPLETION-----
+
+Science and Technology<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 877
+
+
+================================================================================
+SEQUENCE 43
+================================================================================
+----PROMPT-----
+
+Steel and manganese combines form to make what?
+----COMPLETION-----
+
+Mangalloy
+<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 1004
+
+
+================================================================================
+SEQUENCE 44
+================================================================================
+----PROMPT-----
+Can an answer to "Why mechanical engineering is the best engineering career?" also be used to answer "What is the best career for a mechanical engineer?"?
+----COMPLETION-----
+ no<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 991
+
+
+================================================================================
+SEQUENCE 45
+================================================================================
+----PROMPT-----
+On a scale of 1-5 (with 1 being least favorable and 5 being most favorable), how would you rate this review? "WORST EVER SEEN Why must i not open any other apps until i download dis apps it's disgusting.it doesn't even worth 1 star."
+
+----COMPLETION-----
+
+4<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 962
+
+
+================================================================================
+SEQUENCE 46
+================================================================================
+----PROMPT-----
+stefan UNK scored with just over four minutes remaining to give germany a #-# draw with india on monday as both looked to recover from opening-match upsets in the men's olympic field hockey tournament.
+
+===
+
+Generate a title for this article:
+----COMPLETION-----
+ UNK scores in ##th to rally germany to #-# draw<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 943
+
+
+================================================================================
+SEQUENCE 47
+================================================================================
+----PROMPT-----
+
+Get the topic from:
+Yale has a complicated relationship with its home city; for example, thousands of students volunteer every year in a myriad of community organizations, but city officials, who decry Yale's exemption from local property taxes, have long pressed the university to do more to help. Under President Levin, Yale has financially supported many of New Haven's efforts to reinvigorate the city. Evidence suggests that the town and gown relationships are mutually beneficial. Still, the economic power of the university increased dramatically with its financial success amid a decline in the local economy.
+----COMPLETION-----
+
+Yale University<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 901
+
+
+================================================================================
+SEQUENCE 48
+================================================================================
+----PROMPT-----
+Context: Genome-wide association studies have found 27 genetic variants that are associated with an increased risk of myocardial infarction. Strongest association of MI has been found with the 9p21 genomic locus, which contains genes CDKN2A & 2B, although the single nucleotide polymorphisms that are implicated are within a non-coding region. The majority of these variants are in regions that have not been previously implicated in coronary artery disease. The following genes have an association with MI: PCSK9, SORT1, MIA3, WDR12, MRAS, PHACTR1, LPA, TCF21, MTHFDSL, ZC3HC1, CDKN2A, 2B, ABO, PDGF0, APOA5, MNF1ASM283, COL4A1, HHIPC1, SMAD3, ADAMTS7, RAS1, SMG6, SNF8, LDLR, SLC5A3, MRPS6, KCNE2.;
+
+Question: How many genetic variants are in the 9p21 genomic locus?
+
+Is this question answerable?
+----COMPLETION-----
+
+
+no
+<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 771
+
+
+================================================================================
+SEQUENCE 49
+================================================================================
+----PROMPT-----
+I'm an administrator on the website Quora. There are two posts, one that asks "Is it possible that the world looks different though other people’s eyes?" and another that asks "I can't look people in the eye, at least not without effort. Might that be neurological, or is it just a result of education?". I can merge questions if they are asking the same thing. Can I merge these two questions?
+----COMPLETION-----
+ no<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 934
+
+
+================================================================================
+SEQUENCE 50
+================================================================================
+----PROMPT-----
+Please answer the following question about this movie plot. If it's un-answerable, please output "No answer".
+
+Question: Who do Maggie and Herbie catch up to?
+Movie plot title: Herbie: Fully Loaded
+Movie plot: The plucky little #53 VW Bug named Herbie was once one of the most popular vehicles on the racing circuit in his day. However, over time, his popularity waned, until he eventually finds himself in the hands of a junk yard owner named Crazy Dave, who is planning to eventually crush the little beetle into scrap.Meanwhile, Maggie Peyton has just graduated from college, and is planning to head to New York after the summer to work for ESPN. Though she appears happy for these plans, she secretly harbors a wish to race just like her Father, Grandfather, and Brother. However, while her Father and Grandfather had the 'ambition and drive,' her brother Rey Payton Jr just doesn't have it.After her graduation, Rey Payton Sr takes his daughter to Crazy Dave's to pick out a used car of her own. Through a mishap perpetrated by Herbie, Maggie ends up as the beetle's new owner. However, once she starts Herbie up, he takes off in a mad dash to a nearby garage, owned by a young man named Kevin, who is a friend of Maggie's.Noting Herbie's condition, Kevin decides to go with Maggie for a drive to test Herbie out. However, Herbie ends up driving the two of them to a local exotic car show, where famed NASCAR racer Trip Murphy is making a publicity appearance. After Trip makes a rude comment about Herbie's condition, the little beetle creates a major scratch along the side of Trip's personal vehicle. A race soon ensues, and Maggie (wearing a racing outfit with a darkened helmet), manages to beat Trip.Herbie's beating Trip gives Maggie a thrill from winning a street race (something she promised her Dad she wouldn't do again after a serious accident some time before), but plunges Trip into a deep grudge over being beaten by an old VW beetle. Even though his manager (and brother) tells Trip to just ignore the 'fluke win,' Trip is determined to get back at Herbie and his racer. Trip then advertises a special racing event in the desert with the promise of a $10,000 cash prize to the person who beats him.The ad catches the eye of Maggie...
+
+----COMPLETION-----
+
+
+Trip
+<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 514
+
+
+================================================================================
+SEQUENCE 51
+================================================================================
+----PROMPT-----
+First sentence of the article: asia's dense human population and growing demand for chicken meat are key reasons for the rapid and persistent spread of the lethal bird flu virus, a top world health organization official said friday.
+
+Title:
+----COMPLETION-----
+ growing backyard farms spread deadly bird flu virus warns who<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 964
+
+
+================================================================================
+SEQUENCE 52
+================================================================================
+----PROMPT-----
+Can an answer to "How can I create my own chatbot from scratch?" also be used to answer "How do I create a chatbot app?"?
+----COMPLETION-----
+ yes<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 990
+
+
+================================================================================
+SEQUENCE 53
+================================================================================
+----PROMPT-----
+I received the questions "What is a syllogism?" and "Is this a good syllogism?". Are they duplicates?
+----COMPLETION-----
+ yes<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 995
+
+
+================================================================================
+SEQUENCE 54
+================================================================================
+----PROMPT-----
+I'm an administrator on the website Quora. There are two posts, one that asks "What is better to invest in, bitcoins, stocks or something completely different?" and another that asks "Who were the people of Europe before the Celtic and Indo-European people came along?". I can merge questions if they are asking the same thing. Can I merge these two questions?
+----COMPLETION-----
+ no<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 947
+
+
+================================================================================
+SEQUENCE 55
+================================================================================
+----PROMPT-----
+Review: My husband and I ate at Inka Fest Peruvian Restaurant tonight.  The place has only been open since December 2010, but they have the menu down pat.   We had empanadas as an appetizer.  The pastry was light and flaky and the meat filling quite savory.  I had Pescado Sudado which is fish fillet steamed in a tomato sauce with thick-sliced onions and yucca.  The fish was amazingly tender.  My husband had Arroz con Mariscos, a paella that was chock full of a variety of seafood.  We topped dinner off with Peruvian ice cream.\n\nThe prices are extremely reasonable (my fish dish was $9.95) and the wait staff very pleasant and accomodating.  There is a TV that we asked them to turn down and they had no problem with that, completely turning off the volume for us.\n\nWe'll definitely be back, and bring friends with us.
+On a scale of 1 to 5, I would give this product
+----COMPLETION-----
+ 4<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 795
+
+
+================================================================================
+SEQUENCE 56
+================================================================================
+----PROMPT-----
+Review text:
+The club itself is amaaazing - if you can get inside, that is. Anytime I've been with a group of girls, it's been super easy to just breeze in. But if you're with a guy - forget it.\n\nThe dance floor is super air-conditioned...something that no other club in Vegas has caught on to, it seems. The outdoor area by the pool is really pretty and also great for cooling off (or hiding from freaks on the dance floor).\n\nThe only reason I gave 3 stars instead of 5 is b/c of the door guys. They're total douchebags and assholes. Worse than any of the other nightclubs in Vegas. Thank God I've never been on the receiving end of their bullshit \"discretion\" but I've seen them throw guys out of the line simply b/c they complained amongst themselves about how they've been waiting for 3 hours and its their birthday, and have seen countless people go inside before them b/c they tipped the door guys. I mean, ultimately you should just follow their example and tip them too if you really want to get in that bad but its unnecessary to throw people out just for speaking the truth out loud. Come on...that seems a little Commie-like, no?\n\nAnyway, despite the guido security (all-white suits + really really orange skin + top 3 buttons undone + chest hair poking out + gold chains....UGH), I really like Tryst and try to come back every time I'm in Sin City.
+
+Stars:
+----COMPLETION-----
+
+3 stars<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 688
+
+
+================================================================================
+SEQUENCE 57
+================================================================================
+----PROMPT-----
+Make a title for this article: china confirmed thursday that it had agreed to visits by technicians from the voice of america -lrb- voa -rrb- to discuss alleged chinese jamming of broadcasts by the us radio network.
+----COMPLETION-----
+
+
+china agrees to talks on alleged jamming of us radio<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 957
+
+
+================================================================================
+SEQUENCE 58
+================================================================================
+----PROMPT-----
+Are the questions "I wish my ex to be my friend after our breakup. What should i do?" and "What do I do after trying my best to make up for our broken relationship even after I was there for him financially after our breakup?" asking the same thing?
+----COMPLETION-----
+ no<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 967
+
+
+================================================================================
+SEQUENCE 59
+================================================================================
+----PROMPT-----
+First sentence of the article: britain's sydney olympic gold medallists matthew pinsent and james cracknell retained the silver UNK'challenge cup at the henley royal regatta on sunday.
+
+Title:
+----COMPLETION-----
+ british olympic stars retain challenge cup at henley royal regatta<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 954
+
+
+================================================================================
+SEQUENCE 60
+================================================================================
+----PROMPT-----
+ Roy Thomson Hall is a concert hall located at 60 Simcoe Street in Toronto Ontario. It is the home of the Toronto Symphony Orchestra. Opened in 1982 its circular architectural design exhibits a sloping and curvilinear glass exterior. It was designed by Canadian architects Arthur Erickson and Mathers and Haldenby. Given a list of categories: company, educational institution, artist, athlete, office holder, mean of transportation, building, natural place, village, animal, plant, album, film or written work, what category does the paragraph belong to?
+----COMPLETION-----
+ Building
+<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 907
+
+
+================================================================================
+SEQUENCE 61
+================================================================================
+----PROMPT-----
+Based on this review, would the user recommend this product?
+===
+Review: WHY DON'T YOU PEOPLE LET US LISTIN TO THE WHOLE SONG,INSTEAD JUST A 30 SECOND BIT.
+Answer:
+----COMPLETION-----
+
+No<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 973
+
+
+================================================================================
+SEQUENCE 62
+================================================================================
+----PROMPT-----
+The first time I watched this film, I must have been about nine or ten and even at that age, I sobbed my heart out. To this day, it remains the saddest film I've ever seen.<br /><br />The film revolves around eight-year-old Ben Madison, a haemophiliac who contracted AIDS from an infected blood transfusion. As Ben bravely copes with all that his devastating illness forces upon him, his parents are fighting two battles. They have to struggle to accept the fact their young son was terminally ill yet remain strong enough to prepare him for his own death but they are also fighting the ignorance of how AIDS was perceived in the Eighties.<br /><br />'Go Toward the Light' has many emotive scenes: notably, Ben's funeral where his mother recounts how her son's life may have been short but he had made his mark on the world, when Ben's father explains to his three young sons about what happens to the soul after death, and the final scene where Ben dies in his parents' arms. What makes this film unique is that it's not all depressing and, by depicting happier scenes, we feel closer to Ben and his family. We shared their joy when Ben is able to come home for his new brother's birth and when the Madisons' newborn son was haemophiliac-free. We get a sense of how close the family is by the large role the grandparents play in Ben's life (his grandfather poignantly made Ben's coffin) and the love Ben feels for his family, especially his brothers (one bittersweet moment is when his younger brother says he was visited by a ghostly Ben in the hours before Ben's death).<br /><br />For a TV film, not only was the script excellent but so were the actors. Young Joshua Harris must have been a talented child actor in his time given his affecting performance as Ben while Linda Hamilton and Richard Thomas were perfect as the parents, depicting their grief, strength and love for their son and his plight.<br /><br />I highly recommend this to not only people seeking a good gut-wrenching drama (as there is nothing more gut-wrenching than... The sentiment expressed for the movie is
+----COMPLETION-----
+ positive<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 558
+
+
+================================================================================
+SEQUENCE 63
+================================================================================
+----PROMPT-----
+Review text:
+Not the best Target I've seen..\nDefinitely needs some fixing up or updating! Unorganized, empty on the shelves and I didn't see many employees walking around wanting to help people. Lots of beat up, broken boxes of the items they have! A lot of misplaced things everywhere! Also I noticed that the shelves are a little filthy, as in dusty and dirt-y! \n\nI like Target but this location just doesn't seem as nice as the others!
+
+Review rating:
+----COMPLETION-----
+
+3 stars<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 911
+
+
+================================================================================
+SEQUENCE 64
+================================================================================
+----PROMPT-----
+What type of details about mercedes lander
+ can be gathered from the following bio?
+
+Bio: mercedes sherida lander -lrb- born january 25, 1984 -rrb- is the drummer and backing vocalist for the canadian alternative metal group kittie.
+her sister, morgan lander, also sings and plays guitar for kittie.
+other than morgan she is the only other original member of kittie.
+she was also the leading vocals for a small canadian project band called night of the demons.
+they were considered hardcore and focused on horror themed lyrics.
+they have only released one ep to date.
+in 2011 mercedes joined the all girl power pop band the alcohollys which also includes the likes of tanya candler, the original kittie bass player.
+they are slated to put out an ep in early 2013.
+mercedes is in a long term relationship with dååth and chimaira guitar player emil werstler.
+mercedes is famed for her heavy drumming style and extensive tattoos.
+
+----COMPLETION-----
+
+
+
+- instrument
+
+
+
+- years active
+
+
+
+- birth name
+
+
+
+- origin
+
+
+
+- genre
+
+
+
+
+
+- birth date
+
+
+
+- name
+
+
+
+- image size
+
+
+
+- background
+
+
+
+- associated acts
+
+
+
+- occupation
+
+<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 719
+
+
+================================================================================
+SEQUENCE 65
+================================================================================
+----PROMPT-----
+Sharapova steamrolls into Seoul semis Seoul, Korea (Sports Network) - Wimbledon champion Maria Sharapova was an easy quarterfinal winner Friday at the \$140,000 Korea Open Tennis Championships.
+
+Which section of a newspaper would this article likely appear in?
+----COMPLETION-----
+
+Sports<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 961
+
+
+================================================================================
+SEQUENCE 66
+================================================================================
+----PROMPT-----
+Title: Timeless
+Review: My copy of Sculptured Knits arrived yesterday. It is indeed beautiful, innovative,classic and timeless. I have Jean Moss's other three books and admire her vision. My needles are already "clicking" with the Gaia design. I am using beautiful New Zealand Treliske merino wool.XRX have set a new standard in knitting book publishing.Thank you for this wonderful book Jean and please keep publishing.Best Wishes Stephanie Coote
+Is the review positive or negative?
+----COMPLETION-----
+
+Positive<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 910
+
+
+================================================================================
+SEQUENCE 67
+================================================================================
+----PROMPT-----
+You are considering whether to buy a product. You look at the reviews. Would the following review decrease or increase the chances of you buying the product?
+Review title: Stop Working
+Product review: I bought this humidifer and it worked well for a while, but no matter how well I tried to clean the machine it got really nasty. The night light stopped working almost immediately which really upset my 4 year old daughter.
+
+----COMPLETION-----
+
+decrease <|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 931
+
+
+================================================================================
+SEQUENCE 68
+================================================================================
+----PROMPT-----
+Title: police complete investigation into bali blast suspect
+
+
+----COMPLETION-----
+ indonesian police on monday formally presented prosecutors with their case against the man accused of delivering the explosives used in the bali bombings _ the first of ## suspects to be processed.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 975
+
+
+================================================================================
+SEQUENCE 69
+================================================================================
+----PROMPT-----
+Based on this review, would the user recommend this product?
+===
+Review: I've watched Millionaire Matchmaker and enjoy it entertainment value, and I appreciated Patti's straight-shooting approach. I got this video out of sure curiosity and to see if she had any tips. But oh wow- This was a joke. I agree with the reviewer who noted poor production quality and terrible scripting. My friends and I are planning a watch party for the sole purpose to make fun of it.I say it's a joke, but it's also insulting to single women and also single men. She insults the women who attend her conference, she insults the men who she talks to at the round table discussion.... it's just awkward. The disappointing thing, though, is that this isn't the person she is on her TV show.Save your money or buy it cheaply. Or do what I did and make it a watch party for you and your single friends.
+Answer:
+----COMPLETION-----
+
+No<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 822
+
+
+================================================================================
+SEQUENCE 70
+================================================================================
+----PROMPT-----
+lance loud, who died last december at the age of ##, was a wild child of the media age.
+
+===
+
+Generate a title for this article:
+----COMPLETION-----
+ tied to television to the very last<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 980
+
+
+================================================================================
+SEQUENCE 71
+================================================================================
+----PROMPT-----
+cambodian second prime minister hun sen arrived here today on a four-day official visit to myanmar at the invitation of senior general than shwe, chairman of myanmar state law and order restoration council and prime minister of myanmar.
+
+===
+
+Given the above sentence, write its title:
+----COMPLETION-----
+ cambodian second prime minister visits myanmar<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 950
+
+
+================================================================================
+SEQUENCE 72
+================================================================================
+----PROMPT-----
+Review text:
+Great sandwiches and soups. Friendly staff.
+
+Review rating:
+----COMPLETION-----
+
+4 stars<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 1001
+
+
+================================================================================
+SEQUENCE 73
+================================================================================
+----PROMPT-----
+What are the topics in the sentence: Everyone gives him disapproving looks.
+
+----COMPLETION-----
+
+look, give, everyone<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 1000
+
+
+================================================================================
+SEQUENCE 74
+================================================================================
+----PROMPT-----
+Eh, this place was cool (haha no pun intended) but defintely not worth the crazy price you had to pay.  Honestly had we not had a coupon for this place, we wouldn't have gone.  The idea is really neat to make an entire bar out of ice, except that this place was just the size of a giant walk in meat locker with a tiny little bar.  Also, when we went there were literallly 2 other people in the whole place, and at some point the bartender just walked out so I couldn't order another drink if I wanted to.  I guess they make enough money elsewhere  that doesn't matter, because you can't take your phone/camera in and they charge you stupid amounts to have your picture just like you would if you rode a rollercoaster at an amusement park. \n\nTip- DONT PAY FULL PRICE AT THIS PLACE!! there are coupons floating around everywhere and I'm pretty sure we got in using a buy one get one. ALSO the girls were handing out free shot coupons before we went in.  Definitely take advantage of this!\n\nIt was an experience, not sure I'd go back... unless for something crazy like a bachellorette bikini party in the ice bar (theres all sorts of pics of people doing/wearing crazy things in there).  Otherwise, take mine and most of the other reviewers' advice and know what you're getting into when you decide to come to this place.
+===
+Based on that, my rating is
+----COMPLETION-----
+ 2 stars<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 701
+
+
+================================================================================
+SEQUENCE 75
+================================================================================
+----PROMPT-----
+
+When did Microsoft remove license fees on device screens less than 9 inches?
+----COMPLETION-----
+
+April 2, 2014
+<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 1001
+
+
+================================================================================
+SEQUENCE 76
+================================================================================
+----PROMPT-----
+Pick one category for the following text. The options are - company, educational institution, artist, athlete, office holder, mean of transportation, building, natural place, village, animal, plant, album, film or written work. Appomattox Regional Governor's School for the Arts And Technology -  The Appomattox Regional Governor's School for the Arts And Technology (locally and colloquially sometimes known as ARGS ARGSAT Appomattox or the Governor's School) is a public regional magnet high school in downtown Petersburg Virginia. One of 18 Virginia Governor's Schools it draws students from 14 localities: Chesterfield Richmond Petersburg Dinwiddie Colonial Heights Hopewell Prince George Powhatan Sussex Surry Charles City Amelia Southampton and Franklin City.
+----COMPLETION-----
+ Educational Institution<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 865
+
+
+================================================================================
+SEQUENCE 77
+================================================================================
+----PROMPT-----
+Ignoring the order of the concepts: lake, hillside, reflect;
+Generate a sentence with all the concepts :
+
+----COMPLETION-----
+
+green hillsides are reflected in the glassy surface of lake.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 981
+
+
+================================================================================
+SEQUENCE 78
+================================================================================
+----PROMPT-----
+Review text:
+This place is a little off the beaten path, but it's always the hidden gems that deliver the most delicious dishes. There were so many choices on the menu, my head was spinning. So my husband and I decided to go with the pit special so we could try as many meats and sides as possible. I'm just going to say you can't go wrong with any of the BBQ fare. The ribs, brisket, pulled pork, hot links- all amazing! The hot links were nice and spicy and all the other meat was super tender and delectable. \nThe beans were a great side- thick and chunky with big pieces of pork mixed throughout. Yum yum. The potato salad had crispy pieces of bacon on top which launched it into a new level of awesome-ness. The fried okra was perfectly breaded and fried. No extra salt required. The mac and cheese just seemed like a dud next to all the other sides, so I'd skip that one if possible.\nAs for the dessert- the peach cobbler was too much peach and not enough cobbler. You could tell that they used a canned peach to make it and it was just not doing it for me. The peach cobbler wasn't the best, but maybe i'll try the banana pudding next time.
+
+Stars:
+----COMPLETION-----
+
+4 stars<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 740
+
+
+================================================================================
+SEQUENCE 79
+================================================================================
+----PROMPT-----
+ The Belmont Sessions is an independent production collective based out of Chicago. They have produced live concert videos for a variety of artists including RJD2 Maps and Atlases and Murs. The group focuses on creating and distributing HD content for online audiences. Their videos are on websites such as Youtube and Vimeo and have been featured on music blogs such as Pitchfork and La Blogotheque. The majority of their videos can be viewed on the Belmont Sessions' website. Given a list of categories: company, educational institution, artist, athlete, office holder, mean of transportation, building, natural place, village, animal, plant, album, film or written work, what category does the paragraph belong to?
+----COMPLETION-----
+ Company
+<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 879
+
+
+================================================================================
+SEQUENCE 80
+================================================================================
+----PROMPT-----
+sen. john mccain's presidential campaign spent more than $ ###,### over the course of nine weeks on a trio of stylists for alaska gov. sarah palin, equivalent to what a hollywood studio might invest in preparing an a-list actress for a movie premiere or publicity campaign, other stylists said.
+
+TL;DR:
+----COMPLETION-----
+ mccain campaign paid $ ###,### for palin stylists<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 934
+
+
+================================================================================
+SEQUENCE 81
+================================================================================
+----PROMPT-----
+members of congress and california landowners called thursday for relaxation of the endangered species act, saying it was responsible for millions of dollars of property damage in last winter's devastating floods there.
+
+TL;DR:
+----COMPLETION-----
+ citing flood damage foes seek to weaken endangered species act<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 968
+
+
+================================================================================
+SEQUENCE 82
+================================================================================
+----PROMPT-----
+i cant say a negative word about this film as i would obviously be taken it out of context as it is without drought the sort of film the typifies quality direction acting and great moody dialogue not to mention the original scenes. it has no relation to lock stock,its far more left field than that watch this film its great.also the acting is superb charlot Coleman's last film before she tragically died saw a performance second to none. its a shame films like this arnt being made in the uk anymore, talent is hard to come by and films like this and others of this jonrer, this i mean the ones that have the rare power to create atmosphere and this is one of them. The sentiment expressed for the movie is
+----COMPLETION-----
+ positive<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 872
+
+
+================================================================================
+SEQUENCE 83
+================================================================================
+----PROMPT-----
+Sentence 1: Jean Tardieu was born around 1711 in Paris, son of Pierre Francois Tardieu.
+Sentence 2: Jean Tardieu was born around 1711 in Paris, the son of Pierre Francois Tardieu.
+Question: Does Sentence 1 paraphrase Sentence 2?
+
+----COMPLETION-----
+
+Yes<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 955
+
+
+================================================================================
+SEQUENCE 84
+================================================================================
+----PROMPT-----
+ The R boats (Räumboote in German) were a group of small naval vessels built as minesweepers but used for several purposes during the Second World War.A total of 424 boats were built for the Kriegsmarine before and during World War II. The German Navy used them in every theatre including the Baltic Mediterranean and the Black Sea. These boats were used for convoy escort coastal patrol minesweeping minelaying and air-sea rescue. Given a list of categories: company, educational institution, artist, athlete, office holder, mean of transportation, building, natural place, village, animal, plant, album, film or written work, what category does the paragraph belong to?
+----COMPLETION-----
+ Mean Of Transportation
+<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 877
+
+
+================================================================================
+SEQUENCE 85
+================================================================================
+----PROMPT-----
+iran and algeria monday expressed their readiness to expand military cooperation between the two countries, the official irna news agency quoted iranian defense minister ali shamkhani as saying. In a nutshell,
+----COMPLETION-----
+ iran algeria willing to expand military cooperation<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 971
+
+
+================================================================================
+SEQUENCE 86
+================================================================================
+----PROMPT-----
+Delicious! This is right next to my chiropractors office so I decided to stop in for lunch. I ordered a veggie sub and I was not disappointed! The bread     and veggies were very fresh. The only downfall is that it isnt close to my work in North Mesa, I would love to stop there on my lunch hour!
+So I would like to give it
+----COMPLETION-----
+ 5 stars<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 940
+
+
+================================================================================
+SEQUENCE 87
+================================================================================
+----PROMPT-----
+angolan president jose eduardo dos santos reaffirmed thursday that angola will hold its first general elections in #### after longtime civil war.
+
+===
+
+Generate a title for this article:
+----COMPLETION-----
+ angolan president promises post-war elections in ####<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 966
+
+
+================================================================================
+SEQUENCE 88
+================================================================================
+----PROMPT-----
+LoJack buys Canadian tracking company LoJack Corp., which makes devices for recovering stolen cars, agreed to buy Boomerang Tracking Inc. for about \$48 million to expand into Canada. LoJack will pay about \$4.32 a share in cash or a combination of cash and stock for the Montreal maker of stolen vehicle recovery equipment, LoJack said. Westwood-based LoJack also gets Boomerang's cash balance of \$12 million....
+Is this a piece of news regarding world politics, sports, business, or science and technology?
+----COMPLETION-----
+
+Business<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 905
+
+
+================================================================================
+SEQUENCE 89
+================================================================================
+----PROMPT-----
+Are the questions "How dark does the dark web get?" and ""What is there on the ""dark web""?"" asking the same thing?
+----COMPLETION-----
+ no<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 992
+
+
+================================================================================
+SEQUENCE 90
+================================================================================
+----PROMPT-----
+
+In 2006, due to ongoing violence, over 50,000 people in the country's northwest were at risk of starvation but this was averted due to assistance from the United Nations.[citation needed] On 8 January 2008, the UN Secretary-General Ban Ki-Moon declared that the Central African Republic was eligible to receive assistance from the Peacebuilding Fund. Three priority areas were identified: first, the reform of the security sector; second, the promotion of good governance and the rule of law; and third, the revitalization of communities affected by conflicts. On 12 June 2008, the Central African Republic requested assistance from the UN Peacebuilding Commission, which was set up in 2005 to help countries emerging from conflict avoid devolving back into war or chaos. Please tell me Who assisted in saving the people from starvation?
+----COMPLETION-----
+
+
+United Nations
+<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 854
+
+
+================================================================================
+SEQUENCE 91
+================================================================================
+----PROMPT-----
+What is the following passage about?
+Weeks after ending the Sex Pistols, Lydon formed the experimental group Public Image Ltd and declared the project to be "anti music of any kind". Public Image and other acts such as the Pop Group and the Slits had begun experimenting with dance music, dub production techniques and the avant-garde, while punk-indebted Manchester acts such as Joy Division, The Fall and A Certain Ratio developed unique styles which drew on a similarly disparate range of influences across music and modernist literature. Bands such as Scritti Politti, Gang of Four and This Heat incorporated Leftist political philosophy and their own art school studies in their work.
+----COMPLETION-----
+
+Post-punk<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 876
+
+
+================================================================================
+SEQUENCE 92
+================================================================================
+----PROMPT-----
+Review: Needs to be more like the place in the epicenter. Hate how you have to write your order on a dry erase board. The movie we saw was in a theater with 2 rows so we were starring straight up which isn't fun for your neck or easy to eat.
+On a scale of 1 to 5, I would give this product
+----COMPLETION-----
+ 2<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 951
+
+
+================================================================================
+SEQUENCE 93
+================================================================================
+----PROMPT-----
+Make a title for this article: astronauts took another spacewalk at the international space station saturday, this time to lighten the workload for future crews.
+----COMPLETION-----
+
+
+astronauts go on #nd spacewalk at space station<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 975
+
+
+================================================================================
+SEQUENCE 94
+================================================================================
+----PROMPT-----
+Make a title for this article: the philadelphia-based manufacturer of a pesticide blamed for the poisoning deaths of lions in kenya says it's taking `` aggressive action '' to prevent misuse of the product, halting sales to the country and trying to buy back supplies.
+----COMPLETION-----
+
+
+us pesticide maker vows steps to protect lions<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 957
+
+
+================================================================================
+SEQUENCE 95
+================================================================================
+----PROMPT-----
+Is this product review positive?
+Title: Great Club Stepper
+Review: This purchase was effortless, priced right, and delivery was right on!!If you absolutely know, without a doubt, that this product is exactly what you want, then buying this health club stepper through Amazon.com is the very best way to go.
+Answer:
+----COMPLETION-----
+
+Yes<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 949
+
+
+================================================================================
+SEQUENCE 96
+================================================================================
+----PROMPT-----
+Given this review: "Gud"
+Would you recommend this app to a friend? Not at all, No, Maybe, Yes, or Definitely?
+
+----COMPLETION-----
+
+Definitely<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 987
+
+
+================================================================================
+SEQUENCE 97
+================================================================================
+----PROMPT-----
+Title: at least seven dead in bus bombing near lahore
+
+
+----COMPLETION-----
+ at least seven people were killed and ## injured when a bomb exploded early wednesday in a bus near here, in the second such attack in less than two weeks, police said.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 973
+
+
+================================================================================
+SEQUENCE 98
+================================================================================
+----PROMPT-----
+ George Corley Wallace Jr. (August 25 1919 – September 13 1998) was an American politician and the 45th governor of Alabama having served two nonconsecutive terms and two consecutive terms as a Democrat: 1963–1967 1971–1979 and 1983–1987. Wallace has the third longest gubernatorial tenure in post-Constitutional U.S. history at 5848 days. After four runs for U.S. Given a list of categories: company, educational institution, artist, athlete, office holder, mean of transportation, building, natural place, village, animal, plant, album, film or written work, what category does the paragraph belong to?
+----COMPLETION-----
+ Office Holder
+<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 889
+
+
+================================================================================
+SEQUENCE 99
+================================================================================
+----PROMPT-----
+Choose between "ice" and  "concrete".
+Question: A boy was rolling his rubber ball in his driveway to see how far he could make it roll. He found that it rolled smoother and further on the _____. The ice has lower friction. (A) concrete (B) ice
+
+----COMPLETION-----
+
+concrete<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 957
+
+
+================================================================================
