@@ -564,6 +564,7 @@ def test_multiple__call__(
             '[{"prompt": "hi", "completion": ""}, \
       {"prompt": "hi bye", "completion": ""}, \
       {"prompt": "hi bye test", "completion": ""}]',
+            True,
             [],
             [],
         ),
