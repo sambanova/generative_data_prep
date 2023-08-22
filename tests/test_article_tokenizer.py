@@ -561,10 +561,10 @@ def test_multiple__call__(
         (
             BoundaryType.JSONL,
             FileExtension.JSONL,
+            True,
             '[{"prompt": "hi", "completion": ""}, \
       {"prompt": "hi bye", "completion": ""}, \
       {"prompt": "hi bye test", "completion": ""}]',
-            True,
             [],
             [],
         ),

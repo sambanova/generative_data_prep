@@ -35,7 +35,7 @@ def test_len(tokenized_line: TokenizedLine, length: int):
 @pytest.mark.parametrize(
     "length,max_seq_length,eos_token_id,expected",
     [
-        (3, None, None, "[(0, 0, -1) (1, -1, -1) (2, -2, -1)]"),
+        (3, None, None, "[(0, 0) (1, -1) (2, -2)]"),
     ],
 )
 def test_str(tokenized_line: TokenizedLine, expected: str):
@@ -65,7 +65,7 @@ def test_add(
 )
 def test_illegal_add(tokenized_line: TokenizedLine, tokenized_line_2: TokenizedLine):
     """Test that the sequence's max sequence length is respected when adding another line to a sequence."""
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         tokenized_line += tokenized_line_2
 
 
