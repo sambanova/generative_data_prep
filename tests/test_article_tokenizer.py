@@ -545,7 +545,7 @@ def test_multiple__call__(
         (
             BoundaryType.JSONL,
             FileExtension.JSONL,
-            True,
+            False,
             '[{"prompt": "hi bye test hi bye", "completion": ""}]',
             [],
             [],
@@ -561,7 +561,7 @@ def test_multiple__call__(
         (
             BoundaryType.JSONL,
             FileExtension.JSONL,
-            True,
+            False,
             '[{"prompt": "hi", "completion": ""}, \
       {"prompt": "hi bye", "completion": ""}, \
       {"prompt": "hi bye test", "completion": ""}]',
@@ -571,7 +571,7 @@ def test_multiple__call__(
         (
             BoundaryType.JSONL,
             FileExtension.JSONL,
-            True,
+            False,
             '[{"prompt": "hi hi hi hi hi hi hi hi", "completion": "bye"}]',
             [[1, 1, 2, 0, 0, 0]],
             [[PROMPT, PROMPT, COMP, SEP, PAD, PAD]],
@@ -590,7 +590,7 @@ def test_multiple__call__(
         (
             BoundaryType.JSONL,
             FileExtension.JSONL,
-            True,
+            False,
             '[{"prompt": "hi bye test hi bye test", "completion": ""}, \
             {"prompt": "hi bye test hi", "completion": "test hi"}]',
             [[1, 2, 3, 1, 3, 1], [0, 0, 0, 0, 0, 0]],
