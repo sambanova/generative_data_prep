@@ -21,9 +21,11 @@ our models.
 """
 
 from abc import ABC, abstractmethod
-from typing import List, Tuple, TypeVar, Union, overload
+from typing import List, TypeVar, Union, overload
 
 from generative_data_prep.utils import TokenTypeIds
+
+from .token import Token
 
 # custom type representing subclasses of TokenizedLine
 TokenizedLineSubClass = TypeVar("TokenizedLineSubClass", bound="TokenizedLine")
@@ -32,29 +34,25 @@ TokenizedLineSubClass = TypeVar("TokenizedLineSubClass", bound="TokenizedLine")
 class TokenizedLine(ABC):
     """Represent a line of text that has been tokenized into token ids and token type ids."""
 
-    def __init__(self, token_ids: List[int], token_type_ids: List[int]):
+    def __init__(self, tokens: List[Token]):
         """Create a TokenizedLine.
 
         Args:
-            token_ids:  The token ids corresponding to the tokens that the line was tokenized into.  For example, if the
-                line was "how are you doing", the tokens might be ["how", "are", "you", "do", "ing"], and the
-                corresponding token_ids might be [293, 43, 3992, 499, 32].  The actual ids are subject to the
-                tokenizer's implementation.
-            token_type_ids:  The token type ids corresponding to the token ids.  The token type ids specify the type
-                of each corresponding token.  Some examples of token type ids include 'Prompt', 'Completion, and 'End
-                of Sequence'.
+            tokens: list of tokens that make up this tokenized line. These tokens have two main attributes
+                token_ids:  The token ids corresponding to the tokens that the line was tokenized into.  For example,
+                    if the line was "how are you doing", the tokens might be ["how", "are", "you", "do", "ing"],
+                    and the corresponding token_ids might be [293, 43, 3992, 499, 32].  The actual ids are subject to
+                    the tokenizer's implementation.
+                token_type_ids:  The token type ids corresponding to the token ids.  The token type ids specify the type
+                    of each corresponding token.  Some examples of token type ids include 'Prompt', 'Completion, and
+                    'End of Sequence'.
         """
-        if len(token_ids) != len(token_type_ids):
-            err_msg = f"Length of Token IDs {len(token_ids)} must match length of Token Type IDs {len(token_type_ids)}"
-            raise ValueError(err_msg)
-
-        self._token_ids = token_ids
-        self._token_type_ids = token_type_ids
+        self._tokens = tokens
 
     def __iadd__(self: TokenizedLineSubClass, tokenized_line: "TokenizedLine") -> TokenizedLineSubClass:
         """Implement += for a tokenized line."""
-        self._token_type_ids += tokenized_line.token_type_ids
-        self._token_ids += tokenized_line.token_ids
+        self._tokens += tokenized_line.tokens
+
         return self
 
     @overload
@@ -63,28 +61,26 @@ class TokenizedLine(ABC):
         ...
 
     @overload
-    def __getitem__(self: TokenizedLineSubClass, index: int) -> Tuple[int, int]:
+    def __getitem__(self: TokenizedLineSubClass, index: int) -> Token:
         """See __getitem__ docstring below, this is just a type hint."""  # noqa: D418
         ...
 
-    def __getitem__(
-        self: TokenizedLineSubClass, index: Union[int, slice]
-    ) -> Union[Tuple[int, int], TokenizedLineSubClass]:
+    def __getitem__(self: TokenizedLineSubClass, index: Union[int, slice]) -> Union[Token, TokenizedLineSubClass]:
         """Return the token ID and the token type ID at the specified index / slice."""
         if isinstance(index, slice):
             return self._get_slice(index)
         elif isinstance(index, int):
-            return self.token_ids[index], self.token_type_ids[index]
+            return self.tokens[index]
         else:
             raise TypeError(f"Invalid type: {type(index)}")
 
     def __len__(self) -> int:
         """Return the length of the tokenized line."""
-        return len(self.token_ids)
+        return len(self.tokens)
 
     def __str__(self) -> str:
         """Return the tokenized line as a string."""
-        return f'[{" ".join(map(str, zip(self.token_ids, self.token_type_ids)))}]'
+        return f'[{" ".join(map(str, self.tokens))}]'
 
     def __repr__(self) -> str:
         """Return the tokenized line representation.
@@ -98,17 +94,12 @@ class TokenizedLine(ABC):
         """Return whether or not another TokenizedLine is equal to this one."""
         if not isinstance(obj, TokenizedLine):
             return False
-        return self.token_type_ids == obj.token_type_ids and self.token_ids == obj.token_ids
+        return self.tokens == obj.tokens
 
     @property
-    def token_ids(self) -> List[int]:
+    def tokens(self) -> List[Token]:
         """Return the token ids of the TokenizedLine."""
-        return self._token_ids
-
-    @property
-    def token_type_ids(self) -> List[int]:
-        """Return the token type ids of the TokenizedLine."""
-        return self._token_type_ids
+        return self._tokens
 
     def is_empty(self) -> bool:
         """Return whether or not the TokenizedLine is empty."""
@@ -123,6 +114,14 @@ class TokenizedLine(ABC):
         """
         raise NotImplementedError
 
+    def dump_token_ids(self):
+        """Return a list of the token ids from this tokenixed line."""
+        return list(map(lambda x: x.token_id, self.tokens))
+
+    def dump_token_type_ids(self):
+        """Return a list of the token type ids from this tokenixed line."""
+        return list(map(lambda x: x.token_type_id, self.tokens))
+
 
 class TokenizedArticle(TokenizedLine):
     """Represents an article that has been tokenized.
@@ -134,11 +133,11 @@ class TokenizedArticle(TokenizedLine):
     @classmethod
     def get_empty(cls) -> "TokenizedArticle":
         """See base class."""
-        return cls([], [])
+        return cls([])
 
     def _get_slice(self, slice_index: slice) -> "TokenizedArticle":
         """See base class."""
-        return TokenizedArticle(self.token_ids[slice_index], self.token_type_ids[slice_index])
+        return TokenizedArticle(self.tokens[slice_index])
 
 
 class TokenizedSequence(TokenizedLine):
@@ -149,18 +148,11 @@ class TokenizedSequence(TokenizedLine):
     the TokenizedArticles, and must first compress the TokenizedArticles into length-bounded TokenizedSequences.
     """
 
-    def __init__(
-        self,
-        token_ids: List[int],
-        token_type_ids: List[int],
-        max_seq_length: int,
-        eos_token_id: int,
-    ):
+    def __init__(self, tokens: List[Token], max_seq_length: int, eos_token_id: int):
         """Create a TokenizedSequence.
 
         Args:
-            token_ids:  The token ids (see TokenizedLine for more details).
-            token_type_ids:  The token type ids (see TokenizedLine for more details).
+            tokens:  The tokens that make up this tokenized line, each token has an id, a type_id
             max_seq_length:  The maximum allowed length for a sequence.
             eos_token_id:  The end of text (sequence) token.  If a sequence's length is less than the max sequence
                 length, the sequence is usually padded with this token.
@@ -168,10 +160,10 @@ class TokenizedSequence(TokenizedLine):
         if max_seq_length < 1:
             err_msg = f"Cannot have zero / negative max_seq_length. Found max_seq_length == {max_seq_length}"
             raise ValueError(err_msg)
-        if len(token_ids) > max_seq_length:
-            err_msg = f"Token IDs have length == {len(token_ids)}, expected length to be <= {max_seq_length}"
+        if len(tokens) > max_seq_length:
+            err_msg = f"Tokens have length == {len(tokens)}, expected length to be <= {max_seq_length}"
             raise ValueError(err_msg)
-        super().__init__(token_ids, token_type_ids)
+        super().__init__(tokens)
         self.max_seq_length = max_seq_length
         self.eos_token_id = eos_token_id
 
@@ -192,12 +184,7 @@ class TokenizedSequence(TokenizedLine):
         Returns:
             The newly created TokenizedLine.
         """
-        return cls(
-            tokenized_article.token_ids,
-            tokenized_article.token_type_ids,
-            max_seq_length,
-            eos_token_id,
-        )
+        return cls(tokenized_article.tokens, max_seq_length, eos_token_id)
 
     def __iadd__(self, tokenized_line: TokenizedLine) -> "TokenizedSequence":
         """Add another TokenizedLine to this TokenizedSequence.
@@ -215,7 +202,6 @@ class TokenizedSequence(TokenizedLine):
             err_msg_1 = f"Tokenized line with length: {len(tokenized_line)} is too long to be added to"
             err_msg_2 = f"sequence with length: {len(self)} and max sequence length: {self.max_seq_length}"
             raise ValueError(f"{err_msg_1} {err_msg_2}")
-
         return super().__iadd__(tokenized_line)
 
     @property
@@ -225,7 +211,7 @@ class TokenizedSequence(TokenizedLine):
 
     def is_packed(self) -> bool:
         """Return whether or not the TokenizedSequence is at its maximum length."""
-        return len(self.token_ids) == self.max_seq_length
+        return len(self.tokens) == self.max_seq_length
 
     def pack(self, tokenized_line: TokenizedLineSubClass) -> TokenizedLineSubClass:
         """Pack a TokenizedLine into this TokenizedSequence.
@@ -245,10 +231,9 @@ class TokenizedSequence(TokenizedLine):
     def pad(self):
         """Fill the remaining token ids in the TokenizedSequence with the end of text token."""
         padding_size = self.max_seq_length - len(self)
-        self._token_type_ids += padding_size * [TokenTypeIds.PADDING]
-        self._token_ids += padding_size * [self.eos_token_id]
+        self._tokens += [Token(self.eos_token_id, TokenTypeIds.PADDING)] * padding_size
 
     def _get_slice(self, slice_index: slice) -> "TokenizedSequence":
         """See base class."""
-        tokenized_article = TokenizedArticle(self.token_ids[slice_index], self.token_type_ids[slice_index])
+        tokenized_article = TokenizedArticle(self.tokens[slice_index])
         return TokenizedSequence.from_article(tokenized_article, self.max_seq_length, self.eos_token_id)  # type: ignore

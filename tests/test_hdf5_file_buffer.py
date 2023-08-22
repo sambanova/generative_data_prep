@@ -22,7 +22,7 @@ import numpy as np
 import pytest
 
 from generative_data_prep.data_buffers import Hdf5FileBuffer
-from generative_data_prep.tokenized_line import TokenizedSequence
+from generative_data_prep.tokenized_line import Token, TokenizedSequence
 
 MAX_SEQ_LENGTH = 4
 DATA_TYPE = "i4"
@@ -142,8 +142,9 @@ def test_hfd5_text_buffer_write(
         with Hdf5FileBuffer(hdf5_file_path, max_seq_length1, DATA_TYPE, chunk_size) as f:
             for i in range(num_iterations):
                 tokenized_line_copy = tokenized_line[:]
-                tokenized_line_copy._token_ids = list(map(lambda x: x + i, tokenized_line_copy._token_ids))
-                tokenized_line_copy._token_type_ids = list(map(lambda x: x + i, tokenized_line_copy._token_type_ids))
+                tokens_ids = list(map(lambda x: x + i, tokenized_line_copy.dump_token_ids()))
+                token_type_ids = list(map(lambda x: x + i, tokenized_line_copy.dump_token_type_ids()))
+                tokenized_line_copy._tokens = list(map(lambda x: Token(x[0], x[1]), zip(tokens_ids, token_type_ids)))
                 f.write([tokenized_line_copy])
         with h5py.File(hdf5_file_path, "r") as f:
             assert str(f.keys()) == "<KeysViewHDF5 ['input_ids', 'token_type_ids']>"

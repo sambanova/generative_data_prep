@@ -16,7 +16,8 @@ limitations under the License.
 Implement a Text Buffer for writing tokenized sequences to hdf5 files.
 """
 
-from typing import List
+from types import TracebackType
+from typing import List, Optional, Type
 
 import h5py
 import numpy as np
@@ -63,7 +64,12 @@ class Hdf5FileBuffer(FileBuffer):
         self.hdf5_file = h5py.File(self.hdf5_file_path, "w")
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> bool:
         """When the with Hdf5TextBuffer() as ... is exited, flush and close hdf5 file.
 
         Args:
@@ -84,6 +90,8 @@ class Hdf5FileBuffer(FileBuffer):
 
         self.hdf5_file.flush()
         self.hdf5_file.close()
+
+        return True
 
     def _dump_data(self, dataset_name, new_shape, data):
         """Resizes self.hdf5_file to new_shape then dumps data into it.
@@ -111,8 +119,8 @@ class Hdf5FileBuffer(FileBuffer):
             if len(tokenized_seq) != self.max_seq_length:
                 raise ValueError("tokenized sequence has not been filled")
 
-        dump_token_ids = list(map(lambda seq: seq.token_ids, chunk))
-        dump_token_type_ids = list(map(lambda seq: seq.token_type_ids, chunk))
+        dump_token_ids = list(map(lambda seq: seq.dump_token_ids(), chunk))
+        dump_token_type_ids = list(map(lambda seq: seq.dump_token_type_ids(), chunk))
 
         if self.first_dump:
             self.hdf5_file.create_dataset(

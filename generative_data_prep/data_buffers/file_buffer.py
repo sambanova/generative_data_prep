@@ -17,7 +17,10 @@ Abstract class for text buffers, which allow the reading and writing of text.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any
+from types import TracebackType
+from typing import List, Optional, Type
+
+from generative_data_prep.tokenized_line import TokenizedSequence
 
 
 class FileBuffer(ABC):
@@ -29,11 +32,11 @@ class FileBuffer(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def write(self, line: Any):
+    def write(self, tokenized_sequences: List[TokenizedSequence]):
         """Write a line to the TextBuffer.
 
         Args:
-            line: The line to be written to the TextBuffer.
+            tokenized_sequences: The tokenized sequence to be written to the file.
         """
         raise NotImplementedError
 
@@ -49,6 +52,11 @@ class FileBuffer(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def __exit__(self):
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> bool:
         """Called when you exit the text buffer by exiting the with block."""
         raise NotImplementedError
