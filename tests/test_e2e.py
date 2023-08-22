@@ -308,6 +308,7 @@ def test_pipeline(
             overwrite_output_path=False,
             num_workers=num_workers,
             do_not_balance_hdf5=do_not_balance_hdf5,
+            do_not_delete_split_jsonls=do_not_delete_split_jsonls,
             max_seq_length=max_seq_length,
             input_packing_config=input_packing_config,
             packing_boundary=packing_boundary,
