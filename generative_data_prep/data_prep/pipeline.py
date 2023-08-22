@@ -282,6 +282,7 @@ def pipeline_main(  # noqa: C901
     overwrite_output_path: bool,
     num_workers: int,
     do_not_balance_hdf5: bool,
+    do_not_delete_split_jsonls: bool,
     max_seq_length: int,
     input_packing_config: PackingConfig,
     packing_boundary: BoundaryType,
@@ -308,6 +309,7 @@ def pipeline_main(  # noqa: C901
         overwrite_output_path: Whether the output path should be deleted and over-written
         num_workers: Number of workers to use for multiprocessing
         do_not_balance_hdf5: If true, do not re-balance hdf5 files.
+        do_not_delete_split_jsonls: If true, do not delete split jsonl files.
         max_seq_length: Maximum sequence length of the model.
         input_packing_config: Packing style used during tokenization.
         packing_boundary: How to define the boundary when packing text.
@@ -477,3 +479,6 @@ def pipeline_main(  # noqa: C901
         balance_hdf5_files(dev_hdf5_files)
         print(f"Hdf5 balancing is complete, the outputs are located at {hdf5_dir}")
         print(SEP_STR)
+
+    if not do_not_delete_split_jsonls:
+        os.rmdir(split_dir)
