@@ -103,7 +103,7 @@ def rename_files(
 
         new_file_path = os.path.join(split_dir, new_name)
 
-        if os.path.exists(new_file_path) or overwrite_output_path:
+        if os.path.exists(new_file_path) and not overwrite_output_path:
             err_msg = f"{new_file_path} already exists, and you are trying to overwrite it."
             err_msg += " To fix this error either specify --overwrite_output_path or move the conflicting file"
             raise ValueError(err_msg)
@@ -372,7 +372,7 @@ def pipeline_main(  # noqa: C901
     if shuffle == "large_file":
         err_msg = "You specified --shuffle=large_file, but this is only supported on linux operating systems, "
         err_msg += f"your operating system is {platform}. Please change the flag to --shuffle=on_RAM or --shuffle=False"
-        if "linux" in platform.lower():
+        if "linux" not in platform.lower():
             raise OSError(err_msg)
         split_dir = large_file_shuffle(input_file_path, output_dir, False, num_splits)
 
