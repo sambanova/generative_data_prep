@@ -278,6 +278,7 @@ def test_pipeline(
     completion_keyword: str,
     shuffle: str,
     do_not_balance_hdf5: bool,
+    do_not_delete_split_jsonls: bool,
     max_seq_length: int,
     input_packing_config: PackingConfig,
     packing_boundary: BoundaryType,
