@@ -322,4 +322,4 @@ def test_pipeline(
         check_pipeline(output_dir, gold_path)
 
         if not do_not_balance_hdf5:
-            check_balance(os.path.join(output_dir, "hdf5"))
+            check_balance(os.path.join(output_dir))
