@@ -151,8 +151,8 @@ def test_data_prep(
 
 @pytest.mark.parametrize(
     "test_name,disable_space_separator,keep_prompt_only_sequences,prompt_keyword,completion_keyword,\
-    shuffle,do_not_balance_hdf5,max_seq_length,input_packing_config,packing_boundary,attention_boundary,\
-    num_training_splits,num_dev_splits,num_test_splits,dev_ratio,test_ratio",
+    shuffle,do_not_balance_hdf5,do_not_delete_split_jsonls,max_seq_length,input_packing_config,packing_boundary,\
+    attention_boundary,num_training_splits,num_dev_splits,num_test_splits,dev_ratio,test_ratio",
     [
         (
             "pipeline_test",
@@ -161,6 +161,7 @@ def test_data_prep(
             "prompt",
             "completion",
             "False",
+            True,
             True,
             1024,
             PackingConfig.get_default(),
@@ -180,6 +181,7 @@ def test_data_prep(
             "completion",
             "False",
             False,
+            True,
             1024,
             PackingConfig.get_default(),
             BoundaryType.JSONL,
@@ -198,6 +200,7 @@ def test_data_prep(
             "completion",
             "False",
             False,
+            True,
             1024,
             PackingConfig.get_default(),
             BoundaryType.JSONL,
@@ -216,6 +219,7 @@ def test_data_prep(
             "completion",
             "False",
             False,
+            True,
             1024,
             PackingConfig.from_str("single::drop"),
             BoundaryType.JSONL,
@@ -234,6 +238,7 @@ def test_data_prep(
             "completion",
             "False",
             False,
+            True,
             1024,
             PackingConfig.from_str("single::truncate_right"),
             BoundaryType.JSONL,
@@ -252,6 +257,7 @@ def test_data_prep(
             "completion",
             "False",
             False,
+            True,
             1024,
             PackingConfig.from_str("greedy::drop"),
             BoundaryType.PROMPT_COMPLETION_PAIR,
