@@ -157,7 +157,7 @@ def test_data_prep(
 
 @pytest.mark.parametrize(
     "test_name,disable_space_separator,keep_prompt_only_sequences,prompt_keyword,completion_keyword,\
-    shuffle,do_not_balance_hdf5,do_not_delete_split_jsonls,max_seq_length,input_packing_config,packing_boundary,\
+    shuffle,do_not_balance_hdf5,keep_split_jsonls,max_seq_length,input_packing_config,packing_boundary,\
     attention_boundary,num_training_splits,num_dev_splits,num_test_splits,dev_ratio,test_ratio",
     [
         (
@@ -303,7 +303,7 @@ def test_pipeline(
     completion_keyword: str,
     shuffle: str,
     do_not_balance_hdf5: bool,
-    do_not_delete_split_jsonls: bool,
+    keep_split_jsonls: bool,
     max_seq_length: int,
     input_packing_config: PackingConfig,
     packing_boundary: BoundaryType,
@@ -333,7 +333,7 @@ def test_pipeline(
             overwrite_output_path=False,
             num_workers=num_workers,
             do_not_balance_hdf5=do_not_balance_hdf5,
-            do_not_delete_split_jsonls=do_not_delete_split_jsonls,
+            keep_split_jsonls=keep_split_jsonls,
             max_seq_length=max_seq_length,
             input_packing_config=input_packing_config,
             packing_boundary=packing_boundary,
@@ -347,7 +347,7 @@ def test_pipeline(
 
         check_pipeline(output_dir, gold_path)
 
-        if do_not_delete_split_jsonls:
+        if keep_split_jsonls:
             check_splits(output_dir, gold_path)
         else:
             check_no_split_dir(output_dir, gold_path)

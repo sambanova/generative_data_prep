@@ -133,7 +133,7 @@ def add_pipeline_args(subparser: argparse.ArgumentParser):
         decrease this number.",  # noqa: E251
     )
     subparser.add_argument(
-        "--do_not_delete_split_jsonls",
+        "--keep_split_jsonls",
         action="store_true",
         help="If you DO NOT want to delete split jsonls files that are in text format, include this flag. \
         The only reason you would include this flag is if you want to see what text is in what hdf5. \
@@ -288,7 +288,7 @@ if __name__ == "__main__":
             args.overwrite_output_path,
             args.num_workers,
             args.do_not_balance_hdf5,
-            args.do_not_delete_split_jsonls,
+            args.keep_split_jsonls,
             args.max_seq_length,
             args.input_packing_config,
             args.packing_boundary,
