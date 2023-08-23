@@ -47,7 +47,7 @@ pip install .
 - Support for linux and mac OS. Not tested on Windows
 
 ## Introduction
-The `generative_data_prep/data_prep/pipeline.py` script is designed to facilitate end-to-end data preparation for training machine learning models. This script takes a single [jsonline](https://jsonlines.org/) or text file as input, shuffles it, splits it into multiple train/dev/test files, then calls `generative_data_prep/data_prep/data_prep.py` on all the splits to tokenize the text, pack into fixed length sequences and convert to [HDF5 format](https://www.geeksforgeeks.org/hdf5-files-in-python/). The output `hdf5` directory can be used directly for training.
+The `generative_data_prep/data_prep/pipeline.py` script is designed to facilitate end-to-end data preparation for training machine learning models. This script takes a single [jsonline](https://jsonlines.org/) or text file as input, shuffles it, splits it into multiple train/dev/test files, then calls `generative_data_prep/data_prep/data_prep.py` on all the splits to tokenize the text, pack into fixed length sequences and convert to [HDF5 format](https://www.geeksforgeeks.org/hdf5-files-in-python/). The file path passed in to this repo as `output_path` can be used directly as a training dataset.
 
 The `generative_data_prep/data_prep/data_prep.py` script is used for tokenizing a single [jsonline](https://jsonlines.org/) or text file, packing it into fixed length sequences and converting it to [HDF5 format](https://www.geeksforgeeks.org/hdf5-files-in-python/).  However, when training with SambaStudio, multiple split HDF5 files are needed to run data parallel training. Therefore, unless you already have multiple split input files that you want to tokenize directly, we recommend using the `pipeline.py` script for end-to-end data preparation.
 
@@ -70,7 +70,7 @@ python3 -m generative_data_prep pipeline --input_file_path=path_to_jsonl.jsonl -
 ```
 
 ### Output
-The output directory will have 2 sub-directories. `splits` holds the shuffled and split files `hdf5` holds the tokenized versions of the files from the `splits` directory. The `hdf5` subdirectory is what you will use as your input data to upload and run training.
+The output directory will have 2 sub-directories. `splits` holds the shuffled and split files `hdf5` holds the tokenized versions of the files from the `splits` directory. The file path you pass in as the `output_dir` flag is where the data is saved that you will use as your input data to upload and run training.
 
 The output hdf5 files each contain two datasets:
 - \"input_ids\": sequences of tokens ids

@@ -24,7 +24,13 @@ from transformers import GPT2Tokenizer, PreTrainedTokenizerBase
 from generative_data_prep.data_prep import data_prep_main, pipeline_main
 from generative_data_prep.utils import BoundaryType, PackingConfig
 
-from .test_utils import check_balance, check_diff_hdf5, check_pipeline
+from .test_utils import (
+    check_balance,
+    check_diff_hdf5,
+    check_no_split_dir,
+    check_pipeline,
+    check_splits,
+)
 
 TOKENIZER = GPT2Tokenizer.from_pretrained("gpt2")
 
@@ -151,8 +157,8 @@ def test_data_prep(
 
 @pytest.mark.parametrize(
     "test_name,disable_space_separator,keep_prompt_only_sequences,prompt_keyword,completion_keyword,\
-    shuffle,do_not_balance_hdf5,max_seq_length,input_packing_config,packing_boundary,attention_boundary,\
-    num_training_splits,num_dev_splits,num_test_splits,dev_ratio,test_ratio",
+    shuffle,do_not_balance_hdf5,keep_split_jsonls,max_seq_length,input_packing_config,packing_boundary,\
+    attention_boundary,num_training_splits,num_dev_splits,num_test_splits,dev_ratio,test_ratio",
     [
         (
             "pipeline_test",
@@ -161,6 +167,7 @@ def test_data_prep(
             "prompt",
             "completion",
             "False",
+            True,
             True,
             1024,
             PackingConfig.get_default(),
@@ -180,6 +187,7 @@ def test_data_prep(
             "completion",
             "False",
             False,
+            True,
             1024,
             PackingConfig.get_default(),
             BoundaryType.JSONL,
@@ -198,6 +206,7 @@ def test_data_prep(
             "completion",
             "False",
             False,
+            True,
             1024,
             PackingConfig.get_default(),
             BoundaryType.JSONL,
@@ -216,6 +225,26 @@ def test_data_prep(
             "completion",
             "False",
             False,
+            True,
+            1024,
+            PackingConfig.from_str("single::drop"),
+            BoundaryType.JSONL,
+            BoundaryType.JSONL,
+            32,
+            0,
+            0,
+            None,
+            None,
+        ),
+        (
+            "no_split_dir",
+            False,
+            True,
+            "prompt",
+            "completion",
+            "False",
+            False,
+            True,
             1024,
             PackingConfig.from_str("single::drop"),
             BoundaryType.JSONL,
@@ -234,6 +263,7 @@ def test_data_prep(
             "completion",
             "False",
             False,
+            True,
             1024,
             PackingConfig.from_str("single::truncate_right"),
             BoundaryType.JSONL,
@@ -252,6 +282,7 @@ def test_data_prep(
             "completion",
             "False",
             False,
+            True,
             1024,
             PackingConfig.from_str("greedy::drop"),
             BoundaryType.PROMPT_COMPLETION_PAIR,
@@ -272,6 +303,7 @@ def test_pipeline(
     completion_keyword: str,
     shuffle: str,
     do_not_balance_hdf5: bool,
+    keep_split_jsonls: bool,
     max_seq_length: int,
     input_packing_config: PackingConfig,
     packing_boundary: BoundaryType,
@@ -301,6 +333,7 @@ def test_pipeline(
             overwrite_output_path=False,
             num_workers=num_workers,
             do_not_balance_hdf5=do_not_balance_hdf5,
+            keep_split_jsonls=keep_split_jsonls,
             max_seq_length=max_seq_length,
             input_packing_config=input_packing_config,
             packing_boundary=packing_boundary,
@@ -311,7 +344,13 @@ def test_pipeline(
             dev_ratio=dev_ratio,
             test_ratio=test_ratio,
         )
+
         check_pipeline(output_dir, gold_path)
 
+        if keep_split_jsonls:
+            check_splits(output_dir, gold_path)
+        else:
+            check_no_split_dir(output_dir, gold_path)
+
         if not do_not_balance_hdf5:
-            check_balance(os.path.join(output_dir, "hdf5"))
+            check_balance(os.path.join(output_dir))

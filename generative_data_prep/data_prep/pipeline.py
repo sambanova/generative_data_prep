@@ -282,6 +282,7 @@ def pipeline_main(  # noqa: C901
     overwrite_output_path: bool,
     num_workers: int,
     do_not_balance_hdf5: bool,
+    keep_split_jsonls: bool,
     max_seq_length: int,
     input_packing_config: PackingConfig,
     packing_boundary: BoundaryType,
@@ -308,6 +309,7 @@ def pipeline_main(  # noqa: C901
         overwrite_output_path: Whether the output path should be deleted and over-written
         num_workers: Number of workers to use for multiprocessing
         do_not_balance_hdf5: If true, do not re-balance hdf5 files.
+        keep_split_jsonls: If true, do not delete split jsonl files.
         max_seq_length: Maximum sequence length of the model.
         input_packing_config: Packing style used during tokenization.
         packing_boundary: How to define the boundary when packing text.
@@ -355,10 +357,7 @@ def pipeline_main(  # noqa: C901
     split_dir = os.path.join(output_dir, "splits")
     verify_output_dir(split_dir, False)
 
-    hdf5_dir = os.path.join(output_dir, "hdf5")
-    verify_output_dir(hdf5_dir, False)
-
-    tokenizer_dir = os.path.join(hdf5_dir, "tokenizer")
+    tokenizer_dir = os.path.join(output_dir, "tokenizer")
     verify_output_dir(tokenizer_dir, True)
     tokenizer.save_pretrained(tokenizer_dir)
 
@@ -446,7 +445,7 @@ def pipeline_main(  # noqa: C901
     train_hdf5_files, dev_hdf5_files = multiprocess_data_prep(
         files_to_tokenize,
         split_dir,
-        hdf5_dir,
+        output_dir,
         max_seq_length,
         input_packing_config,
         packing_boundary,
@@ -462,7 +461,9 @@ def pipeline_main(  # noqa: C901
         prompt_postfix,
     )
 
-    print(f"Tokenization is complete, the outputs are in {hdf5_dir}, the held out test files are located at {test_dir}")
+    print(
+        f"Tokenization is complete, the outputs are in {output_dir}, the held out test files are located at {test_dir}"
+    )
     print(SEP_STR)
 
     # Balance hdf5 files so they all have the same number of sequences to within 1
@@ -475,5 +476,8 @@ def pipeline_main(  # noqa: C901
         print("Balancing hdf5 files to ensure they have the same number of sequences")
         balance_hdf5_files(train_hdf5_files)
         balance_hdf5_files(dev_hdf5_files)
-        print(f"Hdf5 balancing is complete, the outputs are located at {hdf5_dir}")
+        print(f"Hdf5 balancing is complete, the outputs are located at {output_dir}")
         print(SEP_STR)
+
+    if not keep_split_jsonls:
+        os.rmdir(split_dir)
