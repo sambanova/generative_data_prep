@@ -45,7 +45,7 @@ class PackingConfig:
 
         # error handling
         if self.packing_style is PackingStyleType.FULL and self.overflow_type:
-            err_msg_1 = 'No overflow type cannot be specified for "FULL" packing style.'
+            err_msg_1 = 'No overflow type can be specified for "FULL" packing style.'
             err_msg_2 = f"Found overflow type: {self.overflow_type}"
             raise ValueError(f"{err_msg_1} {err_msg_2}")
 
