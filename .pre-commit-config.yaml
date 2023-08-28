@@ -37,6 +37,7 @@ repos:
   hooks:
   - id: pipenv-lock
     name: Generate pipenv Lock Files for Python Package
+    stages: [manual]
     language: system
     entry: bash -c 'source .circleci/VERSIONS &&
             test ${CIRCLECI} = "true" &&
