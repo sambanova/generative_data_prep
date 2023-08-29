@@ -35,14 +35,11 @@ jobs:
       - run:
           # NOTE: Requires redundant "pip install -U pip" command to avoid OSError
           name: Run Pre-commit
-          # TODO: DEVV-329, DEVV-330, DEVV-333; Fix existing issues with flake8, bandit, & pip-tools
-          # pre-commit run --all-files
           command: |
             source .circleci/VERSIONS && pip install pipenv==${PIPENV_VERSION}
             pipenv sync --categories tests-packages
-            pipenv run pre-commit run
+            pipenv run pre-commit run --all-files
             pipenv check
-            pipenv run pre-commit run --all-files flake8
       - save_cache:
           key: v1-{{ arch }}-{{ checksum "pyproject.toml" }}-{{ checksum "circleci_cache_key" }}
           paths:
