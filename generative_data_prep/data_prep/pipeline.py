@@ -18,6 +18,7 @@ Data preparation pipeline for converting a jsonl file to tokenized hdf5 files co
 
 import os
 import random
+import shutil
 from multiprocessing import Pool
 from sys import platform
 from typing import List, Optional, Tuple
@@ -480,4 +481,4 @@ def pipeline_main(  # noqa: C901
         print(SEP_STR)
 
     if not keep_split_jsonls:
-        os.rmdir(split_dir)
+        shutil.rmtree(split_dir)
