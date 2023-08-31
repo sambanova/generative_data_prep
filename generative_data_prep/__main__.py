@@ -126,7 +126,7 @@ def add_pipeline_args(subparser: argparse.ArgumentParser):
     )
     subparser.add_argument(
         "--num_workers",
-        default=cpu_count(),
+        default=min(cpu_count(), 16),
         type=int,
         required=False,
         help="The number of CPU workers to multi-process run tokenization over, if the previous run failed you need to \
