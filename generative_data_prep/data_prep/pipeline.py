@@ -19,7 +19,7 @@ Data preparation pipeline for converting a jsonl file to tokenized hdf5 files co
 import os
 import random
 import shutil
-from multiprocessing import Pool
+from multiprocessing import Pool, set_start_method
 from sys import platform
 from typing import List, Optional, Tuple
 
@@ -37,6 +37,8 @@ from generative_data_prep.utils import (
     large_file_shuffle,
     verify_output_dir,
 )
+
+set_start_method("spawn")
 
 
 def split_file_linux(num_splits: int, input_file_path: str, split_dir: str) -> None:
@@ -334,6 +336,7 @@ def pipeline_main(  # noqa: C901
     Raises:
         RuntimeError: If shuffling on RAM is not possible
     """
+    print(os.getpid())
     # print input file information
     input_file_size_in_bytes = os.stat(input_file_path).st_size
     input_file_size_in_gb = input_file_size_in_bytes / (1024**3)

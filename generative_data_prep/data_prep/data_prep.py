@@ -19,6 +19,7 @@ Endpoint for tokenizing a jsonl file into a jsonl file.
 from __future__ import absolute_import
 
 import os
+import signal
 import sys
 from typing import Optional
 
@@ -27,6 +28,50 @@ from transformers import PreTrainedTokenizerBase
 from generative_data_prep.data_buffers import Hdf5FileBuffer
 from generative_data_prep.processors import ArticleTokenizer
 from generative_data_prep.utils import BoundaryType, FileExtension, PackingConfig
+
+
+# Function to handle termination signals
+def handle_termination(signum):
+    """Prints the singal that has terminated this process and the raise a ChildProcessError.
+
+    Args:
+        signum: What signal is killing this process
+
+    Raises:
+        ChildProcessError: Error to raise when this process has been killed
+    """
+    if signum == signal.SIGINT:
+        print("Received interrupt signal (SIGINT). Cleaning up...")
+    elif signum == signal.SIGTERM:
+        print("Received termination signal (SIGTERM). Cleaning up...")
+    elif signum == signal.SIGHUP:
+        print("Received hangup signal (SIGHUP). Cleaning up...")
+    elif signum == signal.SIGQUIT:
+        print("Received quit signal (SIGQUIT). Cleaning up...")
+    elif signum == signal.SIGSEGV:
+        print("Received segmentation fault signal (SIGSEGV). Cleaning up...")
+    elif signum == signal.SIGILL:
+        print("Received illegal instruction signal (SIGILL). Cleaning up...")
+    elif signum == signal.SIGBUS:
+        print("Received bus error signal (SIGBUS). Cleaning up...")
+    elif signum == signal.SIGFPE:
+        print("Received floating-point exception signal (SIGFPE). Cleaning up...")
+    else:
+        print(f"Received signal {signum}. Cleaning up...")
+    # Add your cleanup code here
+    raise ChildProcessError(f"Child process {os.getpid()} received termination signal {signum}")
+
+
+def create_termination_handles():
+    """Add handlers to handle any signal that can kill this process."""
+    signal.signal(signal.SIGINT, handle_termination)
+    signal.signal(signal.SIGTERM, handle_termination)
+    signal.signal(signal.SIGHUP, handle_termination)
+    signal.signal(signal.SIGQUIT, handle_termination)
+    signal.signal(signal.SIGSEGV, handle_termination)
+    signal.signal(signal.SIGILL, handle_termination)
+    signal.signal(signal.SIGBUS, handle_termination)
+    signal.signal(signal.SIGFPE, handle_termination)
 
 
 def data_prep_main(
@@ -64,6 +109,8 @@ def data_prep_main(
         prompt_prefix: text to add before the prompt, for chatML conventions use.
         prompt_postfix: text to add after the prompt, for chatML conventions use.
     """
+    print(f"the OS processes id: {os.getpid()}")
+
     if silent:
         sys.stdout = open(os.devnull, "w")
 
