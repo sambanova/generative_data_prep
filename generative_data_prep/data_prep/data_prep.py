@@ -20,7 +20,7 @@ from __future__ import absolute_import
 
 import os
 import sys
-from typing import Optional
+from typing import Dict, Optional
 
 from transformers import PreTrainedTokenizerBase
 
@@ -42,6 +42,7 @@ def data_prep_main(
     keep_prompt_only_sequences: bool,
     prompt_keyword: str,
     completion_keyword: str,
+    category_to_id: Optional[Dict[str, int]] = None,
     prompt_prefix: Optional[str] = None,
     prompt_postfix: Optional[str] = None,
 ):
@@ -61,6 +62,7 @@ def data_prep_main(
         prompt_keyword: Prompt keyword to use as key in jsonl.
         completion_keyword: Completion keyword to use as key in jsonl.
         disable_space_separator: Disable adding space separator if true.
+        category_to_id: Dictionary that maps category ids to categories.
         prompt_prefix: text to add before the prompt, for chatML conventions use.
         prompt_postfix: text to add after the prompt, for chatML conventions use.
     """
@@ -79,6 +81,7 @@ def data_prep_main(
         keep_prompt_only_sequences,
         prompt_keyword,
         completion_keyword,
+        category_to_id,
         prompt_prefix,
         prompt_postfix,
     )

@@ -260,6 +260,30 @@ def get_output_dir(cmd, output_path, overwrite_output_path):
     return output_dir
 
 
+def get_categories(categories_path: str):
+    """Returns a dictionary mapping each category to the corresponding ID.
+
+    Args:
+        categories_path: The path to a json file
+    """
+    category_to_id = None
+    if categories_path is not None:
+        category_to_id = {}
+        if os.path.exists(categories_path):
+            _, file_extension = os.path.splitext(categories_path)
+            if file_extension != ".json":
+                raise ValueError(f"Your --category_path flag must point to a json file, you used {categories_path}")
+            with open(categories_path, "r") as categories_file:
+                categories_list = json.load(categories_file)
+        else:
+            raise ValueError("Invalid category file path {}, does not exist")
+
+        for id, category in enumerate(categories_list):
+            category_to_id[category] = id
+
+    return category_to_id
+
+
 if __name__ == "__main__":
     args = get_args()
     if os.path.splitext(args.input_file_path)[1] not in FileExtension.as_list():
@@ -274,6 +298,7 @@ if __name__ == "__main__":
         args.merges_file,
         args.special_tokens_dict,
     )
+    category_to_id = get_categories(args.categories_path)
 
     if args.cmd == "pipeline":
         pipeline_main(
@@ -298,6 +323,7 @@ if __name__ == "__main__":
             args.num_test_splits,
             args.dev_ratio,
             args.test_ratio,
+            category_to_id,
             args.prompt_prefix,
             args.prompt_postfix,
         )
@@ -315,6 +341,7 @@ if __name__ == "__main__":
             args.keep_prompt_only_sequences,
             args.prompt_keyword,
             args.completion_keyword,
+            category_to_id,
             args.prompt_prefix,
             args.prompt_postfix,
         )

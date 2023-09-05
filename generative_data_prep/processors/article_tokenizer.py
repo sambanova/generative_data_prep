@@ -21,7 +21,7 @@ the SequencePacker class.
 """
 
 import json
-from typing import List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 from transformers import PreTrainedTokenizerBase, logging
 
@@ -57,6 +57,7 @@ class ArticleTokenizer:
         keep_prompt_only_sequences: bool = False,
         prompt_keyword: str = "prompt",
         completion_keyword: str = "completion",
+        category_to_id: Optional[Dict[str, int]] = None,
         prompt_prefix: Optional[str] = None,
         prompt_postfix: Optional[str] = None,
     ):
@@ -80,6 +81,7 @@ class ArticleTokenizer:
                 Defaults to 'prompt'.
             completion_keyword: Keyword to index into loaded json dictionaries to get the completion text.
                 Defaults to 'completion'.
+            category_to_id: Dictionary that maps category ids to categories.
             prompt_prefix: text to add before the prompt, for chatML conventions use.
             prompt_postfix: text to add before the prompt, for chatML conventions use.
 
