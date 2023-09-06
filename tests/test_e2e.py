@@ -310,7 +310,7 @@ def test_data_prep(
             "False",
             False,
             True,
-            1024,
+            2048,
             PackingConfig.from_str("greedy::drop"),
             BoundaryType.PROMPT_COMPLETION_PAIR,
             BoundaryType.JSONL,
