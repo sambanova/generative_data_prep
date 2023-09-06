@@ -368,7 +368,7 @@ def pipeline_main(  # noqa: C901
     verify_output_dir(tokenizer_dir, True)
     tokenizer.save_pretrained(tokenizer_dir)
 
-    if category_to_id != {}:
+    if category_to_id is not None:
         category_to_id_output_file_path = os.path.join(output_dir, "category_to_id.json")
         verify_output_file(category_to_id_output_file_path, overwrite_output_path)
         with open(category_to_id_output_file_path, "w") as f:
