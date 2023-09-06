@@ -31,6 +31,7 @@ from generative_data_prep.tokenized_line import (
     TokenizedSequence,
 )
 from generative_data_prep.utils import (
+    CATEGORY_JSON_KEY,
     BoundaryType,
     FileExtension,
     PackingConfig,
@@ -120,6 +121,7 @@ class ArticleTokenizer:
 
         self.logged_prompt_only_warn_msg_prepack = False
         self.logged_prompt_only_warn_msg_postpack = False
+        self.category_name_to_id = category_to_id
 
     def __call__(self, article: Optional[str]) -> List[TokenizedSequence]:
         """Tokenize and pack input text into tokenized sequence.
@@ -202,7 +204,7 @@ class ArticleTokenizer:
         tokenized_article = TokenizedArticle(tokens)
         return [tokenized_article]
 
-    def process_jsonl(self, jsonl: Union[dict, List]) -> List[TokenizedArticle]:
+    def process_jsonl(self, jsonl: Union[dict, List]) -> List[TokenizedArticle]:  # noqa: C901
         """Tokenize a loaded jsonl and store in a TokenizedArticle object.
 
         Takes in a loaded jsonl, and returns a List of tokenized articles based on self.BoundaryType.
@@ -240,8 +242,19 @@ class ArticleTokenizer:
                     self.logged_prompt_only_warn_msg_prepack = True
                 continue
 
+            category_id = -1
+            if self.category_name_to_id is not None and CATEGORY_JSON_KEY in prompt_completion:
+                category_name = prompt_completion[CATEGORY_JSON_KEY]
+                if category_name not in self.category_name_to_id:
+                    err = f"jsonl found with key {CATEGORY_JSON_KEY} and value {category_name},"
+                    err += (
+                        f" but this category name is not in inputted --categories_path flag {self.category_name_to_id}"
+                    )
+                    raise ValueError(err)
+                category_id = self.category_name_to_id[category_name]
+
             completion, prompt = self._add_space_separator(completion, prompt)
-            tokens += self.tokenize(completion, prompt)
+            tokens += self.tokenize(completion, prompt, category_id)
 
             if self.attention_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and len(tokens) > 0:
                 tokens[-1].make_article_boundary()
@@ -274,7 +287,7 @@ class ArticleTokenizer:
 
         return completion, prompt
 
-    def tokenize(self, completion: str, prompt: Optional[str] = None) -> List[Token]:
+    def tokenize(self, completion: str, prompt: Optional[str] = None, category_id: Optional[int] = -1) -> List[Token]:
         """Tokenize the input prompt and completion.
 
         Call self.tokenizer.encode to convert the input prompt and completion into token ids.
@@ -297,13 +310,13 @@ class ArticleTokenizer:
             if self.prompt_postfix:
                 prompt = prompt + self.prompt_postfix
             prompt_token_ids = self.tokenizer.encode(prompt)
-            tokens += list(map(lambda x: Token(x, TokenTypeIds.PROMPT), prompt_token_ids))
+            tokens += list(map(lambda x: Token(x, TokenTypeIds.PROMPT, category_id), prompt_token_ids))
 
         if completion:
             completion_token_ids = self.tokenizer.encode(completion)
-            tokens += list(map(lambda x: Token(x, TokenTypeIds.COMPLETION), completion_token_ids))
+            tokens += list(map(lambda x: Token(x, TokenTypeIds.COMPLETION, category_id), completion_token_ids))
 
         if len(tokens) >= 1:
-            tokens.append(Token(self.eos_token_id, TokenTypeIds.COMPLETION))
+            tokens.append(Token(self.eos_token_id, TokenTypeIds.COMPLETION, category_id))
 
         return tokens
