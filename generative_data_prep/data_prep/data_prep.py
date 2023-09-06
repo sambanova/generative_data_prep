@@ -86,7 +86,9 @@ def data_prep_main(
         prompt_postfix,
     )
 
-    with Hdf5FileBuffer(output_file, max_seq_length) as hdf5_text_buffer:
+    dump_categories = category_to_id is not None
+
+    with Hdf5FileBuffer(output_file, max_seq_length, dump_categories) as hdf5_text_buffer:
         with open(input_file, "r") as reader:
             for line in reader:
                 hdf5_text_buffer.write(article_tokenizer(line))

@@ -122,6 +122,10 @@ class TokenizedLine(ABC):
         """Return a list of the token type ids from this tokenixed line."""
         return list(map(lambda x: x.token_type_id, self.tokens))
 
+    def dump_category_ids(self):
+        """Return a list of the token type ids from this tokenixed line."""
+        return list(map(lambda x: x.category_id, self.tokens))
+
 
 class TokenizedArticle(TokenizedLine):
     """Represents an article that has been tokenized.

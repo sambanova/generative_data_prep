@@ -36,19 +36,22 @@ class Hdf5FileBuffer(FileBuffer):
         self,
         hdf5_file_path: str,
         max_seq_length: int,
-        data_type: str = "i4",
-        max_chunk_size: int = MEGABYTE,
+        dump_categories: Optional[bool] = False,
+        data_type: Optional[str] = "i4",
+        max_chunk_size: Optional[int] = MEGABYTE,
     ):
         """Initialize Hdf5TextBuffer.
 
         Args:
             hdf5_file_path: Path to the hdf5 file to write to
             max_seq_length: Maximum sequence length of sequences that will be written
+            dump_categories: Whether to dump category_ids into hdf5 files.
             data_type: Data type to write into hdf5 file. Defaults to 'i4'.
             max_chunk_size: How large chunks to write into hdf5 at once. Defaults to 1 MEGABYTE.
         """
         self.hdf5_file_path = hdf5_file_path
         self.max_seq_length = max_seq_length
+        self.dump_categories = dump_categories
         self.data_type = data_type
         data_type_size = np.dtype(data_type).itemsize
         self.max_chunk_length = int(max_chunk_size / (max_seq_length * data_type_size))
@@ -121,6 +124,8 @@ class Hdf5FileBuffer(FileBuffer):
 
         dump_token_ids = list(map(lambda seq: seq.dump_token_ids(), chunk))
         dump_token_type_ids = list(map(lambda seq: seq.dump_token_type_ids(), chunk))
+        if self.dump_categories:
+            dump_category_ids = list(map(lambda seq: seq.dump_category_ids(), chunk))
 
         if self.first_dump:
             self.hdf5_file.create_dataset(
@@ -137,6 +142,14 @@ class Hdf5FileBuffer(FileBuffer):
                 compression="gzip",
                 maxshape=(None, self.max_seq_length),
             )
+            if self.dump_categories:
+                self.hdf5_file.create_dataset(
+                    "category_ids",
+                    data=dump_category_ids,
+                    dtype=self.data_type,
+                    compression="gzip",
+                    maxshape=(None, self.max_seq_length),
+                )
         else:
             num_dump_seq = len(chunk)
             new_shape = (
@@ -146,6 +159,8 @@ class Hdf5FileBuffer(FileBuffer):
 
             self._dump_data("input_ids", new_shape, dump_token_ids)
             self._dump_data("token_type_ids", new_shape, dump_token_type_ids)
+            if self.dump_categories:
+                self._dump_data("category_ids", new_shape, dump_category_ids)
 
         self.first_dump = False
 
