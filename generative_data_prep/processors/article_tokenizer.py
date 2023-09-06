@@ -204,7 +204,27 @@ class ArticleTokenizer:
         tokenized_article = TokenizedArticle(tokens)
         return [tokenized_article]
 
-    def process_jsonl(self, jsonl: Union[dict, List]) -> List[TokenizedArticle]:  # noqa: C901
+    def get_category_id(self, prompt_completion):
+        """Extract the category id metadata from the category_id key of the loaded jsonl.
+
+        Args:
+            prompt_completion: The loaded jsonl.
+
+        Returns:
+            The category ID of the jsonl, save this metadata in HDF5 files.
+        """
+        category_id = -1
+        if self.category_to_id is not None and CATEGORY_JSON_KEY in prompt_completion:
+            category_name = prompt_completion[CATEGORY_JSON_KEY]
+            if category_name not in self.category_to_id:
+                err = f"jsonl found with key {CATEGORY_JSON_KEY} and value {category_name},"
+                err += f" but this category name is not in inputted --categories_path flag {self.category_to_id}"
+                raise ValueError(err)
+            category_id = self.category_to_id[category_name]
+
+        return category_id
+
+    def process_jsonl(self, jsonl: Union[dict, List]) -> List[TokenizedArticle]:
         """Tokenize a loaded jsonl and store in a TokenizedArticle object.
 
         Takes in a loaded jsonl, and returns a List of tokenized articles based on self.BoundaryType.
@@ -242,15 +262,7 @@ class ArticleTokenizer:
                     self.logged_prompt_only_warn_msg_prepack = True
                 continue
 
-            category_id = -1
-            if self.category_to_id is not None and CATEGORY_JSON_KEY in prompt_completion:
-                category_name = prompt_completion[CATEGORY_JSON_KEY]
-                if category_name not in self.category_to_id:
-                    err = f"jsonl found with key {CATEGORY_JSON_KEY} and value {category_name},"
-                    err += f" but this category name is not in inputted --categories_path flag {self.category_to_id}"
-                    raise ValueError(err)
-                category_id = self.category_to_id[category_name]
-
+            category_id = self.get_category_id(prompt_completion)
             completion, prompt = self._add_space_separator(completion, prompt)
             tokens += self.tokenize(completion, prompt, category_id)
 
