@@ -272,7 +272,7 @@ def get_categories(categories_path: str):
         if os.path.exists(categories_path):
             _, file_extension = os.path.splitext(categories_path)
             if file_extension != ".json":
-                raise ValueError(f"Your --category_path flag must point to a json file, you used {categories_path}")
+                raise ValueError(f"Your --categories_path flag must point to a json file, you used {categories_path}")
             with open(categories_path, "r") as categories_file:
                 categories_list = json.load(categories_file)
         else:

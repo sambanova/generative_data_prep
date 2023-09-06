@@ -202,6 +202,17 @@ def data_prep_arg_builder(parser: argparse.ArgumentParser):
             " truncated such that only prompt tokens remain"
         ),
     )
+    parser.add_argument(
+        "--categories_path",
+        default=None,
+        type=str,
+        required=False,
+        help=(
+            "If you include this flag, then the 'category' field from your input jsonls will be stored in the"
+            " 'category_id' dataset in your output hdf5 files. This flag must point to the file path of a json"
+            " file that contains a list of all the strings of the 'category' keys in your dataset."
+        ),
+    )
 
 
 def execute_and_return_stdout(command):
