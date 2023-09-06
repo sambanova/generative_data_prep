@@ -82,7 +82,7 @@ class ArticleTokenizer:
                 Defaults to 'prompt'.
             completion_keyword: Keyword to index into loaded json dictionaries to get the completion text.
                 Defaults to 'completion'.
-            category_to_id: Dictionary that maps category ids to categories.
+            category_to_id: Dictionary that maps category string names to IDs.
             prompt_prefix: text to add before the prompt, for chatML conventions use.
             prompt_postfix: text to add before the prompt, for chatML conventions use.
 
@@ -121,7 +121,7 @@ class ArticleTokenizer:
 
         self.logged_prompt_only_warn_msg_prepack = False
         self.logged_prompt_only_warn_msg_postpack = False
-        self.category_name_to_id = category_to_id
+        self.category_to_id = category_to_id
 
     def __call__(self, article: Optional[str]) -> List[TokenizedSequence]:
         """Tokenize and pack input text into tokenized sequence.
@@ -243,15 +243,13 @@ class ArticleTokenizer:
                 continue
 
             category_id = -1
-            if self.category_name_to_id is not None and CATEGORY_JSON_KEY in prompt_completion:
+            if self.category_to_id is not None and CATEGORY_JSON_KEY in prompt_completion:
                 category_name = prompt_completion[CATEGORY_JSON_KEY]
-                if category_name not in self.category_name_to_id:
+                if category_name not in self.category_to_id:
                     err = f"jsonl found with key {CATEGORY_JSON_KEY} and value {category_name},"
-                    err += (
-                        f" but this category name is not in inputted --categories_path flag {self.category_name_to_id}"
-                    )
+                    err += f" but this category name is not in inputted --categories_path flag {self.category_to_id}"
                     raise ValueError(err)
-                category_id = self.category_name_to_id[category_name]
+                category_id = self.category_to_id[category_name]
 
             completion, prompt = self._add_space_separator(completion, prompt)
             tokens += self.tokenize(completion, prompt, category_id)

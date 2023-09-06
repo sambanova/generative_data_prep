@@ -275,6 +275,12 @@ def get_categories(categories_path: str):
                 raise ValueError(f"Your --categories_path flag must point to a json file, you used {categories_path}")
             with open(categories_path, "r") as categories_file:
                 categories_list = json.load(categories_file)
+                if not isinstance(categories_list, list):
+                    err_msg = (
+                        "Your --categories_path flag must point to a json file that contains a list of categories,"
+                    )
+                    err_msg += f"the loaded json file instead contains {categories_list}"
+                    raise ValueError(err_msg)
         else:
             raise ValueError("Invalid category file path {}, does not exist")
 

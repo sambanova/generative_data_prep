@@ -62,7 +62,7 @@ def data_prep_main(
         prompt_keyword: Prompt keyword to use as key in jsonl.
         completion_keyword: Completion keyword to use as key in jsonl.
         disable_space_separator: Disable adding space separator if true.
-        category_to_id: Dictionary that maps category ids to categories.
+        category_to_id: Dictionary that maps category string names to IDs.
         prompt_prefix: text to add before the prompt, for chatML conventions use.
         prompt_postfix: text to add after the prompt, for chatML conventions use.
     """

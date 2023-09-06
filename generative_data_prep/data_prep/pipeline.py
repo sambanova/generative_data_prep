@@ -333,7 +333,7 @@ def pipeline_main(  # noqa: C901
         num_test_splits: Number of test splits to create.
         dev_ratio: Ratio of data to use for dev (evaluation).
         test_ratio: Ratio of data to use as test.
-        category_to_id: Dictionary that maps category strings to ids.
+        category_to_id: Dictionary that maps category string names to IDs.
         prompt_prefix: text to add before the prompt, for chatML conventions use.
         prompt_postfix: text to add after the prompt, for chatML conventions use.
 
