@@ -70,7 +70,7 @@ python3 -m generative_data_prep pipeline --input_file_path=path_to_jsonl.jsonl -
 ```
 
 ### Output
-The `output_dir` will contain all the tokenized HDF5 split files, and a directory called `tokenizer`. The directory path that is passed in as the `output_dir` flag is where the final dataset is saved that can be used as input data to upload and run training. The `tokenizer` directory will be transfered to any output checkpoints that are saved by Sambastudio so the tokenizer can be used for inference. If you include the `keep_split_jsonls` flag, then the `output_dir` will additionally contain a `splits` directory that saves the jsonl versions of the HDF5 files, meaning that splits/train_1_of_X.jsonl is the jsonl text version of train_1_of_X.hdf5.
+The `output_path` will contain all the tokenized HDF5 split files, and a directory called `tokenizer`. The directory path that is passed in as the `output_path` flag is where the final dataset is saved that can be used as input data to upload and run training. The `tokenizer` directory will be transfered to any output checkpoints that are saved by Sambastudio so the tokenizer can be used for inference. If you include the `keep_split_jsonls` flag, then the `output_path` will additionally contain a `splits` directory that saves the jsonl versions of the HDF5 files, meaning that splits/train_1_of_X.jsonl is the jsonl text version of train_1_of_X.hdf5.
 
 The output HDF5 files each contain two datasets:
 - \"input_ids\": sequences of tokens ids
@@ -112,7 +112,7 @@ The output HDF5 files each contain two datasets:
 | `num_dev_splits` | int | None | Any int | number of dev (eval) splits. If you do not specify `dev_ratio`, you may specify this flag. If you include this flag, you must also include the `num_test_splits` and `num_training_splits` flags. |
 | `num_test_splits` | int | None | Any int | Number of test splits. If you do not specify `test_ratio`, you may specify num_test_splits. If you include this flag, you must also include the `num_dev_splits` and `num_training_splits` flags. |
 | `do_not_balance_hdf5` | bool | False | Include flag for True, no arguments | Include this flag if you DO NOT want to balance HDF5 files, this is not recommended unless the you are dealing with a huge amount of data (many terra bytes), or do not want shuffling between splits. |
-| `keep_split_jsonls` | bool | False | Include flag for True, no arguments | If you DO NOT want to delete split jsonls files that are in text format in the `output_dir/splits` directory include this flag. The only reason you would include this flag is if you want to see what text is in what HDF5, meaning that splits/train_1_of_X.jsonl is the jsonl text version of train_1_of_X.hdf5. Including this flag will increase the storage space of your dataset by more than two times. |
+| `keep_split_jsonls` | bool | False | Include flag for True, no arguments | If you DO NOT want to delete split jsonls files that are in text format in the `output_path/splits` directory include this flag. The only reason you would include this flag is if you want to see what text is in what HDF5, meaning that splits/train_1_of_X.jsonl is the jsonl text version of train_1_of_X.hdf5. Including this flag will increase the storage space of your dataset by more than two times. |
 | `num_workers` | int | False | 0 <= `num_workers`<= # of available CPUs | The number of CPU workers to run tokenization with, if the previous run failed due to OOM, you need to decrease this number. |
 </details>
 
