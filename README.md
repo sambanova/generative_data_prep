@@ -24,7 +24,9 @@ This software package is designed for preparing data that can be used to train g
 - [Introduction](#introduction)
 - [Input format](#input-format)
 - [End to end data preparation](#end-to-end-data-preparation)
+    - [Input Flags](#flags)
 - [Tokenizing one file](#tokenizing-one-file)
+    - [Input Flags](#tokenize-one-file-flags)
 - [Running tests](#running-tests)
 - [Example use cases](#example-use-cases)
     - [Pretraining](#pretraining)
@@ -80,6 +82,22 @@ The output HDF5 files each contain two datasets:
   - id=2 for \<eos\> tokens that serve as padding tokens (will not be trained to predict)
   - id=3 for \<eos\> tokens at the end of articles, that define the attention boundary when training with article attention
 
+### Holdout Evaluation Data
+To evaluate on a holdout set of data during training, pipeline.py can create splits of holdout evaluation data.
+
+To do this, include flags from only one of the two options below, only use one option or the other. Please review the [Flags](#flags) section for in detail descriptions of these flags.
+- To specify the number of training splits and evaluation splits directly, use the three flags `--num_training_splits=...`, `--num_dev_splits=...` and `--num_test_splits=...`
+- To specify the percentage of the data heldout for evaluation, you can specify `--dev_ratio=0.1` and `--test_ratio=...`, where 0.1 means that approximately 10% of the data will be included in the evaluation splits. You can also specify the `--num_training_splits=...` flag to control the total number of training splits, but we recommend to let this default.
+
+All this evaluation data will saved under the `output_path`, if you want to run evaluation on the eval_splits during training you must enable `do_eval` on SambaStudio.
+
+### Holdout Test Data
+To create a holdout set of test data that is not tokenized, pipeline.py can create these splits and will leave the data un-tokenized and save it in the `output_path/test` directory. This data is left in jsonl text format because running evaluation or inference usually requires text inputs instead of tokenized inputs.
+
+To do this, include flags from only one of the two options below, only use one option or the other. Please review the [Flags](#tokenize-one-file-flags) section for in detail descriptions of these flags.
+- To specify the number of training splits and test splits directly, use the three flags `--num_training_splits=...`, `--num_dev_splits=...` and `--num_test_splits=...`
+- To specify the percentage of the data heldout for testing, you can specify `--dev_ratio=...` and `--test_ratio=0.1`, where 0.1 means that approximately 10% of the data will be included in the test splits. You can also specify the `--num_training_splits=...` flag to control the total number of training splits, but we recommend to let this default.
+
 ### Flags
 <details>
   <summary>CLICK HERE to see flags</summary>
@@ -134,7 +152,7 @@ Each HDF5 file contains two datasets:
   - id=2 for \<eos\> tokens that serve as padding tokens
   - id=3 for \<eos\> tokens at the end of articles, that serve as separators
 
-### Flags
+### Tokenize One File Flags
 <details>
   <summary>CLICK HERE to see flags</summary>
 
