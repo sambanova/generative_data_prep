@@ -139,7 +139,7 @@ def test_hfd5_text_buffer_write(
     """Test hdf5 text buffer write function to make sure it properly writes."""
     with tempfile.TemporaryDirectory() as output_dir:
         hdf5_file_path = os.path.join(output_dir, "temp.hdf5")
-        with Hdf5FileBuffer(hdf5_file_path, max_seq_length1, DATA_TYPE, chunk_size) as f:
+        with Hdf5FileBuffer(hdf5_file_path, max_seq_length1, False, DATA_TYPE, chunk_size) as f:
             for i in range(num_iterations):
                 tokenized_line_copy = tokenized_line[:]
                 tokens_ids = list(map(lambda x: x + i, tokenized_line_copy.dump_token_ids()))
