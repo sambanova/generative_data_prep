@@ -16,6 +16,7 @@ limitations under the License.
 Data preparation pipeline for converting a jsonl file to tokenized hdf5 files consumable by SambaSuite.
 """
 
+import concurrent.futures
 import json
 import os
 import random
@@ -189,6 +190,11 @@ def get_split_counts(
     return train_count, dev_count, test_count, num_splits
 
 
+def data_prep_main_helper(args: list):
+    """Helper function to apply the star operator on the arguments when calling the data_prep_main function."""
+    data_prep_main(*args)
+
+
 def multiprocess_data_prep(
     files_to_tokenize: List[str],
     split_dir: str,
@@ -269,8 +275,31 @@ def multiprocess_data_prep(
             )
         )
 
-    with Pool(num_workers) as p:
-        _ = p.starmap(data_prep_main, data_prep_main_args_list)
+    futures = []
+    with concurrent.futures.ProcessPoolExecutor(max_workers=num_workers) as executor:
+        futures = [executor.submit(data_prep_main_helper, args) for args in data_prep_main_args_list]
+
+    # if one process fails with an exception such as a RuntimeError, all other processes will fail with a
+    # BrokenProcessPool exception.  In such a situation we only want to show the user the RuntimeError.  We only want
+    # to show the user the BrokenProcessPool exception if all failing processes failed with this error.  This
+    # is why we have this complicated logic below.
+    broken_process_indices = []
+    broken_process_pool_exc = None
+    # search for any "interesting" exception (a non-BrokenProcessPool Exception)
+    for i, future in enumerate(futures):
+        try:
+            future.result()
+        except Exception as exc:
+            if isinstance(exc, concurrent.futures.process.BrokenProcessPool):
+                broken_process_indices.append(str(i))
+                broken_process_pool_exc = exc
+            else:
+                print(f'\n\nProcess {i} failed with the following exception:')
+                raise exc from None
+    # if no "interesting" exceptions are found, raise the BrokenProcessPool Exception
+    if len(broken_process_indices) > 0:
+        print(f'\n\nProcesses {", ".join(broken_process_indices)} failed with the following exception:')
+        raise broken_process_pool_exc
 
     return train_hdf5_files, dev_hdf5_files
 
