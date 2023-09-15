@@ -299,7 +299,7 @@ def multiprocess_data_prep(
     if len(broken_process_indices) > 0:
         print(f'\n\nProcesses {", ".join(broken_process_indices)} failed with the following exception:')
         assert broken_process_pool_exc is not None  # nosec: B101
-        raise broken_process_pool_exc
+        raise broken_process_pool_exc from None
 
     return train_hdf5_files, dev_hdf5_files
 
