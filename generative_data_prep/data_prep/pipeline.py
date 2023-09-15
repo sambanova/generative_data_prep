@@ -22,7 +22,7 @@ import os
 import random
 import shutil
 from sys import platform
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import numpy as np
 import psutil
@@ -189,7 +189,7 @@ def get_split_counts(
     return train_count, dev_count, test_count, num_splits
 
 
-def data_prep_main_helper(args: list):
+def data_prep_main_helper(args: Iterable[Any]):
     """Helper function to apply the star operator on the arguments when calling the data_prep_main function."""
     data_prep_main(*args)
 
@@ -283,7 +283,7 @@ def multiprocess_data_prep(
     # to show the user the BrokenProcessPool exception if all failing processes failed with this error.  This
     # is why we have this complicated logic below.
     broken_process_indices = []
-    broken_process_pool_exc = None
+    broken_process_pool_exc: Optional[BaseException] = None
     # search for any "interesting" exception (a non-BrokenProcessPool Exception)
     for i, future in enumerate(futures):
         try:
@@ -293,11 +293,12 @@ def multiprocess_data_prep(
                 broken_process_indices.append(str(i))
                 broken_process_pool_exc = exc
             else:
-                print(f'\n\nProcess {i} failed with the following exception:')
+                print(f"\n\nProcess {i} failed with the following exception:")
                 raise exc from None
     # if no "interesting" exceptions are found, raise the BrokenProcessPool Exception
     if len(broken_process_indices) > 0:
         print(f'\n\nProcesses {", ".join(broken_process_indices)} failed with the following exception:')
+        assert broken_process_pool_exc is not None  # nosec: B101
         raise broken_process_pool_exc
 
     return train_hdf5_files, dev_hdf5_files
