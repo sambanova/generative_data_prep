@@ -293,7 +293,9 @@ def multiprocess_data_prep(
                 broken_process_indices.append(str(i))
                 broken_process_pool_exc = exc
             else:
-                print(f"\n\nProcess {i} failed with the following exception:")
+                err_msg_1 = f"Process {i} failed with the exception below."
+                err_msg_2 = "If the error is a MemoryError, reduce the number of workers to limit your RAM usage."
+                print(f"\n\n{err_msg_1}\n{err_msg_2}")
                 raise exc from None
     # if no "interesting" exceptions are found, raise the BrokenProcessPool Exception
     if len(broken_process_indices) > 0:
