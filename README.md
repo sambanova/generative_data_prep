@@ -72,7 +72,7 @@ python3 -m generative_data_prep pipeline --input_file_path=path_to_jsonl.jsonl -
 ```
 
 ### Output
-The `output_path` will contain all the tokenized HDF5 split files, and a directory called `tokenizer`. The directory path that is passed in as the `output_path` flag is where the final dataset is saved that can be used as input data to upload and run training. The `tokenizer` directory will be transfered to any output checkpoints that are saved by Sambastudio so the tokenizer can be used for inference. If you include the `keep_split_jsonls` flag, then the `output_path` will additionally contain a `splits` directory that saves the jsonl versions of the HDF5 files, meaning that splits/train_1_of_X.jsonl is the jsonl text version of train_1_of_X.hdf5.
+The `output_path` will contain all the tokenized HDF5 split files, and a directory called `tokenizer`. The directory path that is passed in as the `output_path` flag is where the final dataset is saved that can be used as input data to upload and run training. The `tokenizer` directory will be transferred to any output checkpoints that are saved by Sambastudio so the tokenizer can be used for inference. If you include the `keep_split_jsonls` flag, then the `output_path` will additionally contain a `splits` directory that saves the jsonl versions of the HDF5 files, meaning that splits/train_1_of_X.jsonl is the jsonl text version of train_1_of_X.hdf5.
 
 The output HDF5 files each contain two datasets:
 - \"input_ids\": sequences of tokens ids
