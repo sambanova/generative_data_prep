@@ -7,7 +7,6 @@ executors:
   python-docker:
     docker:
       - image: cimg/python:3.9
-    # resource_class: sambanova-software/btd-medium
     resource_class: medium
   pip-tools-docker:
     docker:
@@ -77,7 +76,7 @@ jobs:
           when: always
       - run:
           name: Build Python Package
-          command: pipenv run python -m build
+          command: pipenv run hatch build
       - store_test_results:
           path: test_reports/circleci
       - store_artifacts:
