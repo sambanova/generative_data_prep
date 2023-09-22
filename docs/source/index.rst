@@ -1,14 +1,8 @@
-Sambanova Python Template
-=========================
+..
+   Note: Items in this toctree form the top-level navigation. See `api.rst` for the `autosummary` directive, and for why `api.rst` isn't called directly.
 
-
-.. autosummary::
-   :toctree: _autosummary
-   :template: custom-module-template.rst
-   :recursive:
-
-   generative_data_prep
-
+Table of Contents
+=================
 
 .. toctree::
    :maxdepth: 2
@@ -16,3 +10,7 @@ Sambanova Python Template
    Home page <readme_link>
    Contribution Guide <contributing_link>
    Code Documentation <_autosummary/generative_data_prep>
+
+Sambanova Generative Data Preparation
+=====================================
+Welcome to the Sambanova Generative Data Preparation documentation.
