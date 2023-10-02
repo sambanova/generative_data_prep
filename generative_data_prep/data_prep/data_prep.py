@@ -93,3 +93,6 @@ def data_prep_main(
             for line in reader:
                 hdf5_text_buffer.write(article_tokenizer(line))
             hdf5_text_buffer.write(article_tokenizer(None))
+
+    # lets return an object here that stores all the metrics we want to track
+    return article_tokenizer.metrics

@@ -232,10 +232,11 @@ class TokenizedSequence(TokenizedLine):
         self += tokenized_line[:slice_index]
         return tokenized_line[slice_index:]
 
-    def pad(self):
+    def pad(self) -> int:
         """Fill the remaining token ids in the TokenizedSequence with the end of text token."""
         padding_size = self.max_seq_length - len(self)
         self._tokens += [Token(self.eos_token_id, TokenTypeIds.PADDING)] * padding_size
+        return padding_size
 
     def _get_slice(self, slice_index: slice) -> "TokenizedSequence":
         """See base class."""

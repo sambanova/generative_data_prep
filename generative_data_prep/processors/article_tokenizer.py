@@ -38,6 +38,7 @@ from generative_data_prep.utils import (
     TokenTypeIds,
 )
 
+from .metrics import Metrics
 from .sequence_packer import SequencePacker
 
 DEFAULT_PACKING_CONFIG = PackingConfig.get_default()
@@ -114,7 +115,8 @@ class ArticleTokenizer:
         self.prompt_keyword = prompt_keyword
         self.completion_keyword = completion_keyword
         self.eos_token_id = tokenizer.eos_token_id
-        self.packer = SequencePacker(max_seq_length, self.eos_token_id, packing_config)
+        self.metrics = Metrics()
+        self.packer = SequencePacker(max_seq_length, self.eos_token_id, packing_config, self.metrics)
         self.prompt_prefix = prompt_prefix
         self.prompt_postfix = prompt_postfix
         logging.set_verbosity_error()
@@ -141,21 +143,24 @@ class ArticleTokenizer:
         """
         if article is None:
             return self.packer(article)
-
+        self.metrics.articles += 1
         tokenized_articles = []
         if self.file_ext == FileExtension.JSONL:
             # Load from json
             loaded_jsonl = json.loads(article)
             tokenized_articles += self.process_jsonl(loaded_jsonl)
+            self.metrics.prompt_completion_pairs += len(tokenized_articles)
         elif self.file_ext == FileExtension.TXT:
             # Load from txt
             tokenized_articles += self.process_text(article)
+            self.metrics.prompt_completion_pairs += 1
         else:
             err_msg = f"Input file extension {self.file_ext} is invalid,"
             err_msg += f" must be {FileExtension.JSONL} or {FileExtension.TXT}"
             raise ValueError(err_msg)
 
         tokenized_sequences = self.packer(tokenized_articles)
+        self.metrics.sequences += len(tokenized_sequences)
 
         # Check if any sequence in tokenized_sequences contains no completion tokens
         if not self.keep_prompt_only_sequences:
@@ -183,6 +188,7 @@ class ArticleTokenizer:
                     self.logged_prompt_only_warn_msg_postpack = True
                 continue
             filtered_lines.append(line)
+        self.metrics.articles_dropped_from_all_prompt += len(tokenized_lines) - len(filtered_lines)
         return filtered_lines
 
     def process_text(self, text_line: str) -> List[TokenizedArticle]:
@@ -320,13 +326,17 @@ class ArticleTokenizer:
             if self.prompt_postfix:
                 prompt = prompt + self.prompt_postfix
             prompt_token_ids = self.tokenizer.encode(prompt)
+            self.metrics.prompt_tokens += len(prompt_token_ids)
             tokens += list(map(lambda x: Token(x, TokenTypeIds.PROMPT, category_id), prompt_token_ids))
 
         if completion:
             completion_token_ids = self.tokenizer.encode(completion)
+            self.metrics.completion_tokens += len(completion_token_ids)
             tokens += list(map(lambda x: Token(x, TokenTypeIds.COMPLETION, category_id), completion_token_ids))
 
         if len(tokens) >= 1:
             tokens.append(Token(self.eos_token_id, TokenTypeIds.COMPLETION, category_id))
+            self.metrics.completion_tokens += 1
 
+        self.metrics.tokens += len(tokens)
         return tokens

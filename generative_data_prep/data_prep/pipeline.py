@@ -29,6 +29,7 @@ import psutil
 from transformers import PreTrainedTokenizerBase
 
 from generative_data_prep.data_prep import data_prep_main
+from generative_data_prep.processors.metrics import Metrics
 from generative_data_prep.utils import (
     SEP_STR,
     BoundaryType,
@@ -284,10 +285,12 @@ def multiprocess_data_prep(
     # is why we have this complicated logic below.
     broken_process_indices = []
     broken_process_pool_exc: Optional[BaseException] = None
+    metrics = Metrics()
     # search for any "interesting" exception (a non-BrokenProcessPool Exception)
     for i, future in enumerate(futures):
         try:
-            future.result()
+            res_metrucs = future.result()
+            metrics += res_metrucs
         except Exception as exc:
             if isinstance(exc, concurrent.futures.process.BrokenProcessPool):
                 broken_process_indices.append(str(i))
@@ -302,6 +305,8 @@ def multiprocess_data_prep(
         print(f'\n\nProcesses {", ".join(broken_process_indices)} failed with the following exception:')
         assert broken_process_pool_exc is not None  # nosec: B101
         raise broken_process_pool_exc from None
+
+    print(metrics)
 
     return train_hdf5_files, dev_hdf5_files
 
