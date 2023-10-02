@@ -20,6 +20,7 @@ dependencies = [
     "torch",
     "tqdm",
     "transformers",
+    "tabulate"
 ]
 dynamic = ["version"]
 

@@ -22,7 +22,7 @@ the SequencePacker class.
 
 from typing import TypeVar
 
-from generative_data_prep.utils.utils import SEP_STR
+# from tabulate import tabulate
 
 # custom type representing subclasses of Metrics
 MetricsSubClass = TypeVar("MetricsSubClass", bound="Metrics")
@@ -64,56 +64,66 @@ class Metrics:
     def percent_articles_dropped(self) -> float:
         """Percent of the articles dropped due to either packing or all prompt."""
         total_articles_dropped = self.articles_dropped_from_all_prompt + self.articles_dropped_from_packing
-        return round(total_articles_dropped / self.articles, 2)
+        return total_articles_dropped / self.articles
 
     @property
     def percent_articles_dropped_from_prompt(self) -> float:
         """The percent of the articles dropped due to having only prompt tokens (no completion)."""
-        return round(self.articles_dropped_from_all_prompt / self.articles, 2)
+        return self.articles_dropped_from_all_prompt / self.articles
 
     @property
     def percent_articles_dropped_from_packing(self) -> float:
         """The percent of the articles that are dropped due to packing style."""
-        return round(self.articles_dropped_from_all_prompt / self.articles, 2)
+        return self.articles_dropped_from_all_prompt / self.articles
 
     @property
     def averge_prompt_length(self) -> float:
         """The average number of tokens per prompt."""
-        return round(self.prompt_tokens / self.articles, 2)
+        return self.prompt_tokens / self.articles
 
     @property
     def average_completion_length(self) -> float:
         """The average number of tokens per completion."""
-        return round(self.completion_tokens / self.articles, 2)
+        return self.completion_tokens / self.articles
 
     @property
     def sequence_utilization(self) -> float:
         """What percent of the tokens are not padding."""
-        return round(1 - (self.padding_tokens / self.tokens), 2)
+        return 1 - (self.padding_tokens / self.tokens)
 
     @property
     def sequence_completion_utilization(self) -> float:
         """What percent of the tokens are completions."""
-        return round(self.completion_tokens / self.tokens, 2)
+        return self.completion_tokens / self.tokens
+
+    def _to_str_percent(self, value: int) -> str:
+        percent = round(value * 100, 2)
+        return f"{percent:.2f}%"
 
     def __str__(self):
         """String representation of metrics."""
-        ret = SEP_STR
-        ret += "\n" + f"Sequences: {self.sequences}"
-        ret += "\n" + f"Articles: {self.articles}"
-        ret += "\n" + f"Tokens: {self.tokens}"
-        ret += "\n" + f"Prompt Tokens: {self.prompt_tokens}"
-        ret += "\n" + f"Completion Tokens: {self.completion_tokens}"
-        ret += "\n" + f"Padding Tokens: {self.padding_tokens}"
-        ret += "\n" + f"Prompt Completion Pairs: {self.prompt_completion_pairs}"
-        ret += "\n" + f"Tokens Dropped: {self.tokens_dropped}"
-        ret += "\n" + f"Articles Dropped From Packing: {self.articles_dropped_from_packing}"
-        ret += "\n" + f"Percent Dropped From Packing: {self.percent_articles_dropped_from_packing}"
-        ret += "\n" + f"Articles Dropped From All Prompt: {self.articles_dropped_from_all_prompt}"
-        ret += "\n" + f"Percent Dropped From All Prompt: {self.percent_articles_dropped_from_prompt}"
-        ret += "\n" + f"Sequence Utilization: {self.sequence_utilization}"
-        ret += "\n" + f"Sequence Completion Utilization: {self.sequence_completion_utilization}"
-        ret += "\n" + f"Average Completion Length: {self.average_completion_length}"
-        ret += "\n" + f"Average Prompt Length: {self.averge_prompt_length}"
-
+        table = [
+            ["Sequences", self.sequences],
+            ["Articles", self.articles],
+            ["Tokens", self.tokens],
+            ["Prompt Tokens", self.prompt_tokens],
+            ["Completion Tokens", self.completion_tokens],
+            ["Padding Tokens", self.padding_tokens],
+            ["Prompt Completion Pairs", self.prompt_completion_pairs],
+            ["Tokens Dropped", self.tokens_dropped],
+            ["Articles Dropped From Packing", self.articles_dropped_from_packing],
+            ["Percent Dropped From Packing", self._to_str_percent(self.percent_articles_dropped_from_packing)],
+            ["Articles Dropped From All Prompt", self.articles_dropped_from_all_prompt],
+            ["Percent Dropped From All Prompt", self._to_str_percent(self.percent_articles_dropped_from_prompt)],
+            ["Sequence Utilization", self._to_str_percent(self.sequence_utilization)],
+            ["Sequence Completion Utilization", self._to_str_percent(self.sequence_completion_utilization)],
+            ["Average Completion Length", round(self.average_completion_length, 2)],
+            ["Average Prompt Length", round(self.averge_prompt_length, 2)],
+        ]
+        ret = "=================================================="
+        for name, value in table:
+            ret += "\n" + f"{name}: {value}"
+        ret += "=================================================="
         return ret
+
+        # return tabulate(table, "fancy_outline")
