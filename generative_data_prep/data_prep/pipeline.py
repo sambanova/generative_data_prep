@@ -192,7 +192,7 @@ def get_split_counts(
 
 def data_prep_main_helper(args: Iterable[Any]):
     """Helper function to apply the star operator on the arguments when calling the data_prep_main function."""
-    data_prep_main(*args)
+    return data_prep_main(*args)
 
 
 def multiprocess_data_prep(

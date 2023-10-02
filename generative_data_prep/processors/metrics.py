@@ -109,6 +109,8 @@ class Metrics:
             ["Prompt Tokens", self.prompt_tokens],
             ["Completion Tokens", self.completion_tokens],
             ["Padding Tokens", self.padding_tokens],
+            ["Average Completion Length", round(self.average_completion_length, 2)],
+            ["Average Prompt Length", round(self.averge_prompt_length, 2)],
             ["Prompt Completion Pairs", self.prompt_completion_pairs],
             ["Tokens Dropped", self.tokens_dropped],
             ["Articles Dropped From Packing", self.articles_dropped_from_packing],
@@ -116,14 +118,12 @@ class Metrics:
             ["Articles Dropped From All Prompt", self.articles_dropped_from_all_prompt],
             ["Percent Dropped From All Prompt", self._to_str_percent(self.percent_articles_dropped_from_prompt)],
             ["Sequence Utilization", self._to_str_percent(self.sequence_utilization)],
-            ["Sequence Completion Utilization", self._to_str_percent(self.sequence_completion_utilization)],
-            ["Average Completion Length", round(self.average_completion_length, 2)],
-            ["Average Prompt Length", round(self.averge_prompt_length, 2)],
+            ["Sequence Completion Utilization", self._to_str_percent(self.sequence_completion_utilization)]
         ]
         ret = "=================================================="
         for name, value in table:
             ret += "\n" + f"{name}: {value}"
-        ret += "=================================================="
+        ret += "\n" + "=================================================="
         return ret
 
         # return tabulate(table, "fancy_outline")
