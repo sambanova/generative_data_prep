@@ -125,6 +125,17 @@ class ArticleTokenizer:
         self.logged_prompt_only_warn_msg_postpack = False
         self.category_to_id = category_to_id
 
+    def _update_token_metrics(self, tokenized_sequences: List[TokenizedSequence]):
+        """Update the token metrics for the finished tokenized sequences that have been packed.
+
+        Args:
+            tokenized_sequences: The tokenized sequences that are finished being packed.
+        """
+        for seq in tokenized_sequences:
+            self.metrics.total_tokens += len(seq)
+            self.metrics.prompt_tokens += seq.prompt_tokens
+            self.metrics.completion_tokens += seq.completion_tokens
+
     def __call__(self, article: Optional[str]) -> List[TokenizedSequence]:
         """Tokenize and pack input text into tokenized sequence.
 
@@ -142,7 +153,10 @@ class ArticleTokenizer:
             List of tokenized sequences that have been completed
         """
         if article is None:
-            return self.packer(article)
+            tokenized_sequences = self.packer(article)
+            self._update_token_metrics(tokenized_sequences)
+            return tokenized_sequences
+
         self.metrics.articles += 1
         tokenized_articles = []
         if self.file_ext == FileExtension.JSONL:
@@ -164,7 +178,10 @@ class ArticleTokenizer:
 
         # Check if any sequence in tokenized_sequences contains no completion tokens
         if not self.keep_prompt_only_sequences:
-            return self._remove_prompt_only_sequences(tokenized_sequences)
+            tokenized_sequences = self._remove_prompt_only_sequences(tokenized_sequences)
+
+        self._update_token_metrics(tokenized_sequences)
+
         return tokenized_sequences
 
     def _remove_prompt_only_sequences(self, tokenized_lines: List[TokenizedSequence]) -> List[TokenizedSequence]:
@@ -328,17 +345,14 @@ class ArticleTokenizer:
             if self.prompt_postfix:
                 prompt = prompt + self.prompt_postfix
             prompt_token_ids = self.tokenizer.encode(prompt)
-            self.metrics.prompt_tokens += len(prompt_token_ids)
             tokens += list(map(lambda x: Token(x, TokenTypeIds.PROMPT, category_id), prompt_token_ids))
 
         if completion:
             completion_token_ids = self.tokenizer.encode(completion)
-            self.metrics.completion_tokens += len(completion_token_ids)
             tokens += list(map(lambda x: Token(x, TokenTypeIds.COMPLETION, category_id), completion_token_ids))
 
         if len(tokens) >= 1:
             tokens.append(Token(self.eos_token_id, TokenTypeIds.COMPLETION, category_id))
-            self.metrics.completion_tokens += 1
 
-        self.metrics.tokens += len(tokens)
+        self.metrics.input_tokens += len(tokens)
         return tokens
