@@ -144,13 +144,13 @@ class SequencePacker:
             return tokenized_article
 
         if self.packing_config.overflow_type == OverflowType.DROP:
-            self.metrics.articles_dropped_from_packing += len(tokenized_article)
+            self.metrics.tokens_dropped_from_packing += len(tokenized_article)
             return tokenized_article.get_empty()
         elif self.packing_config.overflow_type == OverflowType.TRUNCATE_LEFT:
-            self.metrics.articles_dropped_from_packing += num_overflow_tokens
+            self.metrics.tokens_dropped_from_packing += num_overflow_tokens
             return tokenized_article[num_overflow_tokens:]
         elif self.packing_config.overflow_type == OverflowType.TRUNCATE_RIGHT:
-            self.metrics.articles_dropped_from_packing += num_overflow_tokens
+            self.metrics.tokens_dropped_from_packing += num_overflow_tokens
             return tokenized_article[:-num_overflow_tokens]
         else:
             raise ValueError(f"Invalid Overflow Type {self.packing_config.overflow_type}")

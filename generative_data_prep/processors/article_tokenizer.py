@@ -188,7 +188,9 @@ class ArticleTokenizer:
                     self.logged_prompt_only_warn_msg_postpack = True
                 continue
             filtered_lines.append(line)
-        self.metrics.articles_dropped_from_all_prompt += len(tokenized_lines) - len(filtered_lines)
+        self.metrics.tokens_dropped_from_all_prompt += sum(list(map(lambda x: len(x), tokenized_lines))) - sum(
+            list(map(lambda x: len(x), filtered_lines))
+        )
         return filtered_lines
 
     def process_text(self, text_line: str) -> List[TokenizedArticle]:

@@ -42,8 +42,8 @@ class Metrics:
         self.prompt_completion_pairs: int = 0
         self.prompt_completion_pairs: int = 0
         self.tokens_dropped: int = 0
-        self.articles_dropped_from_packing: int = 0
-        self.articles_dropped_from_all_prompt: int = 0
+        self.tokens_dropped_from_packing: int = 0
+        self.tokens_dropped_from_all_prompt: int = 0
 
     def __iadd__(self: MetricsSubClass, new_metrics: "Metrics") -> MetricsSubClass:
         """Implement += for Metrics."""
@@ -55,26 +55,26 @@ class Metrics:
         self.articles += new_metrics.articles
         self.prompt_completion_pairs += new_metrics.prompt_completion_pairs
         self.tokens_dropped += new_metrics.tokens_dropped
-        self.articles_dropped_from_packing += new_metrics.articles_dropped_from_packing
-        self.articles_dropped_from_all_prompt += new_metrics.articles_dropped_from_all_prompt
+        self.tokens_dropped_from_packing += new_metrics.tokens_dropped_from_packing
+        self.tokens_dropped_from_all_prompt += new_metrics.tokens_dropped_from_all_prompt
 
         return self
 
     @property
     def percent_articles_dropped(self) -> float:
         """Percent of the articles dropped due to either packing or all prompt."""
-        total_articles_dropped = self.articles_dropped_from_all_prompt + self.articles_dropped_from_packing
+        total_articles_dropped = self.tokens_dropped_from_all_prompt + self.tokens_dropped_from_packing
         return total_articles_dropped / self.articles
 
     @property
     def percent_articles_dropped_from_prompt(self) -> float:
         """The percent of the articles dropped due to having only prompt tokens (no completion)."""
-        return self.articles_dropped_from_all_prompt / self.articles
+        return self.tokens_dropped_from_all_prompt / self.articles
 
     @property
     def percent_articles_dropped_from_packing(self) -> float:
         """The percent of the articles that are dropped due to packing style."""
-        return self.articles_dropped_from_all_prompt / self.articles
+        return self.tokens_dropped_from_packing / self.articles
 
     @property
     def averge_prompt_length(self) -> float:
@@ -106,19 +106,17 @@ class Metrics:
             ["Sequences", self.sequences],
             ["Articles", self.articles],
             ["Tokens", self.tokens],
+            ["Prompt Completion Pairs", self.prompt_completion_pairs],
             ["Prompt Tokens", self.prompt_tokens],
             ["Completion Tokens", self.completion_tokens],
             ["Padding Tokens", self.padding_tokens],
             ["Average Completion Length", round(self.average_completion_length, 2)],
             ["Average Prompt Length", round(self.averge_prompt_length, 2)],
-            ["Prompt Completion Pairs", self.prompt_completion_pairs],
             ["Tokens Dropped", self.tokens_dropped],
-            ["Articles Dropped From Packing", self.articles_dropped_from_packing],
             ["Percent Dropped From Packing", self._to_str_percent(self.percent_articles_dropped_from_packing)],
-            ["Articles Dropped From All Prompt", self.articles_dropped_from_all_prompt],
             ["Percent Dropped From All Prompt", self._to_str_percent(self.percent_articles_dropped_from_prompt)],
             ["Sequence Utilization", self._to_str_percent(self.sequence_utilization)],
-            ["Sequence Completion Utilization", self._to_str_percent(self.sequence_completion_utilization)]
+            ["Sequence Completion Utilization", self._to_str_percent(self.sequence_completion_utilization)],
         ]
         ret = "=================================================="
         for name, value in table:
