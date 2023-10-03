@@ -213,7 +213,7 @@ def multiprocess_data_prep(
     category_to_id: Optional[Dict[str, int]] = None,
     prompt_prefix: Optional[str] = None,
     prompt_postfix: Optional[str] = None,
-) -> Tuple[List[str], List[str]]:
+) -> Tuple[List[str], List[str], Metrics]:
     """Tokenizes all the files in files_to_tokenize efficiently using multirpocessing library.
 
     Args:
@@ -235,7 +235,7 @@ def multiprocess_data_prep(
         prompt_postfix: text to add after the prompt, for chatML conventions use.
 
     Returns:
-        List of output training and dev hdf5 file paths
+        List of output training and dev hdf5 file paths, and the metrics associated with tokenization
     """
     print(SEP_STR)
     print(f"Running tokenization jobs locally, There are {num_workers} processes working on it")
@@ -305,9 +305,7 @@ def multiprocess_data_prep(
         assert broken_process_pool_exc is not None  # nosec: B101
         raise broken_process_pool_exc from None
 
-    print(metrics)
-
-    return train_hdf5_files, dev_hdf5_files
+    return train_hdf5_files, dev_hdf5_files, metrics
 
 
 def pipeline_main(  # noqa: C901
@@ -490,7 +488,7 @@ def pipeline_main(  # noqa: C901
         overwrite_output_path,
     )
 
-    train_hdf5_files, dev_hdf5_files = multiprocess_data_prep(
+    train_hdf5_files, dev_hdf5_files, metrics = multiprocess_data_prep(
         files_to_tokenize,
         split_dir,
         output_dir,
@@ -530,3 +528,5 @@ def pipeline_main(  # noqa: C901
 
     if not keep_split_jsonls:
         shutil.rmtree(split_dir)
+
+    return metrics
