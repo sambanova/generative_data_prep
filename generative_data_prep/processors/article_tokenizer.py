@@ -137,14 +137,6 @@ class ArticleTokenizer:
             self.metrics.prompt_tokens += seq.prompt_tokens
             self.metrics.completion_tokens += seq.completion_tokens
             self.metrics.padding_tokens += seq.pad_tokens
-            if len(seq) != 1024:
-                raise ValueError(f"sequnece length != 1024, length: {len(seq)} seq: {seq}")
-
-            if seq.prompt_tokens + seq.completion_tokens + seq.pad_tokens != 1024:
-                raise ValueError(
-                    f"prompt, completion and pad tokens does not equal 1024,\ntotal:\n\
-                    {seq.prompt_tokens + seq.completion_tokens + seq.pad_tokens}, \nsequence:\n{seq}"
-                )
 
     def __call__(self, article: Optional[str]) -> List[TokenizedSequence]:
         """Tokenize and pack input text into tokenized sequence.
@@ -164,6 +156,8 @@ class ArticleTokenizer:
         """
         if article is None:
             tokenized_sequences = self.packer(article)
+            if not self.keep_prompt_only_sequences:
+                tokenized_sequences = self._remove_prompt_only_sequences(tokenized_sequences)
             self._update_token_metrics(tokenized_sequences)
             return tokenized_sequences
 
