@@ -65,6 +65,9 @@ def data_prep_main(
         category_to_id: Dictionary that maps category string names to IDs.
         prompt_prefix: text to add before the prompt, for chatML conventions use.
         prompt_postfix: text to add after the prompt, for chatML conventions use.
+
+    Returns:
+        Metrics associated with tokenization
     """
     if silent:
         sys.stdout = open(os.devnull, "w")
@@ -94,5 +97,4 @@ def data_prep_main(
                 hdf5_text_buffer.write(article_tokenizer(line))
             hdf5_text_buffer.write(article_tokenizer(None))
 
-    # lets return an object here that stores all the metrics we want to track
     return article_tokenizer.metrics

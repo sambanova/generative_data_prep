@@ -1524,11 +1524,11 @@
         },
         "traitlets": {
             "hashes": [
-                "sha256:2351372ff87fc912c483d1cb6aa466573d5f44eb4ed9e602c8d0ac012c9daece",
-                "sha256:813584bb569ac4a098c64ca494e8a3bbfef42e37c36a6132bca554aabd111480"
+                "sha256:7564b5bf8d38c40fa45498072bf4dc5e8346eb087bbf1e2ae2d8774f6a0f078e",
+                "sha256:98277f247f18b2c5cabaf4af369187754f4fb0e85911d473f72329db8a7f4fae"
             ],
             "markers": "python_version >= '3.8'",
-            "version": "==5.11.1"
+            "version": "==5.11.2"
         },
         "typing-extensions": {
             "hashes": [
@@ -2633,11 +2633,11 @@
         },
         "traitlets": {
             "hashes": [
-                "sha256:2351372ff87fc912c483d1cb6aa466573d5f44eb4ed9e602c8d0ac012c9daece",
-                "sha256:813584bb569ac4a098c64ca494e8a3bbfef42e37c36a6132bca554aabd111480"
+                "sha256:7564b5bf8d38c40fa45498072bf4dc5e8346eb087bbf1e2ae2d8774f6a0f078e",
+                "sha256:98277f247f18b2c5cabaf4af369187754f4fb0e85911d473f72329db8a7f4fae"
             ],
             "markers": "python_version >= '3.8'",
-            "version": "==5.11.1"
+            "version": "==5.11.2"
         },
         "typing-extensions": {
             "hashes": [

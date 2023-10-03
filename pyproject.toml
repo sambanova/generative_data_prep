@@ -74,6 +74,7 @@ exclude_dirs = [
 [tool.mypy]
 warn_return_any = true
 warn_unused_configs = true
+additional-dependencies = ["types-tabulate"]
 exclude = [
     "tests",
     "docs",

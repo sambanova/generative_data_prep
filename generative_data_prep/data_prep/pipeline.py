@@ -372,6 +372,9 @@ def pipeline_main(  # noqa: C901
 
     Raises:
         RuntimeError: If shuffling on RAM is not possible
+
+    Returns:
+        Metrics associated with tokenization
     """
     # print input file information
     input_file_size_in_bytes = os.stat(input_file_path).st_size

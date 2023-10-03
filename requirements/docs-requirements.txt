@@ -74,7 +74,7 @@ stack-data==0.6.3
 tinycss2==1.2.1; python_version >= '3.7'
 tomli==2.0.1; python_version < '3.11'
 tornado==6.3.3; python_version >= '3.8'
-traitlets==5.11.1; python_version >= '3.8'
+traitlets==5.11.2; python_version >= '3.8'
 typing-extensions==4.8.0; python_version >= '3.8'
 urllib3==2.0.6; python_version >= '3.7'
 wcwidth==0.2.8

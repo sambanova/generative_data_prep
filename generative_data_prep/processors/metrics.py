@@ -116,4 +116,4 @@ class Metrics:
             ["Seq Completion Utilization", self._to_str_percent(self.sequence_completion_utilization)],
         ]
 
-        return tabulate(table, headers=["Metric Name", "Metric Value"], tablefmt="fancy_grid")
+        return tabulate(table, tablefmt="fancy_grid")
