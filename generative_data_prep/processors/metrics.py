@@ -108,15 +108,10 @@ class Metrics:
             ["Average Completion Length", round(self.average_completion_length, 2)],
             ["Average Prompt Length", round(self.averge_prompt_length, 2)],
             ["Data Utilization", self._to_str_percent(self.data_utilization)],
-            ["Data Dropped From Packing", self._to_str_percent(self.percent_articles_dropped_from_packing)],
-            ["Data Dropped From All Prompt", self._to_str_percent(self.percent_articles_dropped_from_prompt)],
+            ["Dropped From Packing", self._to_str_percent(self.percent_articles_dropped_from_packing)],
+            ["Dropped From All Prompt", self._to_str_percent(self.percent_articles_dropped_from_prompt)],
             ["Sequence Utilization", self._to_str_percent(self.sequence_utilization)],
-            ["Sequence Completion Utilization", self._to_str_percent(self.sequence_completion_utilization)],
+            ["Seq Completion Utilization", self._to_str_percent(self.sequence_completion_utilization)],
         ]
-        # ret = "=================================================="
-        # for name, value in table:
-        #     ret += "\n" + f"{name}: {value}"
-        # ret += "\n" + "=================================================="
-        # return ret
 
-        return tabulate(table, "fancy_outline")
+        return tabulate(table, tablefmt="fancy_grid")
