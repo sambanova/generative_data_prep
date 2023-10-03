@@ -116,7 +116,7 @@ class SequencePacker:
         # If no more tokenized articles, return the last unfinished sequence
         if tokenized_articles is None:
             if not self.unfinished_sequence.is_empty():
-                self.metrics.padding_tokens += unfinished_sequence.pad()
+                unfinished_sequence.pad()
                 self.unfinished_sequence = TokenizedSequence.get_empty(self.max_seq_length, self.eos_token_id)
                 return [unfinished_sequence]
             return []
@@ -180,7 +180,7 @@ class SequencePacker:
             tokenized_article = self._handle_overflow(tokenized_article, unfinished_sequence)
             unfinished_sequence += tokenized_article
             if not unfinished_sequence.is_empty():
-                self.metrics.padding_tokens += unfinished_sequence.pad()
+                unfinished_sequence.pad()
                 newly_packed_sequences.append(unfinished_sequence)
                 unfinished_sequence = TokenizedSequence.get_empty(self.max_seq_length, self.eos_token_id)
 
@@ -190,7 +190,7 @@ class SequencePacker:
                 unfinished_sequence += tokenized_article
             else:
                 # complete the previous sequence
-                self.metrics.padding_tokens += unfinished_sequence.pad()
+                unfinished_sequence.pad()
                 newly_packed_sequences.append(unfinished_sequence)
                 # try and fit the tokenized article in the next sequence
                 unfinished_sequence = TokenizedSequence.get_empty(self.max_seq_length, self.eos_token_id)

@@ -223,6 +223,11 @@ class TokenizedSequence(TokenizedLine):
         """The number of completion tokens in this sequence."""
         return sum(map(lambda token: token.token_type_id in [TokenTypeIds.COMPLETION, TokenTypeIds.SEP], self.tokens))
 
+    @property
+    def pad_tokens(self):
+        """The number of completion tokens in this sequence."""
+        return sum(map(lambda token: token.token_type_id == TokenTypeIds.PADDING, self.tokens))
+
     def is_packed(self) -> bool:
         """Return whether or not the TokenizedSequence is at its maximum length."""
         return len(self.tokens) == self.max_seq_length
@@ -236,17 +241,16 @@ class TokenizedSequence(TokenizedLine):
             tokenized_line:  The TokenizedLine to be packed into this sequence.
 
         Returns:
-            The left over portion of the TokenizedLine.
+            Thxe left over portion of the TokenizedLine.
         """
         slice_index = self.max_seq_length - len(self)
         self += tokenized_line[:slice_index]
         return tokenized_line[slice_index:]
 
-    def pad(self) -> int:
+    def pad(self):
         """Fill the remaining token ids in the TokenizedSequence with the end of text token."""
         padding_size = self.max_seq_length - len(self)
         self._tokens += [Token(self.eos_token_id, TokenTypeIds.PADDING)] * padding_size
-        return padding_size
 
     def _get_slice(self, slice_index: slice) -> "TokenizedSequence":
         """See base class."""

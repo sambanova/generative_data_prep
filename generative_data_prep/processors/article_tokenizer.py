@@ -136,6 +136,7 @@ class ArticleTokenizer:
             self.metrics.total_tokens += len(seq)
             self.metrics.prompt_tokens += seq.prompt_tokens
             self.metrics.completion_tokens += seq.completion_tokens
+            self.metrics.padding_tokens += seq.pad_tokens
 
     def __call__(self, article: Optional[str]) -> List[TokenizedSequence]:
         """Tokenize and pack input text into tokenized sequence.
