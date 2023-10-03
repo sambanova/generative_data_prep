@@ -22,7 +22,7 @@ the SequencePacker class.
 
 from typing import TypeVar
 
-# from tabulate import tabulate
+from tabulate import tabulate
 
 # custom type representing subclasses of Metrics
 MetricsSubClass = TypeVar("MetricsSubClass", bound="Metrics")
@@ -113,10 +113,10 @@ class Metrics:
             ["Sequence Utilization", self._to_str_percent(self.sequence_utilization)],
             ["Sequence Completion Utilization", self._to_str_percent(self.sequence_completion_utilization)],
         ]
-        ret = "=================================================="
-        for name, value in table:
-            ret += "\n" + f"{name}: {value}"
-        ret += "\n" + "=================================================="
-        return ret
+        # ret = "=================================================="
+        # for name, value in table:
+        #     ret += "\n" + f"{name}: {value}"
+        # ret += "\n" + "=================================================="
+        # return ret
 
-        # return tabulate(table, "fancy_outline")
+        return tabulate(table, "fancy_outline")
