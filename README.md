@@ -191,6 +191,24 @@ pytest
 python3 generative_data_prep/utils/decode_hdf5.py --hdf5_file_path=path_to_hdf5_file --output_decoded_file_path=path_to_output_txt_file
 ```
 
+## Track Dataset Metrics
+The metrics associated with this dataset will be printed in the terminal. These metrics give some insight into how the data was packed into sequences, and what the dataset in the HDF5.
+| Metric Name      | Definition | How to Interpret? |
+| --------- | --------- | --------- |
+| Articles | The number of lines in your input dataset. | How many text documents in the input dataset. |
+| Dataset Tokens | Number of tokens in the output hdf5 dataset. | How many tokens your model will be trained on, but this includes prompt tokens, and padding tokens. So this is not necessarily how many tokens will be back-propogated on. |
+| Prompt Tokens | Number of prompt tokens in the output hdf5 dataset. | <- |
+| Completion Tokens | Number of completion tokens in the output hdf5 dataset. | <- |
+| Padding Tokens | Number of padding tokens in the output hdf5 dataset. | <- |
+| Average Completion Length | Number of completion tokens divided by number of input articles. | How long the average completion is the dataset. |
+| Average Prompt Length | Number of prompt tokens divided by number of input articles. |  How long the average prompt is the dataset. |
+| Data Utilization | Number of non-padding tokens in output HDF5 dataset divided by number of tokens in input dataset. | How much of the data that is fed in as an input is actually fit into sequences in the output dataset. If this number is high that means a lot of the input data will not be trained on. Refer to the "Dropped From Packing" or "Dropped From All Prompt" metrics to see why this is happening. |
+| Dropped From Packing  | Number of tokens dropped because of the `input_packing_config` and tokens not fitting in the sequence length, divided by number of tokens in input dataset. | What percent of tokens are dropped because they do not fit into the sequence length, and the `input_packing_config` does not allow them to be overflowed.|
+| Dropped From All Prompt | Number of tokens dropped because all the tokens in a sequence are prompt tokens, divided by number of tokens in input dataset. | Sequences that are all prompts and have no completion are useless because the model will not learn anything and the loss will be 0 which may cause errors. |
+| Sequence Utilization | Average number of non-padding tokens in a sequence divided by sequence length. | What percent of the tokens in each sequence are actually used for training. This number can be changed by using different `input_packing_config`. The packing styles from highest sequence utilization to lowest are: `full`, `greedy::truncate_left` (or right), `greedy::drop`, `single::truncate_left` (or right), `single::drop`.|
+| Seq Completion Utilization | Average number of completions tokens in a sequence divided by sequence length. | What percent of the tokens in a sequence are back-propograted on.|
+
+
 ## Example use cases
 ### Pretraining
 Pretraining on unstructured data enables large languages models to learn general language patterns and structures that are useful for a wide range of downstream tasks. In order to prepare pretraining data, you need a large amount of unstructured text data. To prepare pretraining data use the flag `--input_packing_config=full`.
