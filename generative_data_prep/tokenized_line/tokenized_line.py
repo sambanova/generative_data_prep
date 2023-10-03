@@ -216,17 +216,17 @@ class TokenizedSequence(TokenizedLine):
     @property
     def prompt_tokens(self):
         """The number of prompt tokens in this sequence."""
-        return sum(map(lambda token: token.token_type_id == TokenTypeIds.PROMPT, self.tokens))
+        return sum(token.token_type_id == TokenTypeIds.PROMPT for token in self.tokens)
 
     @property
     def completion_tokens(self):
         """The number of completion tokens in this sequence."""
-        return sum(map(lambda token: token.token_type_id in [TokenTypeIds.COMPLETION, TokenTypeIds.SEP], self.tokens))
+        return sum(token.token_type_id in [TokenTypeIds.COMPLETION, TokenTypeIds.SEP] for token in self.tokens)
 
     @property
     def pad_tokens(self):
         """The number of completion tokens in this sequence."""
-        return sum(map(lambda token: token.token_type_id == TokenTypeIds.PADDING, self.tokens))
+        return sum(token.token_type_id == TokenTypeIds.PADDING for token in self.tokens)
 
     def is_packed(self) -> bool:
         """Return whether or not the TokenizedSequence is at its maximum length."""
@@ -241,7 +241,7 @@ class TokenizedSequence(TokenizedLine):
             tokenized_line:  The TokenizedLine to be packed into this sequence.
 
         Returns:
-            Thxe left over portion of the TokenizedLine.
+            The left over portion of the TokenizedLine.
         """
         slice_index = self.max_seq_length - len(self)
         self += tokenized_line[:slice_index]

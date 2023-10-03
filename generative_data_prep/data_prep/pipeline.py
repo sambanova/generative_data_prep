@@ -289,8 +289,7 @@ def multiprocess_data_prep(
     # search for any "interesting" exception (a non-BrokenProcessPool Exception)
     for i, future in enumerate(futures):
         try:
-            res_metrucs = future.result()
-            metrics += res_metrucs
+            metrics += future.result()
         except Exception as exc:
             if isinstance(exc, concurrent.futures.process.BrokenProcessPool):
                 broken_process_indices.append(str(i))

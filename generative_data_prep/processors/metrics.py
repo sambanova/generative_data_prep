@@ -33,15 +33,17 @@ class Metrics:
 
     def __init__(self):
         """Create a metrics tracking object."""
-        self.input_tokens: int = 0  # how many tokens are provided by the dataset
-        self.total_tokens: int = 0  # how many tokens are in the hdf5 files, includes padding tokens
-        self.prompt_tokens: int = 0
-        self.completion_tokens: int = 0
-        self.padding_tokens: int = 0
-        self.sequences: int = 0
-        self.articles: int = 0
-        self.tokens_dropped_from_packing: int = 0
-        self.tokens_dropped_from_all_prompt: int = 0
+        self.input_tokens: int = 0  # how many tokens are in the input jsonl dataset
+        self.total_tokens: int = 0  # how many tokens are in the output hdf5 dataset
+        self.prompt_tokens: int = 0  # how many prompt tokens are in the output hdf5 dataset
+        self.completion_tokens: int = 0  # how many completion tokens are in the output hdf5 dataset
+        self.padding_tokens: int = 0  # how many padding tokens are in the output hdf5 dataset
+        self.sequences: int = 0  # how many sequences are in the output hdf5 dataset
+        self.articles: int = 0  # how many articles are in the input dataset
+        self.tokens_dropped_from_packing: int = 0  # how many tokens are dropped because of packing
+        self.tokens_dropped_from_all_prompt: int = (
+            0  # how many tokens are dropped because no completions in the entire sequence
+        )
 
     def __iadd__(self: MetricsSubClass, new_metrics: "Metrics") -> MetricsSubClass:
         """Implement += for Metrics."""
@@ -58,12 +60,12 @@ class Metrics:
         return self
 
     @property
-    def percent_articles_dropped_from_prompt(self) -> float:
+    def percent_tokens_dropped_from_all_prompt(self) -> float:
         """The percent of the articles dropped due to having only prompt tokens (no completion)."""
         return self.tokens_dropped_from_all_prompt / self.input_tokens
 
     @property
-    def percent_articles_dropped_from_packing(self) -> float:
+    def percent_tokens_dropped_from_packing(self) -> float:
         """The percent of the articles that are dropped due to packing style."""
         return self.tokens_dropped_from_packing / self.input_tokens
 
@@ -79,7 +81,7 @@ class Metrics:
 
     @property
     def data_utilization(self) -> float:
-        """What percent of the tokens are not padding."""
+        """What percent of the input dataset tokens are actually included."""
         return (self.prompt_tokens + self.completion_tokens) / self.input_tokens
 
     @property
@@ -108,8 +110,8 @@ class Metrics:
             ["Average Completion Length", round(self.average_completion_length, 2)],
             ["Average Prompt Length", round(self.averge_prompt_length, 2)],
             ["Data Utilization", self._to_str_percent(self.data_utilization)],
-            ["Dropped From Packing", self._to_str_percent(self.percent_articles_dropped_from_packing)],
-            ["Dropped From All Prompt", self._to_str_percent(self.percent_articles_dropped_from_prompt)],
+            ["Dropped From Packing", self._to_str_percent(self.percent_tokens_dropped_from_packing)],
+            ["Dropped From All Prompt", self._to_str_percent(self.percent_tokens_dropped_from_all_prompt)],
             ["Sequence Utilization", self._to_str_percent(self.sequence_utilization)],
             ["Seq Completion Utilization", self._to_str_percent(self.sequence_completion_utilization)],
         ]
