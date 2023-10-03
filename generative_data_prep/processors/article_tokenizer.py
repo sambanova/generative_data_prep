@@ -131,6 +131,7 @@ class ArticleTokenizer:
         Args:
             tokenized_sequences: The tokenized sequences that are finished being packed.
         """
+        self.metrics.sequences += len(tokenized_sequences)
         for seq in tokenized_sequences:
             self.metrics.total_tokens += len(seq)
             self.metrics.prompt_tokens += seq.prompt_tokens
@@ -163,18 +164,15 @@ class ArticleTokenizer:
             # Load from json
             loaded_jsonl = json.loads(article)
             tokenized_articles += self.process_jsonl(loaded_jsonl)
-            self.metrics.prompt_completion_pairs += len(tokenized_articles)
         elif self.file_ext == FileExtension.TXT:
             # Load from txt
             tokenized_articles += self.process_text(article)
-            self.metrics.prompt_completion_pairs += 1
         else:
             err_msg = f"Input file extension {self.file_ext} is invalid,"
             err_msg += f" must be {FileExtension.JSONL} or {FileExtension.TXT}"
             raise ValueError(err_msg)
 
         tokenized_sequences = self.packer(tokenized_articles)
-        self.metrics.sequences += len(tokenized_sequences)
 
         # Check if any sequence in tokenized_sequences contains no completion tokens
         if not self.keep_prompt_only_sequences:
@@ -184,16 +182,16 @@ class ArticleTokenizer:
 
         return tokenized_sequences
 
-    def _remove_prompt_only_sequences(self, tokenized_lines: List[TokenizedSequence]) -> List[TokenizedSequence]:
-        """Takes a list of TokenizedLines, removes those that don't contain any COMPLETION TokenTypeIds.
+    def _remove_prompt_only_sequences(self, tokenized_sequences: List[TokenizedSequence]) -> List[TokenizedSequence]:
+        """Takes a list of TokenizedSequences, removes those that don't contain any COMPLETION TokenTypeIds.
 
         Args:
-            tokenized_lines: List of TokenizedLines
+            tokenized_sequences: List of TokenizedSequence
         Returns:
             Original list with prompt-only sequences filtered out
         """
-        filtered_lines = []
-        for line in tokenized_lines:
+        filtered_sequences = []
+        for line in tokenized_sequences:
             if TokenTypeIds.COMPLETION not in line.dump_token_type_ids():
                 if not self.logged_prompt_only_warn_msg_postpack:
                     print(
@@ -204,11 +202,11 @@ class ArticleTokenizer:
                     )
                     self.logged_prompt_only_warn_msg_postpack = True
                 continue
-            filtered_lines.append(line)
-        self.metrics.tokens_dropped_from_all_prompt += sum(list(map(lambda x: len(x), tokenized_lines))) - sum(
-            list(map(lambda x: len(x), filtered_lines))
-        )
-        return filtered_lines
+            filtered_sequences.append(line)
+        self.metrics.tokens_dropped_from_all_prompt += sum(len(seq) for seq in tokenized_sequences)
+        self.metrics.tokens_dropped_from_all_prompt -= sum(len(seq) for seq in filtered_sequences)
+
+        return filtered_sequences
 
     def process_text(self, text_line: str) -> List[TokenizedArticle]:
         """Take an input string, tokenize it, and return the tokenized article representation.

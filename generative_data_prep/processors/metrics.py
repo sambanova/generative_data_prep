@@ -35,14 +35,11 @@ class Metrics:
         """Create a metrics tracking object."""
         self.input_tokens: int = 0  # how many tokens are provided by the dataset
         self.total_tokens: int = 0  # how many tokens are in the hdf5 files, includes padding tokens
-        self.training_tokens: int = 0  # total tokens that you train on... = prompt_tokens + completion_tokens
         self.prompt_tokens: int = 0
         self.completion_tokens: int = 0
         self.padding_tokens: int = 0
         self.sequences: int = 0
         self.articles: int = 0
-        self.prompt_completion_pairs: int = 0
-        self.prompt_completion_pairs: int = 0
         self.tokens_dropped_from_packing: int = 0
         self.tokens_dropped_from_all_prompt: int = 0
 
@@ -50,13 +47,11 @@ class Metrics:
         """Implement += for Metrics."""
         self.input_tokens += new_metrics.input_tokens
         self.total_tokens += new_metrics.total_tokens
-        self.training_tokens += new_metrics.training_tokens
         self.prompt_tokens += new_metrics.prompt_tokens
         self.completion_tokens += new_metrics.completion_tokens
         self.padding_tokens += new_metrics.padding_tokens
         self.sequences += new_metrics.sequences
         self.articles += new_metrics.articles
-        self.prompt_completion_pairs += new_metrics.prompt_completion_pairs
         self.tokens_dropped_from_packing += new_metrics.tokens_dropped_from_packing
         self.tokens_dropped_from_all_prompt += new_metrics.tokens_dropped_from_all_prompt
 
@@ -83,9 +78,14 @@ class Metrics:
         return self.completion_tokens / self.articles
 
     @property
-    def sequence_utilization(self) -> float:
+    def data_utilization(self) -> float:
         """What percent of the tokens are not padding."""
-        return 1 - (self.padding_tokens / self.total_tokens)
+        return (self.prompt_tokens + self.completion_tokens) / self.input_tokens
+
+    @property
+    def sequence_utilization(self) -> float:
+        """What percent of the tokens are not padding ie what percent of tokens are prompt or completion."""
+        return (self.prompt_tokens + self.completion_tokens) / self.total_tokens
 
     @property
     def sequence_completion_utilization(self) -> float:
@@ -101,17 +101,15 @@ class Metrics:
         table = [
             ["Sequences", self.sequences],
             ["Articles", self.articles],
-            ["Prompt Completion Pairs", self.prompt_completion_pairs],
             ["Dataset Tokens", self.total_tokens],
-            ["Training Tokens", self.training_tokens],
             ["Prompt Tokens", self.prompt_tokens],
             ["Completion Tokens", self.completion_tokens],
             ["Padding Tokens", self.padding_tokens],
             ["Average Completion Length", round(self.average_completion_length, 2)],
             ["Average Prompt Length", round(self.averge_prompt_length, 2)],
-            ["Data Utilization", self._to_str_percent(self.sequence_utilization)],
-            ["Percent Dropped From Packing", self._to_str_percent(self.percent_articles_dropped_from_packing)],
-            ["Percent Dropped From All Prompt", self._to_str_percent(self.percent_articles_dropped_from_prompt)],
+            ["Data Utilization", self._to_str_percent(self.data_utilization)],
+            ["Data Dropped From Packing", self._to_str_percent(self.percent_articles_dropped_from_packing)],
+            ["Data Dropped From All Prompt", self._to_str_percent(self.percent_articles_dropped_from_prompt)],
             ["Sequence Utilization", self._to_str_percent(self.sequence_utilization)],
             ["Sequence Completion Utilization", self._to_str_percent(self.sequence_completion_utilization)],
         ]

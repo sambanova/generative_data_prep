@@ -221,7 +221,7 @@ class TokenizedSequence(TokenizedLine):
     @property
     def completion_tokens(self):
         """The number of completion tokens in this sequence."""
-        return sum(map(lambda token: token.token_type_id == TokenTypeIds.COMPLETION, self.tokens))
+        return sum(map(lambda token: token.token_type_id in [TokenTypeIds.COMPLETION, TokenTypeIds.SEP], self.tokens))
 
     def is_packed(self) -> bool:
         """Return whether or not the TokenizedSequence is at its maximum length."""
