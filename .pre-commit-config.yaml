@@ -33,7 +33,6 @@ repos:
     hooks:
     - id: mypy
       exclude: ^(tests\/.*|docs\/.*)$
-      additional_dependencies: [types-tabulate]
 - repo: local
   hooks:
   - id: pipenv-lock
