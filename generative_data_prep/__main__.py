@@ -18,6 +18,7 @@ Entry point to the Text Processing Pipeline.
 
 import argparse
 import json
+import logging
 import os
 from multiprocessing import cpu_count
 from typing import Optional
@@ -168,9 +169,9 @@ def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase, special_tokens_d
         tokenizer: tokenizer to add special tokens to
         special_tokens_dict: special tokens dictionary
     """
-    print(SEP_STR)
-    print("Adding special tokens dict:")
-    print(special_tokens_dict, flush=True)
+    logging.info(SEP_STR)
+    logging.info("Adding special tokens dict:")
+    logging.info(special_tokens_dict)
     dict_string = special_tokens_dict.replace("'", '"')
     tokenizer.add_special_tokens(json.loads(dict_string))
 
@@ -290,6 +291,20 @@ def get_categories(categories_path: str):
     return category_to_id
 
 
+def get_log_file(log_file_path: str, output_dir: str):
+    """If log_file_path is defined then return it, otherwise return output_dir/logs.log.
+
+    Args:
+        log_file_path: The input log_file_path flag.
+        output_dir: The output directory to default to if log_file_path is None.
+    """
+    if log_file_path is None:
+        log_file_path = os.path.join(output_dir, "logs.log")
+    verify_output_file(log_file_path, True)
+
+    return log_file_path
+
+
 if __name__ == "__main__":
     args = get_args()
     if os.path.splitext(args.input_file_path)[1] not in FileExtension.as_list():
@@ -297,6 +312,9 @@ if __name__ == "__main__":
         raise ValueError(err_msg)
     verify_input_file(args.input_file_path)
     output_dir = get_output_dir(args.cmd, args.output_path, args.overwrite_output_path)
+    log_file_path = get_log_file(args.log_file_path, output_dir)
+    logging.basicConfig(filename=log_file_path, filemode="w")
+
     tokenizer = get_tokenizer(
         args.pretrained_tokenizer,
         args.tokenizer_class,
@@ -352,4 +370,11 @@ if __name__ == "__main__":
             args.prompt_postfix,
         )
 
-    print(metrics)
+    logging.info("\n")
+    logging.info(SEP_STR)
+    logging.info("---------METRICS---------")
+    logging.info(SEP_STR)
+    logging.info(metrics)
+    logging.info("\n")
+    logging.info(SEP_STR)
+    logging.info("---------COMPLETE---------")

@@ -47,6 +47,13 @@ def data_prep_arg_builder(parser: argparse.ArgumentParser):
         ),
     )
     parser.add_argument(
+        "--log_file_path",
+        type=str,
+        required=False,
+        default=None,
+        help="The log file path. Defaults to output_path/logs.log",
+    )
+    parser.add_argument(
         "--overwrite_output_path",
         action="store_true",
         help="If the file or files stored at the output path can be over-written",

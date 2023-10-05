@@ -21,9 +21,11 @@ the SequencePacker class.
 """
 
 import json
+import logging
 from typing import Dict, List, Optional, Tuple, Union
 
-from transformers import PreTrainedTokenizerBase, logging
+from transformers import PreTrainedTokenizerBase
+from transformers import logging as transformers_logging
 
 from generative_data_prep.tokenized_line import (
     Token,
@@ -119,7 +121,7 @@ class ArticleTokenizer:
         self.packer = SequencePacker(max_seq_length, self.eos_token_id, packing_config, self.metrics)
         self.prompt_prefix = prompt_prefix
         self.prompt_postfix = prompt_postfix
-        logging.set_verbosity_error()
+        transformers_logging.set_verbosity_error()
 
         self.logged_prompt_only_warn_msg_prepack = False
         self.logged_prompt_only_warn_msg_postpack = False
@@ -197,7 +199,7 @@ class ArticleTokenizer:
         for line in tokenized_sequences:
             if TokenTypeIds.COMPLETION not in line.dump_token_type_ids():
                 if not self.logged_prompt_only_warn_msg_postpack:
-                    print(
+                    logging.warning(
                         "WARNING: --keep_prompt_only_sequences is not set and after packing data \
                         into sequences, some sequences contain no COMPLETION tokens, due to the \
                         prompt text being too long to pack. Sequences with no COMPLETION tokens \
@@ -280,7 +282,7 @@ class ArticleTokenizer:
 
             if not completion and not self.keep_prompt_only_sequences:
                 if not self.logged_prompt_only_warn_msg_prepack:
-                    print(
+                    logging.warning(
                         "WARNING: --keep_prompt_only_sequences is not set and some articles from \
                         the original JSONL data contain no COMPLETION text. Sequences with no \
                         COMPLETION text will be thrown away. Will only print this warning once."

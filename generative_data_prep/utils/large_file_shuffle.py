@@ -13,6 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import logging
 import os
 import random
 import shutil
@@ -53,7 +54,7 @@ def large_file_shuffle(
     Returns:
         output_file_path (str): The file path where the shuffled input was saved
     """
-    print("PERFORMING LARGE FILE APPROXIMATE SHUFFLING")
+    logging.info("PERFORMING LARGE FILE APPROXIMATE SHUFFLING")
     start_time = time.time()
     _, file_extension = os.path.splitext(input_file_path)
     split_dir = os.path.join(output_dir, "splits")
@@ -65,7 +66,7 @@ def large_file_shuffle(
     if os.path.isdir(split_dir):
         warning = f"WARNING - the split directory {split_dir} exists, if you do not manually abort this "
         warning += "run in 5 seconds, it will be deleted and over-written"
-        print(warning)
+        logging.warning(warning)
         time.sleep(5)
         shutil.rmtree(split_dir)
     os.mkdir(split_dir)
@@ -75,37 +76,37 @@ def large_file_shuffle(
             f"WARNING - the output file path {output_path} exists, if you do not manually abort this run in 5 seconds, "
         )
         warning_msg += "it will be deleted and over-written"
-        print(warning_msg)
+        logging.warning(warning_msg)
         time.sleep(5)
         os.remove(output_path)
 
     prev_time = time.time()
-    print("splitting file")
+    logging.info("splitting file")
     split_command = f"split -d -n r/{num_splits} {input_file_path} {split_dir}/"
     os.system(split_command)  # nosec
-    print(f"splitting took {time.time() - prev_time} seconds (used round robin splitting)")
+    logging.info(f"splitting took {time.time() - prev_time} seconds (used round robin splitting)")
 
     prev_time = time.time()
-    print(f"shuffling {num_splits} files")
+    logging.info(f"shuffling {num_splits} files")
     file_list = list(os.listdir(split_dir))
     for file in tqdm(file_list):
         curr_file_path = os.path.join(split_dir, file)
         shuf_command = f"shuf {curr_file_path} --output={curr_file_path}"
         os.system(shuf_command)  # nosec
-    print(f"finished shuffling {num_splits} files. Took {time.time() - prev_time} seconds")
+    logging.info(f"finished shuffling {num_splits} files. Took {time.time() - prev_time} seconds")
 
     if concat_splits:
         random_split_list = list(range(num_splits))
         random.shuffle(random_split_list)
         prev_time = time.time()
-        print("concatenating shuffled splits")
+        logging.info("concatenating shuffled splits")
         for rand_ind in tqdm(random_split_list):
             curr_file_path = os.path.join(split_dir, file_list[rand_ind])
             concat_command = f"cat {curr_file_path} >> {output_path}"
             os.system(concat_command)  # nosec
             os.remove(curr_file_path)
-        print(f"Finished concatenating files. Took {time.time() - prev_time} seconds")
+        logging.info(f"Finished concatenating files. Took {time.time() - prev_time} seconds")
         shutil.rmtree(split_dir)
 
-    print(f"TOTAL TIME: {time.time() - start_time}")
+    logging.info(f"TOTAL TIME: {time.time() - start_time}")
     return output_path
