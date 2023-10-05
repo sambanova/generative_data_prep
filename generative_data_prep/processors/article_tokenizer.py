@@ -21,7 +21,6 @@ the SequencePacker class.
 """
 
 import json
-import logging
 from typing import Dict, List, Optional, Tuple, Union
 
 from transformers import PreTrainedTokenizerBase
@@ -124,7 +123,6 @@ class ArticleTokenizer:
         transformers_logging.set_verbosity_error()
 
         self.logged_prompt_only_warn_msg_prepack = False
-        self.logged_prompt_only_warn_msg_postpack = False
         self.category_to_id = category_to_id
 
     def _update_token_metrics(self, tokenized_sequences: List[TokenizedSequence]):
@@ -198,14 +196,6 @@ class ArticleTokenizer:
         filtered_sequences = []
         for line in tokenized_sequences:
             if TokenTypeIds.COMPLETION not in line.dump_token_type_ids():
-                if not self.logged_prompt_only_warn_msg_postpack:
-                    logging.warning(
-                        "WARNING: --keep_prompt_only_sequences is not set and after packing data \
-                        into sequences, some sequences contain no COMPLETION tokens, due to the \
-                        prompt text being too long to pack. Sequences with no COMPLETION tokens \
-                        will be thrown away. Will only print this warning once."
-                    )
-                    self.logged_prompt_only_warn_msg_postpack = True
                 continue
             filtered_sequences.append(line)
         self.metrics.tokens_dropped_from_all_prompt += sum(len(seq) for seq in tokenized_sequences)
@@ -281,13 +271,6 @@ class ArticleTokenizer:
             completion = prompt_completion[self.completion_keyword]
 
             if not completion and self.keep_prompt_only_sequences:
-                if not self.logged_prompt_only_warn_msg_prepack:
-                    logging.warning(
-                        "WARNING: --keep_prompt_only_sequences is not set and some articles from \
-                        the original JSONL data contain no COMPLETION text. Sequences with no \
-                        COMPLETION text will be thrown away. Will only print this warning once."
-                    )
-                    self.logged_prompt_only_warn_msg_prepack = True
                 continue
 
             category_id = self.get_category_id(prompt_completion)
