@@ -21,3 +21,10 @@ import logging
 # Create a logger and set its log level
 logger = logging.getLogger("generative_data_prep_logger")
 # logger.setLevel(logging.INFO)  # Set your desired log level here
+
+console_handler = logging.StreamHandler()  # This is your console handler
+logger.setLevel(logging.INFO)
+console_handler.setLevel(logging.INFO)
+formatter = logging.Formatter("%(message)s")
+console_handler.setFormatter(formatter)
+logger.addHandler(console_handler)
