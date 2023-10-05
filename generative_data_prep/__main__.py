@@ -302,10 +302,7 @@ def create_logger(log_file_path: str, output_dir: str):
     if log_file_path is None:
         log_file_path = os.path.join(output_dir, "logs.log")
 
-    # Create a custom log formatter
-    formatter = logging.Formatter(" %(message)s")
-
-    # Create a file handler and set the formatter
+    formatter = logging.Formatter("%(message)s")
     file_handler = logging.FileHandler(log_file_path)
     file_handler.setFormatter(formatter)
     # Add the file handler to the logger
@@ -378,9 +375,9 @@ if __name__ == "__main__":
 
     logger.info("\n")
     logger.info(SEP_STR)
-    logger.info("---------METRICS---------")
+    logger.info("----------------METRICS-----------------")
     logger.info(SEP_STR)
     logger.info(metrics)
     logger.info("\n")
     logger.info(SEP_STR)
-    logger.info("---------COMPLETE---------")
+    logger.info("----------------COMPLETE----------------")
