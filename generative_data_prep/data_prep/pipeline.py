@@ -239,7 +239,6 @@ def multiprocess_data_prep(
         List of output training and dev hdf5 file paths, and the metrics associated with tokenization
     """
     logger.info(SEP_STR)
-    logger.info(SEP_STR)
     logger.info(f"Running tokenization jobs locally, There are {num_workers} processes working on it")
     if input_file_size_in_gb > 10:
         warning_msg = f"your input file size is {input_file_size_in_gb} GB, "
@@ -512,24 +511,24 @@ def pipeline_main(  # noqa: C901
         prompt_prefix,
         prompt_postfix,
     )
-
+    logger.info(SEP_STR)
     logger.info(
         f"Tokenization is complete, the outputs are in {output_dir}, the held out test files are located at {test_dir}"
     )
-    logger.info(SEP_STR)
 
     # Balance hdf5 files so they all have the same number of sequences to within 1
     if do_not_balance_hdf5:
+        logger.info(SEP_STR)
         warning = "WARNING: Skipping balancing hdf5 files, this is not recommended because during "
         warning += 'distributed training some workers will train on some data more than once per "epoch"'
         logger.warning(warning)
-        logger.info(SEP_STR)
+
     else:
+        logger.info(SEP_STR)
         logger.info("Balancing hdf5 files to ensure they have the same number of sequences")
         balance_hdf5_files(train_hdf5_files)
         balance_hdf5_files(dev_hdf5_files)
         logger.info(f"Hdf5 balancing is complete, the outputs are located at {output_dir}")
-        logger.info(SEP_STR)
 
     if not keep_split_jsonls:
         shutil.rmtree(split_dir)

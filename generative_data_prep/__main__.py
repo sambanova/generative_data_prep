@@ -32,6 +32,7 @@ from generative_data_prep.utils import (
     TOKENIZER_CLASSES,
     FileExtension,
     data_prep_arg_builder,
+    header,
     logger,
     verify_input_file,
     verify_output_dir,
@@ -373,11 +374,6 @@ if __name__ == "__main__":
             args.prompt_postfix,
         )
 
-    logger.info("\n")
-    logger.info(SEP_STR)
-    logger.info("----------------METRICS-----------------")
-    logger.info(SEP_STR)
+    logger.info(header("Metrics"))
     logger.info(metrics)
-    logger.info("\n")
-    logger.info(SEP_STR)
-    logger.info("----------------COMPLETE----------------")
+    logger.info(header("Complete"))

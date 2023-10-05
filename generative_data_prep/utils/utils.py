@@ -30,6 +30,12 @@ except OSError:
     SEP_STR = "----------------------------------------------------------------------------------"
 
 
+def header(header_name: str):
+    """Create a header out of the header_name string."""
+    half_sep_str = int((len(SEP_STR) - len(header_name)) / 2) * "-"
+    return half_sep_str + header_name + half_sep_str
+
+
 def data_prep_arg_builder(parser: argparse.ArgumentParser):
     """Adds all the arguments that are required for data_prep.py's argparser, besides the output_path.
 
