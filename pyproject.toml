@@ -22,7 +22,7 @@ dependencies = [
     "transformers",
     "tabulate",
     "types-tabulate",
-    "git"
+    "gitpython"
 ]
 dynamic = ["version"]
 

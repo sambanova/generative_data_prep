@@ -20,6 +20,8 @@ import logging
 
 import git
 
+from .utils import SEP_STR
+
 # Create a logger and set its log level
 logger = logging.getLogger("generative_data_prep_logger")
 # logger.setLevel(logging.INFO)  # Set your desired log level here
@@ -49,6 +51,8 @@ def log_git_commit_hash(logger):
 
 def log_input_args(logger, args):
     """Log the input arguments."""
-    for arg in args:
-        breakpoint()
-        logger.info("thing")
+    logger.info(SEP_STR)
+    logger.info("Logging command line input flags.")
+    argument_dict = vars(args)
+    for arg, value in argument_dict.items():
+        logger.info(f"{arg}: {value}")
