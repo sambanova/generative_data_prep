@@ -15,8 +15,10 @@ limitations under the License.
 
 This class creates a common logger.
 """
-
+import datetime
 import logging
+
+import git
 
 # Create a logger and set its log level
 logger = logging.getLogger("generative_data_prep_logger")
@@ -28,3 +30,25 @@ console_handler.setLevel(logging.INFO)
 formatter = logging.Formatter("%(message)s")
 console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
+
+
+def log_current_datetime(logger):
+    """Log the current date and time."""
+    # Get the current date and time
+    current_datetime = datetime.datetime.now()
+    logger.info(f"Time Of Execution: {current_datetime}")
+
+
+def log_git_commit_hash(logger):
+    """Log the current git commit hash."""
+    repo = git.Repo(search_parent_directories=True)
+    sha = repo.head.object.hexsha
+    logger.info("Running Generative Data Prep Repo: https://github.com/sambanova/generative_data_prep/")
+    logger.info(f"git commit hash: {sha}")
+
+
+def log_input_args(logger, args):
+    """Log the input arguments."""
+    for arg in args:
+        breakpoint()
+        logger.info("thing")

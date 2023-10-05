@@ -15,7 +15,6 @@ limitations under the License.
 
 Entry point to the Text Processing Pipeline.
 """
-
 import argparse
 import json
 import logging
@@ -33,6 +32,9 @@ from generative_data_prep.utils import (
     FileExtension,
     data_prep_arg_builder,
     header,
+    log_current_datetime,
+    log_git_commit_hash,
+    log_input_args,
     logger,
     verify_input_file,
     verify_output_dir,
@@ -308,6 +310,8 @@ def create_logger(log_file_path: str, output_dir: str):
     file_handler.setFormatter(formatter)
     # Add the file handler to the logger
     logger.addHandler(file_handler)
+    log_git_commit_hash(logger)
+    log_current_datetime(logger)
 
 
 if __name__ == "__main__":
@@ -318,6 +322,7 @@ if __name__ == "__main__":
     verify_input_file(args.input_file_path)
     output_dir = get_output_dir(args.cmd, args.output_path, args.overwrite_output_path)
     create_logger(args.log_file_path, output_dir)
+    log_input_args(logger, args)
 
     tokenizer = get_tokenizer(
         args.pretrained_tokenizer,

@@ -21,7 +21,8 @@ dependencies = [
     "tqdm",
     "transformers",
     "tabulate",
-    "types-tabulate"
+    "types-tabulate",
+    "git"
 ]
 dynamic = ["version"]
 
