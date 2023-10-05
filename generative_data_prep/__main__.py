@@ -313,7 +313,7 @@ if __name__ == "__main__":
     verify_input_file(args.input_file_path)
     output_dir = get_output_dir(args.cmd, args.output_path, args.overwrite_output_path)
     log_file_path = get_log_file(args.log_file_path, output_dir)
-    logging.basicConfig(filename=log_file_path, filemode="w")
+    logging.basicConfig(filename=log_file_path, level=logging.INFO, format="%(message)")
 
     tokenizer = get_tokenizer(
         args.pretrained_tokenizer,
