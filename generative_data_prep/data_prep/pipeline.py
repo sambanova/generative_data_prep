@@ -381,11 +381,7 @@ def pipeline_main(  # noqa: C901
     input_file_size_in_bytes = os.stat(input_file_path).st_size
     input_file_size_in_gb = input_file_size_in_bytes / (1024**3)
     logger.info(SEP_STR)
-    logger.info(
-        "Size of input jsonl file is: {:.2f} GB, or {:.2f} MB".format(
-            input_file_size_in_gb, input_file_size_in_bytes / (1024**2)
-        )
-    )
+    logger.info(f"Size of input jsonl file is: {input_file_size_in_gb} GB ({input_file_size_in_bytes / (1024**2)} MB)")
     if input_file_size_in_bytes <= 1:
         raise ValueError(f"your inputted file {input_file_path} is empty")
 
@@ -512,9 +508,7 @@ def pipeline_main(  # noqa: C901
         prompt_postfix,
     )
     logger.info(SEP_STR)
-    logger.info(
-        f"Tokenization is complete, the outputs are in {output_dir}, the held out test files are located at {test_dir}"
-    )
+    logger.info(f"Tokenization is complete, the output dataset is located at: {output_dir}")
 
     # Balance hdf5 files so they all have the same number of sequences to within 1
     if do_not_balance_hdf5:
@@ -528,7 +522,6 @@ def pipeline_main(  # noqa: C901
         logger.info("Balancing hdf5 files to ensure they have the same number of sequences")
         balance_hdf5_files(train_hdf5_files)
         balance_hdf5_files(dev_hdf5_files)
-        logger.info(f"Hdf5 balancing is complete, the outputs are located at {output_dir}")
 
     if not keep_split_jsonls:
         shutil.rmtree(split_dir)
