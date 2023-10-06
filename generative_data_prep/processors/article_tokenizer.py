@@ -133,7 +133,7 @@ class ArticleTokenizer:
         """
         self.metrics.sequences += len(tokenized_sequences)
         for seq in tokenized_sequences:
-            self.metrics.total_tokens += len(seq)
+            self.metrics.output_tokens += len(seq)
             self.metrics.prompt_tokens += seq.prompt_tokens
             self.metrics.completion_tokens += seq.completion_tokens
             self.metrics.padding_tokens += seq.pad_tokens
@@ -194,8 +194,8 @@ class ArticleTokenizer:
             Original list with prompt-only sequences filtered out
         """
         filtered_sequences = []
-        for line in tokenized_sequences:
-            if TokenTypeIds.COMPLETION not in line.dump_token_type_ids():
+        for seq in tokenized_sequences:
+            if TokenTypeIds.COMPLETION not in seq.dump_token_type_ids():
                 if not self.logged_prompt_only_warn_msg_postpack:
                     print(
                         "WARNING: --keep_prompt_only_sequences is not set and after packing data \
@@ -204,10 +204,9 @@ class ArticleTokenizer:
                         will be thrown away. Will only print this warning once."
                     )
                     self.logged_prompt_only_warn_msg_postpack = True
+                self.metrics.tokens_dropped_from_all_prompt += len(seq)
                 continue
-            filtered_sequences.append(line)
-        self.metrics.tokens_dropped_from_all_prompt += sum(len(seq) for seq in tokenized_sequences)
-        self.metrics.tokens_dropped_from_all_prompt -= sum(len(seq) for seq in filtered_sequences)
+            filtered_sequences.append(seq)
 
         return filtered_sequences
 

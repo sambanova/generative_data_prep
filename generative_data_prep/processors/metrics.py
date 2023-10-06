@@ -13,11 +13,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 
-This module implements ArticleTokenizer.
+This module implements Metrics.
 
-Article tokenizer takes any input text or jsonl, runs tokenization using
-the passed in tokenizer, and then packs the tokens into sequences using
-the SequencePacker class.
+A metrics object keeps track of all the information about a tokenized dataset when it is created.
 """
 
 from typing import TypeVar
@@ -34,7 +32,7 @@ class Metrics:
     def __init__(self):
         """Create a metrics tracking object."""
         self.input_tokens: int = 0  # how many tokens are in the input jsonl dataset
-        self.total_tokens: int = 0  # how many tokens are in the output hdf5 dataset
+        self.output_tokens: int = 0  # how many tokens are in the output hdf5 dataset
         self.prompt_tokens: int = 0  # how many prompt tokens are in the output hdf5 dataset
         self.completion_tokens: int = 0  # how many completion tokens are in the output hdf5 dataset
         self.padding_tokens: int = 0  # how many padding tokens are in the output hdf5 dataset
@@ -48,7 +46,7 @@ class Metrics:
     def __iadd__(self: MetricsSubClass, new_metrics: "Metrics") -> MetricsSubClass:
         """Implement += for Metrics."""
         self.input_tokens += new_metrics.input_tokens
-        self.total_tokens += new_metrics.total_tokens
+        self.output_tokens += new_metrics.output_tokens
         self.prompt_tokens += new_metrics.prompt_tokens
         self.completion_tokens += new_metrics.completion_tokens
         self.padding_tokens += new_metrics.padding_tokens
@@ -87,12 +85,12 @@ class Metrics:
     @property
     def sequence_utilization(self) -> float:
         """What percent of the tokens are not padding ie what percent of tokens are prompt or completion."""
-        return (self.prompt_tokens + self.completion_tokens) / self.total_tokens
+        return (self.prompt_tokens + self.completion_tokens) / self.output_tokens
 
     @property
     def sequence_completion_utilization(self) -> float:
         """What percent of the tokens are completions."""
-        return self.completion_tokens / self.total_tokens
+        return self.completion_tokens / self.output_tokens
 
     def _to_str_percent(self, value: int) -> str:
         percent = round(value * 100, 2)
@@ -103,7 +101,7 @@ class Metrics:
         table = [
             ["Sequences", self.sequences],
             ["Articles", self.articles],
-            ["Dataset Tokens", self.total_tokens],
+            ["Dataset Tokens", self.output_tokens],
             ["Prompt Tokens", self.prompt_tokens],
             ["Completion Tokens", self.completion_tokens],
             ["Padding Tokens", self.padding_tokens],
