@@ -55,4 +55,4 @@ def log_input_args(logger, args):
     logger.debug("Logging command line input flags.")
     argument_dict = vars(args)
     for arg, value in argument_dict.items():
-        logger.info(f"{arg}: {value}")
+        logger.debug(f"{arg}: {value}")
