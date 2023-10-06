@@ -307,7 +307,7 @@ if __name__ == "__main__":
     category_to_id = get_categories(args.categories_path)
 
     if args.cmd == "pipeline":
-        pipeline_main(
+        metrics = pipeline_main(
             args.input_file_path,
             tokenizer,
             output_dir,
@@ -334,7 +334,7 @@ if __name__ == "__main__":
             args.prompt_postfix,
         )
     elif args.cmd == "data_prep":
-        data_prep_main(
+        metrics = data_prep_main(
             args.silent,
             tokenizer,
             args.input_file_path,
@@ -351,3 +351,5 @@ if __name__ == "__main__":
             args.prompt_prefix,
             args.prompt_postfix,
         )
+
+    print(metrics)

@@ -38,6 +38,7 @@ from generative_data_prep.utils import (
     TokenTypeIds,
 )
 
+from .metrics import Metrics
 from .sequence_packer import SequencePacker
 
 DEFAULT_PACKING_CONFIG = PackingConfig.get_default()
@@ -114,7 +115,8 @@ class ArticleTokenizer:
         self.prompt_keyword = prompt_keyword
         self.completion_keyword = completion_keyword
         self.eos_token_id = tokenizer.eos_token_id
-        self.packer = SequencePacker(max_seq_length, self.eos_token_id, packing_config)
+        self.metrics = Metrics()
+        self.packer = SequencePacker(max_seq_length, self.eos_token_id, packing_config, self.metrics)
         self.prompt_prefix = prompt_prefix
         self.prompt_postfix = prompt_postfix
         logging.set_verbosity_error()
@@ -122,6 +124,19 @@ class ArticleTokenizer:
         self.logged_prompt_only_warn_msg_prepack = False
         self.logged_prompt_only_warn_msg_postpack = False
         self.category_to_id = category_to_id
+
+    def _update_token_metrics(self, tokenized_sequences: List[TokenizedSequence]):
+        """Update the token metrics for the finished tokenized sequences that have been packed.
+
+        Args:
+            tokenized_sequences: The tokenized sequences that are finished being packed.
+        """
+        self.metrics.sequences += len(tokenized_sequences)
+        for seq in tokenized_sequences:
+            self.metrics.output_tokens += len(seq)
+            self.metrics.prompt_tokens += seq.prompt_tokens
+            self.metrics.completion_tokens += seq.completion_tokens
+            self.metrics.padding_tokens += seq.pad_tokens
 
     def __call__(self, article: Optional[str]) -> List[TokenizedSequence]:
         """Tokenize and pack input text into tokenized sequence.
@@ -140,8 +155,13 @@ class ArticleTokenizer:
             List of tokenized sequences that have been completed
         """
         if article is None:
-            return self.packer(article)
+            tokenized_sequences = self.packer(article)
+            if not self.keep_prompt_only_sequences:
+                tokenized_sequences = self._remove_prompt_only_sequences(tokenized_sequences)
+            self._update_token_metrics(tokenized_sequences)
+            return tokenized_sequences
 
+        self.metrics.articles += 1
         tokenized_articles = []
         if self.file_ext == FileExtension.JSONL:
             # Load from json
@@ -159,20 +179,23 @@ class ArticleTokenizer:
 
         # Check if any sequence in tokenized_sequences contains no completion tokens
         if not self.keep_prompt_only_sequences:
-            return self._remove_prompt_only_sequences(tokenized_sequences)
+            tokenized_sequences = self._remove_prompt_only_sequences(tokenized_sequences)
+
+        self._update_token_metrics(tokenized_sequences)
+
         return tokenized_sequences
 
-    def _remove_prompt_only_sequences(self, tokenized_lines: List[TokenizedSequence]) -> List[TokenizedSequence]:
-        """Takes a list of TokenizedLines, removes those that don't contain any COMPLETION TokenTypeIds.
+    def _remove_prompt_only_sequences(self, tokenized_sequences: List[TokenizedSequence]) -> List[TokenizedSequence]:
+        """Takes a list of TokenizedSequences, removes those that don't contain any COMPLETION TokenTypeIds.
 
         Args:
-            tokenized_lines: List of TokenizedLines
+            tokenized_sequences: List of TokenizedSequence
         Returns:
             Original list with prompt-only sequences filtered out
         """
-        filtered_lines = []
-        for line in tokenized_lines:
-            if TokenTypeIds.COMPLETION not in line.dump_token_type_ids():
+        filtered_sequences = []
+        for seq in tokenized_sequences:
+            if TokenTypeIds.COMPLETION not in seq.dump_token_type_ids():
                 if not self.logged_prompt_only_warn_msg_postpack:
                     print(
                         "WARNING: --keep_prompt_only_sequences is not set and after packing data \
@@ -181,9 +204,11 @@ class ArticleTokenizer:
                         will be thrown away. Will only print this warning once."
                     )
                     self.logged_prompt_only_warn_msg_postpack = True
+                self.metrics.tokens_dropped_from_all_prompt += len(seq)
                 continue
-            filtered_lines.append(line)
-        return filtered_lines
+            filtered_sequences.append(seq)
+
+        return filtered_sequences
 
     def process_text(self, text_line: str) -> List[TokenizedArticle]:
         """Take an input string, tokenize it, and return the tokenized article representation.
@@ -329,4 +354,5 @@ class ArticleTokenizer:
         if len(tokens) >= 1:
             tokens.append(Token(self.eos_token_id, TokenTypeIds.COMPLETION, category_id))
 
+        self.metrics.input_tokens += len(tokens)
         return tokens

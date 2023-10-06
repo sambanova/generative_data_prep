@@ -593,11 +593,8 @@ def test_multiple__call__(
             False,
             '[{"prompt": "hi bye test hi bye test", "completion": ""}, \
             {"prompt": "hi bye test hi", "completion": "test hi"}]',
-            [[1, 2, 3, 1, 3, 1], [0, 0, 0, 0, 0, 0]],
-            [
-                [PROMPT, PROMPT, PROMPT, PROMPT, COMP, COMP],
-                [SEP, PAD, PAD, PAD, PAD, PAD],
-            ],
+            [[1, 2, 3, 1, 3, 1]],
+            [[PROMPT, PROMPT, PROMPT, PROMPT, COMP, COMP]],
         ),
     ],
 )
