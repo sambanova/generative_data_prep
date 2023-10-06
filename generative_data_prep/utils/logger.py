@@ -38,21 +38,21 @@ def log_current_datetime(logger):
     """Log the current date and time."""
     # Get the current date and time
     current_datetime = datetime.datetime.now()
-    logger.info(f"Time Of Execution: {current_datetime}")
+    logger.debug(f"Time Of Execution: {current_datetime}")
 
 
 def log_git_commit_hash(logger):
     """Log the current git commit hash."""
     repo = git.Repo(search_parent_directories=True)
     sha = repo.head.object.hexsha
-    logger.info("Running Generative Data Prep Repo: https://github.com/sambanova/generative_data_prep/")
-    logger.info(f"git commit hash: {sha}")
+    logger.debug("Running Generative Data Prep Repo: https://github.com/sambanova/generative_data_prep/")
+    logger.debug(f"git commit hash: {sha}")
 
 
 def log_input_args(logger, args):
     """Log the input arguments."""
-    logger.info(SEP_STR)
-    logger.info("Logging command line input flags.")
+    logger.debug(SEP_STR)
+    logger.debug("Logging command line input flags.")
     argument_dict = vars(args)
     for arg, value in argument_dict.items():
         logger.info(f"{arg}: {value}")

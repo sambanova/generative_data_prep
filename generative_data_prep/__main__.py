@@ -308,6 +308,7 @@ def create_logger(log_file_path: str, output_dir: str):
     formatter = logging.Formatter("%(message)s")
     file_handler = logging.FileHandler(log_file_path)
     file_handler.setFormatter(formatter)
+    file_handler.setLevel(logging.DEBUG)
     # Add the file handler to the logger
     logger.addHandler(file_handler)
     log_git_commit_hash(logger)
