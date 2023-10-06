@@ -25,11 +25,13 @@ from typing import List, Optional, Tuple
 from generative_data_prep.tokenized_line import TokenizedArticle, TokenizedSequence
 from generative_data_prep.utils import OverflowType, PackingConfig, PackingStyleType
 
+from .metrics import Metrics
+
 
 class SequencePacker:
     """Takes articles and packs them into fixed length sequences."""
 
-    def __init__(self, max_seq_length: int, eos_token_id: int, packing_config: PackingConfig):
+    def __init__(self, max_seq_length: int, eos_token_id: int, packing_config: PackingConfig, metrics: Metrics):
         r"""Create the SequencePacker.
 
         Args:
@@ -49,6 +51,7 @@ class SequencePacker:
                 beyond the max sequence length.
                 'truncate_right':  Truncate the article from the right if there are any tokens that overflow
                 beyond the max sequence length.
+            metrics: The metrics to track for the tokenization process, update the metrics stored in this object.
 
         Example:
             >>> from generative_data_prep.utils import TokenTypeIds
@@ -97,6 +100,7 @@ class SequencePacker:
         self.packing_config = packing_config
 
         self.unfinished_sequence = TokenizedSequence.get_empty(self.max_seq_length, self.eos_token_id)
+        self.metrics = metrics
 
     def __call__(self, tokenized_articles: Optional[List[TokenizedArticle]]) -> List[TokenizedSequence]:
         """Call the SequencePacker.
@@ -140,10 +144,13 @@ class SequencePacker:
             return tokenized_article
 
         if self.packing_config.overflow_type == OverflowType.DROP:
+            self.metrics.tokens_dropped_from_packing += len(tokenized_article)
             return tokenized_article.get_empty()
         elif self.packing_config.overflow_type == OverflowType.TRUNCATE_LEFT:
+            self.metrics.tokens_dropped_from_packing += num_overflow_tokens
             return tokenized_article[num_overflow_tokens:]
         elif self.packing_config.overflow_type == OverflowType.TRUNCATE_RIGHT:
+            self.metrics.tokens_dropped_from_packing += num_overflow_tokens
             return tokenized_article[:-num_overflow_tokens]
         else:
             raise ValueError(f"Invalid Overflow Type {self.packing_config.overflow_type}")
