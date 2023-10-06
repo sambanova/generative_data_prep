@@ -183,8 +183,10 @@ class SequencePacker:
                 unfinished_sequence += tokenized_article
             else:
                 # complete the previous sequence
-                unfinished_sequence.pad()
-                newly_packed_sequences.append(unfinished_sequence)
+                # complete the previous sequence
+                if not unfinished_sequence.is_empty():
+                    unfinished_sequence.pad()
+                    newly_packed_sequences.append(unfinished_sequence)
                 # try and fit the tokenized article in the next sequence
                 unfinished_sequence = TokenizedSequence.get_empty(self.max_seq_length, self.eos_token_id)
                 tokenized_article = self._handle_overflow(tokenized_article, unfinished_sequence)
