@@ -179,10 +179,8 @@ class SequencePacker:
                 raise ValueError(err_msg)
             tokenized_article = self._handle_overflow(tokenized_article, unfinished_sequence)
             unfinished_sequence += tokenized_article
-            if not unfinished_sequence.is_empty():
-                unfinished_sequence.pad()
-                newly_packed_sequences.append(unfinished_sequence)
-                unfinished_sequence = TokenizedSequence.get_empty(self.max_seq_length, self.eos_token_id)
+            unfinished_sequence.pad()
+            newly_packed_sequences.append(unfinished_sequence)
 
         elif self.packing_config.packing_style == PackingStyleType.GREEDY:
             # if it fits in the unfinished sequence, then add it
