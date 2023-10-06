@@ -225,7 +225,7 @@ class TokenizedSequence(TokenizedLine):
 
     @property
     def pad_tokens(self):
-        """The number of completion tokens in this sequence."""
+        """The number of padding tokens in this sequence."""
         return sum(token.token_type_id == TokenTypeIds.PADDING for token in self.tokens)
 
     def is_packed(self) -> bool:
