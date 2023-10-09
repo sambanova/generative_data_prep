@@ -213,6 +213,21 @@ class TokenizedSequence(TokenizedLine):
         """The number of unfilled tokens in this sequence."""
         return self.max_seq_length - len(self)
 
+    @property
+    def prompt_tokens(self):
+        """The number of prompt tokens in this sequence."""
+        return sum(token.token_type_id == TokenTypeIds.PROMPT for token in self.tokens)
+
+    @property
+    def completion_tokens(self):
+        """The number of completion tokens in this sequence."""
+        return sum(token.token_type_id in [TokenTypeIds.COMPLETION, TokenTypeIds.SEP] for token in self.tokens)
+
+    @property
+    def pad_tokens(self):
+        """The number of padding tokens in this sequence."""
+        return sum(token.token_type_id == TokenTypeIds.PADDING for token in self.tokens)
+
     def is_packed(self) -> bool:
         """Return whether or not the TokenizedSequence is at its maximum length."""
         return len(self.tokens) == self.max_seq_length

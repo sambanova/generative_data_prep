@@ -29,6 +29,7 @@ import psutil
 from transformers import PreTrainedTokenizerBase
 
 from generative_data_prep.data_prep import data_prep_main
+from generative_data_prep.processors.metrics import Metrics
 from generative_data_prep.utils import (
     SEP_STR,
     BoundaryType,
@@ -191,7 +192,7 @@ def get_split_counts(
 
 def data_prep_main_helper(args: Iterable[Any]):
     """Helper function to apply the star operator on the arguments when calling the data_prep_main function."""
-    data_prep_main(*args)
+    return data_prep_main(*args)
 
 
 def multiprocess_data_prep(
@@ -212,7 +213,7 @@ def multiprocess_data_prep(
     category_to_id: Optional[Dict[str, int]] = None,
     prompt_prefix: Optional[str] = None,
     prompt_postfix: Optional[str] = None,
-) -> Tuple[List[str], List[str]]:
+) -> Tuple[List[str], List[str], Metrics]:
     """Tokenizes all the files in files_to_tokenize efficiently using multirpocessing library.
 
     Args:
@@ -234,7 +235,7 @@ def multiprocess_data_prep(
         prompt_postfix: text to add after the prompt, for chatML conventions use.
 
     Returns:
-        List of output training and dev hdf5 file paths
+        List of output training and dev hdf5 file paths, and the metrics associated with tokenization
     """
     print(SEP_STR)
     print(f"Running tokenization jobs locally, There are {num_workers} processes working on it")
@@ -284,10 +285,11 @@ def multiprocess_data_prep(
     # is why we have this complicated logic below.
     broken_process_indices = []
     broken_process_pool_exc: Optional[BaseException] = None
+    metrics = Metrics()
     # search for any "interesting" exception (a non-BrokenProcessPool Exception)
     for i, future in enumerate(futures):
         try:
-            future.result()
+            metrics += future.result()
         except Exception as exc:
             if isinstance(exc, concurrent.futures.process.BrokenProcessPool):
                 broken_process_indices.append(str(i))
@@ -303,7 +305,7 @@ def multiprocess_data_prep(
         assert broken_process_pool_exc is not None  # nosec: B101
         raise broken_process_pool_exc from None
 
-    return train_hdf5_files, dev_hdf5_files
+    return train_hdf5_files, dev_hdf5_files, metrics
 
 
 def pipeline_main(  # noqa: C901
@@ -370,6 +372,9 @@ def pipeline_main(  # noqa: C901
 
     Raises:
         RuntimeError: If shuffling on RAM is not possible
+
+    Returns:
+        Metrics associated with tokenization
     """
     # print input file information
     input_file_size_in_bytes = os.stat(input_file_path).st_size
@@ -486,7 +491,7 @@ def pipeline_main(  # noqa: C901
         overwrite_output_path,
     )
 
-    train_hdf5_files, dev_hdf5_files = multiprocess_data_prep(
+    train_hdf5_files, dev_hdf5_files, metrics = multiprocess_data_prep(
         files_to_tokenize,
         split_dir,
         output_dir,
@@ -526,3 +531,5 @@ def pipeline_main(  # noqa: C901
 
     if not keep_split_jsonls:
         shutil.rmtree(split_dir)
+
+    return metrics
