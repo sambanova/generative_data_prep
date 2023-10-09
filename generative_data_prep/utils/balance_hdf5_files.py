@@ -64,8 +64,11 @@ def balance_hdf5_files(hdf5_file_paths: List[str]) -> None:  # noqa: C901
     file_path_to_num_needed_seqs = {}
     extra_token_seqs = []
     extra_ttid_seqs = []
+    extra_category_seqs = []
+    has_category_ids = False
     for file_path in hdf5_file_paths:
         with h5py.File(file_path, "r+") as curr_hdf5_file:
+            has_category_ids = "category_ids" in curr_hdf5_file.keys()
             curr_num_seq = curr_hdf5_file["input_ids"].shape[0]
             seq_len = curr_hdf5_file["input_ids"].shape[1]
             # If file has more than the average number of sequences
@@ -87,6 +90,12 @@ def balance_hdf5_files(hdf5_file_paths: List[str]) -> None:  # noqa: C901
                 extra_ttid_seqs.append(curr_extra_ttid_seqs)
                 curr_hdf5_file["token_type_ids"].resize((curr_num_seq, seq_len))
 
+                # save extra token category sequences, and update hdf5 file
+                if has_category_ids:
+                    curr_extra_category_seqs = curr_hdf5_file["category_ids"][-num_extra_seq:]
+                    extra_category_seqs.append(curr_extra_category_seqs)
+                    curr_hdf5_file["category_ids"].resize((curr_num_seq, seq_len))
+
             # If file has less than the average number of sequences
             elif curr_num_seq < avg_seqs:
                 num_needed_seq = avg_seqs - curr_num_seq
@@ -107,9 +116,13 @@ def balance_hdf5_files(hdf5_file_paths: List[str]) -> None:  # noqa: C901
 
         extra_token_seqs_np = np.vstack(extra_token_seqs)
         extra_ttid_seqs_np = np.vstack(extra_ttid_seqs)
+        if has_category_ids:
+            extra_category_seqs_np = np.vstack(extra_category_seqs)
     else:
         extra_token_seqs_np = np.zeros((0, 0))
         extra_ttid_seqs_np = np.zeros((0, 0))
+        if has_category_ids:
+            extra_category_seqs_np = np.zeros((0, 0))
         if len(file_path_to_num_needed_seqs) != 0:
             raise ValueError(
                 f"No extra sequences found, but these files need extra sequences {file_path_to_num_needed_seqs}"
@@ -135,8 +148,14 @@ def balance_hdf5_files(hdf5_file_paths: List[str]) -> None:  # noqa: C901
             curr_hdf5_file["token_type_ids"][-num_needed_seq:] = extra_ttid_seqs_np[:num_needed_seq]
             # remove saved token_type_ids sequences so they are not used again
             extra_ttid_seqs_np = extra_ttid_seqs_np[num_needed_seq:]
+            if has_category_ids:
+                # add extra category_ids to hdf5 file
+                curr_hdf5_file["category_ids"].resize(new_shape)
+                curr_hdf5_file["category_ids"][-num_needed_seq:] = extra_category_seqs_np[:num_needed_seq]
+                # remove saved token_type_ids sequences so they are not used again
+                extra_category_seqs_np = extra_category_seqs_np[num_needed_seq:]
 
-    if len(extra_token_seqs_np) != 0:
+    if len(extra_token_seqs_np) != 0 or len(extra_category_seqs_np) != 0:
         raise ValueError("extra_token_seqs_np is non zero at the end of rebalancing")
     if remainder != 0:
         raise ValueError("remaineder is not 0 after finishing rebalancing")
