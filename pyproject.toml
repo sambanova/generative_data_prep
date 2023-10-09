@@ -21,7 +21,7 @@ dependencies = [
     "tqdm",
     "transformers",
     "tabulate",
-    "gitpython"
+    "gitpython",
     "types-tabulate"
 ]
 dynamic = ["version"]

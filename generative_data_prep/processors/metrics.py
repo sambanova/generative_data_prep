@@ -16,7 +16,6 @@ limitations under the License.
 This module implements Metrics.
 
 A metrics object keeps track of all the information about a tokenized dataset when it is created.
-
 """
 
 from typing import TypeVar

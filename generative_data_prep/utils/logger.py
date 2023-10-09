@@ -38,15 +38,15 @@ def log_current_datetime(logger):
     """Log the current date and time."""
     # Get the current date and time
     current_datetime = datetime.datetime.now()
-    logger.debug(f"Time Of Execution: {current_datetime}")
+    logger.debug(f"Time of execution: {current_datetime}")
 
 
 def log_git_commit_hash(logger):
     """Log the current git commit hash."""
     repo = git.Repo(search_parent_directories=True)
     sha = repo.head.object.hexsha
-    logger.debug("Running Generative Data Prep Repo: https://github.com/sambanova/generative_data_prep/")
-    logger.debug(f"git commit hash: {sha}")
+    logger.debug("Running Generative Data Prep repository: https://github.com/sambanova/generative_data_prep/")
+    logger.debug(f"Git commit hash: {sha}")
 
 
 def log_input_args(logger, args):

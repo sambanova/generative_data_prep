@@ -92,7 +92,7 @@ def verify_output_dir(
                         shutil.rmtree(file_path)
         elif raise_warning_if_exists:
             logger.info(SEP_STR)
-            logger.warning(f"WARNING: {output_dir} already exists, new files will be written here")
+            logger.warning(f"WARNING: {output_dir} already exists, new files will be written here.")
     else:
         os.makedirs(output_dir)
 

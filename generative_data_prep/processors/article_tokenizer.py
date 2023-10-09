@@ -270,7 +270,7 @@ class ArticleTokenizer:
                 raise json.JSONDecodeError(err_msg, str(jsonl), 0)
             completion = prompt_completion[self.completion_keyword]
 
-            if not completion and self.keep_prompt_only_sequences:
+            if not completion and not self.keep_prompt_only_sequences:
                 continue
 
             category_id = self.get_category_id(prompt_completion)
