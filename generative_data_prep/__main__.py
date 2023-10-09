@@ -383,4 +383,3 @@ if __name__ == "__main__":
     logger.info(header("Metrics"))
     logger.info(metrics)
     logger.info(header("Complete"))
-
