@@ -155,7 +155,7 @@ def balance_hdf5_files(hdf5_file_paths: List[str]) -> None:  # noqa: C901
                 # remove saved token_type_ids sequences so they are not used again
                 extra_category_seqs_np = extra_category_seqs_np[num_needed_seq:]
 
-    if len(extra_token_seqs_np) != 0 or len(extra_category_seqs_np) != 0:
+    if len(extra_token_seqs_np) != 0:
         raise ValueError("extra_token_seqs_np is non zero at the end of rebalancing")
     if remainder != 0:
         raise ValueError("remaineder is not 0 after finishing rebalancing")
