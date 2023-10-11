@@ -22,8 +22,9 @@ import os
 
 import git
 
-logger = logging.getLogger("generative_data_prep_logger")
 logging.config.fileConfig("generative_data_prep/utils/logger_config.yaml")
+logger = logging.getLogger("generative_data_prep_logger")
+start_time = datetime.datetime.now()
 
 try:
     SEP_STR = "-" * os.get_terminal_size().columns
@@ -41,7 +42,7 @@ def add_file_handler(log_file_path: str, output_dir: str):
     if log_file_path is None:
         log_file_path = os.path.join(output_dir, "logs.log")
     formatter = logging.Formatter("%(message)s")
-    file_handler = logging.FileHandler(log_file_path)
+    file_handler = logging.FileHandler(log_file_path, "w")
     file_handler.setFormatter(formatter)
     file_handler.setLevel(logging.DEBUG)
     # Add the file handler to the Logger
@@ -51,6 +52,7 @@ def add_file_handler(log_file_path: str, output_dir: str):
 def log_current_datetime():
     """Log at the current date and time."""
     current_datetime = datetime.datetime.now()
+    logger.debug(SEP_STR)
     logger.debug(f"Time of execution: {current_datetime}")
 
 
@@ -80,3 +82,13 @@ def get_header(header_name: str):
     """Create a header out of the header_name string."""
     half_sep_str = int((len(SEP_STR) - len(header_name)) / 2) * "-"
     return half_sep_str + header_name + half_sep_str
+
+
+def log_elapsed_time():
+    """Log how much time it took to execute entire script."""
+    logger.info(f"Elapsed time: {datetime.datetime.now().replace(microsecond=0) - start_time.replace(microsecond=0)}")
+
+
+def log_sep_str():
+    """Log the seperator string."""
+    logger.info(SEP_STR)

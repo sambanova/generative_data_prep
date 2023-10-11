@@ -37,6 +37,7 @@ from generative_data_prep.utils import (
     balance_hdf5_files,
     execute_and_return_stdout,
     large_file_shuffle,
+    log_sep_str,
     verify_output_dir,
     verify_output_file,
 )
@@ -239,8 +240,10 @@ def multiprocess_data_prep(
     Returns:
         List of output training and dev hdf5 file paths, and the metrics associated with tokenization
     """
+    log_sep_str()
     logger.info(f"Running tokenization jobs locally, There are {num_workers} processes working on it.")
     if input_file_size_in_gb > 10:
+        log_sep_str()
         warning_msg = f"WARNING: your input file size is {input_file_size_in_gb} GB, "
         warning_msg += "this is large and may take up a lot of your machines resources for a long time."
         logger.warning(warning_msg)
@@ -296,12 +299,14 @@ def multiprocess_data_prep(
                 broken_process_indices.append(str(i))
                 broken_process_pool_exc = exc
             else:
+                log_sep_str()
                 err_msg_1 = f"Process {i} failed with the exception below."
                 err_msg_2 = "If the error is a MemoryError, reduce the number of workers to limit your RAM usage."
                 logger.error(f"\n\n{err_msg_1}\n{err_msg_2}")
                 raise exc from None
     # if no "interesting" exceptions are found, raise the BrokenProcessPool Exception
     if len(broken_process_indices) > 0:
+        log_sep_str()
         logger.error(f'\n\nProcesses {", ".join(broken_process_indices)} failed with the following exception:')
         assert broken_process_pool_exc is not None  # nosec: B101
         raise broken_process_pool_exc from None
@@ -382,6 +387,7 @@ def pipeline_main(  # noqa: C901
     input_file_size_in_gb = input_file_size_in_bytes / (1024**3)
     log_message = f"Size of input jsonl file is: {round(input_file_size_in_gb, 2)} GB"
     log_message += f" ({round(input_file_size_in_bytes / (1024**2), 2)} MB)"
+    log_sep_str()
     logger.info(log_message)
     if input_file_size_in_bytes <= 1:
         raise ValueError(f"your inputted file {input_file_path} is empty")
@@ -425,6 +431,7 @@ def pipeline_main(  # noqa: C901
     # Case 2: Shuffling on RAM with linux OS
     elif shuffle == "on_RAM" and "linux" in platform.lower():
         check_RAM(input_file_size_in_bytes)
+        log_sep_str()
         logger.info("Shuffling input file, please be patient.")
         file_ext = os.path.splitext(input_file_path)[1]
         shuffle_file_path = os.path.join(output_dir, f"tmp_shuf{file_ext}")
@@ -455,7 +462,8 @@ def pipeline_main(  # noqa: C901
 
     # Case 4: Do not shuffle, split file without linux OS
     elif shuffle == "False" and "linux" not in platform.lower():
-        logger.warning("WARNING, you did not specify the --shuffle flag, so no shuffling was done!")
+        log_sep_str()
+        logger.warning("WARNING: you did not specify the --shuffle flag, so no shuffling was done!")
         out_files = []
         num_digits = len(str(num_splits))
         for i in range(num_splits):
@@ -471,7 +479,8 @@ def pipeline_main(  # noqa: C901
 
     # Case 5: Do not shuffle, split file with linux OS
     elif shuffle == "False" and "linux" in platform.lower():
-        logger.warning("WARNING, you did not specify the --shuffle flag, so no shuffling was done!")
+        log_sep_str()
+        logger.warning("WARNING: you did not specify the --shuffle flag, so no shuffling was done!")
         split_file_linux(num_splits, input_file_path, split_dir)
 
     # rename files to include the corresponding names of 'test', 'dev' and 'train'
@@ -505,15 +514,18 @@ def pipeline_main(  # noqa: C901
         prompt_prefix,
         prompt_postfix,
     )
+    log_sep_str()
     logger.info(f"Tokenization is complete, the output dataset is located at: {output_dir}")
 
     # Balance hdf5 files so they all have the same number of sequences to within 1
     if do_not_balance_hdf5:
+        log_sep_str()
         warning = "WARNING: Skipping balancing hdf5 files, this is not recommended because during "
         warning += 'distributed training some workers will train on some data more than once per "epoch".'
         logger.warning(warning)
 
     else:
+        log_sep_str()
         logger.info("Balancing hdf5 files to ensure they have the same number of sequences.")
         balance_hdf5_files(train_hdf5_files)
         balance_hdf5_files(dev_hdf5_files)

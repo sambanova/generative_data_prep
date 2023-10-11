@@ -32,9 +32,11 @@ from generative_data_prep.utils import (
     add_file_handler,
     data_prep_arg_builder,
     log_current_datetime,
+    log_elapsed_time,
     log_git_commit_hash,
     log_input_args,
     log_metrics,
+    log_sep_str,
     verify_input_file,
     verify_output_dir,
     verify_output_file,
@@ -174,6 +176,7 @@ def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase, special_tokens_d
         tokenizer: tokenizer to add special tokens to
         special_tokens_dict: special tokens dictionary
     """
+    log_sep_str()
     logger.info(f"Adding special tokens dict:\n{special_tokens_dict}")
     dict_string = special_tokens_dict.replace("'", '"')
     tokenizer.add_special_tokens(json.loads(dict_string))
@@ -362,3 +365,4 @@ if __name__ == "__main__":
         )
 
     log_metrics(metrics)
+    log_elapsed_time()

@@ -23,6 +23,8 @@ import os
 import shutil
 from typing import Optional
 
+from .logger import log_sep_str
+
 logger = logging.getLogger("generative_data_prep_logger")
 
 
@@ -91,6 +93,7 @@ def verify_output_dir(
                     else:
                         shutil.rmtree(file_path)
         elif raise_warning_if_exists:
+            log_sep_str()
             logger.warning(f"WARNING: {output_dir} already exists, new files will be written here.")
     else:
         os.makedirs(output_dir)

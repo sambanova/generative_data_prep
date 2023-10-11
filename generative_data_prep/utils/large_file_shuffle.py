@@ -20,6 +20,8 @@ import time
 
 from tqdm import tqdm
 
+from .logger import log_sep_str
+
 logger = logging.getLogger("generative_data_prep_logger")
 
 
@@ -55,6 +57,7 @@ def large_file_shuffle(
     Returns:
         output_file_path (str): The file path where the shuffled input was saved
     """
+    log_sep_str()
     logger.info("Performing large file approximate shuffling.")
     start_time = time.time()
     _, file_extension = os.path.splitext(input_file_path)
@@ -65,7 +68,7 @@ def large_file_shuffle(
         output_path = split_dir
 
     if os.path.isdir(split_dir):
-        warning = f"WARNING - the split directory {split_dir} exists, if you do not manually abort this "
+        warning = f"WARNING: the split directory {split_dir} exists, if you do not manually abort this "
         warning += "run in 5 seconds, it will be deleted and over-written."
         logger.warning(warning)
         time.sleep(5)
@@ -74,7 +77,7 @@ def large_file_shuffle(
 
     if os.path.isfile(output_path):
         warning_msg = (
-            f"WARNING - the output file path {output_path} exists, if you do not manually abort this run in 5 seconds, "
+            f"WARNING: the output file path {output_path} exists, if you do not manually abort this run in 5 seconds, "
         )
         warning_msg += "it will be deleted and over-written."
         logger.warning(warning_msg)
