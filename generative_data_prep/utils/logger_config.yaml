@@ -1,0 +1,12 @@
+version: 1
+formatters:
+  simple:
+    format: "%(message)s"
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: simple
+root:
+  level: DEBUG
+  handlers: [console]
