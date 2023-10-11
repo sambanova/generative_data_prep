@@ -20,6 +20,7 @@ import logging
 import os
 
 import git
+import yaml
 
 try:
     SEP_STR = "-" * os.get_terminal_size().columns
@@ -34,14 +35,10 @@ class Logger(object):
         """Create a new Logger object if it does not exist."""
         if not hasattr(cls, "instance"):
             cls.instance = super(Logger, cls).__new__(cls)
+            with open("logging_config.yaml", "rt") as f:
+                config = yaml.safe_load(f.read())
+            logging.config.dictConfig(config)
             cls.instance._logger = logging.getLogger("generative_data_prep_logger")
-            cls.instance._logger.setLevel(logging.DEBUG)
-            console_handler = logging.StreamHandler()  # This is your console handler
-            console_handler.setLevel(logging.INFO)
-            formatter = logging.Formatter("%(message)s")
-            console_handler.setFormatter(formatter)
-            cls.instance._logger.addHandler(console_handler)
-            return cls.instance
         return cls.instance
 
     @classmethod
