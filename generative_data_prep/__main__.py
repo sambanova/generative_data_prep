@@ -42,8 +42,6 @@ from generative_data_prep.utils import (
     verify_output_file,
 )
 
-logger = logging.getLogger("generative_data_prep_logger")
-
 
 def add_data_prep_args(subparser: argparse.ArgumentParser):
     """Create the argparser for the generative_data_prep/data_prep/data_prep.py script.
@@ -298,6 +296,8 @@ def get_categories(categories_path: str):
 
 
 if __name__ == "__main__":
+    logger = logging.getLogger("generative_data_prep_logger")
+    logging.config.fileConfig("configs/logger.conf")
     args = get_args()
     if os.path.splitext(args.input_file_path)[1] not in FileExtension.as_list():
         err_msg = f"The input file is not a jsonl or txt file {args.input_file_path}"
