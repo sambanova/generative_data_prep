@@ -24,7 +24,7 @@ import git
 try:
     SEP_STR = "-" * os.get_terminal_size().columns
 except OSError:
-    SEP_STR = "----------------------------------------------------------------------------------"
+    SEP_STR = "-" * 80
 
 
 class Logger(object):
@@ -33,7 +33,6 @@ class Logger(object):
     def __new__(cls):
         """Create a new Logger object if it does not exist."""
         if not hasattr(cls, "instance"):
-            breakpoint()
             cls.instance = super(Logger, cls).__new__(cls)
             cls.instance._logger = logging.getLogger("generative_data_prep_logger")
             cls.instance._logger.setLevel(logging.DEBUG)
@@ -44,6 +43,23 @@ class Logger(object):
             cls.instance._logger.addHandler(console_handler)
             return cls.instance
         return cls.instance
+
+    @classmethod
+    def add_file_handler(cls, log_file_path: str, output_dir: str):
+        """If log_file_path is defined then return it, otherwise return output_dir/logs.log.
+
+        Args:
+            log_file_path: The input log_file_path flag.
+            output_dir: The output directory to default to if log_file_path is None.
+        """
+        if log_file_path is None:
+            log_file_path = os.path.join(output_dir, "logs.log")
+        formatter = logging.Formatter("%(message)s")
+        file_handler = logging.FileHandler(log_file_path)
+        file_handler.setFormatter(formatter)
+        file_handler.setLevel(logging.DEBUG)
+        # Add the file handler to the Logger()
+        cls.instance._logger.addHandler(file_handler)
 
     @classmethod
     def info(cls, message, print_sep_str=True):
@@ -95,11 +111,6 @@ class Logger(object):
         argument_dict = vars(args)
         for arg, value in argument_dict.items():
             cls._logger.debug(f"{arg}: {value}")
-
-    @classmethod
-    def add_handler(cls, handler):
-        """Add a handler to the logger."""
-        cls._logger.addHandler(handler)
 
     @classmethod
     def log_metrics(cls, metrics):

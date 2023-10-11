@@ -17,7 +17,6 @@ Entry point to the Text Processing Pipeline.
 """
 import argparse
 import json
-import logging
 import os
 from multiprocessing import cpu_count
 from typing import Optional
@@ -288,26 +287,6 @@ def get_categories(categories_path: str):
     return category_to_id
 
 
-def create_Logger(log_file_path: str, output_dir: str):
-    """If log_file_path is defined then return it, otherwise return output_dir/logs.log.
-
-    Args:
-        log_file_path: The input log_file_path flag.
-        output_dir: The output directory to default to if log_file_path is None.
-    """
-    if log_file_path is None:
-        log_file_path = os.path.join(output_dir, "logs.log")
-
-    formatter = logging.Formatter("%(message)s")
-    file_handler = logging.FileHandler(log_file_path)
-    file_handler.setFormatter(formatter)
-    file_handler.setLevel(logging.DEBUG)
-    # Add the file handler to the Logger()
-    logger.add_handler(file_handler)
-    logger.log_git_commit_hash()
-    logger.log_current_datetime()
-
-
 if __name__ == "__main__":
     args = get_args()
     if os.path.splitext(args.input_file_path)[1] not in FileExtension.as_list():
@@ -315,7 +294,9 @@ if __name__ == "__main__":
         raise ValueError(err_msg)
     verify_input_file(args.input_file_path)
     output_dir = get_output_dir(args.cmd, args.output_path, args.overwrite_output_path)
-    create_Logger(args.log_file_path, output_dir)
+    logger.add_file_handler(args.log_file_path, output_dir)
+    logger.log_git_commit_hash()
+    logger.log_current_datetime()
     logger.log_input_args(args)
 
     tokenizer = get_tokenizer(
