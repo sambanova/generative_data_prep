@@ -123,6 +123,15 @@ def test_handle_overflow(
             [3, 2, 10, 2, 2, 5],
             [(5, 0), (4, 1), (5, 0)],
         ),
+        # all sequences should be dropped test case
+        (
+            5,
+            -1,
+            PackingStyleType.GREEDY,
+            OverflowType.DROP,
+            [6, 6, 6, 6],
+            [],
+        ),
         (
             5,
             -1,
