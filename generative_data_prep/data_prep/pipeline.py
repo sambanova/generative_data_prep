@@ -378,7 +378,9 @@ def pipeline_main(  # noqa: C901
     # print input file information
     input_file_size_in_bytes = os.stat(input_file_path).st_size
     input_file_size_in_gb = input_file_size_in_bytes / (1024**3)
-    logger.info(f"Size of input jsonl file is: {input_file_size_in_gb} GB ({input_file_size_in_bytes / (1024**2)} MB)")
+    log_message = f"Size of input jsonl file is: {round(input_file_size_in_gb, 2)} GB"
+    log_message += f" ({round(input_file_size_in_bytes / (1024**2), 2)} MB)"
+    logger.info(log_message)
     if input_file_size_in_bytes <= 1:
         raise ValueError(f"your inputted file {input_file_path} is empty")
 
