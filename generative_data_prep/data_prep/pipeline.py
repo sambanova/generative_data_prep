@@ -240,13 +240,13 @@ def multiprocess_data_prep(
     Returns:
         List of output training and dev hdf5 file paths, and the metrics associated with tokenization
     """
-    log_sep_str()
-    logger.info(f"Running tokenization jobs locally, There are {num_workers} processes working on it.")
     if input_file_size_in_gb > 10:
         log_sep_str()
         warning_msg = f"WARNING: your input file size is {input_file_size_in_gb} GB, "
         warning_msg += "this is large and may take up a lot of your machines resources for a long time."
         logger.warning(warning_msg)
+    log_sep_str()
+    logger.info(f"Running tokenization jobs locally, There are {num_workers} processes working on it.")
     sub_input_file_paths = list(map(lambda file_name: os.path.join(split_dir, file_name), files_to_tokenize))
     sub_output_file_paths = list(
         map(
