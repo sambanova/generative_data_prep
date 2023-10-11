@@ -18,6 +18,7 @@ This class creates a common logger.
 import datetime
 import logging
 import os
+from pathlib import Path
 
 import git
 import yaml
@@ -35,7 +36,7 @@ class Logger(object):
         """Create a new Logger object if it does not exist."""
         if not hasattr(cls, "instance"):
             cls.instance = super(Logger, cls).__new__(cls)
-            with open("logging_config.yaml", "rt") as f:
+            with open(os.path.join(Path.cwd(), "generative_data_prep/utils/logger_config.yaml"), "rt") as f:
                 config = yaml.safe_load(f.read())
             logging.config.dictConfig(config)
             cls.instance._logger = logging.getLogger("generative_data_prep_logger")
