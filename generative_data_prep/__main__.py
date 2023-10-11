@@ -17,6 +17,7 @@ Entry point to the Text Processing Pipeline.
 """
 import argparse
 import json
+import logging
 import os
 from multiprocessing import cpu_count
 from typing import Optional
@@ -28,12 +29,18 @@ from generative_data_prep.utils import (
     GPT2_KEY,
     TOKENIZER_CLASSES,
     FileExtension,
-    Logger,
+    add_file_handler,
     data_prep_arg_builder,
+    log_current_datetime,
+    log_git_commit_hash,
+    log_input_args,
+    log_metrics,
     verify_input_file,
     verify_output_dir,
     verify_output_file,
 )
+
+logger = logging.getLogger("generative_data_prep_logger")
 
 
 def add_data_prep_args(subparser: argparse.ArgumentParser):
@@ -167,7 +174,7 @@ def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase, special_tokens_d
         tokenizer: tokenizer to add special tokens to
         special_tokens_dict: special tokens dictionary
     """
-    Logger.info(f"Adding special tokens dict:\n{special_tokens_dict}")
+    logger.info(f"Adding special tokens dict:\n{special_tokens_dict}")
     dict_string = special_tokens_dict.replace("'", '"')
     tokenizer.add_special_tokens(json.loads(dict_string))
 
@@ -294,10 +301,10 @@ if __name__ == "__main__":
         raise ValueError(err_msg)
     verify_input_file(args.input_file_path)
     output_dir = get_output_dir(args.cmd, args.output_path, args.overwrite_output_path)
-    Logger.add_file_handler(args.log_file_path, output_dir)
-    Logger.log_git_commit_hash()
-    Logger.log_current_datetime()
-    Logger.log_input_args(args)
+    add_file_handler(args.log_file_path, output_dir)
+    log_git_commit_hash()
+    log_current_datetime()
+    log_input_args(args)
 
     tokenizer = get_tokenizer(
         args.pretrained_tokenizer,
@@ -354,4 +361,4 @@ if __name__ == "__main__":
             args.prompt_postfix,
         )
 
-    Logger.log_metrics(metrics)
+    log_metrics(metrics)

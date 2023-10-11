@@ -18,6 +18,7 @@ Data preparation pipeline for converting a jsonl file to tokenized hdf5 files co
 
 import concurrent.futures
 import json
+import logging
 import os
 import random
 import shutil
@@ -32,7 +33,6 @@ from generative_data_prep.data_prep import data_prep_main
 from generative_data_prep.processors.metrics import Metrics
 from generative_data_prep.utils import (
     BoundaryType,
-    Logger,
     PackingConfig,
     balance_hdf5_files,
     execute_and_return_stdout,
@@ -40,6 +40,8 @@ from generative_data_prep.utils import (
     verify_output_dir,
     verify_output_file,
 )
+
+logger = logging.getLogger("generative_data_prep_logger")
 
 
 def split_file_linux(num_splits: int, input_file_path: str, split_dir: str) -> None:
@@ -237,11 +239,11 @@ def multiprocess_data_prep(
     Returns:
         List of output training and dev hdf5 file paths, and the metrics associated with tokenization
     """
-    Logger.info(f"Running tokenization jobs locally, There are {num_workers} processes working on it.")
+    logger.info(f"Running tokenization jobs locally, There are {num_workers} processes working on it.")
     if input_file_size_in_gb > 10:
         warning_msg = f"WARNING: your input file size is {input_file_size_in_gb} GB, "
         warning_msg += "this is large and may take up a lot of your machines resources for a long time."
-        Logger.warning(warning_msg)
+        logger.warning(warning_msg)
     sub_input_file_paths = list(map(lambda file_name: os.path.join(split_dir, file_name), files_to_tokenize))
     sub_output_file_paths = list(
         map(
@@ -296,11 +298,11 @@ def multiprocess_data_prep(
             else:
                 err_msg_1 = f"Process {i} failed with the exception below."
                 err_msg_2 = "If the error is a MemoryError, reduce the number of workers to limit your RAM usage."
-                Logger.error(f"\n\n{err_msg_1}\n{err_msg_2}")
+                logger.error(f"\n\n{err_msg_1}\n{err_msg_2}")
                 raise exc from None
     # if no "interesting" exceptions are found, raise the BrokenProcessPool Exception
     if len(broken_process_indices) > 0:
-        Logger.error(f'\n\nProcesses {", ".join(broken_process_indices)} failed with the following exception:')
+        logger.error(f'\n\nProcesses {", ".join(broken_process_indices)} failed with the following exception:')
         assert broken_process_pool_exc is not None  # nosec: B101
         raise broken_process_pool_exc from None
 
@@ -380,7 +382,7 @@ def pipeline_main(  # noqa: C901
     input_file_size_in_gb = input_file_size_in_bytes / (1024**3)
     log_message = f"Size of input jsonl file is: {round(input_file_size_in_gb, 2)} GB"
     log_message += f" ({round(input_file_size_in_bytes / (1024**2), 2)} MB)"
-    Logger.info(log_message)
+    logger.info(log_message)
     if input_file_size_in_bytes <= 1:
         raise ValueError(f"your inputted file {input_file_path} is empty")
 
@@ -423,7 +425,7 @@ def pipeline_main(  # noqa: C901
     # Case 2: Shuffling on RAM with linux OS
     elif shuffle == "on_RAM" and "linux" in platform.lower():
         check_RAM(input_file_size_in_bytes)
-        Logger.info("Shuffling input file, please be patient.")
+        logger.info("Shuffling input file, please be patient.")
         file_ext = os.path.splitext(input_file_path)[1]
         shuffle_file_path = os.path.join(output_dir, f"tmp_shuf{file_ext}")
         shuffle_command = f"shuf {input_file_path} > {shuffle_file_path}"
@@ -453,7 +455,7 @@ def pipeline_main(  # noqa: C901
 
     # Case 4: Do not shuffle, split file without linux OS
     elif shuffle == "False" and "linux" not in platform.lower():
-        Logger.warning("WARNING, you did not specify the --shuffle flag, so no shuffling was done!")
+        logger.warning("WARNING, you did not specify the --shuffle flag, so no shuffling was done!")
         out_files = []
         num_digits = len(str(num_splits))
         for i in range(num_splits):
@@ -469,7 +471,7 @@ def pipeline_main(  # noqa: C901
 
     # Case 5: Do not shuffle, split file with linux OS
     elif shuffle == "False" and "linux" in platform.lower():
-        Logger.warning("WARNING, you did not specify the --shuffle flag, so no shuffling was done!")
+        logger.warning("WARNING, you did not specify the --shuffle flag, so no shuffling was done!")
         split_file_linux(num_splits, input_file_path, split_dir)
 
     # rename files to include the corresponding names of 'test', 'dev' and 'train'
@@ -503,16 +505,16 @@ def pipeline_main(  # noqa: C901
         prompt_prefix,
         prompt_postfix,
     )
-    Logger.info(f"Tokenization is complete, the output dataset is located at: {output_dir}")
+    logger.info(f"Tokenization is complete, the output dataset is located at: {output_dir}")
 
     # Balance hdf5 files so they all have the same number of sequences to within 1
     if do_not_balance_hdf5:
         warning = "WARNING: Skipping balancing hdf5 files, this is not recommended because during "
         warning += 'distributed training some workers will train on some data more than once per "epoch".'
-        Logger.warning(warning)
+        logger.warning(warning)
 
     else:
-        Logger.info("Balancing hdf5 files to ensure they have the same number of sequences.")
+        logger.info("Balancing hdf5 files to ensure they have the same number of sequences.")
         balance_hdf5_files(train_hdf5_files)
         balance_hdf5_files(dev_hdf5_files)
 

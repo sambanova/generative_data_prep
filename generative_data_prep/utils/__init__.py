@@ -24,7 +24,13 @@ from .constants import (
     TokenTypeIds,
 )
 from .large_file_shuffle import large_file_shuffle
-from .logger import Logger
+from .logger import (
+    add_file_handler,
+    log_current_datetime,
+    log_git_commit_hash,
+    log_input_args,
+    log_metrics,
+)
 from .path_verify import verify_input_file, verify_output_dir, verify_output_file
 from .utils import (
     GPT2_KEY,
@@ -50,5 +56,9 @@ __all__ = [
     "data_prep_arg_builder",
     "execute_and_return_stdout",
     "CATEGORY_JSON_KEY",
-    "Logger",
+    "add_file_handler",
+    "log_input_args",
+    "log_current_datetime",
+    "log_metrics",
+    "log_git_commit_hash",
 ]
