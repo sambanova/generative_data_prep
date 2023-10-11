@@ -58,69 +58,68 @@ class Logger(object):
         file_handler.setFormatter(formatter)
         file_handler.setLevel(logging.DEBUG)
         # Add the file handler to the Logger()
-        cls.instance._logger.addHandler(file_handler)
+        cls.instance.addHandler(file_handler)
 
     @classmethod
     def info(cls, message, print_sep_str=True):
         """Log at the info level."""
         if print_sep_str:
-            cls._logger(SEP_STR)
-        cls._logger.info(message)
+            cls.instance(SEP_STR)
+        cls.instance.info(message)
 
     @classmethod
     def error(cls, message, print_sep_str=True):
         """Log at the error level."""
         if print_sep_str:
-            cls._logger(SEP_STR)
-        cls._logger.info(message)
+            cls.instance.info(SEP_STR)
+        cls.instance.info(message)
 
     @classmethod
     def warning(cls, message, print_sep_str=True):
         """Log at the warning level."""
         if print_sep_str:
-            cls._logger(SEP_STR)
-        cls._logger.info(message)
+            cls.instance.info(SEP_STR)
+        cls.instance.info(message)
 
     @classmethod
     def debug(cls, message, print_sep_str=True):
         """Log at the debug level."""
         if print_sep_str:
-            cls._logger(SEP_STR)
-        cls._logger.info(message)
+            cls.instance.info(SEP_STR)
+        cls.instance.info(message)
 
     @classmethod
     def log_current_datetime(cls):
         """Log at the current date and time."""
         current_datetime = datetime.datetime.now()
-        cls._logger.debug(f"Time of execution: {current_datetime}")
+        cls.instance.debug(f"Time of execution: {current_datetime}")
 
     @classmethod
     def log_git_commit_hash(cls):
         """Log the current git commit hash."""
         repo = git.Repo(search_parent_directories=True)
         sha = repo.head.object.hexsha
-        cls._logger.debug("Running Generative Data Prep repository: https://github.com/sambanova/generative_data_prep/")
-        cls._logger.debug(f"Git commit hash: {sha}")
+        cls.instance.debug(
+            "Running Generative Data Prep repository: https://github.com/sambanova/generative_data_prep/"
+        )
+        cls.instance.debug(f"Git commit hash: {sha}")
 
     @classmethod
     def log_input_args(cls, args):
         """Log the input arguments."""
-        cls._logger.debug(SEP_STR)
-        cls._logger.debug("Logging command line input flags.")
+        cls.instance.debug(SEP_STR)
+        cls.instance.debug("Logging command line input flags.")
         argument_dict = vars(args)
         for arg, value in argument_dict.items():
-            cls._logger.debug(f"{arg}: {value}")
+            cls.instance.debug(f"{arg}: {value}")
 
     @classmethod
     def log_metrics(cls, metrics):
         """Log the metrics table."""
-        cls._logger.info(f"{cls._header('Metrics')}\n{metrics}\n{cls._header('Complete')}")
+        cls.instance.info(f"{cls._header('Metrics')}\n{metrics}\n{cls._header('Complete')}")
 
     @classmethod
     def _header(cls, header_name: str):
         """Create a header out of the header_name string."""
         half_sep_str = int((len(SEP_STR) - len(header_name)) / 2) * "-"
         return half_sep_str + header_name + half_sep_str
-
-
-logger = Logger()
