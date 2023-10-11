@@ -27,14 +27,9 @@ from transformers import AutoTokenizer, PreTrainedTokenizerBase
 from generative_data_prep.data_prep import data_prep_main, pipeline_main
 from generative_data_prep.utils import (
     GPT2_KEY,
-    SEP_STR,
     TOKENIZER_CLASSES,
     FileExtension,
     data_prep_arg_builder,
-    header,
-    log_current_datetime,
-    log_git_commit_hash,
-    log_input_args,
     logger,
     verify_input_file,
     verify_output_dir,
@@ -173,9 +168,7 @@ def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase, special_tokens_d
         tokenizer: tokenizer to add special tokens to
         special_tokens_dict: special tokens dictionary
     """
-    logger.info(SEP_STR)
-    logger.info("Adding special tokens dict:")
-    logger.info(special_tokens_dict)
+    logger.info(f"Adding special tokens dict:\n{special_tokens_dict}")
     dict_string = special_tokens_dict.replace("'", '"')
     tokenizer.add_special_tokens(json.loads(dict_string))
 
@@ -295,7 +288,7 @@ def get_categories(categories_path: str):
     return category_to_id
 
 
-def create_logger(log_file_path: str, output_dir: str):
+def create_Logger(log_file_path: str, output_dir: str):
     """If log_file_path is defined then return it, otherwise return output_dir/logs.log.
 
     Args:
@@ -309,10 +302,10 @@ def create_logger(log_file_path: str, output_dir: str):
     file_handler = logging.FileHandler(log_file_path)
     file_handler.setFormatter(formatter)
     file_handler.setLevel(logging.DEBUG)
-    # Add the file handler to the logger
-    logger.addHandler(file_handler)
-    log_git_commit_hash(logger)
-    log_current_datetime(logger)
+    # Add the file handler to the Logger()
+    logger.add_handler(file_handler)
+    logger.log_git_commit_hash()
+    logger.log_current_datetime()
 
 
 if __name__ == "__main__":
@@ -322,8 +315,8 @@ if __name__ == "__main__":
         raise ValueError(err_msg)
     verify_input_file(args.input_file_path)
     output_dir = get_output_dir(args.cmd, args.output_path, args.overwrite_output_path)
-    create_logger(args.log_file_path, output_dir)
-    log_input_args(logger, args)
+    create_Logger(args.log_file_path, output_dir)
+    logger.log_input_args(args)
 
     tokenizer = get_tokenizer(
         args.pretrained_tokenizer,
@@ -380,6 +373,4 @@ if __name__ == "__main__":
             args.prompt_postfix,
         )
 
-    logger.info(header("Metrics"))
-    logger.info(metrics)
-    logger.info(header("Complete"))
+    logger.log_metrics(metrics)

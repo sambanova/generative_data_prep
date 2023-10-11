@@ -22,8 +22,7 @@ import os
 import shutil
 from typing import Optional
 
-from .logger import logger
-from .utils import SEP_STR
+from .logger import Logger
 
 
 def verify_input_file(input_file: str):
@@ -91,8 +90,7 @@ def verify_output_dir(
                     else:
                         shutil.rmtree(file_path)
         elif raise_warning_if_exists:
-            logger.info(SEP_STR)
-            logger.warning(f"WARNING: {output_dir} already exists, new files will be written here.")
+            Logger().warning(f"WARNING: {output_dir} already exists, new files will be written here.")
     else:
         os.makedirs(output_dir)
 

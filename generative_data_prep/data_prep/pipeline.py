@@ -31,7 +31,6 @@ from transformers import PreTrainedTokenizerBase
 from generative_data_prep.data_prep import data_prep_main
 from generative_data_prep.processors.metrics import Metrics
 from generative_data_prep.utils import (
-    SEP_STR,
     BoundaryType,
     PackingConfig,
     balance_hdf5_files,
@@ -238,7 +237,6 @@ def multiprocess_data_prep(
     Returns:
         List of output training and dev hdf5 file paths, and the metrics associated with tokenization
     """
-    logger.info(SEP_STR)
     logger.info(f"Running tokenization jobs locally, There are {num_workers} processes working on it.")
     if input_file_size_in_gb > 10:
         warning_msg = f"WARNING: your input file size is {input_file_size_in_gb} GB, "
@@ -380,7 +378,6 @@ def pipeline_main(  # noqa: C901
     # print input file information
     input_file_size_in_bytes = os.stat(input_file_path).st_size
     input_file_size_in_gb = input_file_size_in_bytes / (1024**3)
-    logger.info(SEP_STR)
     logger.info(f"Size of input jsonl file is: {input_file_size_in_gb} GB ({input_file_size_in_bytes / (1024**2)} MB)")
     if input_file_size_in_bytes <= 1:
         raise ValueError(f"your inputted file {input_file_path} is empty")
@@ -424,7 +421,6 @@ def pipeline_main(  # noqa: C901
     # Case 2: Shuffling on RAM with linux OS
     elif shuffle == "on_RAM" and "linux" in platform.lower():
         check_RAM(input_file_size_in_bytes)
-        logger.info(SEP_STR)
         logger.info("Shuffling input file, please be patient.")
         file_ext = os.path.splitext(input_file_path)[1]
         shuffle_file_path = os.path.join(output_dir, f"tmp_shuf{file_ext}")
@@ -455,7 +451,6 @@ def pipeline_main(  # noqa: C901
 
     # Case 4: Do not shuffle, split file without linux OS
     elif shuffle == "False" and "linux" not in platform.lower():
-        logger.info(SEP_STR)
         logger.warning("WARNING, you did not specify the --shuffle flag, so no shuffling was done!")
         out_files = []
         num_digits = len(str(num_splits))
@@ -472,7 +467,6 @@ def pipeline_main(  # noqa: C901
 
     # Case 5: Do not shuffle, split file with linux OS
     elif shuffle == "False" and "linux" in platform.lower():
-        logger.info(SEP_STR)
         logger.warning("WARNING, you did not specify the --shuffle flag, so no shuffling was done!")
         split_file_linux(num_splits, input_file_path, split_dir)
 
@@ -507,18 +501,15 @@ def pipeline_main(  # noqa: C901
         prompt_prefix,
         prompt_postfix,
     )
-    logger.info(SEP_STR)
     logger.info(f"Tokenization is complete, the output dataset is located at: {output_dir}")
 
     # Balance hdf5 files so they all have the same number of sequences to within 1
     if do_not_balance_hdf5:
-        logger.info(SEP_STR)
         warning = "WARNING: Skipping balancing hdf5 files, this is not recommended because during "
         warning += 'distributed training some workers will train on some data more than once per "epoch".'
         logger.warning(warning)
 
     else:
-        logger.info(SEP_STR)
         logger.info("Balancing hdf5 files to ensure they have the same number of sequences.")
         balance_hdf5_files(train_hdf5_files)
         balance_hdf5_files(dev_hdf5_files)

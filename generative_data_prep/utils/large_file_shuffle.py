@@ -82,32 +82,31 @@ def large_file_shuffle(
         os.remove(output_path)
 
     prev_time = time.time()
-    logger.info("splitting file")
+    logger.info("splitting file", False)
     split_command = f"split -d -n r/{num_splits} {input_file_path} {split_dir}/"
     os.system(split_command)  # nosec
-    logger.info(f"splitting took {time.time() - prev_time} seconds (used round robin splitting).")
+    logger.info(f"splitting took {time.time() - prev_time} seconds (used round robin splitting).", False)
 
     prev_time = time.time()
-    logger.info(f"shuffling {num_splits} files")
+    logger.info(f"shuffling {num_splits} files", False)
     file_list = list(os.listdir(split_dir))
     for file in tqdm(file_list):
         curr_file_path = os.path.join(split_dir, file)
         shuf_command = f"shuf {curr_file_path} --output={curr_file_path}"
         os.system(shuf_command)  # nosec
-    logger.info(f"Finished shuffling {num_splits} files. Took {time.time() - prev_time} seconds.")
 
     if concat_splits:
         random_split_list = list(range(num_splits))
         random.shuffle(random_split_list)
         prev_time = time.time()
-        logger.info("Concatenating shuffled splits.")
+        logger.info("Concatenating shuffled splits.", False)
         for rand_ind in tqdm(random_split_list):
             curr_file_path = os.path.join(split_dir, file_list[rand_ind])
             concat_command = f"cat {curr_file_path} >> {output_path}"
             os.system(concat_command)  # nosec
             os.remove(curr_file_path)
-        logger.info(f"Finished concatenating files. Took {time.time() - prev_time} seconds.")
+        logger.info(f"Finished concatenating files. Took {time.time() - prev_time} seconds.", False)
         shutil.rmtree(split_dir)
 
-    logger.info(f"Total time: {time.time() - start_time}")
+    logger.info(f"Finished shuffling {num_splits} files. Took {time.time() - start_time} seconds.", False)
     return output_path
