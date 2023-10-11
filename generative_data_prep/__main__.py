@@ -167,7 +167,7 @@ def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase, special_tokens_d
         tokenizer: tokenizer to add special tokens to
         special_tokens_dict: special tokens dictionary
     """
-    Logger().info(f"Adding special tokens dict:\n{special_tokens_dict}")
+    Logger.info(f"Adding special tokens dict:\n{special_tokens_dict}")
     dict_string = special_tokens_dict.replace("'", '"')
     tokenizer.add_special_tokens(json.loads(dict_string))
 
@@ -294,10 +294,10 @@ if __name__ == "__main__":
         raise ValueError(err_msg)
     verify_input_file(args.input_file_path)
     output_dir = get_output_dir(args.cmd, args.output_path, args.overwrite_output_path)
-    Logger().add_file_handler(args.log_file_path, output_dir)
-    Logger().log_git_commit_hash()
-    Logger().log_current_datetime()
-    Logger().log_input_args(args)
+    Logger.add_file_handler(args.log_file_path, output_dir)
+    Logger.log_git_commit_hash()
+    Logger.log_current_datetime()
+    Logger.log_input_args(args)
 
     tokenizer = get_tokenizer(
         args.pretrained_tokenizer,
@@ -354,4 +354,4 @@ if __name__ == "__main__":
             args.prompt_postfix,
         )
 
-    Logger().log_metrics(metrics)
+    Logger.log_metrics(metrics)

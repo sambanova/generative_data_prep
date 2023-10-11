@@ -40,7 +40,7 @@ class Logger(object):
             with open(os.path.join(Path.cwd(), "generative_data_prep/utils/logger_config.yaml"), "rt") as f:
                 config = yaml.safe_load(f.read())
             logging.config.dictConfig(config)
-            cls.instance = logging.getLogger("generative_data_prep_logger")
+            cls.instance._logger = logging.getLogger("generative_data_prep_logger")
         return cls.instance
 
     @classmethod
@@ -57,8 +57,8 @@ class Logger(object):
         file_handler = logging.FileHandler(log_file_path)
         file_handler.setFormatter(formatter)
         file_handler.setLevel(logging.DEBUG)
-        # Add the file handler to the Logger()
-        cls.instance.addHandler(file_handler)
+        # Add the file handler to the Logger
+        cls.instance._logger.addHandler(file_handler)
 
     @classmethod
     def info(cls, message, print_sep_str=True):
