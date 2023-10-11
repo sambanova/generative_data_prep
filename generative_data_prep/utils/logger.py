@@ -17,6 +17,7 @@ This class creates a common logger.
 """
 import datetime
 import logging
+import logging.config
 import os
 from pathlib import Path
 
@@ -39,7 +40,7 @@ class Logger(object):
             with open(os.path.join(Path.cwd(), "generative_data_prep/utils/logger_config.yaml"), "rt") as f:
                 config = yaml.safe_load(f.read())
             logging.config.dictConfig(config)
-            cls.instance._logger = logging.getLogger("generative_data_prep_logger")
+            cls.instance = logging.getLogger("generative_data_prep_logger")
         return cls.instance
 
     @classmethod
