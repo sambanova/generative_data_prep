@@ -22,7 +22,7 @@ import os
 
 import git
 
-logging.config.fileConfig("generative_data_prep/utils/logger_config.yaml")
+logging.config.fileConfig("generative_data_prep/utils/logger_config.ini")
 logger = logging.getLogger("generative_data_prep_logger")
 start_time = datetime.datetime.now()
 
