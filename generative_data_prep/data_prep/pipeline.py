@@ -17,13 +17,17 @@ Data preparation pipeline for converting a jsonl file to tokenized hdf5 files co
 """
 
 import concurrent.futures
+import multiprocessing
 import json
 import logging
 import os
 import random
+import time
 import shutil
+from alive_progress import alive_bar
 from sys import platform
 from typing import Any, Dict, Iterable, List, Optional, Tuple
+
 
 import numpy as np
 import psutil
@@ -122,6 +126,13 @@ def rename_files(
             files_to_tokenize.append(new_name)
     return files_to_tokenize
 
+def estimate_total_num_articles(files_to_tokenize, split_dir):
+    lines_per_file = 0
+    with open(os.path.join(split_dir, files_to_tokenize[0]), 'r') as file:
+        for _ in file:
+            lines_per_file += 1
+    
+    return lines_per_file * len(files_to_tokenize)
 
 def get_split_counts(
     input_file_size_in_gb: float,
@@ -197,6 +208,9 @@ def data_prep_main_helper(args: Iterable[Any]):
     """Helper function to apply the star operator on the arguments when calling the data_prep_main function."""
     return data_prep_main(*args)
 
+def update_progress_bar(num_tokenized_articles, progress_bar):
+    """Use the shared variable to update the progress bar."""
+    pass
 
 def multiprocess_data_prep(
     files_to_tokenize: List[str],
@@ -215,7 +229,7 @@ def multiprocess_data_prep(
     input_file_size_in_gb: float,
     category_to_id: Optional[Dict[str, int]] = None,
     prompt_prefix: Optional[str] = None,
-    prompt_postfix: Optional[str] = None,
+    prompt_postfix: Optional[str] = None,    
 ) -> Tuple[List[str], List[str], Metrics]:
     """Tokenizes all the files in files_to_tokenize efficiently using multirpocessing library.
 
@@ -234,6 +248,7 @@ def multiprocess_data_prep(
         tokenizer: The tokenizer to use for tokenizing text.
         num_workers: Number of workers to use for multiprocessing
         input_file_size_in_gb: Size of the input file in gigabytes.
+        category_to_id: Dictionary that maps category names to ids.
         prompt_prefix: text to add before the prompt, for chatML conventions use.
         prompt_postfix: text to add after the prompt, for chatML conventions use.
 
@@ -256,7 +271,10 @@ def multiprocess_data_prep(
     )
     train_hdf5_files = list(filter(lambda file_name: "train" in file_name, sub_output_file_paths))
     dev_hdf5_files = list(filter(lambda file_name: "dev" in file_name, sub_output_file_paths))
-
+    total_num_articles = estimate_total_num_articles(files_to_tokenize, split_dir)
+    manager = multiprocessing.Manager()
+    num_tokenized_articles_lock = manager.Lock()
+    num_tokenized_articles = manager.Value(int, 0)
     data_prep_main_args_list = []
     for input_file_path, output_file_path in zip(sub_input_file_paths, sub_output_file_paths):
         data_prep_main_args_list.append(
@@ -273,6 +291,8 @@ def multiprocess_data_prep(
                 keep_prompt_only_sequences,
                 prompt_keyword,
                 completion_keyword,
+                num_tokenized_articles,
+                num_tokenized_articles_lock,
                 category_to_id,
                 prompt_prefix,
                 prompt_postfix,
@@ -281,8 +301,8 @@ def multiprocess_data_prep(
 
     futures = []
     with concurrent.futures.ProcessPoolExecutor(max_workers=num_workers) as executor:
-        futures = [executor.submit(data_prep_main_helper, args) for args in data_prep_main_args_list]
-
+        futures = [executor.submit(data_prep_main_helper, args) for args in data_prep_main_args_list]    
+    
     # if one process fails with an exception such as a RuntimeError, all other processes will fail with a
     # BrokenProcessPool exception.  In such a situation we only want to show the user the RuntimeError.  We only want
     # to show the user the BrokenProcessPool exception if all failing processes failed with this error.  This
@@ -290,26 +310,38 @@ def multiprocess_data_prep(
     broken_process_indices = []
     broken_process_pool_exc: Optional[BaseException] = None
     metrics = Metrics()
-    # search for any "interesting" exception (a non-BrokenProcessPool Exception)
-    for i, future in enumerate(futures):
-        try:
-            metrics += future.result()
-        except Exception as exc:
-            if isinstance(exc, concurrent.futures.process.BrokenProcessPool):
-                broken_process_indices.append(str(i))
-                broken_process_pool_exc = exc
-            else:
-                log_sep_str()
-                err_msg_1 = f"Process {i} failed with the exception below."
-                err_msg_2 = "If the error is a MemoryError, reduce the number of workers to limit your RAM usage."
-                LOGGER.error(f"\n\n{err_msg_1}\n{err_msg_2}")
-                raise exc from None
-    # if no "interesting" exceptions are found, raise the BrokenProcessPool Exception
-    if len(broken_process_indices) > 0:
-        log_sep_str()
-        LOGGER.error(f'\n\nProcesses {", ".join(broken_process_indices)} failed with the following exception:')
-        assert broken_process_pool_exc is not None  # nosec: B101
-        raise broken_process_pool_exc from None
+
+    with alive_bar(total_num_articles) as bar:
+        while True:
+            # search for any "interesting" exception (a non-BrokenProcessPool Exception)
+            for i, future in enumerate(concurrent.futures.as_completed(futures)):
+                try:
+                    metrics += future.result()
+                except Exception as exc:
+                    if isinstance(exc, concurrent.futures.process.BrokenProcessPool):
+                        broken_process_indices.append(str(i))
+                        broken_process_pool_exc = exc
+                    else:
+                        log_sep_str()
+                        err_msg_1 = f"Process {i} failed with the exception below."
+                        err_msg_2 = "If the error is a MemoryError, reduce the number of workers to limit your RAM usage."
+                        LOGGER.error(f"\n\n{err_msg_1}\n{err_msg_2}")
+                        raise exc from None
+                    # if no "interesting" exceptions are found, raise the BrokenProcessPool Exception
+                    if len(broken_process_indices) > 0:
+                        log_sep_str()
+                        LOGGER.error(f'\n\nProcesses {", ".join(broken_process_indices)} failed with the following exception:')
+                        assert broken_process_pool_exc is not None  # nosec: B101
+                        raise broken_process_pool_exc from None
+                    
+            with num_tokenized_articles_lock:
+                bar(num_tokenized_articles.value)
+
+            # Check if all tasks are done
+            if all(future.done() for future in futures):
+                break
+            
+            time.sleep(1)
 
     return train_hdf5_files, dev_hdf5_files, metrics
 
@@ -512,8 +544,9 @@ def pipeline_main(  # noqa: C901
         input_file_size_in_gb,
         category_to_id,
         prompt_prefix,
-        prompt_postfix,
+        prompt_postfix
     )
+
     log_sep_str()
     LOGGER.info(f"Tokenization is complete, the output dataset is located at: {output_dir}")
 

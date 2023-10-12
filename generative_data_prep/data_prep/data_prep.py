@@ -20,6 +20,7 @@ from __future__ import absolute_import
 
 import os
 import sys
+import multiprocessing
 from typing import Dict, Optional
 
 from transformers import PreTrainedTokenizerBase
@@ -42,6 +43,8 @@ def data_prep_main(
     keep_prompt_only_sequences: bool,
     prompt_keyword: str,
     completion_keyword: str,
+    num_tokenized_articles: multiprocessing.Value = None,
+    num_tokenized_articles_lock: multiprocessing.Lock = None,
     category_to_id: Optional[Dict[str, int]] = None,
     prompt_prefix: Optional[str] = None,
     prompt_postfix: Optional[str] = None,
@@ -96,5 +99,8 @@ def data_prep_main(
             for line in reader:
                 hdf5_text_buffer.write(article_tokenizer(line))
             hdf5_text_buffer.write(article_tokenizer(None))
+            if num_tokenized_articles_lock is not None and num_tokenized_articles is not None:
+                with num_tokenized_articles_lock:
+                    num_tokenized_articles.value += 1
 
     return article_tokenizer.metrics
