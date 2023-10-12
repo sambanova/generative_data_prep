@@ -18,11 +18,14 @@ Helper functions to verify that file paths are valid.
 Check to make sure that the files can be created and correctly written or read from.
 If the path is not valid, then fail out gracefully with ValueError.
 """
+import logging
 import os
 import shutil
 from typing import Optional
 
-from .utils import SEP_STR
+from .logger import log_sep_str
+
+LOGGER = logging.getLogger("generative_data_prep_logger")
 
 
 def verify_input_file(input_file: str):
@@ -90,8 +93,8 @@ def verify_output_dir(
                     else:
                         shutil.rmtree(file_path)
         elif raise_warning_if_exists:
-            print(SEP_STR)
-            print(f"WARNING: {output_dir} already exists, new files will be written here")
+            log_sep_str()
+            LOGGER.warning(f"WARNING: {output_dir} already exists, new files will be written here.")
     else:
         os.makedirs(output_dir)
 

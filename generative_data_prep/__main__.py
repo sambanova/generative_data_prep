@@ -15,9 +15,9 @@ limitations under the License.
 
 Entry point to the Text Processing Pipeline.
 """
-
 import argparse
 import json
+import logging
 import os
 from multiprocessing import cpu_count
 from typing import Optional
@@ -27,10 +27,16 @@ from transformers import AutoTokenizer, PreTrainedTokenizerBase
 from generative_data_prep.data_prep import data_prep_main, pipeline_main
 from generative_data_prep.utils import (
     GPT2_KEY,
-    SEP_STR,
     TOKENIZER_CLASSES,
     FileExtension,
+    add_file_handler,
     data_prep_arg_builder,
+    log_current_datetime,
+    log_elapsed_time,
+    log_git_commit_hash,
+    log_input_args,
+    log_metrics,
+    log_sep_str,
     verify_input_file,
     verify_output_dir,
     verify_output_file,
@@ -168,9 +174,8 @@ def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase, special_tokens_d
         tokenizer: tokenizer to add special tokens to
         special_tokens_dict: special tokens dictionary
     """
-    print(SEP_STR)
-    print("Adding special tokens dict:")
-    print(special_tokens_dict, flush=True)
+    log_sep_str()
+    logger.info(f"Adding special tokens dict:\n{special_tokens_dict}")
     dict_string = special_tokens_dict.replace("'", '"')
     tokenizer.add_special_tokens(json.loads(dict_string))
 
@@ -291,12 +296,19 @@ def get_categories(categories_path: str):
 
 
 if __name__ == "__main__":
+    logger = logging.getLogger("generative_data_prep_logger")
+    logging.config.fileConfig("configs/logger.conf")
     args = get_args()
     if os.path.splitext(args.input_file_path)[1] not in FileExtension.as_list():
         err_msg = f"The input file is not a jsonl or txt file {args.input_file_path}"
         raise ValueError(err_msg)
     verify_input_file(args.input_file_path)
     output_dir = get_output_dir(args.cmd, args.output_path, args.overwrite_output_path)
+    add_file_handler(args.log_file_path, output_dir)
+    log_git_commit_hash()
+    log_current_datetime()
+    log_input_args(args)
+
     tokenizer = get_tokenizer(
         args.pretrained_tokenizer,
         args.tokenizer_class,
@@ -352,4 +364,5 @@ if __name__ == "__main__":
             args.prompt_postfix,
         )
 
-    print(metrics)
+    log_metrics(metrics)
+    log_elapsed_time()
