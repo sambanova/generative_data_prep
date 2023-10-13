@@ -36,12 +36,6 @@ def get_files_to_tokenize(test_name: str) -> str:
     return glob.glob(f"{split_dir}/*")
 
 
-def get_(test_name: str) -> str:
-    """Create a absolute path to example input."""
-    ext = ".txt" if "txt" in test_name else ".jsonl"
-    return os.path.join(Path.cwd(), EXAMPLE_PATH, test_name, f"example_{test_name}_data{ext}")
-
-
 class SomeStrangeException(Exception):
     """A random exception created for the purpose of this test."""
 
