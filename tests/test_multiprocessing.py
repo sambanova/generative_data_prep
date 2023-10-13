@@ -13,7 +13,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-import glob
 import os
 from pathlib import Path
 
@@ -32,8 +31,7 @@ def get_split_dir(test_name: str) -> str:
 
 def get_files_to_tokenize(test_name: str) -> str:
     """Create a absolute path to example input."""
-    split_dir = get_split_dir(test_name)
-    return glob.glob(f"{split_dir}/*")
+    os.listdir(get_split_dir(test_name))
 
 
 class SomeStrangeException(Exception):
