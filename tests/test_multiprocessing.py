@@ -31,7 +31,7 @@ def get_split_dir(test_name: str) -> str:
 
 def get_files_to_tokenize(test_name: str) -> str:
     """Create a absolute path to example input."""
-    os.listdir(get_split_dir(test_name))
+    return os.listdir(get_split_dir(test_name))
 
 
 class SomeStrangeException(Exception):
