@@ -13,10 +13,33 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+import glob
+import os
+from pathlib import Path
+
 import pytest
 
 import generative_data_prep
 from generative_data_prep.data_prep import multiprocess_data_prep
+
+from .test_utils import EXAMPLE_PATH
+
+
+def get_split_dir(test_name: str) -> str:
+    """Create a absolute path to example input."""
+    return os.path.join(Path.cwd(), EXAMPLE_PATH, test_name, f"pipelined_{test_name}", "splits")
+
+
+def get_files_to_tokenize(test_name: str) -> str:
+    """Create a absolute path to example input."""
+    split_dir = get_split_dir(test_name)
+    return glob.glob(f"{split_dir}/*")
+
+
+def get_(test_name: str) -> str:
+    """Create a absolute path to example input."""
+    ext = ".txt" if "txt" in test_name else ".jsonl"
+    return os.path.join(Path.cwd(), EXAMPLE_PATH, test_name, f"example_{test_name}_data{ext}")
 
 
 class SomeStrangeException(Exception):
@@ -38,8 +61,8 @@ def test_multiprocess_data_prep_graceful_exit():
     generative_data_prep.data_prep.pipeline.data_prep_main_helper = data_prep_main_helper_dummy
     with pytest.raises(SomeStrangeException):
         multiprocess_data_prep(
-            files_to_tokenize=["test_file.jsonl"],
-            split_dir="splits",
+            files_to_tokenize=[get_split_dir("generative_tuning")],
+            split_dir=get_files_to_tokenize("generative_tuning"),
             hdf5_dir="hdf5",
             max_seq_length=1024,
             input_packing_config=None,

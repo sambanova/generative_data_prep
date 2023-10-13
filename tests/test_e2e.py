@@ -26,6 +26,7 @@ from generative_data_prep.data_prep import data_prep_main, pipeline_main
 from generative_data_prep.utils import BoundaryType, PackingConfig
 
 from .test_utils import (
+    EXAMPLE_PATH,
     check_balance,
     check_diff_hdf5,
     check_no_split_dir,
@@ -34,8 +35,6 @@ from .test_utils import (
 )
 
 TOKENIZER = GPT2Tokenizer.from_pretrained("gpt2")
-
-EXAMPLE_PATH = "tests/examples"
 
 
 def get_input_path(test_name: str) -> str:
