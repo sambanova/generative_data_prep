@@ -53,8 +53,8 @@ def test_multiprocess_data_prep_graceful_exit():
     generative_data_prep.data_prep.pipeline.data_prep_main_helper = data_prep_main_helper_dummy
     with pytest.raises(SomeStrangeException):
         multiprocess_data_prep(
-            files_to_tokenize=[get_split_dir("generative_tuning")],
-            split_dir=get_files_to_tokenize("generative_tuning"),
+            files_to_tokenize=get_files_to_tokenize("generative_tuning"),
+            split_dir=get_split_dir("generative_tuning"),
             hdf5_dir="hdf5",
             max_seq_length=1024,
             input_packing_config=None,
