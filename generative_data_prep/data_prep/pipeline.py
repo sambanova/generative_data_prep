@@ -275,6 +275,7 @@ def multiprocess_data_prep(
     manager = multiprocessing.Manager()
     num_tokenized_articles_lock = manager.Lock()
     num_tokenized_articles = manager.Value(int, 0)
+    prev_num_tokenized_articles = 0
     data_prep_main_args_list = []
     for input_file_path, output_file_path in zip(sub_input_file_paths, sub_output_file_paths):
         data_prep_main_args_list.append(
@@ -298,11 +299,9 @@ def multiprocess_data_prep(
                 prompt_postfix,
             )
         )
-
     futures = []
-    with concurrent.futures.ProcessPoolExecutor(max_workers=num_workers) as executor:
-        futures = [executor.submit(data_prep_main_helper, args) for args in data_prep_main_args_list]    
-    
+    executor = concurrent.futures.ProcessPoolExecutor(max_workers=num_workers)
+    futures = [executor.submit(data_prep_main_helper, args) for args in data_prep_main_args_list]  
     # if one process fails with an exception such as a RuntimeError, all other processes will fail with a
     # BrokenProcessPool exception.  In such a situation we only want to show the user the RuntimeError.  We only want
     # to show the user the BrokenProcessPool exception if all failing processes failed with this error.  This
@@ -310,39 +309,41 @@ def multiprocess_data_prep(
     broken_process_indices = []
     broken_process_pool_exc: Optional[BaseException] = None
     metrics = Metrics()
-
     with alive_bar(total_num_articles) as bar:
         while True:
             # search for any "interesting" exception (a non-BrokenProcessPool Exception)
-            for i, future in enumerate(concurrent.futures.as_completed(futures)):
-                try:
-                    metrics += future.result()
-                except Exception as exc:
-                    if isinstance(exc, concurrent.futures.process.BrokenProcessPool):
-                        broken_process_indices.append(str(i))
-                        broken_process_pool_exc = exc
-                    else:
-                        log_sep_str()
-                        err_msg_1 = f"Process {i} failed with the exception below."
-                        err_msg_2 = "If the error is a MemoryError, reduce the number of workers to limit your RAM usage."
-                        LOGGER.error(f"\n\n{err_msg_1}\n{err_msg_2}")
-                        raise exc from None
-                    # if no "interesting" exceptions are found, raise the BrokenProcessPool Exception
-                    if len(broken_process_indices) > 0:
-                        log_sep_str()
-                        LOGGER.error(f'\n\nProcesses {", ".join(broken_process_indices)} failed with the following exception:')
-                        assert broken_process_pool_exc is not None  # nosec: B101
-                        raise broken_process_pool_exc from None
-                    
-            with num_tokenized_articles_lock:
-                bar(num_tokenized_articles.value)
-
-            # Check if all tasks are done
+            for i, future in enumerate(futures):
+                if future.done():
+                    try:
+                        metrics += future.result()
+                    except Exception as exc:
+                        if isinstance(exc, concurrent.futures.process.BrokenProcessPool):
+                            broken_process_indices.append(str(i))
+                            broken_process_pool_exc = exc
+                        else:
+                            log_sep_str()
+                            err_msg_1 = f"Process {i} failed with the exception below."
+                            err_msg_2 = "If the error is a MemoryError, reduce the number of workers to limit your RAM usage."
+                            LOGGER.error(f"\n\n{err_msg_1}\n{err_msg_2}")
+                            raise exc from None
+                        # if no "interesting" exceptions are found, raise the BrokenProcessPool Exception
+                        if len(broken_process_indices) > 0:
+                            log_sep_str()
+                            LOGGER.error(f'\n\nProcesses {", ".join(broken_process_indices)} failed with the following exception:')
+                            assert broken_process_pool_exc is not None  # nosec: B101
+                            raise broken_process_pool_exc from None
+            
             if all(future.done() for future in futures):
                 break
-            
-            time.sleep(1)
 
+            with num_tokenized_articles_lock:
+                num_new_tokenized_articles = num_tokenized_articles.value - prev_num_tokenized_articles
+                bar(num_new_tokenized_articles)
+                prev_num_tokenized_articles = num_tokenized_articles.value
+            
+            time.sleep(.5)
+
+    executor.shutdown(wait=False) 
     return train_hdf5_files, dev_hdf5_files, metrics
 
 
