@@ -24,7 +24,6 @@ import multiprocessing
 from typing import Dict, Optional
 
 from transformers import PreTrainedTokenizerBase
-import logging
 
 from generative_data_prep.data_buffers import Hdf5FileBuffer
 from generative_data_prep.processors import ArticleTokenizer
@@ -66,6 +65,8 @@ def data_prep_main(
         prompt_keyword: Prompt keyword to use as key in jsonl.
         completion_keyword: Completion keyword to use as key in jsonl.
         disable_space_separator: Disable adding space separator if true.
+        num_tokenized_articles: Shared variable for number of tokenized articles.
+        num_tokenized_articles_lock: Lock needed in order to updated shared variable.
         category_to_id: Dictionary that maps category string names to IDs.
         prompt_prefix: text to add before the prompt, for chatML conventions use.
         prompt_postfix: text to add after the prompt, for chatML conventions use.
@@ -73,8 +74,8 @@ def data_prep_main(
     Returns:
         Metrics associated with tokenization
     """
-    # if silent:
-    #     sys.stdout = open(os.devnull, "w")
+    if silent:
+        sys.stdout = open(os.devnull, "w")
 
     file_ext = FileExtension(os.path.splitext(input_file)[1])
     article_tokenizer = ArticleTokenizer(

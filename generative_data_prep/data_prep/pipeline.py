@@ -127,6 +127,15 @@ def rename_files(
     return files_to_tokenize
 
 def estimate_total_num_articles(files_to_tokenize, split_dir):
+    """Estimates the total number of articles based on number of artiles in first split times number of splits. 
+
+    Args:
+        files_to_tokenize: List of files to tokenize.
+        split_dir: Directory where the split files are located.
+
+    Returns:
+        Estimate of the total number of articles needed to tokenize
+    """
     lines_per_file = 0
     with open(os.path.join(split_dir, files_to_tokenize[0]), 'r') as file:
         for _ in file:
@@ -208,9 +217,6 @@ def data_prep_main_helper(args: Iterable[Any]):
     """Helper function to apply the star operator on the arguments when calling the data_prep_main function."""
     return data_prep_main(*args)
 
-def update_progress_bar(num_tokenized_articles, progress_bar):
-    """Use the shared variable to update the progress bar."""
-    pass
 
 def multiprocess_data_prep(
     files_to_tokenize: List[str],
@@ -272,46 +278,42 @@ def multiprocess_data_prep(
     train_hdf5_files = list(filter(lambda file_name: "train" in file_name, sub_output_file_paths))
     dev_hdf5_files = list(filter(lambda file_name: "dev" in file_name, sub_output_file_paths))
     total_num_articles = estimate_total_num_articles(files_to_tokenize, split_dir)
+    # create manager for shared variables to keep track of tokenization progress
     manager = multiprocessing.Manager()
     num_tokenized_articles_lock = manager.Lock()
     num_tokenized_articles = manager.Value(int, 0)
     prev_num_tokenized_articles = 0
-    data_prep_main_args_list = []
-    for input_file_path, output_file_path in zip(sub_input_file_paths, sub_output_file_paths):
-        data_prep_main_args_list.append(
-            (
-                True,
-                tokenizer,
-                input_file_path,
-                output_file_path,
-                max_seq_length,
-                input_packing_config,
-                packing_boundary,
-                attention_boundary,
-                disable_space_separator,
-                keep_prompt_only_sequences,
-                prompt_keyword,
-                completion_keyword,
-                num_tokenized_articles,
-                num_tokenized_articles_lock,
-                category_to_id,
-                prompt_prefix,
-                prompt_postfix,
-            )
-        )
-    futures = []
+    # Submit multiprocessing workers
     executor = concurrent.futures.ProcessPoolExecutor(max_workers=num_workers)
-    futures = [executor.submit(data_prep_main_helper, args) for args in data_prep_main_args_list]  
-    # if one process fails with an exception such as a RuntimeError, all other processes will fail with a
-    # BrokenProcessPool exception.  In such a situation we only want to show the user the RuntimeError.  We only want
-    # to show the user the BrokenProcessPool exception if all failing processes failed with this error.  This
-    # is why we have this complicated logic below.
+    futures = []
+    for input_file_path, output_file_path in zip(sub_input_file_paths, sub_output_file_paths):
+        futures.append(executor.submit(data_prep_main_helper, (
+                            True,
+                            tokenizer,
+                            input_file_path,
+                            output_file_path,
+                            max_seq_length,
+                            input_packing_config,
+                            packing_boundary,
+                            attention_boundary,
+                            disable_space_separator,
+                            keep_prompt_only_sequences,
+                            prompt_keyword,
+                            completion_keyword,
+                            num_tokenized_articles,
+                            num_tokenized_articles_lock,
+                            category_to_id,
+                            prompt_prefix,
+                            prompt_postfix,
+            )
+        ))
+
     broken_process_indices = []
     broken_process_pool_exc: Optional[BaseException] = None
     metrics = Metrics()
+    # Loop while processes are running, update progress bar.
     with alive_bar(total_num_articles) as bar:
         while True:
-            # search for any "interesting" exception (a non-BrokenProcessPool Exception)
             for i, future in enumerate(futures):
                 if future.done():
                     try:
@@ -321,6 +323,7 @@ def multiprocess_data_prep(
                             broken_process_indices.append(str(i))
                             broken_process_pool_exc = exc
                         else:
+                            # If any process fails with NOT a BrokenProcessPool, show this error instead.
                             log_sep_str()
                             err_msg_1 = f"Process {i} failed with the exception below."
                             err_msg_2 = "If the error is a MemoryError, reduce the number of workers to limit your RAM usage."
@@ -332,10 +335,10 @@ def multiprocess_data_prep(
                             LOGGER.error(f'\n\nProcesses {", ".join(broken_process_indices)} failed with the following exception:')
                             assert broken_process_pool_exc is not None  # nosec: B101
                             raise broken_process_pool_exc from None
-            
+            # If all the processes are done, break the loop
             if all(future.done() for future in futures):
                 break
-
+            # Update the progress bar with how every many new articles were tokenized
             with num_tokenized_articles_lock:
                 num_new_tokenized_articles = num_tokenized_articles.value - prev_num_tokenized_articles
                 bar(num_new_tokenized_articles)
@@ -343,7 +346,8 @@ def multiprocess_data_prep(
             
             time.sleep(.5)
 
-    executor.shutdown(wait=False) 
+    executor.shutdown()
+    manager.shutdown() 
     return train_hdf5_files, dev_hdf5_files, metrics
 
 
