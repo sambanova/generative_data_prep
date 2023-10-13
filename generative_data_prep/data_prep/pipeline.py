@@ -17,20 +17,19 @@ Data preparation pipeline for converting a jsonl file to tokenized hdf5 files co
 """
 
 import concurrent.futures
-import multiprocessing
 import json
 import logging
+import multiprocessing
 import os
 import random
-import time
 import shutil
-from alive_progress import alive_bar
+import time
 from sys import platform
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
-
 import numpy as np
 import psutil
+from alive_progress import alive_bar
 from transformers import PreTrainedTokenizerBase
 
 from generative_data_prep.data_prep import data_prep_main
@@ -126,8 +125,9 @@ def rename_files(
             files_to_tokenize.append(new_name)
     return files_to_tokenize
 
+
 def estimate_total_num_articles(files_to_tokenize, split_dir):
-    """Estimates the total number of articles based on number of artiles in first split times number of splits. 
+    """Estimates the total number of articles based on number of artiles in first split times number of splits.
 
     Args:
         files_to_tokenize: List of files to tokenize.
@@ -137,11 +137,12 @@ def estimate_total_num_articles(files_to_tokenize, split_dir):
         Estimate of the total number of articles needed to tokenize
     """
     lines_per_file = 0
-    with open(os.path.join(split_dir, files_to_tokenize[0]), 'r') as file:
+    with open(os.path.join(split_dir, files_to_tokenize[0]), "r") as file:
         for _ in file:
             lines_per_file += 1
-    
+
     return lines_per_file * len(files_to_tokenize)
+
 
 def get_split_counts(
     input_file_size_in_gb: float,
@@ -218,7 +219,7 @@ def data_prep_main_helper(args: Iterable[Any]):
     return data_prep_main(*args)
 
 
-def multiprocess_data_prep(
+def multiprocess_data_prep(  # noqa: C901
     files_to_tokenize: List[str],
     split_dir: str,
     hdf5_dir: str,
@@ -235,7 +236,7 @@ def multiprocess_data_prep(
     input_file_size_in_gb: float,
     category_to_id: Optional[Dict[str, int]] = None,
     prompt_prefix: Optional[str] = None,
-    prompt_postfix: Optional[str] = None,    
+    prompt_postfix: Optional[str] = None,
 ) -> Tuple[List[str], List[str], Metrics]:
     """Tokenizes all the files in files_to_tokenize efficiently using multirpocessing library.
 
@@ -287,26 +288,30 @@ def multiprocess_data_prep(
     executor = concurrent.futures.ProcessPoolExecutor(max_workers=num_workers)
     futures = []
     for input_file_path, output_file_path in zip(sub_input_file_paths, sub_output_file_paths):
-        futures.append(executor.submit(data_prep_main_helper, (
-                            True,
-                            tokenizer,
-                            input_file_path,
-                            output_file_path,
-                            max_seq_length,
-                            input_packing_config,
-                            packing_boundary,
-                            attention_boundary,
-                            disable_space_separator,
-                            keep_prompt_only_sequences,
-                            prompt_keyword,
-                            completion_keyword,
-                            num_tokenized_articles,
-                            num_tokenized_articles_lock,
-                            category_to_id,
-                            prompt_prefix,
-                            prompt_postfix,
+        futures.append(
+            executor.submit(
+                data_prep_main_helper,
+                (
+                    True,
+                    tokenizer,
+                    input_file_path,
+                    output_file_path,
+                    max_seq_length,
+                    input_packing_config,
+                    packing_boundary,
+                    attention_boundary,
+                    disable_space_separator,
+                    keep_prompt_only_sequences,
+                    prompt_keyword,
+                    completion_keyword,
+                    num_tokenized_articles,
+                    num_tokenized_articles_lock,
+                    category_to_id,
+                    prompt_prefix,
+                    prompt_postfix,
+                ),
             )
-        ))
+        )
 
     broken_process_indices = []
     broken_process_pool_exc: Optional[BaseException] = None
@@ -326,13 +331,17 @@ def multiprocess_data_prep(
                             # If any process fails with NOT a BrokenProcessPool, show this error instead.
                             log_sep_str()
                             err_msg_1 = f"Process {i} failed with the exception below."
-                            err_msg_2 = "If the error is a MemoryError, reduce the number of workers to limit your RAM usage."
+                            err_msg_2 = (
+                                "If the error is a MemoryError, reduce the number of workers to limit your RAM usage."
+                            )
                             LOGGER.error(f"\n\n{err_msg_1}\n{err_msg_2}")
                             raise exc from None
                         # if no "interesting" exceptions are found, raise the BrokenProcessPool Exception
                         if len(broken_process_indices) > 0:
                             log_sep_str()
-                            LOGGER.error(f'\n\nProcesses {", ".join(broken_process_indices)} failed with the following exception:')
+                            LOGGER.error(
+                                f'\n\nProcesses {", ".join(broken_process_indices)} failed with the exception:'
+                            )
                             assert broken_process_pool_exc is not None  # nosec: B101
                             raise broken_process_pool_exc from None
             # If all the processes are done, break the loop
@@ -343,11 +352,11 @@ def multiprocess_data_prep(
                 num_new_tokenized_articles = num_tokenized_articles.value - prev_num_tokenized_articles
                 bar(num_new_tokenized_articles)
                 prev_num_tokenized_articles = num_tokenized_articles.value
-            
-            time.sleep(.5)
+
+            time.sleep(0.5)
 
     executor.shutdown()
-    manager.shutdown() 
+    manager.shutdown()
     return train_hdf5_files, dev_hdf5_files, metrics
 
 
@@ -549,7 +558,7 @@ def pipeline_main(  # noqa: C901
         input_file_size_in_gb,
         category_to_id,
         prompt_prefix,
-        prompt_postfix
+        prompt_postfix,
     )
 
     log_sep_str()

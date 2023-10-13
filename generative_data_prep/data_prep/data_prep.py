@@ -20,7 +20,8 @@ from __future__ import absolute_import
 
 import os
 import sys
-import multiprocessing
+from multiprocessing.managers import ValueProxy
+from multiprocessing.synchronize import Lock
 from typing import Dict, Optional
 
 from transformers import PreTrainedTokenizerBase
@@ -43,8 +44,8 @@ def data_prep_main(
     keep_prompt_only_sequences: bool,
     prompt_keyword: str,
     completion_keyword: str,
-    num_tokenized_articles: multiprocessing.Value = None,
-    num_tokenized_articles_lock: multiprocessing.Lock = None,
+    num_tokenized_articles: Optional[ValueProxy] = None,
+    num_tokenized_articles_lock: Optional[Lock] = None,
     category_to_id: Optional[Dict[str, int]] = None,
     prompt_prefix: Optional[str] = None,
     prompt_postfix: Optional[str] = None,
