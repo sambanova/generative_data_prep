@@ -106,6 +106,7 @@ To do this, include flags from only one of the two options below, only use one o
 | --- | --- | --- | --- | --- |
 | `input_file_path`  | str | REQUIRED | Any existing file path | Path to the input dataset which must be in jsonline format, where each line is of the form specified in [Input Format](#input-format).|
 | `output_path` | str | `input_file_path`'s directory | Any valid directory path | The directory to store the output files |
+| `log_file_path` | str | `output_path`/logs.log | Any valid file path | The file to save the logs in, this will save the date and time, git commit hash, input arguments and metrics associated with the dataset. |
 | `overwrite_output_path` | bool | False | Include flag for True, no arguments | Permission to delete and overwrite files in `output_path`. |
 | `pretrained_tokenizer` | str | None | Valid tokenizer key from Huggingface | The pretrained tokenizer to be used, loaded using transformers.AutoTokenizer.from_pretrained(args.pretrained_tokenizer), in lieu of a `tokenizer_class`, `vocab_file` and `merges_file`. |
 | `tokenizer_class` | str | 'gpt2' | ['gpt2'] | Tokenizer class to use, defaults to "gpt2" (transformers.GPT2Tokenizer). If `pretrained_tokenizer` is not specified, this is required. |
@@ -161,6 +162,7 @@ Each HDF5 file contains two datasets:
 | --- | --- | --- | --- | --- |
 | `input_file_path`  | str | REQUIRED | Any existing file path | Path to the input dataset where each line is of the form specified in [Input Format](#input-format).|
 | `output_path` | str | `input_file_path`'s directory | Any valid directory path | The directory to store the output files |
+| `log_file_path` | str | `output_path`'s directory/logs.log | Any valid file path | The file to save the logs in, this will save the date and time, git commit hash, input arguments and metrics associated with the dataset. |
 | `overwrite_output_path` | bool | False | Include flag for True, no arguments | Permission to delete and overwrite files in `output_path`. |
 | `pretrained_tokenizer` | str | None | Valid tokenizer key from Huggingface | The pretrained tokenizer to be used, loaded using transformers.AutoTokenizer.from_pretrained(args.pretrained_tokenizer), in lieu of a --tokenizer_class, --vocab_file and --merges_file. |
 | `tokenizer_class` | str | 'gpt2' | ['gpt2'] | Tokenizer class to use, defaults to "gpt2" (transformers.GPT2Tokenizer). If --pretrained_tokenizer is not specified, this is required. |

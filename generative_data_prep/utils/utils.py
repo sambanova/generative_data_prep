@@ -14,7 +14,6 @@ limitations under the License.
 """
 
 import argparse
-import os
 from subprocess import PIPE, run  # nosec
 
 from transformers import GPT2Tokenizer
@@ -24,10 +23,6 @@ from .constants import BoundaryType
 
 GPT2_KEY = "gpt2"
 TOKENIZER_CLASSES = {GPT2_KEY: GPT2Tokenizer}
-try:
-    SEP_STR = "-" * os.get_terminal_size().columns
-except OSError:
-    SEP_STR = "----------------------------------------------------------------------------------"
 
 
 def data_prep_arg_builder(parser: argparse.ArgumentParser):
@@ -45,6 +40,13 @@ def data_prep_arg_builder(parser: argparse.ArgumentParser):
             "The path to the output directory if using end to end data preparation, the path to output hdf5 file if"
             " running tokenization"
         ),
+    )
+    parser.add_argument(
+        "--log_file_path",
+        type=str,
+        required=False,
+        default=None,
+        help="The log file path. Defaults to '<output_path>/logs.log'",
     )
     parser.add_argument(
         "--overwrite_output_path",
