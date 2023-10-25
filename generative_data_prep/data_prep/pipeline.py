@@ -351,9 +351,10 @@ def multiprocess_data_prep(  # noqa: C901
             with num_tokenized_articles_lock:
                 num_new_tokenized_articles = num_tokenized_articles.value - prev_num_tokenized_articles
                 bar(num_new_tokenized_articles)
+                print(f'Progress: {num_tokenized_articles.value} / {total_num_articles}')
                 prev_num_tokenized_articles = num_tokenized_articles.value
 
-            time.sleep(0.5)
+            time.sleep(1)
 
     executor.shutdown()
     manager.shutdown()
