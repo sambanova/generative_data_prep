@@ -14,7 +14,7 @@ limitations under the License.
 """
 
 import argparse
-import os
+from importlib.resources import files as importlib_files
 from subprocess import PIPE, run  # nosec
 
 from transformers import GPT2Tokenizer
@@ -22,6 +22,7 @@ from transformers import GPT2Tokenizer
 from .arg_configs import PackingConfig
 from .constants import BoundaryType
 
+PACKAGE_ROOT_PATH = importlib_files("generative_data_prep")
 GPT2_KEY = "gpt2"
 TOKENIZER_CLASSES = {GPT2_KEY: GPT2Tokenizer}
 
@@ -234,7 +235,9 @@ def execute_and_return_stdout(command):
 
 
 def get_config_file_path():
-    """Return absolute path to the logging config file."""
-    config_file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "configs", "logger.conf"))
-    breakpoint()
-    return config_file_path
+    """Return absolute path to the logging config file.
+
+    Returns:
+        Path: absolute path to the logging config file
+    """
+    return PACKAGE_ROOT_PATH / "configs" / "logger.conf"
