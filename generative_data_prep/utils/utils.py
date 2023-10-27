@@ -14,6 +14,7 @@ limitations under the License.
 """
 
 import argparse
+import os
 from subprocess import PIPE, run  # nosec
 
 from transformers import GPT2Tokenizer
@@ -230,3 +231,8 @@ def execute_and_return_stdout(command):
     """
     result = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, shell=True)  # nosec
     return result
+
+
+def get_config_file_path():
+    """Return absolute path to the logging config file."""
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "configs", "logger.conf"))
