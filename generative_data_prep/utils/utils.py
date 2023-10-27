@@ -235,4 +235,6 @@ def execute_and_return_stdout(command):
 
 def get_config_file_path():
     """Return absolute path to the logging config file."""
-    return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "configs", "logger.conf"))
+    config_file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "configs", "logger.conf"))
+    breakpoint()
+    return config_file_path
