@@ -16,13 +16,14 @@ limitations under the License.
 import argparse
 from subprocess import PIPE, run  # nosec
 
-from transformers import GPT2Tokenizer
+from transformers import GPT2Config, GPT2Tokenizer
 
 from .arg_configs import PackingConfig
 from .constants import BoundaryType
 
 GPT2_KEY = "gpt2"
 TOKENIZER_CLASSES = {GPT2_KEY: GPT2Tokenizer}
+TOKENIZER_CONFIG = {GPT2_KEY: GPT2Config}
 
 
 def data_prep_arg_builder(parser: argparse.ArgumentParser):

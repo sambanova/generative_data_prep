@@ -22,12 +22,13 @@ import os
 from multiprocessing import cpu_count
 from typing import Optional
 
-from transformers import AutoTokenizer, PreTrainedTokenizerBase
+from transformers import AutoConfig, AutoTokenizer, PreTrainedTokenizerBase
 
 from generative_data_prep.data_prep import data_prep_main, pipeline_main
 from generative_data_prep.utils import (
     GPT2_KEY,
     TOKENIZER_CLASSES,
+    TOKENIZER_CONFIG,
     FileExtension,
     add_file_handler,
     data_prep_arg_builder,
@@ -220,12 +221,13 @@ def get_tokenizer(
 
     if pretrained_tokenizer is not None:
         tokenizer = AutoTokenizer.from_pretrained(pretrained_tokenizer)
+        model_config = AutoConfig.from_pretrained(pretrained_tokenizer)
     else:
         verify_input_file(vocab_file)
         verify_input_file(merges_file)
-        for tokenizer_key_i, tokenizer_class_i in TOKENIZER_CLASSES.items():
-            if tokenizer_class == tokenizer_key_i:
-                tokenizer = tokenizer_class_i(vocab_file, merges_file)
+        if tokenizer_class in TOKENIZER_CLASSES and tokenizer_class in TOKENIZER_CONFIG:
+            tokenizer = TOKENIZER_CLASSES[tokenizer_class](vocab_file, merges_file)
+            model_config = TOKENIZER_CONFIG[tokenizer_class](vocab_size=tokenizer.vocab_size)
 
         if tokenizer is None:
             raise NotImplementedError(
@@ -235,7 +237,7 @@ def get_tokenizer(
     if special_tokens_dict:
         add_special_tokens_dict(tokenizer, special_tokens_dict)
 
-    return tokenizer
+    return tokenizer, model_config
 
 
 def get_output_dir(cmd, output_path, overwrite_output_path):
@@ -309,7 +311,7 @@ if __name__ == "__main__":
     log_current_datetime()
     log_input_args(args)
 
-    tokenizer = get_tokenizer(
+    tokenizer, model_config = get_tokenizer(
         args.pretrained_tokenizer,
         args.tokenizer_class,
         args.vocab_file,
@@ -322,6 +324,7 @@ if __name__ == "__main__":
         metrics = pipeline_main(
             args.input_file_path,
             tokenizer,
+            model_config,
             output_dir,
             args.disable_space_separator,
             args.keep_prompt_only_sequences,
