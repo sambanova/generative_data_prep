@@ -130,6 +130,7 @@ dmypy.json
 
 # pytest
 test_reports/
+tests/examples/tester_*
 
 # MacOS
 **/.DS_Store
