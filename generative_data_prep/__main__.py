@@ -204,6 +204,8 @@ def get_tokenizer(
     Returns:
         Tokenizer
     """
+    tokenizer = None
+    model_config = None
     if pretrained_tokenizer is None and tokenizer_class is None:
         pretrained_tokenizer = GPT2_KEY
 
@@ -225,13 +227,16 @@ def get_tokenizer(
     else:
         verify_input_file(vocab_file)
         verify_input_file(merges_file)
-        if tokenizer_class in TOKENIZER_CLASSES and tokenizer_class in TOKENIZER_CONFIG:
+        if tokenizer_class in TOKENIZER_CLASSES:
             tokenizer = TOKENIZER_CLASSES[tokenizer_class](vocab_file, merges_file)
-            model_config = TOKENIZER_CONFIG[tokenizer_class](vocab_size=tokenizer.vocab_size)
+            if tokenizer_class in TOKENIZER_CONFIG:
+                model_config = TOKENIZER_CONFIG[tokenizer_class](vocab_size=tokenizer.vocab_size)
 
         if tokenizer is None:
+            raise NotImplementedError(f"The tokenizer_class you selected ({tokenizer_class}) has not been implemented")
+        if model_config is None:
             raise NotImplementedError(
-                f"The tokenizer_class you selected ({args.tokenizer_class}) has not been implemented "
+                f"The tokenizer_class you selected ({tokenizer_class}) is missing a config associated with it"
             )
 
     if special_tokens_dict:
