@@ -8,20 +8,67 @@ Contributing Guide
 Local Environment Setup
 ***********************
 
-#. Create Python virtual environment ``venv`` in the root of local software-repository
+**NOTE**: Please ensure that your Python version matches the version used in CI flow in ``.circleci/config.yml`` file.
+
+#. Create Python virtual environment using ``pipenv``
 
     .. code-block::
 
-        python -m venv venv
-        source venv/bin/activate
+        pip install pipenv
+        pipenv --python <VERSION>  # Creates a virtual environment for the project with specified VERSION; e.g. pipenv --python 3.9
 
-#. Install and set-up Pre-commit
+#. Install and set-up Required Python Packages in editable mode
 
     .. code-block::
 
-        pip install pre-commit
-        pre-commit install
+        pipenv run pip install -e .
+        pipenv sync --categories=default,build-packages,dev-packages,docs-packages,tests-packages
+        pipenv --help
 
+#. Initialize Pre-commit
+
+    .. code-block::
+
+        pipenv run pre-commit install
+
+#. To run any Python commands, you should either be in ``pipenv`` shell (``pipenv shell`` to enter) or use ``pipenv run`` in front of the command
+
+    .. code-block::
+
+        # Example to run pytest
+        pipenv run pytest
+
+        # OR
+        pipenv shell
+        pytest
+
+#. If you update ``setup.cfg``, ``pyproject.toml``, or ``Pipfile``
+
+   - ``requirements`` files would need to be regenrated. For this, you would need to have ``docker`` installed on your machine.
+
+     .. code-block::
+
+        pipenv run pre-commit run --all-files --hook-stage manual pipenv-lock
+
+   - ``Pipfile.lock`` would need to be regenerated
+
+     .. code-block::
+
+        pipenv run pre-commit run --all-files --hook-stage manual pipenv-lock
+
+Important Python Versions
+*************************
+
+Python versions are defined in these places:
+
+- ``pyproject.toml``
+   Defines the python-version requirement of the project
+- ``Pipfile``
+   Defines python-version used to configure ``pipenv``
+- ``.circleci/config.yml``
+   Python-version used in CI flow
+
+**NOTE**: When updating ``python`` version for; ensure that all ``pyproject.toml``, ``Pipfile``, and ``.circleci/config.yml`` are in sync.
 
 Naming Conventions
 ******************
