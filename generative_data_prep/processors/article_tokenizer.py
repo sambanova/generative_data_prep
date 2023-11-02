@@ -334,7 +334,7 @@ class ArticleTokenizer:
             tokens += list(map(lambda x: Token(x, TokenTypeIds.PROMPT, category_id), prompt_token_ids))
 
         if completion:
-            completion_token_ids = self.tokenizer.encode(completion)
+            completion_token_ids = self.tokenizer.encode(completion, add_special_tokens=False)
             tokens += list(map(lambda x: Token(x, TokenTypeIds.COMPLETION, category_id), completion_token_ids))
 
         if len(tokens) >= 1:
