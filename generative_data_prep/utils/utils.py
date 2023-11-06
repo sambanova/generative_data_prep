@@ -16,7 +16,12 @@ limitations under the License.
 import argparse
 from subprocess import PIPE, run  # nosec
 
-from transformers import GPT2Config, GPT2Tokenizer
+from transformers import (
+    GPT2Config,
+    GPT2Tokenizer,
+    PretrainedConfig,
+    PreTrainedTokenizerBase,
+)
 
 from .arg_configs import PackingConfig
 from .constants import BoundaryType
@@ -25,7 +30,7 @@ from .constants import BoundaryType
 class TokenizerConfigPair:
     """New datastructure to store tokenizer and config pairs for same model type."""
 
-    def __init__(self, tokenizer, config) -> None:
+    def __init__(self, tokenizer: PreTrainedTokenizerBase, config: PretrainedConfig) -> None:
         """Initialization of TokenizerConfigPair.
 
         Args:
