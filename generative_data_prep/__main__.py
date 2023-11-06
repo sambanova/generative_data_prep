@@ -28,7 +28,6 @@ from generative_data_prep.data_prep import data_prep_main, pipeline_main
 from generative_data_prep.utils import (
     GPT2_KEY,
     TOKENIZER_CLASSES,
-    TOKENIZER_CONFIG,
     FileExtension,
     add_file_handler,
     data_prep_arg_builder,
@@ -202,7 +201,7 @@ def get_tokenizer(
         NotImplementedError: If the tokenizer class selected has not been implemented
 
     Returns:
-        Tokenizer
+        Tokenizer, ModelConfig
     """
     tokenizer = None
     model_config = None
@@ -228,9 +227,8 @@ def get_tokenizer(
         verify_input_file(vocab_file)
         verify_input_file(merges_file)
         if tokenizer_class in TOKENIZER_CLASSES:
-            tokenizer = TOKENIZER_CLASSES[tokenizer_class](vocab_file, merges_file)
-            if tokenizer_class in TOKENIZER_CONFIG:
-                model_config = TOKENIZER_CONFIG[tokenizer_class](vocab_size=tokenizer.vocab_size)
+            tokenizer = TOKENIZER_CLASSES[tokenizer_class].tokenizer(vocab_file, merges_file)
+            model_config = TOKENIZER_CLASSES[tokenizer_class].config(vocab_size=tokenizer.vocab_size)
 
         if tokenizer is None:
             raise NotImplementedError(f"The tokenizer_class you selected ({tokenizer_class}) has not been implemented")

@@ -1,4 +1,5 @@
 import os
+import pathlib
 
 from transformers import GPT2Config, GPT2Tokenizer, GPT2TokenizerFast
 
@@ -16,9 +17,9 @@ def test_pretrained_tokenizer():
 
 def test_tokenizer_class():
     """Test the tokenizer function using a tokenizer_class with vocab and merge files."""
-    current_dir = os.getcwd()
-    vocab_file = os.path.join(current_dir, "tests", "gpt2_vocab_and_merge_files", "vocab.json")
-    merge_file = os.path.join(current_dir, "tests", "gpt2_vocab_and_merge_files", "merges.txt")
+    current_dir = pathlib.Path(__file__).parent.resolve()
+    vocab_file = os.path.join(current_dir, "gpt2_vocab_and_merge_files", "vocab.json")
+    merge_file = os.path.join(current_dir, "gpt2_vocab_and_merge_files", "merges.txt")
     tokenizer, model_config = get_tokenizer(
         pretrained_tokenizer=None,
         tokenizer_class="gpt2",
@@ -52,9 +53,9 @@ def test_tokenizer_class_not_implemented():
     """Test the tokenizer function using a tokenizer_class but with the intention of
     failing due to using a model type that isn't added to the TOKENIZER_CLASS.
     """
-    current_dir = os.getcwd()
-    vocab_file = os.path.join(current_dir, "tests", "gpt2_vocab_and_merge_files", "vocab.json")
-    merge_file = os.path.join(current_dir, "tests", "gpt2_vocab_and_merge_files", "merges.txt")
+    current_dir = pathlib.Path(__file__).parent.resolve()
+    vocab_file = os.path.join(current_dir, "gpt2_vocab_and_merge_files", "vocab.json")
+    merge_file = os.path.join(current_dir, "gpt2_vocab_and_merge_files", "merges.txt")
     try:
         _, _ = get_tokenizer(
             pretrained_tokenizer=None,

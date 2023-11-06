@@ -37,7 +37,6 @@ from .path_verify import verify_input_file, verify_output_dir, verify_output_fil
 from .utils import (
     GPT2_KEY,
     TOKENIZER_CLASSES,
-    TOKENIZER_CONFIG,
     data_prep_arg_builder,
     execute_and_return_stdout,
 )
@@ -56,7 +55,6 @@ __all__ = [
     "verify_output_file",
     "GPT2_KEY",
     "TOKENIZER_CLASSES",
-    "TOKENIZER_CONFIG",
     "data_prep_arg_builder",
     "execute_and_return_stdout",
     "CATEGORY_JSON_KEY",
