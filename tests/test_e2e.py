@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import Dict
 
 import pytest
-from transformers import GPT2Tokenizer, PreTrainedTokenizerBase
+from transformers import GPT2Config, GPT2Tokenizer, PreTrainedTokenizerBase
 
 from generative_data_prep.data_prep import data_prep_main, pipeline_main
 from generative_data_prep.utils import BoundaryType, PackingConfig
@@ -34,6 +34,7 @@ from .test_utils import (
 )
 
 TOKENIZER = GPT2Tokenizer.from_pretrained("gpt2")
+MODEL_CONFIG = GPT2Config.from_pretrained("gpt2")
 
 EXAMPLE_PATH = "tests/examples"
 
@@ -353,6 +354,7 @@ def test_pipeline(
         pipeline_main(
             input_file_path=input_path,
             tokenizer=TOKENIZER,
+            model_config=MODEL_CONFIG,
             output_dir=output_dir,
             disable_space_separator=disable_space_separator,
             keep_prompt_only_sequences=keep_prompt_only_sequences,
