@@ -94,6 +94,7 @@ class FileExtension(str, BaseEnum):
 
 CATEGORY_JSON_KEY = "category"
 
+# TODO: move logging config to config file: https://github.com/sambanova/generative_data_prep/pull/58
 LOGGING_CONFIG = {
     "version": 1,
     "disable_existing_loggers": False,
