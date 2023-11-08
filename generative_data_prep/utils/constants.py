@@ -15,8 +15,6 @@ limitations under the License.
 
 from enum import Enum
 
-import logging
-import logging.config
 
 class BaseEnum(Enum):
     """Contains additional utility methods for the custom Enums."""
@@ -96,33 +94,20 @@ class FileExtension(str, BaseEnum):
 
 CATEGORY_JSON_KEY = "category"
 
-LOG_CONFIG = {
+LOGGING_CONFIG = {
     "version": 1,
     "disable_existing_loggers": False,
-    "formatters": {
-        "fileFormatter": {"format": "%(message)s"},
-        "consoleFormatter": {"format": "%(message)s"}
-    },
+    "formatters": {"fileFormatter": {"format": "%(message)s"}, "consoleFormatter": {"format": "%(message)s"}},
     "handlers": {
-        "consoleHandler": {
-            "class": "logging.StreamHandler",
-            "level": "INFO",
-            "formatter": "consoleFormatter"
-        }
+        "consoleHandler": {"class": "logging.StreamHandler", "level": "INFO", "formatter": "consoleFormatter"}
     },
     "loggers": {
-        "root": {
-            "level": "DEBUG",
-            "handlers": ["consoleHandler"],
-            "propagate": 0
-        },
+        "root": {"level": "DEBUG", "handlers": ["consoleHandler"], "propagate": 0},
         "generative_data_prep_logger": {
             "level": "DEBUG",
             "handlers": ["consoleHandler"],
             "qualname": "generative_data_prep_logger",
-            "propagate": 0
-        }
-    }
+            "propagate": 0,
+        },
+    },
 }
-
-
