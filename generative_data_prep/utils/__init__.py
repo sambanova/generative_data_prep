@@ -17,6 +17,7 @@ from .arg_configs import PackingConfig
 from .balance_hdf5_files import balance_hdf5_files
 from .constants import (
     CATEGORY_JSON_KEY,
+    LOGGING_CONFIG,
     BoundaryType,
     FileExtension,
     OverflowType,
@@ -65,4 +66,5 @@ __all__ = [
     "log_git_commit_hash",
     "log_elapsed_time",
     "log_sep_str",
+    "LOGGING_CONFIG",
 ]
