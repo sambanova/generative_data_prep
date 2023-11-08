@@ -22,6 +22,7 @@ from .constants import (
     OverflowType,
     PackingStyleType,
     TokenTypeIds,
+    LOG_CONFIG
 )
 from .large_file_shuffle import large_file_shuffle
 from .logger import (
@@ -65,4 +66,5 @@ __all__ = [
     "log_git_commit_hash",
     "log_elapsed_time",
     "log_sep_str",
+    "LOG_CONFIG"
 ]

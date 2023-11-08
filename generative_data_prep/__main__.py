@@ -40,6 +40,7 @@ from generative_data_prep.utils import (
     verify_input_file,
     verify_output_dir,
     verify_output_file,
+    LOG_CONFIG
 )
 
 
@@ -302,7 +303,7 @@ def get_categories(categories_path: str):
 
 if __name__ == "__main__":
     logger = logging.getLogger("generative_data_prep_logger")
-    logging.config.fileConfig("configs/logger.conf")
+    logging.config.dictConfig(LOG_CONFIG)
     args = get_args()
     if os.path.splitext(args.input_file_path)[1] not in FileExtension.as_list():
         err_msg = f"The input file is not a jsonl or txt file {args.input_file_path}"
