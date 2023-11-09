@@ -91,3 +91,17 @@ line-length = 120
 # Configure hatch for python builds
 [tool.hatch]
 version.source = "vcs"
+build.include = [
+    "generative_data_prep/**",
+    "requirements/**",
+    "pyproject.toml",
+    "setup.cfg",
+    "README.rst"
+]
+build.exclude = [
+    ".github/**",
+    "tests/**",
+    "docs/**",
+    ".gitignore",
+    ".pre-commit-config.yaml"
+]
