@@ -12,5 +12,4 @@ def test_get_config_file_path():
     assert (
         str(full_config_file_path).split("/")[-1] == expected_config_filename
     ), f"The returned file path is not {expected_config_filename}."
-    print(full_config_file_path)
     assert full_config_file_path.exists(), f"The returned file path {full_config_file_path} does not exist."
