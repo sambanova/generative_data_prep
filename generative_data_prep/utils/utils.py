@@ -47,7 +47,7 @@ class TokenizerConfigPair:
 GPT2_KEY = "gpt2"
 TOKENIZER_CLASSES = {GPT2_KEY: TokenizerConfigPair(tokenizer=GPT2Tokenizer, config=GPT2Config)}
 
-EXCLUDE_FILES_SHA256 = ["logs.log"]
+EXCLUDE_FILES_SHA256 = ["logs.log", "tokenizer.json", "vocab.json"]
 
 
 def data_prep_arg_builder(parser: argparse.ArgumentParser):
@@ -304,14 +304,11 @@ def validate_sha256(output_dir: str):
     for file, hash_file_name in files_to_hash:
         output_file_hash = os.path.join(output_dir, "sha256", hash_file_name)
         if not os.path.isfile(output_file_hash):
-            print(f"{output_file_hash}", flush=True)
             return False
         with open(output_file_hash, "r") as file_hash_read:
             file_hash = file_hash_read.read().strip()
             current_file_hash = _calculate_sha256(file)
             if file_hash != current_file_hash:
-                print(f"file_hash = {file_hash} for {output_file_hash}")
-                print(f"current_file_hash = {current_file_hash} for {file}")
                 return False
     return True
 
