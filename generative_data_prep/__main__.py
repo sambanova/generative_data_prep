@@ -27,11 +27,11 @@ from transformers import AutoConfig, AutoTokenizer, PreTrainedTokenizerBase
 from generative_data_prep.data_prep import data_prep_main, pipeline_main
 from generative_data_prep.utils import (
     GPT2_KEY,
-    LOGGING_CONFIG,
     TOKENIZER_CLASSES,
     FileExtension,
     add_file_handler,
     data_prep_arg_builder,
+    get_config_file_path,
     log_current_datetime,
     log_elapsed_time,
     log_git_commit_hash,
@@ -303,7 +303,7 @@ def get_categories(categories_path: str):
 
 if __name__ == "__main__":
     logger = logging.getLogger("generative_data_prep_logger")
-    logging.config.dictConfig(LOGGING_CONFIG)
+    logging.config.fileConfig(get_config_file_path())
     args = get_args()
     if os.path.splitext(args.input_file_path)[1] not in FileExtension.as_list():
         err_msg = f"The input file is not a jsonl or txt file {args.input_file_path}"

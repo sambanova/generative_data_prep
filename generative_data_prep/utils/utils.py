@@ -14,6 +14,7 @@ limitations under the License.
 """
 
 import argparse
+from importlib.resources import files as importlib_files
 from subprocess import PIPE, run  # nosec
 
 from transformers import (
@@ -25,6 +26,8 @@ from transformers import (
 
 from .arg_configs import PackingConfig
 from .constants import BoundaryType
+
+PACKAGE_ROOT_PATH = importlib_files("generative_data_prep")
 
 
 class TokenizerConfigPair:
@@ -250,3 +253,12 @@ def execute_and_return_stdout(command):
     """
     result = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, shell=True)  # nosec
     return result
+
+
+def get_config_file_path():
+    """Return absolute path to the logging config file.
+
+    Returns:
+        Path: absolute path to the logging config file
+    """
+    return PACKAGE_ROOT_PATH / "configs" / "logger.conf"

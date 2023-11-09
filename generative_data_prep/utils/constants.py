@@ -15,6 +15,8 @@ limitations under the License.
 
 from enum import Enum
 
+CATEGORY_JSON_KEY = "category"
+
 
 class BaseEnum(Enum):
     """Contains additional utility methods for the custom Enums."""
@@ -90,25 +92,3 @@ class FileExtension(str, BaseEnum):
 
     TXT = ".txt"
     JSONL = ".jsonl"
-
-
-CATEGORY_JSON_KEY = "category"
-
-# TODO: move logging config to config file: https://github.com/sambanova/generative_data_prep/pull/58
-LOGGING_CONFIG = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {"fileFormatter": {"format": "%(message)s"}, "consoleFormatter": {"format": "%(message)s"}},
-    "handlers": {
-        "consoleHandler": {"class": "logging.StreamHandler", "level": "INFO", "formatter": "consoleFormatter"}
-    },
-    "loggers": {
-        "root": {"level": "DEBUG", "handlers": ["consoleHandler"], "propagate": 0},
-        "generative_data_prep_logger": {
-            "level": "DEBUG",
-            "handlers": ["consoleHandler"],
-            "qualname": "generative_data_prep_logger",
-            "propagate": 0,
-        },
-    },
-}
