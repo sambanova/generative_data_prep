@@ -47,8 +47,6 @@ class TokenizerConfigPair:
 GPT2_KEY = "gpt2"
 TOKENIZER_CLASSES = {GPT2_KEY: TokenizerConfigPair(tokenizer=GPT2Tokenizer, config=GPT2Config)}
 
-EXCLUDE_FILES_SHA256 = ["logs.log", "tokenizer.json", "vocab.json"]
-
 
 def data_prep_arg_builder(parser: argparse.ArgumentParser):
     """Adds all the arguments that are required for data_prep.py's argparser, besides the output_path.
@@ -283,7 +281,6 @@ def _get_walk_files_to_hash(dir: str, filter: Optional[str] = None):
                 prefix + filename.split(".")[0] + ".txt",
             )
             for filename in filenames
-            if filename not in EXCLUDE_FILES_SHA256
         ]
 
         files_to_hash.extend(hash_file_name)
