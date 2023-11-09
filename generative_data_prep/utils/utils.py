@@ -14,7 +14,10 @@ limitations under the License.
 """
 
 import argparse
+import hashlib
+import os
 from subprocess import PIPE, run  # nosec
+from typing import Optional
 
 from transformers import (
     GPT2Config,
@@ -250,3 +253,68 @@ def execute_and_return_stdout(command):
     """
     result = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, shell=True)  # nosec
     return result
+
+
+def _calculate_sha256(file_path: str):
+    sha256_hash = hashlib.sha256()
+    with open(file_path, "rb") as file:
+        for byte_block in iter(lambda: file.read(4096), b""):
+            sha256_hash.update(byte_block)
+    return sha256_hash.hexdigest()
+
+
+def _get_walk_files_to_hash(dir: str, filter: Optional[str] = None):
+    files_to_hash = []
+    for foldername, _, filenames in os.walk(dir):
+        if filter is not None and filter in foldername:
+            continue
+        hash_file_name = [
+            (os.path.join(foldername, filename), foldername.replace(os.path.sep, "_") + filename.split(".")[0] + ".txt")
+            for filename in filenames
+        ]
+
+        files_to_hash.extend(hash_file_name)
+    return files_to_hash
+
+
+def validate_sha256(output_dir: str):
+    """Validates the current sha256 directory within the output directory.
+
+    Args:
+        output_dir (str)
+
+    Returns:
+        Boolean value: False for the files have been modified, and True for all
+        files have not been modified
+    """
+    files_to_hash = _get_walk_files_to_hash(output_dir, "sha256")
+    for file, hash_file_name in files_to_hash:
+        output_file_hash = os.path.join(output_dir, "sha256", hash_file_name)
+        if not os.path.isfile(output_file_hash):
+            return False
+        with open(output_file_hash, "r") as file_hash_read:
+            file_hash = file_hash_read.read()
+            current_file_hash = _calculate_sha256(file)
+            if file_hash != current_file_hash:
+                return False
+    return True
+
+
+def create_sha256(output_dir: str):
+    """Creates the corresponding sha256 files for each of the files within the output directory.
+
+    Args:
+        output_dir (str)
+
+    Returns:
+        None
+    """
+    files_to_hash = _get_walk_files_to_hash(output_dir)
+
+    hash_dir = os.path.join(output_dir, "sha256")
+    os.mkdir(hash_dir)
+    for file, hash_file_name in files_to_hash:
+        file_hash = _calculate_sha256(file)
+        output_file_hash = os.path.join(hash_dir, hash_file_name)
+        with open(output_file_hash, "w") as output_file:
+            output_file.write(file_hash)
