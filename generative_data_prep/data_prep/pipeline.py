@@ -27,7 +27,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import numpy as np
 import psutil
-from transformers import PreTrainedTokenizerBase
+from transformers import PretrainedConfig, PreTrainedTokenizerBase
 
 from generative_data_prep.data_prep import data_prep_main
 from generative_data_prep.processors.metrics import Metrics
@@ -317,6 +317,7 @@ def multiprocess_data_prep(
 def pipeline_main(  # noqa: C901
     input_file_path: str,
     tokenizer: PreTrainedTokenizerBase,
+    model_config: PretrainedConfig,
     output_dir: str,
     disable_space_separator: bool,
     keep_prompt_only_sequences: bool,
@@ -407,6 +408,8 @@ def pipeline_main(  # noqa: C901
     tokenizer_dir = os.path.join(output_dir, "tokenizer")
     verify_output_dir(tokenizer_dir, True)
     tokenizer.save_pretrained(tokenizer_dir)
+    model_config_path = os.path.join(tokenizer_dir, "config.json")
+    model_config.to_json_file(model_config_path)
 
     if category_to_id is not None:
         category_to_id_output_file_path = os.path.join(output_dir, "category_to_id.json")

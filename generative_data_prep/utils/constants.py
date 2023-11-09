@@ -90,6 +90,3 @@ class FileExtension(str, BaseEnum):
 
     TXT = ".txt"
     JSONL = ".jsonl"
-
-
-CATEGORY_JSON_KEY = "category"
