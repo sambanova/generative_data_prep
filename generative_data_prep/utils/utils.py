@@ -269,10 +269,11 @@ def _get_walk_files_to_hash(dir: str, filter: Optional[str] = None):
         if filter is not None and filter in foldername:
             continue
         relative_foldername = os.path.relpath(foldername, dir)
+        prefix = relative_foldername.replace(os.path.sep, "_")
         hash_file_name = [
             (
                 os.path.join(foldername, filename),
-                relative_foldername.replace(os.path.sep, "_") + filename.split(".")[0] + ".txt",
+                prefix + filename.split(".")[0] + ".txt",
             )
             for filename in filenames
         ]
