@@ -15,6 +15,8 @@ limitations under the License.
 
 from enum import Enum
 
+CATEGORY_JSON_KEY = "category"
+
 
 class BaseEnum(Enum):
     """Contains additional utility methods for the custom Enums."""
