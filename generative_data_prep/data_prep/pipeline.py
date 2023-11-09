@@ -35,7 +35,6 @@ from generative_data_prep.utils import (
     BoundaryType,
     PackingConfig,
     balance_hdf5_files,
-    create_sha256,
     execute_and_return_stdout,
     large_file_shuffle,
     log_sep_str,
@@ -536,8 +535,5 @@ def pipeline_main(  # noqa: C901
 
     if not keep_split_jsonls:
         shutil.rmtree(split_dir)
-
-    # Create sha256 of all the files within the directory
-    create_sha256(output_dir)
 
     return metrics

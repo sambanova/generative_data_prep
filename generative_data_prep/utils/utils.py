@@ -47,6 +47,8 @@ class TokenizerConfigPair:
 GPT2_KEY = "gpt2"
 TOKENIZER_CLASSES = {GPT2_KEY: TokenizerConfigPair(tokenizer=GPT2Tokenizer, config=GPT2Config)}
 
+EXCLUDE_FILES_SHA256 = ["logs.log"]
+
 
 def data_prep_arg_builder(parser: argparse.ArgumentParser):
     """Adds all the arguments that are required for data_prep.py's argparser, besides the output_path.
@@ -266,7 +268,7 @@ def _calculate_sha256(file_path: str):
 def _get_walk_files_to_hash(dir: str, filter: Optional[str] = None):
     files_to_hash = []
     for foldername, _, filenames in os.walk(dir):
-        if filter is not None and filter in foldername:
+        if filter is not None and filter in foldername.split("/"):
             continue
         relative_foldername = os.path.relpath(foldername, dir)
         if relative_foldername == ".":
@@ -281,6 +283,7 @@ def _get_walk_files_to_hash(dir: str, filter: Optional[str] = None):
                 prefix + filename.split(".")[0] + ".txt",
             )
             for filename in filenames
+            if filename not in EXCLUDE_FILES_SHA256
         ]
 
         files_to_hash.extend(hash_file_name)
@@ -301,11 +304,14 @@ def validate_sha256(output_dir: str):
     for file, hash_file_name in files_to_hash:
         output_file_hash = os.path.join(output_dir, "sha256", hash_file_name)
         if not os.path.isfile(output_file_hash):
+            print(f"{output_file_hash}", flush=True)
             return False
         with open(output_file_hash, "r") as file_hash_read:
-            file_hash = file_hash_read.read()
+            file_hash = file_hash_read.read().strip()
             current_file_hash = _calculate_sha256(file)
             if file_hash != current_file_hash:
+                print(f"file_hash = {file_hash} for {output_file_hash}")
+                print(f"current_file_hash = {current_file_hash} for {file}")
                 return False
     return True
 

@@ -40,6 +40,7 @@ from .utils import (
     create_sha256,
     data_prep_arg_builder,
     execute_and_return_stdout,
+    validate_sha256,
 )
 
 __all__ = [
@@ -59,6 +60,7 @@ __all__ = [
     "data_prep_arg_builder",
     "execute_and_return_stdout",
     "create_sha256",
+    "validate_sha256",
     "CATEGORY_JSON_KEY",
     "add_file_handler",
     "log_input_args",
