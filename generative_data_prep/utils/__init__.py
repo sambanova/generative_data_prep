@@ -13,8 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from metadata_generation import DatasetMetadata
-
 from .arg_configs import PackingConfig
 from .balance_hdf5_files import balance_hdf5_files
 from .constants import (
@@ -35,6 +33,7 @@ from .logger import (
     log_metrics,
     log_sep_str,
 )
+from .metadata_generation import DatasetMetadata
 from .path_verify import verify_input_file, verify_output_dir, verify_output_file
 from .utils import (
     GPT2_KEY,

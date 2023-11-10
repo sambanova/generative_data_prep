@@ -15,6 +15,7 @@ limitations under the License.
 
 DatasetMetadata pydantic model and functions to verify pydantic model.
 """
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -42,7 +43,7 @@ class DatasetMetadata(BaseModel):
     vocab_size: int
     model_type: str
     number_of_training_files: int
-    number_of_dev_files: int
-    number_of_test_files: int
+    number_of_dev_files: Optional[int]
+    number_of_test_files: Optional[int]
     max_batch_size_train: int
-    max_batch_size_dev: int
+    max_batch_size_dev: Optional[int]
