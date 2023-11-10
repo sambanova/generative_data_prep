@@ -214,7 +214,7 @@ def multiprocess_data_prep(
     tokenizer: PreTrainedTokenizerBase,
     num_workers: int,
     input_file_size_in_gb: float,
-    dataset_metadata_json: Dict[str, Union[str, int, bool, None]],
+    dataset_metadata_json: Optional[Dict[str, Union[str, int, bool, None]]],
     category_to_id: Optional[Dict[str, int]] = None,
     prompt_prefix: Optional[str] = None,
     prompt_postfix: Optional[str] = None,
@@ -332,8 +332,9 @@ def multiprocess_data_prep(
         assert broken_process_pool_exc is not None  # nosec: B101
         raise broken_process_pool_exc from None
 
-    dataset_metadata_json["max_batch_size_train"] = max_batch_size_train
-    dataset_metadata_json["max_batch_size_dev"] = max_batch_size_dev
+    if dataset_metadata_json is not None:
+        dataset_metadata_json["max_batch_size_train"] = max_batch_size_train
+        dataset_metadata_json["max_batch_size_dev"] = max_batch_size_dev
 
     return train_hdf5_files, dev_hdf5_files, metrics
 
@@ -564,8 +565,8 @@ def pipeline_main(  # noqa: C901
     else:
         log_sep_str()
         LOGGER.info("Balancing hdf5 files to ensure they have the same number of sequences.")
-        balance_hdf5_files(train_hdf5_files)
-        balance_hdf5_files(dev_hdf5_files)
+        balance_hdf5_files(train_hdf5_files, dataset_metadata_json, "train")
+        balance_hdf5_files(dev_hdf5_files, dataset_metadata_json, "dev")
 
     if not keep_split_jsonls:
         shutil.rmtree(split_dir)

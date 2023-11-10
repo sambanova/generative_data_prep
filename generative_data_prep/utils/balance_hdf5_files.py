@@ -18,13 +18,17 @@ Function to balance the number of sequences in hdf5 splits.
 import sys
 import time
 from glob import glob
-from typing import List
+from typing import Dict, List, Optional, Union
 
 import h5py
 import numpy as np
 
 
-def balance_hdf5_files(hdf5_file_paths: List[str]) -> None:  # noqa: C901
+def balance_hdf5_files(
+    hdf5_file_paths: List[str],
+    dataset_metadata_json: Optional[Dict[str, Union[str, int, bool, None]]] = None,
+    dataset_type: Optional[str] = None,
+) -> None:  # noqa: C901
     """Balances all the files in hdf5_file_paths, to have the same number fo sequences (within 1).
 
     This is done by first calculating the average number of sequences per file,
@@ -41,6 +45,8 @@ def balance_hdf5_files(hdf5_file_paths: List[str]) -> None:  # noqa: C901
 
     Args:
         hdf5_file_paths: A list of the hdf5 files to balance
+        dataset_metadata_json: The metadata dictionary that needs to be modified
+        dataset_type: Whether it is a train or dev dataset
     """
     num_files = len(hdf5_file_paths)
     if num_files == 0:
@@ -66,6 +72,7 @@ def balance_hdf5_files(hdf5_file_paths: List[str]) -> None:  # noqa: C901
     extra_ttid_seqs = []
     extra_category_seqs = []
     has_category_ids = False
+    max_batch_size = None
     for file_path in hdf5_file_paths:
         with h5py.File(file_path, "r+") as curr_hdf5_file:
             has_category_ids = "category_ids" in curr_hdf5_file.keys()
@@ -95,6 +102,10 @@ def balance_hdf5_files(hdf5_file_paths: List[str]) -> None:  # noqa: C901
                     curr_extra_category_seqs = curr_hdf5_file["category_ids"][-num_extra_seq:]
                     extra_category_seqs.append(curr_extra_category_seqs)
                     curr_hdf5_file["category_ids"].resize((curr_num_seq, seq_len))
+                if max_batch_size is None:
+                    max_batch_size = curr_num_seq
+                else:
+                    max_batch_size = min(max_batch_size, curr_num_seq)
 
             # If file has less than the average number of sequences
             elif curr_num_seq < avg_seqs:
@@ -109,6 +120,11 @@ def balance_hdf5_files(hdf5_file_paths: List[str]) -> None:  # noqa: C901
                 if remainder > 0:
                     remainder -= 1
                     file_path_to_num_needed_seqs[file_path] = 1
+                else:
+                    if max_batch_size is None:
+                        max_batch_size = curr_num_seq
+                    else:
+                        max_batch_size = min(max_batch_size, curr_num_seq)
 
     if len(extra_token_seqs) > 0:
         if len(extra_token_seqs) != len(extra_ttid_seqs):
@@ -154,11 +170,21 @@ def balance_hdf5_files(hdf5_file_paths: List[str]) -> None:  # noqa: C901
                 curr_hdf5_file["category_ids"][-num_needed_seq:] = extra_category_seqs_np[:num_needed_seq]
                 # remove saved token_type_ids sequences so they are not used again
                 extra_category_seqs_np = extra_category_seqs_np[num_needed_seq:]
+            if max_batch_size is None:
+                max_batch_size = new_shape[0]
+            else:
+                max_batch_size = min(max_batch_size, new_shape[0])
 
     if len(extra_token_seqs_np) != 0:
         raise ValueError("extra_token_seqs_np is non zero at the end of rebalancing")
     if remainder != 0:
-        raise ValueError("remaineder is not 0 after finishing rebalancing")
+        raise ValueError("remainder is not 0 after finishing rebalancing")
+
+    if dataset_metadata_json is not None:
+        if dataset_type == "train":
+            dataset_metadata_json["max_batch_size_train"] = max_batch_size
+        elif dataset_type == "dev":
+            dataset_metadata_json["max_batch_size_dev"] = max_batch_size
 
 
 if __name__ == "__main__":
