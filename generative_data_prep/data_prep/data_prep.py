@@ -45,6 +45,7 @@ def data_prep_main(
     category_to_id: Optional[Dict[str, int]] = None,
     prompt_prefix: Optional[str] = None,
     prompt_postfix: Optional[str] = None,
+    dataset_type: Optional[str] = None,
 ):
     """Tokenize input_file into packed sequences stored in output_file.
 
@@ -96,5 +97,5 @@ def data_prep_main(
             for line in reader:
                 hdf5_text_buffer.write(article_tokenizer(line))
             hdf5_text_buffer.write(article_tokenizer(None))
-
+    article_tokenizer.metrics.dataset_type = dataset_type
     return article_tokenizer.metrics

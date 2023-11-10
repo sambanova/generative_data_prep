@@ -13,6 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+from metadata_generation import DatasetMetadata
+
 from .arg_configs import PackingConfig
 from .balance_hdf5_files import balance_hdf5_files
 from .constants import (
@@ -69,4 +71,5 @@ __all__ = [
     "log_git_commit_hash",
     "log_elapsed_time",
     "log_sep_str",
+    "DatasetMetadata",
 ]

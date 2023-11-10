@@ -23,7 +23,7 @@ import os
 import random
 import shutil
 from sys import platform
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
 import psutil
@@ -33,6 +33,7 @@ from generative_data_prep.data_prep import data_prep_main
 from generative_data_prep.processors.metrics import Metrics
 from generative_data_prep.utils import (
     BoundaryType,
+    DatasetMetadata,
     PackingConfig,
     balance_hdf5_files,
     execute_and_return_stdout,
@@ -213,6 +214,7 @@ def multiprocess_data_prep(
     tokenizer: PreTrainedTokenizerBase,
     num_workers: int,
     input_file_size_in_gb: float,
+    dataset_metadata_json: Dict[str, Union[str, int, bool, None]],
     category_to_id: Optional[Dict[str, int]] = None,
     prompt_prefix: Optional[str] = None,
     prompt_postfix: Optional[str] = None,
@@ -259,6 +261,11 @@ def multiprocess_data_prep(
 
     data_prep_main_args_list = []
     for input_file_path, output_file_path in zip(sub_input_file_paths, sub_output_file_paths):
+        dataset_type = None
+        if output_file_path in train_hdf5_files:
+            dataset_type = "train"
+        elif output_file_path in dev_hdf5_files:
+            dataset_type = "dev"
         data_prep_main_args_list.append(
             (
                 True,
@@ -276,6 +283,7 @@ def multiprocess_data_prep(
                 category_to_id,
                 prompt_prefix,
                 prompt_postfix,
+                dataset_type,
             )
         )
 
@@ -290,10 +298,23 @@ def multiprocess_data_prep(
     broken_process_indices = []
     broken_process_pool_exc: Optional[BaseException] = None
     metrics = Metrics()
+    max_batch_size_train = None
+    max_batch_size_dev = None
     # search for any "interesting" exception (a non-BrokenProcessPool Exception)
     for i, future in enumerate(futures):
         try:
-            metrics += future.result()
+            indiv_metric = future.result()
+            if indiv_metric.dataset_type == "train":
+                if max_batch_size_train is None:
+                    max_batch_size_train = indiv_metric.sequences
+                else:
+                    max_batch_size_train = min(max_batch_size_train, indiv_metric.sequences)
+            elif indiv_metric.dataset_type == "dev":
+                if max_batch_size_dev is None:
+                    max_batch_size_dev = indiv_metric.sequences
+                else:
+                    max_batch_size_dev = min(max_batch_size_dev, indiv_metric.sequences)
+            metrics += indiv_metric
         except Exception as exc:
             if isinstance(exc, concurrent.futures.process.BrokenProcessPool):
                 broken_process_indices.append(str(i))
@@ -310,6 +331,9 @@ def multiprocess_data_prep(
         LOGGER.error(f'\n\nProcesses {", ".join(broken_process_indices)} failed with the following exception:')
         assert broken_process_pool_exc is not None  # nosec: B101
         raise broken_process_pool_exc from None
+
+    dataset_metadata_json["max_batch_size_train"] = max_batch_size_train
+    dataset_metadata_json["max_batch_size_dev"] = max_batch_size_dev
 
     return train_hdf5_files, dev_hdf5_files, metrics
 
@@ -384,6 +408,12 @@ def pipeline_main(  # noqa: C901
         Metrics associated with tokenization
     """
     # print input file information
+    dataset_metadata_json = {
+        "max_seq_length": max_seq_length,
+        "token_type_ids": True,
+        "vocab_size": tokenizer.vocab_size,
+        "model_type": str(type(model_config)),
+    }
     input_file_size_in_bytes = os.stat(input_file_path).st_size
     input_file_size_in_gb = input_file_size_in_bytes / (1024**3)
     log_message = f"Size of input jsonl file is: {round(input_file_size_in_gb, 2)} GB"
@@ -401,6 +431,9 @@ def pipeline_main(  # noqa: C901
         dev_ratio,
         test_ratio,
     )
+    dataset_metadata_json["number_of_training_files"] = num_training_splits
+    dataset_metadata_json["number_of_dev_files"] = num_dev_splits
+    dataset_metadata_json["number_of_test_files"] = num_test_splits
 
     split_dir = os.path.join(output_dir, "splits")
     verify_output_dir(split_dir, False)
@@ -513,6 +546,7 @@ def pipeline_main(  # noqa: C901
         tokenizer,
         num_workers,
         input_file_size_in_gb,
+        dataset_metadata_json,
         category_to_id,
         prompt_prefix,
         prompt_postfix,
@@ -535,5 +569,8 @@ def pipeline_main(  # noqa: C901
 
     if not keep_split_jsonls:
         shutil.rmtree(split_dir)
+
+    dataset_metadata = DatasetMetadata(**dataset_metadata_json)
+    print(dataset_metadata)
 
     return metrics
