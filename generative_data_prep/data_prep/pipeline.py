@@ -27,6 +27,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
 import psutil
+import yaml
 from transformers import PretrainedConfig, PreTrainedTokenizerBase
 
 from generative_data_prep.data_prep import data_prep_main
@@ -572,6 +573,8 @@ def pipeline_main(  # noqa: C901
         shutil.rmtree(split_dir)
 
     dataset_metadata = DatasetMetadata(**dataset_metadata_json)
-    print(dataset_metadata)
+    metadata_file_path = os.path.join(output_dir, "metadata.yaml")
+    with open(metadata_file_path, "w") as file:
+        yaml.dump(dataset_metadata.dict(), file, default_flow_style=False)
 
     return metrics
