@@ -15,9 +15,13 @@ limitations under the License.
 
 DatasetMetadata pydantic model and functions to verify pydantic model.
 """
+import os
+import sys
 from typing import Optional
 
-from pydantic import BaseModel
+import yaml
+from pydantic import BaseModel, FieldValidationInfo, field_validator
+from transformers import GPT2Config
 
 
 class DatasetMetadata(BaseModel):
@@ -47,3 +51,98 @@ class DatasetMetadata(BaseModel):
     number_of_test_files: Optional[int]
     max_batch_size_train: int
     max_batch_size_dev: Optional[int]
+
+    @field_validator("max_seq_length")
+    @classmethod
+    def validate_max_seq_length(cls, v: int, info: FieldValidationInfo):
+        """Validates max sequence length."""
+        runtime_max_seq_length = info.context.get("max_seq_length")
+        if v != runtime_max_seq_length:
+            raise ValueError(
+                f"""max_seq_length specified during training ({runtime_max_seq_length})
+                must match max_seq_length used during generative data prep ({v})"""
+            )
+        return v
+
+    @field_validator("number_of_training_files")
+    @classmethod
+    def validate_number_of_training_files(cls, v: int, info: FieldValidationInfo):
+        """Validates number of training files."""
+        number_of_instances = info.context.get("world_size")
+        if v < number_of_instances:
+            raise ValueError(
+                f"""The number of training files ({v}) is less than the
+                specified number of workers ({number_of_instances})"""
+            )
+        return v
+
+    @field_validator("vocab_size")
+    @classmethod
+    def validation_vocab_size(cls, v: int, info: FieldValidationInfo):
+        """Validates vocab size."""
+        pass
+
+    @field_validator("model_type")
+    @classmethod
+    def validation_model_type(cls, v: str, info: FieldValidationInfo):
+        """Validates model type."""
+        str_model_type = info.context.get("model_type_class")
+        if type(str_model_type) is not str:
+            raise ValueError("Model type should be the type(model_config) and then passed in as a string")
+        if v != str_model_type:
+            raise ValueError(
+                f"""Model type of model during runtime ({str_model_type})
+                does not match model type used during training ({v})"""
+            )
+
+    @field_validator("number_of_dev_files")
+    @classmethod
+    def validation_number_of_dev_files(cls, v: int, info: FieldValidationInfo):
+        """Validates number of dev files."""
+        do_eval = info.context.get("eval")
+        if type(do_eval) is not bool:
+            raise ValueError("eval parameter should be a boolean variable")
+        if do_eval and v == 0:
+            raise ValueError("Evaluating during runtime but have no evaluation files to run in dataset")
+
+    @field_validator("max_batch_size_train")
+    @classmethod
+    def validation_batch_size_train(cls, v: int, info: FieldValidationInfo):
+        """Validates batch size for training."""
+        runtime_batch_size = info.context.get("batch_size")
+        if type(runtime_batch_size) is not int:
+            raise ValueError("batch_size parameter should be an integer variable")
+        if runtime_batch_size > v:
+            raise ValueError(
+                f"""batch size specified during training ({runtime_batch_size}) exceeds the maximum
+                allowed batch size ({v}) based on training dataset"""
+            )
+
+    @field_validator("max_batch_size_dev")
+    @classmethod
+    def validation_batch_size_dev(cls, v: int, info: FieldValidationInfo):
+        """Validates bath size for evaluation."""
+        do_eval = info.context.get("eval")
+        runtime_batch_size = info.context.get("batch_size")
+        if type(do_eval) is not bool:
+            raise ValueError("eval parameter should be a boolean variable")
+        if do_eval and runtime_batch_size > v:
+            raise ValueError(
+                f"""batch size specified during training ({runtime_batch_size}) exceeds the maximum
+                allowed batch size ({v}) based on evaluation dataset"""
+            )
+
+
+if __name__ == "__main__":
+    metadata_file = os.path.join(sys.argv[1], "metadata.yaml")
+    with open(metadata_file, "r") as file:
+        metadata_dict = yaml.safe_load(file)
+    context_dict = {
+        "eval": True,
+        "batch_size": 1,
+        "model_type_class": str(type(GPT2Config.from_pretrained("gpt2"))),
+        "vocab_size": 20590,
+        "world_size": 4,
+        "max_seq_length": 1024,
+    }
+    DatasetMetadata.model_validate(**metadata_dict, context=context_dict)
