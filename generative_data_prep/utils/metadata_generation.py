@@ -102,8 +102,14 @@ class DatasetMetadata(BaseModel):
         do_eval = info.context.get("eval")
         if type(do_eval) is not bool:
             raise ValueError("eval parameter should be a boolean variable")
-        if do_eval and v == 0:
-            raise ValueError("Evaluating during runtime but have no evaluation files to run in dataset")
+        if do_eval:
+            if v is None:
+                raise ValueError(
+                    """Evaluation during training is turned on but there are no
+                evaluation files in this dataset"""
+                )
+            if v == 0:
+                raise ValueError("Evaluating during runtime but have no evaluation files to run in dataset")
 
     @field_validator("max_batch_size_train")
     @classmethod
@@ -126,11 +132,17 @@ class DatasetMetadata(BaseModel):
         runtime_batch_size = info.context.get("batch_size")
         if type(do_eval) is not bool:
             raise ValueError("eval parameter should be a boolean variable")
-        if do_eval and runtime_batch_size > v:
-            raise ValueError(
-                f"""batch size specified during training ({runtime_batch_size}) exceeds the maximum
-                allowed batch size ({v}) based on evaluation dataset"""
-            )
+        if do_eval:
+            if v is None:
+                raise ValueError(
+                    """Evaluation during training is turned on but there are no
+                evaluation files in this dataset"""
+                )
+            if runtime_batch_size > v:
+                raise ValueError(
+                    f"""batch size specified during training ({runtime_batch_size}) exceeds the maximum
+                    allowed batch size ({v}) based on evaluation files in dataset"""
+                )
 
 
 if __name__ == "__main__":
@@ -145,4 +157,4 @@ if __name__ == "__main__":
         "world_size": 4,
         "max_seq_length": 1024,
     }
-    DatasetMetadata.model_validate(**metadata_dict, context=context_dict)
+    DatasetMetadata.model_validate(metadata_dict, context=context_dict)
