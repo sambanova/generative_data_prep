@@ -150,7 +150,7 @@ if __name__ == "__main__":
     with open(metadata_file, "r") as file:
         metadata_dict = yaml.safe_load(file)
     context_dict = {
-        "eval": True,
+        "eval": False,
         "batch_size": 1,
         "model_type_class": str(type(GPT2Config.from_pretrained("gpt2"))),
         "vocab_size": 20590,
