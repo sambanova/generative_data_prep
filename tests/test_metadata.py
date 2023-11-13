@@ -82,7 +82,7 @@ def test_pydantic_model_greater_vocab_size():
         print(exc.errors(), flush=True)
         error = exc.errors()[0]
         if "vocab_size" == error["loc"][0]:
-            assert "60000" in error["msg"]
+            assert "50000" in error["msg"]
             assert "50257" in error["msg"]
             assert "exceeds the maximum allowed batch size" in error["msg"]
         else:
