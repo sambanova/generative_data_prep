@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 import yaml
+from pydantic import ValidationError
 from transformers import BertConfig, GPT2Config
 
 from generative_data_prep.utils import DatasetMetadata
@@ -42,4 +43,10 @@ def test_pydantic_model_wrong_model_type():
         "world_size": 4,
         "max_seq_length": 1024,
     }
-    DatasetMetadata.model_validate(metadata_dict, context=context_dict)
+    try:
+        DatasetMetadata.model_validate(metadata_dict, context=context_dict)
+    except ValidationError as exc:
+        print(exc, flush=True)
+        assert True
+        return
+    assert False
