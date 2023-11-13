@@ -122,7 +122,7 @@ class DatasetMetadata(BaseModel):
         if do_eval:
             if v is None:
                 raise ValueError(
-                    ("Evaluation during training is turned on but there are no " "evaluation files in this dataset")
+                    "Evaluation during training is turned on but there are no evaluation files in this dataset"
                 )
             if v == 0:
                 raise ValueError("Evaluating during runtime but have no evaluation files to run in dataset")
@@ -153,7 +153,7 @@ class DatasetMetadata(BaseModel):
         if do_eval:
             if v is None:
                 raise ValueError(
-                    ("Evaluation during training is turned on but there are no " "evaluation files in this dataset")
+                    "Evaluation during training is turned on but there are no evaluation files in this dataset"
                 )
             if runtime_batch_size > v:
                 raise ValueError(
