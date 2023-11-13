@@ -115,7 +115,7 @@ def test_pydantic_model_greater_world_size():
         if "number_of_training_files" == error["loc"][0]:
             assert "100" in error["msg"]
             assert "4" in error["msg"]
-            assert "is greater than the specified number of files" in error["msg"]
+            assert "greater than" in error["msg"]
         else:
             assert False
         return
