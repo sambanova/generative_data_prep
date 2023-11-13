@@ -34,7 +34,6 @@ from generative_data_prep.data_prep import data_prep_main
 from generative_data_prep.processors.metrics import Metrics
 from generative_data_prep.utils import (
     BoundaryType,
-    DatasetMetadata,
     PackingConfig,
     balance_hdf5_files,
     execute_and_return_stdout,
@@ -414,7 +413,7 @@ def pipeline_main(  # noqa: C901
         "max_seq_length": max_seq_length,
         "token_type_ids": True,
         "vocab_size": tokenizer.vocab_size,
-        "model_type": str(type(model_config)),
+        "tokenizer_model_type": str(type(model_config)),
     }
     input_file_size_in_bytes = os.stat(input_file_path).st_size
     input_file_size_in_gb = input_file_size_in_bytes / (1024**3)
@@ -572,9 +571,8 @@ def pipeline_main(  # noqa: C901
     if not keep_split_jsonls:
         shutil.rmtree(split_dir)
 
-    dataset_metadata = DatasetMetadata(**dataset_metadata_json)
     metadata_file_path = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file_path, "w") as file:
-        yaml.dump(dataset_metadata.dict(), file, default_flow_style=False)
+        yaml.dump(dataset_metadata_json, file, default_flow_style=False)
 
     return metrics
