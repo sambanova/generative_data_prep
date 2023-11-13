@@ -57,6 +57,8 @@ class DatasetMetadata(BaseModel):
     def validate_max_seq_length(cls, v: int, info: FieldValidationInfo):
         """Validates max sequence length."""
         runtime_max_seq_length = info.context.get("max_seq_length")
+        if type(runtime_max_seq_length) is not int:
+            raise ValueError("Max sequence length context param should be an integer variable")
         if v != runtime_max_seq_length:
             raise ValueError(
                 f"""max_seq_length specified during training ({runtime_max_seq_length})
@@ -69,6 +71,8 @@ class DatasetMetadata(BaseModel):
     def validate_number_of_training_files(cls, v: int, info: FieldValidationInfo):
         """Validates number of training files."""
         number_of_instances = info.context.get("world_size")
+        if type(number_of_instances) is not int:
+            raise ValueError("World size context param should be an integer variable")
         if v < number_of_instances:
             raise ValueError(
                 f"""The number of training files ({v}) is less than the
@@ -80,7 +84,13 @@ class DatasetMetadata(BaseModel):
     @classmethod
     def validation_vocab_size(cls, v: int, info: FieldValidationInfo):
         """Validates vocab size."""
-        pass
+        runtime_vocab_size = info.context.get("vocab_size")
+        if type(runtime_vocab_size) is not int:
+            raise ValueError("Vocab size context param should be an integer variable")
+        if v > runtime_vocab_size:
+            raise ValueError(
+                f"Runtime vocab size ({runtime_vocab_size}) must be equal to or greater than dataset vocab size ({v})"
+            )
 
     @field_validator("model_type")
     @classmethod
@@ -88,7 +98,7 @@ class DatasetMetadata(BaseModel):
         """Validates model type."""
         str_model_type = info.context.get("model_type_class")
         if type(str_model_type) is not str:
-            raise ValueError("Model type should be the type(model_config) and then passed in as a string")
+            raise ValueError("Model type context param should be the type(model_config) and then passed in as a string")
         if v != str_model_type:
             raise ValueError(
                 f"""Model type of model during runtime ({str_model_type})
@@ -101,7 +111,7 @@ class DatasetMetadata(BaseModel):
         """Validates number of dev files."""
         do_eval = info.context.get("eval")
         if type(do_eval) is not bool:
-            raise ValueError("eval parameter should be a boolean variable")
+            raise ValueError("eval context param should be a boolean variable")
         if do_eval:
             if v is None:
                 raise ValueError(
@@ -117,7 +127,7 @@ class DatasetMetadata(BaseModel):
         """Validates batch size for training."""
         runtime_batch_size = info.context.get("batch_size")
         if type(runtime_batch_size) is not int:
-            raise ValueError("batch_size parameter should be an integer variable")
+            raise ValueError("batch_size context param should be an integer variable")
         if runtime_batch_size > v:
             raise ValueError(
                 f"""batch size specified during training ({runtime_batch_size}) exceeds the maximum
@@ -131,7 +141,7 @@ class DatasetMetadata(BaseModel):
         do_eval = info.context.get("eval")
         runtime_batch_size = info.context.get("batch_size")
         if type(do_eval) is not bool:
-            raise ValueError("eval parameter should be a boolean variable")
+            raise ValueError("eval context param should be a boolean variable")
         if do_eval:
             if v is None:
                 raise ValueError(
@@ -153,7 +163,7 @@ if __name__ == "__main__":
         "eval": False,
         "batch_size": 1,
         "model_type_class": str(type(GPT2Config.from_pretrained("gpt2"))),
-        "vocab_size": 20590,
+        "vocab_size": 50257,
         "world_size": 4,
         "max_seq_length": 1024,
     }
