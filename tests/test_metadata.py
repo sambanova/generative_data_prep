@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 import yaml
-from transformers import GPT2Config
+from transformers import BertConfig, GPT2Config
 
 from generative_data_prep.utils import DatasetMetadata
 
@@ -37,7 +37,7 @@ def test_pydantic_model_wrong_model_type():
     context_dict = {
         "eval": False,
         "batch_size": 1,
-        "model_type": str(type(GPT2Config.from_pretrained("gpt2"))),
+        "model_type": str(type(BertConfig.from_pretrained("bert-based-uncased"))),
         "vocab_size": 50257,
         "world_size": 4,
         "max_seq_length": 1024,
