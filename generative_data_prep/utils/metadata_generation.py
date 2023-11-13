@@ -75,8 +75,8 @@ class DatasetMetadata(BaseModel):
             raise ValueError("World size context param should be an integer variable")
         if v < number_of_instances:
             raise ValueError(
-                f"""The number of training files ({v}) is less than the
-                specified number of workers ({number_of_instances})"""
+                f"""The number of workers({number_of_instances}) is greater than
+                the specified number of files ({v})"""
             )
         return v
 
