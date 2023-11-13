@@ -149,8 +149,9 @@ def test_pydantic_model_greater_batch_size():
         error = exc.errors()[0]
         if "max_batch_size_train" == error["loc"][0]:
             assert "30" in error["msg"]
-            assert "1024" in error["msg"]
-            assert "must match max_seq_length" in error["msg"]
+            assert "13" in error["msg"]
+            assert "exceeds the maximum" in error["msg"]
+            assert "allowed batch size" in error["msg"]
         else:
             assert False
         return
