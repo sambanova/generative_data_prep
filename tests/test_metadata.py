@@ -84,7 +84,7 @@ def test_pydantic_model_greater_vocab_size():
         if "vocab_size" == error["loc"][0]:
             assert "50000" in error["msg"]
             assert "50257" in error["msg"]
-            assert "exceeds the maximum allowed batch size" in error["msg"]
+            assert "must be equal to or greater than dataset vocab size" in error["msg"]
         else:
             assert False
         return
