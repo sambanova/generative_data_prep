@@ -45,7 +45,7 @@ class DatasetMetadata(BaseModel):
     max_seq_length: int
     token_type_ids: bool
     vocab_size: int
-    model_type: str
+    tokenizer_model_type: str
     number_of_training_files: int
     number_of_dev_files: Optional[int]
     number_of_test_files: Optional[int]
@@ -93,11 +93,11 @@ class DatasetMetadata(BaseModel):
             )
         return v
 
-    @field_validator("model_type")
+    @field_validator("tokenizer_model_type")
     @classmethod
-    def validation_model_type(cls, v: str, info: ValidationInfo):
+    def validation_tokenizer_model_type(cls, v: str, info: ValidationInfo):
         """Validates model type."""
-        str_model_type = info.context.get("model_type_class")
+        str_model_type = info.context.get("model_type")
         if type(str_model_type) is not str:
             raise ValueError("Model type context param should be the type(model_config) and then passed in as a string")
         if v != str_model_type:
@@ -163,7 +163,7 @@ if __name__ == "__main__":
     context_dict = {
         "eval": False,
         "batch_size": 1,
-        "model_type_class": str(type(GPT2Config.from_pretrained("gpt2"))),
+        "model_type": str(type(GPT2Config.from_pretrained("gpt2"))),
         "vocab_size": 50257,
         "world_size": 4,
         "max_seq_length": 1024,
