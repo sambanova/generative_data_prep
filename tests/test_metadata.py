@@ -158,6 +158,7 @@ def test_pydantic_model_greater_batch_size():
 
 def test_pydantic_model_no_evaluation_files():
     """Testing DatasetMetadata loads in variables correctly. This should fail"""
+    error_keys = ["number_of_dev_files", "max_batch_size_dev"]
     output_dir = os.path.join(
         Path.cwd(), "tests", "examples", "pretraining_sha256_split", "pipelined_pretraining_sha256_split"
     )
@@ -177,6 +178,7 @@ def test_pydantic_model_no_evaluation_files():
     except ValidationError as exc:
         assert len(exc.errors()) == 2
         for error in exc.errors():
+            assert error["loc"][0] in error_keys
             assert (
                 "Evaluation during training is turned on but there are no " "evaluation files in this dataset"
             ) in error["msg"]
