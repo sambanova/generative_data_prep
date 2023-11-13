@@ -71,7 +71,7 @@ def test_pydantic_model_greater_vocab_size():
         "eval": False,
         "batch_size": 1,
         "model_type": str(type(GPT2Config.from_pretrained("gpt2"))),
-        "vocab_size": 60000,
+        "vocab_size": 50000,
         "world_size": 4,
         "max_seq_length": 1024,
     }
@@ -103,7 +103,7 @@ def test_pydantic_model_greater_world_size():
         "eval": False,
         "batch_size": 1,
         "model_type": str(type(GPT2Config.from_pretrained("gpt2"))),
-        "vocab_size": 50000,
+        "vocab_size": 50257,
         "world_size": 100,
         "max_seq_length": 1024,
     }
