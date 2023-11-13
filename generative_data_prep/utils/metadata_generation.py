@@ -20,7 +20,7 @@ import sys
 from typing import Optional
 
 import yaml
-from pydantic import BaseModel, FieldValidationInfo, field_validator
+from pydantic import BaseModel, ValidationInfo, field_validator
 from transformers import GPT2Config
 
 
@@ -54,7 +54,7 @@ class DatasetMetadata(BaseModel):
 
     @field_validator("max_seq_length")
     @classmethod
-    def validate_max_seq_length(cls, v: int, info: FieldValidationInfo):
+    def validate_max_seq_length(cls, v: int, info: ValidationInfo):
         """Validates max sequence length."""
         runtime_max_seq_length = info.context.get("max_seq_length")
         if type(runtime_max_seq_length) is not int:
@@ -68,7 +68,7 @@ class DatasetMetadata(BaseModel):
 
     @field_validator("number_of_training_files")
     @classmethod
-    def validate_number_of_training_files(cls, v: int, info: FieldValidationInfo):
+    def validate_number_of_training_files(cls, v: int, info: ValidationInfo):
         """Validates number of training files."""
         number_of_instances = info.context.get("world_size")
         if type(number_of_instances) is not int:
@@ -82,7 +82,7 @@ class DatasetMetadata(BaseModel):
 
     @field_validator("vocab_size")
     @classmethod
-    def validation_vocab_size(cls, v: int, info: FieldValidationInfo):
+    def validation_vocab_size(cls, v: int, info: ValidationInfo):
         """Validates vocab size."""
         runtime_vocab_size = info.context.get("vocab_size")
         if type(runtime_vocab_size) is not int:
@@ -95,7 +95,7 @@ class DatasetMetadata(BaseModel):
 
     @field_validator("model_type")
     @classmethod
-    def validation_model_type(cls, v: str, info: FieldValidationInfo):
+    def validation_model_type(cls, v: str, info: ValidationInfo):
         """Validates model type."""
         str_model_type = info.context.get("model_type_class")
         if type(str_model_type) is not str:
@@ -108,7 +108,7 @@ class DatasetMetadata(BaseModel):
 
     @field_validator("number_of_dev_files")
     @classmethod
-    def validation_number_of_dev_files(cls, v: int, info: FieldValidationInfo):
+    def validation_number_of_dev_files(cls, v: int, info: ValidationInfo):
         """Validates number of dev files."""
         do_eval = info.context.get("eval")
         if type(do_eval) is not bool:
@@ -124,7 +124,7 @@ class DatasetMetadata(BaseModel):
 
     @field_validator("max_batch_size_train")
     @classmethod
-    def validation_batch_size_train(cls, v: int, info: FieldValidationInfo):
+    def validation_batch_size_train(cls, v: int, info: ValidationInfo):
         """Validates batch size for training."""
         runtime_batch_size = info.context.get("batch_size")
         if type(runtime_batch_size) is not int:
@@ -137,7 +137,7 @@ class DatasetMetadata(BaseModel):
 
     @field_validator("max_batch_size_dev")
     @classmethod
-    def validation_batch_size_dev(cls, v: int, info: FieldValidationInfo):
+    def validation_batch_size_dev(cls, v: int, info: ValidationInfo):
         """Validates bath size for evaluation."""
         do_eval = info.context.get("eval")
         runtime_batch_size = info.context.get("batch_size")
