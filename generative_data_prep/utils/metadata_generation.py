@@ -61,8 +61,10 @@ class DatasetMetadata(BaseModel):
             raise ValueError("Max sequence length context param should be an integer variable")
         if v != runtime_max_seq_length:
             raise ValueError(
-                f"""max_seq_length specified during training ({runtime_max_seq_length})
-                must match max_seq_length used during generative data prep ({v})"""
+                (
+                    f"max_seq_length specified during training ({runtime_max_seq_length}) "
+                    f"must match max_seq_length used during generative data prep ({v})"
+                )
             )
         return v
 
@@ -75,8 +77,10 @@ class DatasetMetadata(BaseModel):
             raise ValueError("World size context param should be an integer variable")
         if v < number_of_instances:
             raise ValueError(
-                f"""The number of workers({number_of_instances}) is greater than
-                the specified number of files ({v})"""
+                (
+                    f"The number of workers({number_of_instances}) is greater than "
+                    f"the specified number of files ({v})"
+                )
             )
         return v
 
@@ -102,8 +106,10 @@ class DatasetMetadata(BaseModel):
             raise ValueError("Model type context param should be the type(model_config) and then passed in as a string")
         if v != str_model_type:
             raise ValueError(
-                f"""Model type of model during runtime ({str_model_type})
-                does not match model type used during training ({v})"""
+                (
+                    f"Model type of model during runtime ({str_model_type}) "
+                    f"does not match model type used during training ({v})"
+                )
             )
 
     @field_validator("number_of_dev_files")
@@ -116,8 +122,7 @@ class DatasetMetadata(BaseModel):
         if do_eval:
             if v is None:
                 raise ValueError(
-                    """Evaluation during training is turned on but there are no
-                evaluation files in this dataset"""
+                    ("Evaluation during training is turned on but there are no " "evaluation files in this dataset")
                 )
             if v == 0:
                 raise ValueError("Evaluating during runtime but have no evaluation files to run in dataset")
@@ -131,8 +136,10 @@ class DatasetMetadata(BaseModel):
             raise ValueError("batch_size context param should be an integer variable")
         if runtime_batch_size > v:
             raise ValueError(
-                f"""batch size specified during training ({runtime_batch_size}) exceeds the maximum
-                allowed batch size ({v}) based on training dataset"""
+                (
+                    f"batch size specified during training ({runtime_batch_size}) exceeds the maximum "
+                    f"allowed batch size ({v}) based on training dataset"
+                )
             )
 
     @field_validator("max_batch_size_dev")
@@ -146,13 +153,14 @@ class DatasetMetadata(BaseModel):
         if do_eval:
             if v is None:
                 raise ValueError(
-                    """Evaluation during training is turned on but there are no
-                evaluation files in this dataset"""
+                    ("Evaluation during training is turned on but there are no " "evaluation files in this dataset")
                 )
             if runtime_batch_size > v:
                 raise ValueError(
-                    f"""batch size specified during training ({runtime_batch_size}) exceeds the maximum
-                    allowed batch size ({v}) based on evaluation files in dataset"""
+                    (
+                        f"batch size specified during training ({runtime_batch_size}) exceeds the maximum "
+                        f"allowed batch size ({v}) based on evaluation files in dataset"
+                    )
                 )
 
 
