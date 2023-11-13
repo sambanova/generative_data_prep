@@ -91,6 +91,7 @@ class DatasetMetadata(BaseModel):
             raise ValueError(
                 f"Runtime vocab size ({runtime_vocab_size}) must be equal to or greater than dataset vocab size ({v})"
             )
+        return v
 
     @field_validator("model_type")
     @classmethod
