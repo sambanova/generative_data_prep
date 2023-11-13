@@ -116,7 +116,7 @@ def test_pydantic_model_different_sequence_length():
     except ValidationError as exc:
         assert len(exc.errors()) == 1
         error = exc.errors()[0]
-        if "number_of_training_files" == error["loc"][0]:
+        if "max_seq_length" == error["loc"][0]:
             assert "2048" in error["msg"]
             assert "1024" in error["msg"]
             assert "must match max_seq_length" in error["msg"]
@@ -147,7 +147,7 @@ def test_pydantic_model_greater_batch_size():
     except ValidationError as exc:
         assert len(exc.errors()) == 1
         error = exc.errors()[0]
-        if "number_of_training_files" == error["loc"][0]:
+        if "max_batch_size_train" == error["loc"][0]:
             assert "30" in error["msg"]
             assert "1024" in error["msg"]
             assert "must match max_seq_length" in error["msg"]
