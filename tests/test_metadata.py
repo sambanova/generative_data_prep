@@ -49,7 +49,7 @@ def test_pydantic_model_wrong_model_type():
     except ValidationError as exc:
         assert len(exc.errors()) == 1
         error = exc.errors()[0]
-        if "tokenizer_model_type" == error[0]["loc"][0]:
+        if "tokenizer_model_type" == error["loc"][0]:
             assert "BertConfig" in error["msg"]
             assert "GPT2Config" in error["msg"]
             assert "does not match model type used during training" in error["msg"]
@@ -79,8 +79,9 @@ def test_pydantic_model_greater_vocab_size():
         DatasetMetadata.model_validate(metadata_dict, context=context_dict)
     except ValidationError as exc:
         assert len(exc.errors()) == 1
+        print(exc.errors(), flush=True)
         error = exc.errors()[0]
-        if "vocab_size" == error[0]["loc"][0]:
+        if "vocab_size" == error["loc"][0]:
             assert "60000" in error["msg"]
             assert "50257" in error["msg"]
             assert "exceeds the maximum allowed batch size" in error["msg"]
@@ -111,7 +112,7 @@ def test_pydantic_model_greater_world_size():
     except ValidationError as exc:
         assert len(exc.errors()) == 1
         error = exc.errors()[0]
-        if "number_of_training_files" == error[0]["loc"][0]:
+        if "number_of_training_files" == error["loc"][0]:
             assert "100" in error["msg"]
             assert "4" in error["msg"]
             assert "is greater than the specified number of files" in error["msg"]
