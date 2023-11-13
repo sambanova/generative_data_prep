@@ -37,7 +37,7 @@ def test_pydantic_model_wrong_model_type():
     context_dict = {
         "eval": False,
         "batch_size": 1,
-        "model_type": str(type(BertConfig.from_pretrained("bert-based-uncased"))),
+        "model_type": str(type(BertConfig.from_pretrained("bert-base-uncased"))),
         "vocab_size": 50257,
         "world_size": 4,
         "max_seq_length": 1024,
