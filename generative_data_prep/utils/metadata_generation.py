@@ -167,4 +167,4 @@ if __name__ == "__main__":
         "world_size": 4,
         "max_seq_length": 1024,
     }
-    DatasetMetadata.model_validate(metadata_dict, context=context_dict)
+    print(DatasetMetadata.model_validate(metadata_dict, context=context_dict))
