@@ -211,6 +211,52 @@ The metrics associated with this dataset will be printed in the terminal. These 
 | Sequence Utilization | Average number of non-padding tokens in a sequence divided by sequence length. | The percent of the tokens in each sequence are actually used for training. This number imrpoved be changed by using different `input_packing_config`. The packing styles from highest sequence utilization to lowest are: `full`, `greedy::truncate_left` (or truncate_right), `greedy::drop`, `single::truncate_left` (or truncate_right), `single::drop`.|
 | Seq Completion Utilization | Average number of completions tokens in a sequence divided by sequence length. | The percent of the tokens in a sequence are learned.|
 
+## Validating training parameters with dataset metadata
+
+To help improve speed and cross-checking we now provide a metadata file along with the dataset. This file is located right under the `output_dir` as `metadata.yaml`. This file is used along with a custom pydantic model which you can import from this library which will verify the dataset parameters and the training parameters. This can be used as a way to catch bugs before training begins.
+#### Structure of Metadata file
+```
+max_seq_length: int
+token_type_ids: bool
+vocab_size: int
+tokenizer_model_type: str
+number_of_training_files: int
+number_of_dev_files: Optional[int]
+number_of_test_files: Optional[int]
+max_batch_size_train: int
+max_batch_size_dev: Optional[int]
+```
+
+NOTE:
+* `tokenizer_model_type` is the string conversion of `type(modelConfig)`. Can use this field to compare the model used during training, which can be extracted by using `AutoConfig` in Huggingface transformers. Then wrapping it with `str(type())`.
+* `number_of_dev_files` and `max_batch_size_dev` will be `None` unless dev files are created during generative data pipeline.
+* `number_of_test_files` will be `None` unless test files are created during generative data pipeline.
+* `token_type_ids` will always be `True` for now since they are always generated.
+
+#### How to use pydantic model
+
+```
+import yaml
+from generative_data_prep.utils import DatasetMetadata
+from transformers import AutoConfig
+
+# Load in the metadata file using pyyaml
+metadata_file = os.path.join(output_dir, "metadata.yaml")
+with open(metadata_file, "r") as file:
+    metadata_dict = yaml.safe_load(file)
+
+gpt2_config = AutoConfig.from_pretrained("gpt2")
+training_param_dict = {
+    "eval": False,
+    "batch_size": 1,
+    "model_type": str(type(gpt2_config)),
+    "vocab_size": gpt2_config.vocab_size,
+    "world_size": 4,
+    "max_seq_length": 1024,
+}
+
+DatasetMetadata.model_validate(metadata_dict, context=training_param_dict)
+```
 
 ## Example use cases
 ### Pretraining
