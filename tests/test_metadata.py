@@ -189,7 +189,11 @@ def test_pydantic_model_no_evaluation_files():
 def test_pydantic_model_yes_evaluation_files():
     """Testing DatasetMetadata loads in variables correctly. This should fail"""
     output_dir = os.path.join(
-        Path.cwd(), "tests", "examples", "pretraining_sha256_split", "pipelined_pretraining_sha256_split_and_eval"
+        Path.cwd(),
+        "tests",
+        "examples",
+        "pretraining_sha256_split_and_eval",
+        "pipelined_pretraining_sha256_split_and_eval",
     )
     metadata_file = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
