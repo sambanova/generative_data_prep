@@ -258,6 +258,24 @@ training_param_dict = {
 DatasetMetadata.model_validate(metadata_dict, context=training_param_dict)
 ```
 
+If DatasetMetadata does not error out then that means the training parameters meet the requirements of the dataset!
+
+If DatasetMetadata does error out, that means that the training parameters need to be modified or the dataset needs to be generated again to fit the needs of the training parameters. There will be a detailed error output indicating which parameters of the metadata are not compatible.
+
+#### How to check for corruption
+
+We also create an overall metadata file for each of the files within the output directory! This metadata file contains each of the different files paired with their size, modified date, and sha256 hash. This allows for users to check to see if their dataset has been corrupted; thus invalidating the datasetMetadata pydantic model as there could be some hidden errors. This verification should be used before running the pydantic model to make sure nothing is wrong with the dataset.
+
+Here is an example code of what this would look like!
+
+```
+from generative_data_prep.utils import validate_sha256
+
+validate_sha256(output_dir)
+```
+`output_dir` here should point to the directory which was created using generative data pipeline. This function returns a `bool` and will be `True` if there is NO corruption in the dataset and `False` if there is corruption in the dataset.
+
+Under the hood each file is scrubbed through and is first checked with the size and modified date. If these values are not the same as when the file was first created then the function will calculate the sha256 of the file and compare it to what is saved.
 ## Example use cases
 ### Pretraining
 Pretraining on unstructured data enables large languages models to learn general language patterns and structures that are useful for a wide range of downstream tasks. In order to prepare pretraining data, you need a large amount of unstructured text data. To prepare pretraining data use the flag `--input_packing_config=full`.
