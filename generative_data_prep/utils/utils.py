@@ -274,7 +274,7 @@ def _get_walk_files_to_hash(dir: str, filter: Optional[str] = None):
             relative_foldername = ""
         relative_foldername = relative_foldername.replace(os.path.sep, "_")
         if relative_foldername != "":
-            relative_foldername += relative_foldername + "_"
+            relative_foldername += "_"
         hash_file_name = [
             (
                 os.path.join(foldername, filename),
