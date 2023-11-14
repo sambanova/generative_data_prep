@@ -24,7 +24,7 @@ import h5py
 import numpy as np
 
 
-def balance_hdf5_files(
+def balance_hdf5_files(  # noqa: C901
     hdf5_file_paths: List[str],
     dataset_metadata_json: Optional[Dict[str, Union[str, int, bool, None]]] = None,
     dataset_type: Optional[str] = None,

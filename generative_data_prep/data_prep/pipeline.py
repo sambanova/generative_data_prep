@@ -199,7 +199,7 @@ def data_prep_main_helper(args: Iterable[Any]):
     return data_prep_main(*args)
 
 
-def multiprocess_data_prep(
+def multiprocess_data_prep(  # noqa: C901
     files_to_tokenize: List[str],
     split_dir: str,
     hdf5_dir: str,
