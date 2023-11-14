@@ -214,7 +214,7 @@ def multiprocess_data_prep(
     tokenizer: PreTrainedTokenizerBase,
     num_workers: int,
     input_file_size_in_gb: float,
-    dataset_metadata_json: Optional[Dict[str, Union[str, int, bool, None]]],
+    dataset_metadata_json: Optional[Dict[str, Union[str, int, bool, None]]] = None,
     category_to_id: Optional[Dict[str, int]] = None,
     prompt_prefix: Optional[str] = None,
     prompt_postfix: Optional[str] = None,
