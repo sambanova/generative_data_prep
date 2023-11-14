@@ -15,6 +15,7 @@ limitations under the License.
 
 import argparse
 import hashlib
+import json
 import os
 from subprocess import PIPE, run  # nosec
 from typing import Optional
@@ -323,8 +324,10 @@ def create_sha256(output_dir: str):
 
     hash_dir = os.path.join(output_dir, "sha256")
     os.mkdir(hash_dir)
+    output_file_hash = os.path.join(hash_dir, "files_metadata.json")
+    file_info_dict = {}
     for file, hash_file_name in files_to_hash:
         file_hash = _calculate_sha256(file)
-        output_file_hash = os.path.join(hash_dir, hash_file_name)
-        with open(output_file_hash, "w") as output_file:
-            output_file.write(file_hash)
+        file_info_dict[hash_file_name] = {"sha256": file_hash}
+    with open(output_file_hash, "w") as output_file:
+        json.dump(file_info_dict, output_file)
