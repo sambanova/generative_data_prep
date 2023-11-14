@@ -41,6 +41,7 @@ from .utils import (
     create_sha256,
     data_prep_arg_builder,
     execute_and_return_stdout,
+    get_config_file_path,
     validate_sha256,
 )
 
@@ -70,5 +71,6 @@ __all__ = [
     "log_git_commit_hash",
     "log_elapsed_time",
     "log_sep_str",
+    "get_config_file_path",
     "DatasetMetadata",
 ]

@@ -18,6 +18,7 @@ import hashlib
 import json
 import math
 import os
+from importlib.resources import files as importlib_files
 from subprocess import PIPE, run  # nosec
 from typing import Optional
 
@@ -30,6 +31,8 @@ from transformers import (
 
 from .arg_configs import PackingConfig
 from .constants import BoundaryType
+
+PACKAGE_ROOT_PATH = importlib_files("generative_data_prep")
 
 
 class TokenizerConfigPair:
@@ -341,3 +344,12 @@ def create_sha256(output_dir: str):
         }
     with open(output_file_hash, "w") as output_file:
         json.dump(file_info_dict, output_file)
+
+
+def get_config_file_path():
+    """Return absolute path to the logging config file.
+
+    Returns:
+        Path: absolute path to the logging config file
+    """
+    return PACKAGE_ROOT_PATH / "configs" / "logger.conf"
