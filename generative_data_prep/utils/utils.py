@@ -298,15 +298,16 @@ def validate_sha256(output_dir: str):
         files have not been modified
     """
     files_to_hash = _get_walk_files_to_hash(output_dir, "sha256")
+    sha_info_file = os.path.join(output_dir, "sha256", "files_metadata.json")
+    with open(sha_info_file, "r") as output_file:
+        file_info_dict = json.load(output_file)
     for file, hash_file_name in files_to_hash:
-        output_file_hash = os.path.join(output_dir, "sha256", hash_file_name)
-        if not os.path.isfile(output_file_hash):
+        if hash_file_name not in file_info_dict:
             return False
-        with open(output_file_hash, "r") as file_hash_read:
-            file_hash = file_hash_read.read().strip()
-            current_file_hash = _calculate_sha256(file)
-            if file_hash != current_file_hash:
-                return False
+        file_hash = file_info_dict[hash_file_name]
+        current_file_hash = _calculate_sha256(file)
+        if file_hash != current_file_hash:
+            return False
     return True
 
 
