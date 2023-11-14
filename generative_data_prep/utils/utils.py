@@ -16,6 +16,7 @@ limitations under the License.
 import argparse
 import hashlib
 import json
+import math
 import os
 from subprocess import PIPE, run  # nosec
 from typing import Optional
@@ -304,10 +305,15 @@ def validate_sha256(output_dir: str):
     for file, hash_file_name in files_to_hash:
         if hash_file_name not in file_info_dict:
             return False
-        file_hash = file_info_dict[hash_file_name]["sha256"]
-        current_file_hash = _calculate_sha256(file)
-        if file_hash != current_file_hash:
-            return False
+        current_modified_time = os.path.getmtime(file)
+        current_size = os.path.getsize(file)
+        if current_size != file_info_dict[hash_file_name]["size"] or not math.isclose(
+            current_modified_time, file_info_dict[hash_file_name]["modified_time"]
+        ):
+            file_hash = file_info_dict[hash_file_name]["sha256"]
+            current_file_hash = _calculate_sha256(file)
+            if file_hash != current_file_hash:
+                return False
     return True
 
 
@@ -328,6 +334,10 @@ def create_sha256(output_dir: str):
     file_info_dict = {}
     for file, hash_file_name in files_to_hash:
         file_hash = _calculate_sha256(file)
-        file_info_dict[hash_file_name] = {"sha256": file_hash}
+        file_info_dict[hash_file_name] = {
+            "sha256": file_hash,
+            "size": os.path.getsize(file),
+            "modified_time": os.path.getmtime(file),
+        }
     with open(output_file_hash, "w") as output_file:
         json.dump(file_info_dict, output_file)
