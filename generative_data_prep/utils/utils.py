@@ -304,7 +304,7 @@ def validate_sha256(output_dir: str):
     for file, hash_file_name in files_to_hash:
         if hash_file_name not in file_info_dict:
             return False
-        file_hash = file_info_dict[hash_file_name]
+        file_hash = file_info_dict[hash_file_name]["sha256"]
         current_file_hash = _calculate_sha256(file)
         if file_hash != current_file_hash:
             return False
