@@ -1,4 +1,6 @@
+import logging
 import os
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -6,13 +8,57 @@ import pytest
 from generative_data_prep.utils import validate_sha256
 
 
-def test_validation_sha_with_split():
-    """Testing validation method and sha256 created correctly. With splits."""
-    validate_dir = os.path.join(
-        Path.cwd(), "tests", "examples", "pretraining_sha256_split", "pipelined_pretraining_sha256_split"
+@pytest.fixture(scope="session")
+def shared_output_dir(tmp_path_factory):
+    """Creating temp directories for each test and running generative pipeline e2e"""
+    tmp_split_output_dir = tmp_path_factory.mktemp("pretraining_sha256_split")
+    logging.info(f"temporary split output directory is in {tmp_split_output_dir}")
+    tmp_split_with_eval_output_dir = tmp_path_factory.mktemp("pretraining_sha256_split_and_eval")
+    logging.info(f"temporary split output directory is in {tmp_split_with_eval_output_dir}")
+    tmp_no_split_output_dir = tmp_path_factory.mktemp("pretraining_sha256_no_split")
+    logging.info(f"temporary split output directory is in {tmp_no_split_output_dir}")
+    input_file = os.path.join(Path.cwd(), "tests", "examples", "pretraining", "example_pretraining_data.jsonl")
+    command = [
+        "python3",
+        "-m",
+        "generative_data_prep",
+        "pipeline",
+        "--input_file_path",
+        f"{input_file}",
+        "--pretrained_tokenizer",
+        "gpt2",
+        "--max_seq_length",
+        "1024",
+        "--shuffle",
+        "on_RAM",
+        "--num_training_splits",
+        "4",
+    ]
+    subprocess.run(command + ["--output_path", f"{tmp_no_split_output_dir}"])
+    subprocess.run(command + ["--keep_split_jsonls", "--output_path", f"{tmp_split_output_dir}"])
+    subprocess.run(
+        command
+        + [
+            "--num_dev_splits",
+            "1",
+            "--num_test_splits",
+            "1",
+            "--keep_split_jsonls",
+            "--output_path",
+            f"{tmp_split_with_eval_output_dir}",
+        ]
     )
+    return {
+        "tmp_no_split_output_dir": tmp_no_split_output_dir,
+        "tmp_split_output_dir": tmp_split_output_dir,
+        "tmp_split_with_eval_output_dir": tmp_split_with_eval_output_dir,
+    }
+
+
+def test_validation_sha_with_split(shared_output_dir):
+    """Testing validation method and sha256 created correctly. With splits."""
     # breakpoint()
-    assert validate_sha256(validate_dir)
+    assert validate_sha256(shared_output_dir["tmp_split_output_dir"])
 
 
 def fake_getsize(file_path):
@@ -26,31 +72,19 @@ def mock_getsize(monkeypatch):
     monkeypatch.setattr(os.path, "getsize", fake_getsize)
 
 
-def test_validation_sha_with_split_redoing_sha256(mock_getsize):
+def test_validation_sha_with_split_redoing_sha256(mock_getsize, shared_output_dir):
     """Testing validation method and sha256 created correctly. With splits."""
-    validate_dir = os.path.join(
-        Path.cwd(), "tests", "examples", "pretraining_sha256_split", "pipelined_pretraining_sha256_split"
-    )
-    # breakpoint()
-    assert validate_sha256(validate_dir)
+
+    assert validate_sha256(shared_output_dir["tmp_split_output_dir"])
 
 
-def test_validation_sha_with_split_and_eval():
+def test_validation_sha_with_split_and_eval(shared_output_dir):
     """Testing validation method and sha256 created correctly. With splits."""
-    validate_dir = os.path.join(
-        Path.cwd(),
-        "tests",
-        "examples",
-        "pretraining_sha256_split_and_eval",
-        "pipelined_pretraining_sha256_split_and_eval",
-    )
-    # breakpoint()
-    assert validate_sha256(validate_dir)
+
+    assert validate_sha256(shared_output_dir["tmp_split_with_eval_output_dir"])
 
 
-def test_validation_sha_without_split():
+def test_validation_sha_without_split(shared_output_dir):
     """Testing validation method and sha256 created correctly. Without splits."""
-    validate_dir = os.path.join(
-        Path.cwd(), "tests", "examples", "pretraining_sha256_no_split", "pipelined_pretraining_sha256_no_split"
-    )
-    assert validate_sha256(validate_dir)
+
+    assert validate_sha256(shared_output_dir["tmp_no_split_output_dir"])
