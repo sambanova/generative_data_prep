@@ -11,7 +11,11 @@ from generative_data_prep.utils import DatasetMetadata
 def test_pydantic_model_passing():
     """Testing DatasetMetadata loads in variables correctly. This should pass"""
     output_dir = os.path.join(
-        Path.cwd(), "tests", "examples", "pretraining_sha256_split", "pipelined_pretraining_sha256_split"
+        Path.cwd(),
+        "tests",
+        "examples",
+        "pretraining_split_with_new_metadata_and_sha256",
+        "pipelined_pretraining_sha256_split",
     )
     metadata_file = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
@@ -31,7 +35,11 @@ def test_pydantic_model_wrong_model_type_and_less_vocab_size():
     """Testing DatasetMetadata loads in variables correctly. This should fail"""
     error_keys = ["tokenizer_model_type", "vocab_size"]
     output_dir = os.path.join(
-        Path.cwd(), "tests", "examples", "pretraining_sha256_split", "pipelined_pretraining_sha256_split"
+        Path.cwd(),
+        "tests",
+        "examples",
+        "pretraining_split_with_new_metadata_and_sha256",
+        "pipelined_pretraining_sha256_split",
     )
     metadata_file = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
@@ -66,7 +74,11 @@ def test_pydantic_model_wrong_model_type_and_less_vocab_size():
 def test_pydantic_model_greater_world_size():
     """Testing DatasetMetadata loads in variables correctly. This should fail"""
     output_dir = os.path.join(
-        Path.cwd(), "tests", "examples", "pretraining_sha256_split", "pipelined_pretraining_sha256_split"
+        Path.cwd(),
+        "tests",
+        "examples",
+        "pretraining_split_with_new_metadata_and_sha256",
+        "pipelined_pretraining_sha256_split",
     )
     metadata_file = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
@@ -97,7 +109,11 @@ def test_pydantic_model_greater_world_size():
 def test_pydantic_model_different_sequence_length():
     """Testing DatasetMetadata loads in variables correctly. This should fail"""
     output_dir = os.path.join(
-        Path.cwd(), "tests", "examples", "pretraining_sha256_split", "pipelined_pretraining_sha256_split"
+        Path.cwd(),
+        "tests",
+        "examples",
+        "pretraining_split_with_new_metadata_and_sha256",
+        "pipelined_pretraining_sha256_split",
     )
     metadata_file = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
@@ -128,7 +144,11 @@ def test_pydantic_model_different_sequence_length():
 def test_pydantic_model_greater_batch_size():
     """Testing DatasetMetadata loads in variables correctly. This should fail"""
     output_dir = os.path.join(
-        Path.cwd(), "tests", "examples", "pretraining_sha256_split", "pipelined_pretraining_sha256_split"
+        Path.cwd(),
+        "tests",
+        "examples",
+        "pretraining_split_with_new_metadata_and_sha256",
+        "pipelined_pretraining_sha256_split",
     )
     metadata_file = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
@@ -160,7 +180,11 @@ def test_pydantic_model_no_evaluation_files():
     """Testing DatasetMetadata loads in variables correctly. This should fail"""
     error_keys = ["number_of_dev_files", "max_batch_size_dev"]
     output_dir = os.path.join(
-        Path.cwd(), "tests", "examples", "pretraining_sha256_split", "pipelined_pretraining_sha256_split"
+        Path.cwd(),
+        "tests",
+        "examples",
+        "pretraining_split_with_new_metadata_and_sha256",
+        "pipelined_pretraining_sha256_split",
     )
     metadata_file = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
@@ -192,12 +216,14 @@ def test_pydantic_model_yes_evaluation_files():
         Path.cwd(),
         "tests",
         "examples",
-        "pretraining_sha256_split_and_eval",
-        "pipelined_pretraining_sha256_split_and_eval",
+        "pretraining_split_with_new_metadata_and_sha256",
+        "pipelined_pretraining_sha256_split",
     )
     metadata_file = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
         metadata_dict = yaml.safe_load(file)
+    metadata_dict["number_of_dev_files"] = 1
+    metadata_dict["max_batch_size_dev"] = 7
     context_dict = {
         "eval": True,
         "batch_size": 1,
@@ -215,12 +241,14 @@ def test_pydantic_model_yes_evaluation_files_batch_size_greater():
         Path.cwd(),
         "tests",
         "examples",
-        "pretraining_sha256_split_and_eval",
-        "pipelined_pretraining_sha256_split_and_eval",
+        "pretraining_split_with_new_metadata_and_sha256",
+        "pipelined_pretraining_sha256_split",
     )
     metadata_file = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
         metadata_dict = yaml.safe_load(file)
+    metadata_dict["number_of_dev_files"] = 1
+    metadata_dict["max_batch_size_dev"] = 7
     context_dict = {
         "eval": True,
         "batch_size": 8,
