@@ -15,13 +15,9 @@ limitations under the License.
 
 DatasetMetadata pydantic model and functions to verify pydantic model.
 """
-import os
-import sys
 from typing import Optional
 
-import yaml
 from pydantic import BaseModel, ValidationInfo, field_validator
-from transformers import GPT2Config
 
 
 class DatasetMetadata(BaseModel):
@@ -68,19 +64,30 @@ class DatasetMetadata(BaseModel):
             )
         return v
 
+    @field_validator("token_type_ids")
+    @classmethod
+    def validate_token_type_ids(cls, v: bool, info: ValidationInfo):
+        """Validates number of training files."""
+        use_token_type_ids = info.context.get("use_token_type_ids")
+        if type(use_token_type_ids) is not bool:
+            raise ValueError("Token type id context param should be an boolean variable")
+        if use_token_type_ids is True:
+            if v is not True:
+                raise ValueError(
+                    "Token type ids is required for training however it is not a key within the datapoints"
+                )
+        return v
+
     @field_validator("number_of_training_files")
     @classmethod
     def validate_number_of_training_files(cls, v: int, info: ValidationInfo):
         """Validates number of training files."""
-        number_of_instances = info.context.get("world_size")
-        if type(number_of_instances) is not int:
+        number_of_workers = info.context.get("number_of_workers")
+        if type(number_of_workers) is not int:
             raise ValueError("World size context param should be an integer variable")
-        if v < number_of_instances:
+        if v < number_of_workers:
             raise ValueError(
-                (
-                    f"The number of workers({number_of_instances}) is greater than "
-                    f"the specified number of files ({v})"
-                )
+                (f"The number of workers({number_of_workers}) is greater than " f"the specified number of files ({v})")
             )
         return v
 
@@ -162,18 +169,3 @@ class DatasetMetadata(BaseModel):
                         f"allowed batch size ({v}) based on evaluation files in dataset"
                     )
                 )
-
-
-if __name__ == "__main__":
-    metadata_file = os.path.join(sys.argv[1], "metadata.yaml")
-    with open(metadata_file, "r") as file:
-        metadata_dict = yaml.safe_load(file)
-    context_dict = {
-        "eval": False,
-        "batch_size": 1,
-        "model_type": str(type(GPT2Config.from_pretrained("gpt2"))),
-        "vocab_size": 50257,
-        "world_size": 4,
-        "max_seq_length": 1024,
-    }
-    print(DatasetMetadata.model_validate(metadata_dict, context=context_dict))

@@ -212,6 +212,8 @@ The metrics associated with this dataset will be printed in the terminal. These 
 | Seq Completion Utilization | Average number of completions tokens in a sequence divided by sequence length. | The percent of the tokens in a sequence are learned.|
 
 ## Validating training parameters with dataset metadata
+<details>
+  <summary>CLICK HERE to see how to use dataset validation</summary>
 
 To help improve speed and cross-checking we now provide a metadata file along with the dataset. This file is located right under the `output_dir` as `metadata.yaml`. This file is used along with a custom pydantic model which you can import from this library which will verify the dataset parameters and the training parameters. This can be used as a way to catch bugs before training begins.
 #### Structure of Metadata file
@@ -250,8 +252,9 @@ training_param_dict = {
     "eval": False,
     "batch_size": 1,
     "model_type": str(type(gpt2_config)),
+    "use_token_type_ids": use_token_type_ids,
     "vocab_size": gpt2_config.vocab_size,
-    "world_size": 4,
+    "number_of_workers": 4,
     "max_seq_length": 1024,
 }
 
@@ -276,6 +279,9 @@ validate_sha256(output_dir)
 `output_dir` here should point to the directory which was created using generative data pipeline. This function returns a `bool` and will be `True` if there is NO corruption in the dataset and `False` if there is corruption in the dataset.
 
 Under the hood each file is scrubbed through and is first checked with the size and modified date. If these values are not the same as when the file was first created then the function will calculate the sha256 of the file and compare it to what is saved.
+
+</details>
+
 ## Example use cases
 ### Pretraining
 Pretraining on unstructured data enables large languages models to learn general language patterns and structures that are useful for a wide range of downstream tasks. In order to prepare pretraining data, you need a large amount of unstructured text data. To prepare pretraining data use the flag `--input_packing_config=full`.

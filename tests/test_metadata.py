@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+import pytest
 import yaml
 from pydantic import ValidationError
 from transformers import AutoConfig
@@ -8,7 +9,8 @@ from transformers import AutoConfig
 from generative_data_prep.utils import DatasetMetadata
 
 
-def test_pydantic_model_passing():
+@pytest.mark.parametrize("use_token_type_ids", [(True), (False)])
+def test_pydantic_model_passing(use_token_type_ids):
     """Testing DatasetMetadata loads in variables correctly. This should pass"""
     output_dir = os.path.join(
         Path.cwd(),
@@ -25,13 +27,15 @@ def test_pydantic_model_passing():
         "batch_size": 1,
         "model_type": str(type(AutoConfig.from_pretrained("gpt2"))),
         "vocab_size": 50257,
-        "world_size": 4,
+        "use_token_type_ids": use_token_type_ids,
+        "number_of_workers": 4,
         "max_seq_length": 1024,
     }
     DatasetMetadata.model_validate(metadata_dict, context=context_dict)
 
 
-def test_pydantic_model_wrong_model_type_and_less_vocab_size():
+@pytest.mark.parametrize("use_token_type_ids", [(True), (False)])
+def test_pydantic_model_wrong_model_type_and_less_vocab_size(use_token_type_ids):
     """Testing DatasetMetadata loads in variables correctly. This should fail"""
     error_keys = ["tokenizer_model_type", "vocab_size"]
     output_dir = os.path.join(
@@ -50,7 +54,8 @@ def test_pydantic_model_wrong_model_type_and_less_vocab_size():
         "batch_size": 1,
         "model_type": str(type(bert_config)),
         "vocab_size": bert_config.vocab_size,
-        "world_size": 4,
+        "use_token_type_ids": use_token_type_ids,
+        "number_of_workers": 4,
         "max_seq_length": 1024,
     }
     try:
@@ -71,7 +76,8 @@ def test_pydantic_model_wrong_model_type_and_less_vocab_size():
     assert False
 
 
-def test_pydantic_model_greater_world_size():
+@pytest.mark.parametrize("use_token_type_ids", [(True), (False)])
+def test_pydantic_model_greater_world_size(use_token_type_ids):
     """Testing DatasetMetadata loads in variables correctly. This should fail"""
     output_dir = os.path.join(
         Path.cwd(),
@@ -87,8 +93,9 @@ def test_pydantic_model_greater_world_size():
         "eval": False,
         "batch_size": 1,
         "model_type": str(type(AutoConfig.from_pretrained("gpt2"))),
+        "use_token_type_ids": use_token_type_ids,
         "vocab_size": 50257,
-        "world_size": 100,
+        "number_of_workers": 100,
         "max_seq_length": 1024,
     }
     try:
@@ -106,7 +113,8 @@ def test_pydantic_model_greater_world_size():
     assert False
 
 
-def test_pydantic_model_different_sequence_length():
+@pytest.mark.parametrize("use_token_type_ids", [(True), (False)])
+def test_pydantic_model_different_sequence_length(use_token_type_ids):
     """Testing DatasetMetadata loads in variables correctly. This should fail"""
     output_dir = os.path.join(
         Path.cwd(),
@@ -122,8 +130,9 @@ def test_pydantic_model_different_sequence_length():
         "eval": False,
         "batch_size": 1,
         "model_type": str(type(AutoConfig.from_pretrained("gpt2"))),
+        "use_token_type_ids": use_token_type_ids,
         "vocab_size": 50257,
-        "world_size": 4,
+        "number_of_workers": 4,
         "max_seq_length": 2048,
     }
     try:
@@ -141,7 +150,8 @@ def test_pydantic_model_different_sequence_length():
     assert False
 
 
-def test_pydantic_model_greater_batch_size():
+@pytest.mark.parametrize("use_token_type_ids", [(True), (False)])
+def test_pydantic_model_greater_batch_size(use_token_type_ids):
     """Testing DatasetMetadata loads in variables correctly. This should fail"""
     output_dir = os.path.join(
         Path.cwd(),
@@ -157,8 +167,9 @@ def test_pydantic_model_greater_batch_size():
         "eval": False,
         "batch_size": 30,
         "model_type": str(type(AutoConfig.from_pretrained("gpt2"))),
+        "use_token_type_ids": use_token_type_ids,
         "vocab_size": 50257,
-        "world_size": 4,
+        "number_of_workers": 4,
         "max_seq_length": 1024,
     }
     try:
@@ -176,7 +187,8 @@ def test_pydantic_model_greater_batch_size():
     assert False
 
 
-def test_pydantic_model_no_evaluation_files():
+@pytest.mark.parametrize("use_token_type_ids", [(True), (False)])
+def test_pydantic_model_no_evaluation_files(use_token_type_ids):
     """Testing DatasetMetadata loads in variables correctly. This should fail"""
     error_keys = ["number_of_dev_files", "max_batch_size_dev"]
     output_dir = os.path.join(
@@ -193,8 +205,9 @@ def test_pydantic_model_no_evaluation_files():
         "eval": True,
         "batch_size": 1,
         "model_type": str(type(AutoConfig.from_pretrained("gpt2"))),
+        "use_token_type_ids": use_token_type_ids,
         "vocab_size": 50257,
-        "world_size": 4,
+        "number_of_workers": 4,
         "max_seq_length": 1024,
     }
     try:
@@ -210,7 +223,8 @@ def test_pydantic_model_no_evaluation_files():
     assert False
 
 
-def test_pydantic_model_yes_evaluation_files():
+@pytest.mark.parametrize("use_token_type_ids", [(True), (False)])
+def test_pydantic_model_yes_evaluation_files(use_token_type_ids):
     """Testing DatasetMetadata loads in variables correctly. This should pass"""
     output_dir = os.path.join(
         Path.cwd(),
@@ -228,14 +242,16 @@ def test_pydantic_model_yes_evaluation_files():
         "eval": True,
         "batch_size": 1,
         "model_type": str(type(AutoConfig.from_pretrained("gpt2"))),
+        "use_token_type_ids": use_token_type_ids,
         "vocab_size": 50257,
-        "world_size": 4,
+        "number_of_workers": 4,
         "max_seq_length": 1024,
     }
     DatasetMetadata.model_validate(metadata_dict, context=context_dict)
 
 
-def test_pydantic_model_yes_evaluation_files_batch_size_greater():
+@pytest.mark.parametrize("use_token_type_ids", [(True), (False)])
+def test_pydantic_model_yes_evaluation_files_batch_size_greater(use_token_type_ids):
     """Testing DatasetMetadata loads in variables correctly. This should fail"""
     output_dir = os.path.join(
         Path.cwd(),
@@ -253,8 +269,9 @@ def test_pydantic_model_yes_evaluation_files_batch_size_greater():
         "eval": True,
         "batch_size": 8,
         "model_type": str(type(AutoConfig.from_pretrained("gpt2"))),
+        "use_token_type_ids": use_token_type_ids,
         "vocab_size": 50257,
-        "world_size": 4,
+        "number_of_workers": 4,
         "max_seq_length": 1024,
     }
     try:
