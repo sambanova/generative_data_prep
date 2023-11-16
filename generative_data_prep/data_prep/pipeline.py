@@ -432,9 +432,9 @@ def pipeline_main(  # noqa: C901
         dev_ratio,
         test_ratio,
     )
-    dataset_metadata_json["number_of_training_files"] = num_training_splits
-    dataset_metadata_json["number_of_dev_files"] = num_dev_splits
-    dataset_metadata_json["number_of_test_files"] = num_test_splits
+    dataset_metadata_json["number_of_training_files"] = train_count
+    dataset_metadata_json["number_of_dev_files"] = dev_count
+    dataset_metadata_json["number_of_test_files"] = test_count
 
     split_dir = os.path.join(output_dir, "splits")
     verify_output_dir(split_dir, False)
