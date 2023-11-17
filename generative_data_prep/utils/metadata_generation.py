@@ -154,18 +154,10 @@ class DatasetMetadata(BaseModel):
     def validation_batch_size_dev(cls, v: int, info: ValidationInfo):
         """Validates bath size for evaluation."""
         do_eval = info.context.get("eval")
-        runtime_batch_size = info.context.get("batch_size")
         if type(do_eval) is not bool:
             raise ValueError("eval context param should be a boolean variable")
         if do_eval:
             if v is None:
                 raise ValueError(
                     "Evaluation during training is turned on but there are no evaluation files in this dataset"
-                )
-            if runtime_batch_size > v:
-                raise ValueError(
-                    (
-                        f"batch size specified during training ({runtime_batch_size}) exceeds the maximum "
-                        f"allowed batch size ({v}) based on evaluation files in dataset"
-                    )
                 )
