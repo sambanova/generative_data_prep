@@ -22,7 +22,7 @@ import os
 from multiprocessing import cpu_count
 from typing import Optional
 
-from transformers import AutoTokenizer, PreTrainedTokenizerBase
+from transformers import AutoConfig, AutoTokenizer, PreTrainedTokenizerBase
 
 from generative_data_prep.data_prep import data_prep_main, pipeline_main
 from generative_data_prep.utils import (
@@ -31,6 +31,7 @@ from generative_data_prep.utils import (
     FileExtension,
     add_file_handler,
     data_prep_arg_builder,
+    get_config_file_path,
     log_current_datetime,
     log_elapsed_time,
     log_git_commit_hash,
@@ -201,8 +202,10 @@ def get_tokenizer(
         NotImplementedError: If the tokenizer class selected has not been implemented
 
     Returns:
-        Tokenizer
+        Tokenizer, ModelConfig
     """
+    tokenizer = None
+    model_config = None
     if pretrained_tokenizer is None and tokenizer_class is None:
         pretrained_tokenizer = GPT2_KEY
 
@@ -220,22 +223,25 @@ def get_tokenizer(
 
     if pretrained_tokenizer is not None:
         tokenizer = AutoTokenizer.from_pretrained(pretrained_tokenizer)
+        model_config = AutoConfig.from_pretrained(pretrained_tokenizer)
     else:
         verify_input_file(vocab_file)
         verify_input_file(merges_file)
-        for tokenizer_key_i, tokenizer_class_i in TOKENIZER_CLASSES.items():
-            if tokenizer_class == tokenizer_key_i:
-                tokenizer = tokenizer_class_i(vocab_file, merges_file)
+        if tokenizer_class in TOKENIZER_CLASSES:
+            tokenizer = TOKENIZER_CLASSES[tokenizer_class].tokenizer(vocab_file, merges_file)
+            model_config = TOKENIZER_CLASSES[tokenizer_class].config(vocab_size=tokenizer.vocab_size)
 
         if tokenizer is None:
+            raise NotImplementedError(f"The tokenizer_class you selected ({tokenizer_class}) has not been implemented")
+        if model_config is None:
             raise NotImplementedError(
-                f"The tokenizer_class you selected ({args.tokenizer_class}) has not been implemented "
+                f"The tokenizer_class you selected ({tokenizer_class}) is missing a config associated with it"
             )
 
     if special_tokens_dict:
         add_special_tokens_dict(tokenizer, special_tokens_dict)
 
-    return tokenizer
+    return tokenizer, model_config
 
 
 def get_output_dir(cmd, output_path, overwrite_output_path):
@@ -297,7 +303,7 @@ def get_categories(categories_path: str):
 
 if __name__ == "__main__":
     logger = logging.getLogger("generative_data_prep_logger")
-    logging.config.fileConfig("configs/logger.conf")
+    logging.config.fileConfig(get_config_file_path())
     args = get_args()
     if os.path.splitext(args.input_file_path)[1] not in FileExtension.as_list():
         err_msg = f"The input file is not a jsonl or txt file {args.input_file_path}"
@@ -309,7 +315,7 @@ if __name__ == "__main__":
     log_current_datetime()
     log_input_args(args)
 
-    tokenizer = get_tokenizer(
+    tokenizer, model_config = get_tokenizer(
         args.pretrained_tokenizer,
         args.tokenizer_class,
         args.vocab_file,
@@ -322,6 +328,7 @@ if __name__ == "__main__":
         metrics = pipeline_main(
             args.input_file_path,
             tokenizer,
+            model_config,
             output_dir,
             args.disable_space_separator,
             args.keep_prompt_only_sequences,

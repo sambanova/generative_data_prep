@@ -3,7 +3,6 @@ requires = ["setuptools>=67", "wheel>=0.40", "hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
-# Use "sambanova_" prefix in the package name i.e. the root folder for the source-code
 name = "sambanova-generative-data-prep"
 description = "Prepare data that can be used to train generative models."
 readme = "README.md"
@@ -92,3 +91,17 @@ line-length = 120
 # Configure hatch for python builds
 [tool.hatch]
 version.source = "vcs"
+build.include = [
+    "generative_data_prep/**",
+    "requirements/**",
+    "pyproject.toml",
+    "setup.cfg",
+    "README.rst"
+]
+build.exclude = [
+    ".github/**",
+    "tests/**",
+    "docs/**",
+    ".gitignore",
+    ".pre-commit-config.yaml"
+]

@@ -184,7 +184,8 @@ Each HDF5 file contains two datasets:
 
 ## Running tests
 ```
-pip install ".[tests]"
+pip install .
+pip install -r requirements/tests-requirements.txt
 pytest
 ```
 

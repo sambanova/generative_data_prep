@@ -60,7 +60,7 @@ jobs:
           name: Instantiate Python Virtual Environment
           command: |
             source .circleci/VERSIONS && pip install pipenv==${PIPENV_VERSION}
-            pipenv run pip install -e .
+            pipenv run pip install .
             pipenv sync --categories=default,build-packages,docs-packages,tests-packages
       - save_cache:
           key: v2-{{ arch }}-{{ .Branch }}-{{ checksum "circleci_cache_key" }}
