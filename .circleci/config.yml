@@ -22,6 +22,10 @@ executors:
 jobs:
   pre-commit:
     executor: pip-tools-docker
+    parameters:
+      PIPENV_LOCK_ARGS:
+        type: string
+        default: ""
     steps:
       - checkout
       - run:
@@ -43,8 +47,8 @@ jobs:
           name: Verify Pipfile
           command: |
             source .circleci/VERSIONS
-            pipenv lock --clear
-            pipenv check
+            pipenv lock << parameters.PIPENV_LOCK_ARGS >>
+            pipenv check --system
       - save_cache:
           key: v1-{{ arch }}-{{ checksum "pyproject.toml" }}-{{ checksum "circleci_cache_key" }}
           paths:
@@ -210,5 +214,6 @@ workflows:
               only:
                 - main
     jobs:
-      - pre-commit
+      - pre-commit:
+          PIPENV_LOCK_ARGS: "--clear"
       - test
