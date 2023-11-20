@@ -46,7 +46,7 @@ repos:
               docker run
                 -e DOCKER_DEFAULT_PLATFORM=${PLATFORM}
                 --rm -v ${PWD}:/app -w /app ${DOCKER_IMAGE} bash -c "
-                  pip install pipenv==${PIPENV_VERSION} && pipenv lock"'
+                  pip install pip==${PIP_VERSION} pip install pipenv==${PIPENV_VERSION} && pipenv lock"'
     files: ^(Pipfile.lock)$
   - id: generate-requirements
     name: Generate requirements files using the Pipfile.lock

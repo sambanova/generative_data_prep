@@ -35,7 +35,8 @@ jobs:
           # NOTE: Requires redundant "pip install -U pip" command to avoid OSError
           name: Run Pre-commit
           command: |
-            source .circleci/VERSIONS && pip install pipenv==${PIPENV_VERSION}
+            source .circleci/VERSIONS
+            pip install pip==${PIP_VERSION} pip install pipenv==${PIPENV_VERSION}
             pipenv sync --categories tests-packages
             pipenv run pre-commit run --all-files
             pipenv check
