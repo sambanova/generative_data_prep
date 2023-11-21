@@ -18,6 +18,7 @@ def test_pipeline_runs_successfully(run_path):
     THEN the pipeline runs successfully
         And returns a return code of 0 within specified timeout
     """
+    # TODO: Need to reduce the time limit back down to 9 or get it close to 9
     time_limit_seconds = 17
     input_file_path = PYTHON_ROOT_DIR + "/tests/examples/generative_tuning/example_generative_tuning_data.jsonl"
     output_path = f"{PYTHON_ROOT_DIR}/tests/examples/tester_{secrets.token_hex(8)}"
