@@ -7,7 +7,7 @@ name = "pypi"
 python_version = "3.9"
 
 [packages]
-sambanova-generative-data-prep = {editable = true, path = "."}
+sambanova-generative-data-prep = {path = "."}
 
 [build-packages]
 hatch = "*"
