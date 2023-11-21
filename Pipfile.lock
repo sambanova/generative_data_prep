@@ -1485,7 +1485,7 @@
             "version": "==0.4.0"
         },
         "sambanova-generative-data-prep": {
-            "editable": false,
+            "editable": true,
             "path": "."
         },
         "smmap": {
