@@ -1,4 +1,6 @@
+import logging
 import os
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -17,7 +19,6 @@ def test_pydantic_model_passing(use_token_type_ids):
         "tests",
         "examples",
         "pretraining_split_with_new_metadata_and_sha256",
-        "pipelined_pretraining_sha256_split",
     )
     metadata_file = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
@@ -43,7 +44,6 @@ def test_pydantic_model_wrong_model_type_and_less_vocab_size(use_token_type_ids)
         "tests",
         "examples",
         "pretraining_split_with_new_metadata_and_sha256",
-        "pipelined_pretraining_sha256_split",
     )
     metadata_file = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
@@ -84,7 +84,6 @@ def test_pydantic_model_greater_world_size(use_token_type_ids):
         "tests",
         "examples",
         "pretraining_split_with_new_metadata_and_sha256",
-        "pipelined_pretraining_sha256_split",
     )
     metadata_file = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
@@ -121,7 +120,6 @@ def test_pydantic_model_different_sequence_length(use_token_type_ids):
         "tests",
         "examples",
         "pretraining_split_with_new_metadata_and_sha256",
-        "pipelined_pretraining_sha256_split",
     )
     metadata_file = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
@@ -158,7 +156,6 @@ def test_pydantic_model_greater_batch_size(use_token_type_ids):
         "tests",
         "examples",
         "pretraining_split_with_new_metadata_and_sha256",
-        "pipelined_pretraining_sha256_split",
     )
     metadata_file = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
@@ -196,7 +193,6 @@ def test_pydantic_model_no_evaluation_files(use_token_type_ids):
         "tests",
         "examples",
         "pretraining_split_with_new_metadata_and_sha256",
-        "pipelined_pretraining_sha256_split",
     )
     metadata_file = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
@@ -216,9 +212,14 @@ def test_pydantic_model_no_evaluation_files(use_token_type_ids):
         assert len(exc.errors()) == 2
         for error in exc.errors():
             assert error["loc"][0] in error_keys
-            assert (
-                "Evaluation during training is turned on but there are no " "evaluation files in this dataset"
-            ) in error["msg"]
+            if error["loc"][0] == "max_batch_size_dev":
+                assert (
+                    "Evaluation during training is turned on but there are no " "evaluation files in this dataset"
+                ) in error["msg"]
+            elif error["loc"][0] == "number_of_dev_files":
+                assert ("Evaluating during runtime but have no evaluation files to run in dataset") in error["msg"]
+            else:
+                assert False
         return
     assert False
 
@@ -231,7 +232,6 @@ def test_pydantic_model_yes_evaluation_files(use_token_type_ids):
         "tests",
         "examples",
         "pretraining_split_with_new_metadata_and_sha256",
-        "pipelined_pretraining_sha256_split",
     )
     metadata_file = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
@@ -248,3 +248,37 @@ def test_pydantic_model_yes_evaluation_files(use_token_type_ids):
         "max_seq_length": 1024,
     }
     DatasetMetadata.model_validate(metadata_dict, context=context_dict)
+
+
+def test_metadata_end2end_output(tmp_path):
+    """Testing the e2e pipeline is still the same. This should pass"""
+
+    tmp_e2e_output_dir = tmp_path / "e2e_testing_output_directory"
+    logging.info(f"temporary e2e output directory is in {tmp_e2e_output_dir}")
+    base_dir = os.path.join(Path.cwd(), "tests", "examples", "pretraining_split_with_new_metadata_and_sha256")
+    input_file = os.path.join(base_dir, "example_pretraining_data.jsonl")
+    command = [
+        "python3",
+        "-m",
+        "generative_data_prep",
+        "pipeline",
+        "--input_file_path",
+        f"{input_file}",
+        "--pretrained_tokenizer",
+        "gpt2",
+        "--max_seq_length",
+        "1024",
+        "--shuffle",
+        "on_RAM",
+        "--num_training_splits",
+        "4",
+    ]
+    subprocess.run(command + ["--keep_split_jsonls", "--output_path", f"{tmp_e2e_output_dir}"])
+    metadata_file = os.path.join(tmp_e2e_output_dir, "metadata.yaml")
+    with open(metadata_file, "r") as file:
+        metadata_dict = yaml.safe_load(file)
+    ground_truth_metadata_file = os.path.join(base_dir, "metadata.yaml")
+    with open(ground_truth_metadata_file, "r") as file:
+        ground_truth_metadata_dict = yaml.safe_load(file)
+
+    assert metadata_dict == ground_truth_metadata_dict
