@@ -21,7 +21,9 @@ dependencies = [
     "transformers",
     "tabulate",
     "gitpython",
-    "types-tabulate"
+    "types-tabulate",
+    "pydantic",
+    "pyyaml",
 ]
 dynamic = ["version"]
 
