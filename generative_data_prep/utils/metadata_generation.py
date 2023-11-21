@@ -118,6 +118,7 @@ class DatasetMetadata(BaseModel):
                     f"does not match model type used during training ({v})"
                 )
             )
+        return v
 
     @field_validator("number_of_dev_files")
     @classmethod
@@ -129,6 +130,7 @@ class DatasetMetadata(BaseModel):
         if do_eval:
             if v == 0:
                 raise ValueError("Evaluating during runtime but have no evaluation files to run in dataset")
+        return v
 
     @field_validator("max_batch_size_train")
     @classmethod
@@ -144,6 +146,7 @@ class DatasetMetadata(BaseModel):
                     f"allowed batch size ({v}) based on training dataset"
                 )
             )
+        return v
 
     @field_validator("max_batch_size_dev")
     @classmethod
@@ -157,3 +160,4 @@ class DatasetMetadata(BaseModel):
                 raise ValueError(
                     "Evaluation during training is turned on but there are no evaluation files in this dataset"
                 )
+        return v

@@ -223,16 +223,15 @@ token_type_ids: bool
 vocab_size: int
 tokenizer_model_type: str
 number_of_training_files: int
-number_of_dev_files: Optional[int]
-number_of_test_files: Optional[int]
+number_of_dev_files: int
+number_of_test_files: int
 max_batch_size_train: int
 max_batch_size_dev: Optional[int]
 ```
 
 NOTE:
 * `tokenizer_model_type` is the string conversion of `type(modelConfig)`. Can use this field to compare the model used during training, which can be extracted by using `AutoConfig` in Huggingface transformers. Then wrapping it with `str(type())`.
-* `number_of_dev_files` and `max_batch_size_dev` will be `None` unless dev files are created during generative data pipeline.
-* `number_of_test_files` will be `None` unless test files are created during generative data pipeline.
+* `max_batch_size_dev` will be `None` unless dev files are created during generative data pipeline.
 * `token_type_ids` will always be `True` for now since they are always generated.
 
 #### How to use pydantic model
