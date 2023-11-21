@@ -43,8 +43,8 @@ class DatasetMetadata(BaseModel):
     vocab_size: int
     tokenizer_model_type: str
     number_of_training_files: int
-    number_of_dev_files: Optional[int]
-    number_of_test_files: Optional[int]
+    number_of_dev_files: int
+    number_of_test_files: int
     max_batch_size_train: int
     max_batch_size_dev: Optional[int]
 
@@ -127,10 +127,6 @@ class DatasetMetadata(BaseModel):
         if type(do_eval) is not bool:
             raise ValueError("eval context param should be a boolean variable")
         if do_eval:
-            if v is None:
-                raise ValueError(
-                    "Evaluation during training is turned on but there are no evaluation files in this dataset"
-                )
             if v == 0:
                 raise ValueError("Evaluating during runtime but have no evaluation files to run in dataset")
 
