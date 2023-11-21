@@ -16,7 +16,6 @@ twine = "*"
 
 [dev-packages]
 ipdb = "*"
-sambanova-generative-data-prep = {editable = true, path = "."}
 
 [docs-packages]
 ipython = "*"
