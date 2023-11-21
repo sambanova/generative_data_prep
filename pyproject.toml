@@ -21,9 +21,9 @@ dependencies = [
     "transformers",
     "tabulate",
     "gitpython",
+    "types-tabulate",
     "pydantic",
     "pyyaml",
-    "types-tabulate"
 ]
 dynamic = ["version"]
 
@@ -44,6 +44,7 @@ filterwarnings = [
     "error",
     # TODO: Fix the Warning and remove this ignore line
     "ignore:unclosed file.*io.TextIOWrapper.*:ResourceWarning",
+    "ignore:Pydantic V1 style.*validators are deprecated.*:pydantic.warnings.PydanticDeprecatedSince20",
 ]
 addopts = """
 -ra -q -vv
