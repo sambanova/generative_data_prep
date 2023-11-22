@@ -1,6 +1,6 @@
 import logging
 import os
-import subprocess
+from argparse import Namespace
 from pathlib import Path
 
 import pytest
@@ -8,7 +8,8 @@ import yaml
 from pydantic import ValidationError
 from transformers import AutoConfig
 
-from generative_data_prep.utils import DatasetMetadata
+from generative_data_prep.__main__ import main
+from generative_data_prep.utils import BoundaryType, DatasetMetadata, PackingConfig
 
 
 @pytest.mark.parametrize("use_token_type_ids", [(True), (False)])
@@ -257,23 +258,44 @@ def test_metadata_end2end_output(tmp_path):
     logging.info(f"temporary e2e output directory is in {tmp_e2e_output_dir}")
     base_dir = os.path.join(Path.cwd(), "tests", "examples", "pretraining_split_with_new_metadata_and_sha256")
     input_file = os.path.join(base_dir, "example_pretraining_data.jsonl")
-    command = [
-        "python3",
-        "-m",
-        "generative_data_prep",
-        "pipeline",
-        "--input_file_path",
-        f"{input_file}",
-        "--pretrained_tokenizer",
-        "gpt2",
-        "--max_seq_length",
-        "1024",
-        "--shuffle",
-        "on_RAM",
-        "--num_training_splits",
-        "4",
-    ]
-    subprocess.run(command + ["--keep_split_jsonls", "--output_path", f"{tmp_e2e_output_dir}"])
+    num_workers = os.cpu_count()
+    if num_workers is None:
+        num_workers = 1
+    args_dict = {
+        "cmd": "pipeline",
+        "num_training_splits": 4,
+        "dev_ratio": None,
+        "num_dev_splits": None,
+        "test_ratio": None,
+        "num_test_splits": None,
+        "shuffle": "on_RAM",
+        "num_workers": num_workers,
+        "keep_split_jsonls": True,
+        "input_file_path": input_file,
+        "output_path": tmp_e2e_output_dir,
+        "overwrite_output_path": False,
+        "disable_space_separator": False,
+        "keep_prompt_only_sequences": False,
+        "silent": False,
+        "do_not_balance_hdf5": False,
+        "log_file_path": None,
+        "tokenizer_class": None,
+        "pretrained_tokenizer": None,
+        "vocab_file": None,
+        "merges_file": None,
+        "max_seq_length": 1024,
+        "input_packing_config": PackingConfig.get_default(),
+        "packing_boundary": BoundaryType.JSONL.value,
+        "attention_boundary": BoundaryType.JSONL.value,
+        "special_tokens_dict": None,
+        "prompt_keyword": "prompt",
+        "completion_keyword": "completion",
+        "prompt_prefix": None,
+        "prompt_postfix": None,
+        "categories_path": None,
+    }
+    args = Namespace(**args_dict)
+    main(args)
     metadata_file = os.path.join(tmp_e2e_output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
         metadata_dict = yaml.safe_load(file)
@@ -281,4 +303,7 @@ def test_metadata_end2end_output(tmp_path):
     with open(ground_truth_metadata_file, "r") as file:
         ground_truth_metadata_dict = yaml.safe_load(file)
 
-    assert metadata_dict == ground_truth_metadata_dict
+    print(f"ground truth: {ground_truth_metadata_dict}\n newly generated: {metadata_dict}", flush=True)
+    assert (
+        metadata_dict == ground_truth_metadata_dict
+    ), f"ground truth: {ground_truth_metadata_dict}\n newly generated: {metadata_dict}"
