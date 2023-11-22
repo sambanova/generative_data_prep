@@ -303,7 +303,4 @@ def test_metadata_end2end_output(tmp_path):
     with open(ground_truth_metadata_file, "r") as file:
         ground_truth_metadata_dict = yaml.safe_load(file)
 
-    print(f"ground truth: {ground_truth_metadata_dict}\n newly generated: {metadata_dict}", flush=True)
-    assert (
-        metadata_dict == ground_truth_metadata_dict
-    ), f"ground truth: {ground_truth_metadata_dict}\n newly generated: {metadata_dict}"
+    assert metadata_dict == ground_truth_metadata_dict
