@@ -211,6 +211,75 @@ The metrics associated with this dataset will be printed in the terminal. These 
 | Sequence Utilization | Average number of non-padding tokens in a sequence divided by sequence length. | The percent of the tokens in each sequence are actually used for training. This number imrpoved be changed by using different `input_packing_config`. The packing styles from highest sequence utilization to lowest are: `full`, `greedy::truncate_left` (or truncate_right), `greedy::drop`, `single::truncate_left` (or truncate_right), `single::drop`.|
 | Seq Completion Utilization | Average number of completions tokens in a sequence divided by sequence length. | The percent of the tokens in a sequence are learned.|
 
+## Validating training parameters with dataset metadata
+<details>
+  <summary>CLICK HERE to see how to use dataset validation</summary>
+
+To help improve speed and cross-checking we now provide a metadata file along with the dataset. This file is located right under the `output_dir` as `metadata.yaml`. This file is used along with a custom pydantic model which you can import from this library which will verify the dataset parameters and the training parameters. This can be used as a way to catch bugs before training begins.
+#### Structure of Metadata file
+```
+max_seq_length: int
+token_type_ids: bool
+vocab_size: int
+tokenizer_model_type: str
+number_of_training_files: int
+number_of_dev_files: int
+number_of_test_files: int
+max_batch_size_train: int
+max_batch_size_dev: Optional[int]
+```
+
+NOTE:
+* `tokenizer_model_type` is the string conversion of `type(modelConfig)`. Can use this field to compare the model used during training, which can be extracted by using `AutoConfig` in Huggingface transformers. Then wrapping it with `str(type())`.
+* `max_batch_size_dev` will be `None` unless dev files are created during generative data pipeline.
+* `token_type_ids` will always be `True` for now since they are always generated.
+
+#### How to use pydantic model
+
+```
+import yaml
+from generative_data_prep.utils import DatasetMetadata
+from transformers import AutoConfig
+
+# Load in the metadata file using pyyaml
+metadata_file = os.path.join(output_dir, "metadata.yaml")
+with open(metadata_file, "r") as file:
+    metadata_dict = yaml.safe_load(file)
+
+gpt2_config = AutoConfig.from_pretrained("gpt2")
+training_param_dict = {
+    "eval": False,
+    "batch_size": 1,
+    "model_type": str(type(gpt2_config)),
+    "use_token_type_ids": use_token_type_ids,
+    "vocab_size": gpt2_config.vocab_size,
+    "number_of_workers": 4,
+    "max_seq_length": 1024,
+}
+
+DatasetMetadata.model_validate(metadata_dict, context=training_param_dict)
+```
+
+If DatasetMetadata does not error out then that means the training parameters meet the requirements of the dataset!
+
+If DatasetMetadata does error out, that means that the training parameters need to be modified or the dataset needs to be generated again to fit the needs of the training parameters. There will be a detailed error output indicating which parameters of the metadata are not compatible.
+
+#### How to check for corruption
+
+We also create an overall metadata file for each of the files within the output directory! This metadata file contains each of the different files paired with their size, modified date, and sha256 hash. This allows for users to check to see if their dataset has been corrupted; thus invalidating the datasetMetadata pydantic model as there could be some hidden errors. This verification should be used before running the pydantic model to make sure nothing is wrong with the dataset.
+
+Here is an example code of what this would look like!
+
+```
+from generative_data_prep.utils import validate_sha256
+
+validate_sha256(output_dir)
+```
+`output_dir` here should point to the directory which was created using generative data pipeline. This function returns a `bool` and will be `True` if there is NO corruption in the dataset and `False` if there is corruption in the dataset.
+
+Under the hood each file is scrubbed through and is first checked with the size and modified date. If these values are not the same as when the file was first created then the function will calculate the sha256 of the file and compare it to what is saved.
+
+</details>
 
 ## Example use cases
 ### Pretraining
