@@ -402,6 +402,9 @@ def pipeline_main(  # noqa: C901
         test_ratio,
     )
 
+    lines = open(input_file_path).readlines()
+    assert len(lines) >= num_training_splits + num_dev_splits + num_test_splits, "Number of splits exceeds number of entries."
+    
     split_dir = os.path.join(output_dir, "splits")
     verify_output_dir(split_dir, False)
 
