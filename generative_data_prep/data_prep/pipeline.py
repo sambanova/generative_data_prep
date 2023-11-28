@@ -25,11 +25,12 @@ import random
 import shutil
 import time
 from sys import platform
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
 import psutil
 from alive_progress import alive_bar
+import yaml
 from transformers import PretrainedConfig, PreTrainedTokenizerBase
 
 
@@ -235,6 +236,7 @@ def multiprocess_data_prep(  # noqa: C901
     tokenizer: PreTrainedTokenizerBase,
     num_workers: int,
     input_file_size_in_gb: float,
+    dataset_metadata_json: Optional[Dict[str, Union[str, int, bool, None]]] = None,
     category_to_id: Optional[Dict[str, int]] = None,
     prompt_prefix: Optional[str] = None,
     prompt_postfix: Optional[str] = None,
@@ -289,6 +291,11 @@ def multiprocess_data_prep(  # noqa: C901
     executor = concurrent.futures.ProcessPoolExecutor(max_workers=num_workers)
     futures = []
     for input_file_path, output_file_path in zip(sub_input_file_paths, sub_output_file_paths):
+        dataset_type = None
+        if output_file_path in train_hdf5_files:
+            dataset_type = "train"
+        elif output_file_path in dev_hdf5_files:
+            dataset_type = "dev"
         futures.append(
             executor.submit(
                 data_prep_main_helper,
@@ -310,6 +317,7 @@ def multiprocess_data_prep(  # noqa: C901
                     category_to_id,
                     prompt_prefix,
                     prompt_postfix,
+                    dataset_type
                 ),
             )
         )
@@ -317,13 +325,26 @@ def multiprocess_data_prep(  # noqa: C901
     broken_process_indices = []
     broken_process_pool_exc: Optional[BaseException] = None
     metrics = Metrics()
+    max_batch_size_train = None
+    max_batch_size_dev = None
     # Loop while processes are running, update progress bar.
     with alive_bar(total_num_articles) as bar:
         while True:
             for i, future in enumerate(futures):
                 if future.done():
                     try:
-                        metrics += future.result()
+                        indiv_metric = future.result()
+                        if indiv_metric.dataset_type == "train":
+                            if max_batch_size_train is None:
+                                max_batch_size_train = indiv_metric.sequences
+                            else:
+                                max_batch_size_train = min(max_batch_size_train, indiv_metric.sequences)
+                        elif indiv_metric.dataset_type == "dev":
+                            if max_batch_size_dev is None:
+                                max_batch_size_dev = indiv_metric.sequences
+                            else:
+                                max_batch_size_dev = min(max_batch_size_dev, indiv_metric.sequences)
+                        metrics += indiv_metric
                     except Exception as exc:
                         if isinstance(exc, concurrent.futures.process.BrokenProcessPool):
                             broken_process_indices.append(str(i))
@@ -356,9 +377,14 @@ def multiprocess_data_prep(  # noqa: C901
                 prev_num_tokenized_articles = num_tokenized_articles.value
 
             time.sleep(1)
+    if dataset_metadata_json is not None:
+        dataset_metadata_json["max_batch_size_train"] = max_batch_size_train
+        dataset_metadata_json["max_batch_size_dev"] = max_batch_size_dev
 
     executor.shutdown()
     manager.shutdown()
+            
+
     return train_hdf5_files, dev_hdf5_files, metrics
 
 
@@ -432,6 +458,12 @@ def pipeline_main(  # noqa: C901
         Metrics associated with tokenization
     """
     # print input file information
+    dataset_metadata_json = {
+        "max_seq_length": max_seq_length,
+        "token_type_ids": True,
+        "vocab_size": tokenizer.vocab_size,
+        "tokenizer_model_type": str(type(model_config)),
+    }
     input_file_size_in_bytes = os.stat(input_file_path).st_size
     input_file_size_in_gb = input_file_size_in_bytes / (1024**3)
     log_message = f"Size of input jsonl file is: {round(input_file_size_in_gb, 2)} GB"
@@ -449,6 +481,9 @@ def pipeline_main(  # noqa: C901
         dev_ratio,
         test_ratio,
     )
+    dataset_metadata_json["number_of_training_files"] = train_count
+    dataset_metadata_json["number_of_dev_files"] = dev_count
+    dataset_metadata_json["number_of_test_files"] = test_count
 
     split_dir = os.path.join(output_dir, "splits")
     verify_output_dir(split_dir, False)
@@ -561,6 +596,7 @@ def pipeline_main(  # noqa: C901
         tokenizer,
         num_workers,
         input_file_size_in_gb,
+        dataset_metadata_json,
         category_to_id,
         prompt_prefix,
         prompt_postfix,
@@ -579,10 +615,14 @@ def pipeline_main(  # noqa: C901
     else:
         log_sep_str()
         LOGGER.info("Balancing hdf5 files to ensure they have the same number of sequences.")
-        balance_hdf5_files(train_hdf5_files)
-        balance_hdf5_files(dev_hdf5_files)
+        balance_hdf5_files(train_hdf5_files, dataset_metadata_json, "train")
+        balance_hdf5_files(dev_hdf5_files, dataset_metadata_json, "dev")
 
     if not keep_split_jsonls:
         shutil.rmtree(split_dir)
+
+    metadata_file_path = os.path.join(output_dir, "metadata.yaml")
+    with open(metadata_file_path, "w") as file:
+        yaml.dump(dataset_metadata_json, file, default_flow_style=False)
 
     return metrics

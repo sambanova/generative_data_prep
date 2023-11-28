@@ -18,7 +18,7 @@ This module implements Metrics.
 A metrics object keeps track of all the information about a tokenized dataset when it is created.
 """
 
-from typing import TypeVar
+from typing import TypeVar, Union
 
 from tabulate import tabulate
 
@@ -42,6 +42,7 @@ class Metrics:
         self.tokens_dropped_from_all_prompt: int = (
             0  # how many tokens are dropped because no completions in the entire sequence
         )
+        self.dataset_type: Union[str, None] = None
 
     def __iadd__(self: MetricsSubClass, new_metrics: "Metrics") -> MetricsSubClass:
         """Implement += for Metrics."""

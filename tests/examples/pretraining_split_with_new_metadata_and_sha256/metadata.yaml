@@ -1,0 +1,9 @@
+max_batch_size_dev: null
+max_batch_size_train: 13
+max_seq_length: 1024
+number_of_dev_files: 0
+number_of_test_files: 0
+number_of_training_files: 4
+token_type_ids: true
+tokenizer_model_type: <class 'transformers.models.gpt2.configuration_gpt2.GPT2Config'>
+vocab_size: 50257

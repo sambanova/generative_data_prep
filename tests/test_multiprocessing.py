@@ -45,12 +45,17 @@ def data_prep_main_helper_dummy(args):
     raise SomeStrangeException
 
 
-def test_multiprocess_data_prep_graceful_exit():
+@pytest.fixture
+def mock_data_prep_main_helper(monkeypatch):
+    """Mocking size function using monkeypatch."""
+    monkeypatch.setattr(generative_data_prep.data_prep.pipeline, "data_prep_main_helper", data_prep_main_helper_dummy)
+
+
+def test_multiprocess_data_prep_graceful_exit(mock_data_prep_main_helper):
     """Tests that the multiprocess_data_prep function exits when a child process raises an Exception."""
     # using unittest.mock.patch wasn't working because of a pickling error when multiprocessing over the Mock object.
     # Apparently there is a library called SharedMock that we can look into, but due to lack of time, just using this
     # hacky import method to mock the data_prep_main_helper function.
-    generative_data_prep.data_prep.pipeline.data_prep_main_helper = data_prep_main_helper_dummy
     with pytest.raises(SomeStrangeException):
         multiprocess_data_prep(
             files_to_tokenize=get_files_to_tokenize("generative_tuning"),

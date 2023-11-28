@@ -33,7 +33,7 @@ repos:
   hooks:
   - id: mypy
     exclude: ^(tests\/.*|docs\/.*)$
-    additional_dependencies: [types-tabulate]
+    additional_dependencies: [types-tabulate, types-PyYAML]
 - repo: local
   hooks:
   - id: pipenv-lock
@@ -46,19 +46,13 @@ repos:
               docker run
                 -e DOCKER_DEFAULT_PLATFORM=${PLATFORM}
                 --rm -v ${PWD}:/app -w /app ${DOCKER_IMAGE} bash -c "
-                  pip install pipenv==${PIPENV_VERSION} && pipenv lock"'
-    files: ^(Pipfile.lock)$
-  - id: generate-requirements
-    name: Generate requirements files using the Pipfile.lock
-    language: system
-    entry: bash -c '
-      pipenv requirements > requirements/requirements.txt &&
-      pipenv requirements --categories=default,build-packages,dev-packages,docs-packages,tests-packages > requirements/all-requirements.txt &&
-      pipenv requirements --categories build-packages > requirements/build-requirements.txt &&
-      pipenv requirements --categories dev-packages > requirements/dev-requirements.txt &&
-      pipenv requirements --categories docs-packages > requirements/docs-requirements.txt &&
-      pipenv requirements --categories tests-packages > requirements/tests-requirements.txt'
-    files: ^(setup\.cfg|pyproject\.toml|Pipfile.*|requirements.*\.txt)$
+                  pip install pip==${PIP_VERSION} && pip install pipenv==${PIPENV_VERSION} && pipenv lock &&
+                  pipenv requirements > requirements/requirements.txt &&
+                  pipenv requirements --categories=default,build-packages,dev-packages,docs-packages,tests-packages > requirements/all-requirements.txt &&
+                  pipenv requirements --categories build-packages > requirements/build-requirements.txt &&
+                  pipenv requirements --categories dev-packages > requirements/dev-requirements.txt &&
+                  pipenv requirements --categories docs-packages > requirements/docs-requirements.txt &&
+                  pipenv requirements --categories tests-packages > requirements/tests-requirements.txt"'
   - id: pytest
     name: Run Pytest using pipenv
     stages: [manual]
