@@ -330,11 +330,10 @@ def create_sha256(output_dir: str):
     Returns:
         None
     """
-    files_to_hash = _get_walk_files_to_hash(output_dir)
-
     hash_dir = os.path.join(output_dir, "sha256")
     if os.path.isdir(hash_dir):
         shutil.rmtree(hash_dir)
+    files_to_hash = _get_walk_files_to_hash(output_dir)
     os.mkdir(hash_dir)
     output_file_hash = os.path.join(hash_dir, "files_metadata.json")
     file_info_dict = {}
