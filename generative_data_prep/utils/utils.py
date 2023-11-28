@@ -283,7 +283,7 @@ def _get_walk_files_to_hash(dir: str, filter: Optional[str] = None):
         hash_file_names = [
             (
                 os.path.join(foldername, filename),
-                relative_foldername + filename.split(".")[0] + ".txt",
+                relative_foldername + filename,
             )
             for filename in filenames
         ]
