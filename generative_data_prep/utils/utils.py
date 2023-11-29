@@ -18,6 +18,7 @@ import hashlib
 import json
 import math
 import os
+import shutil
 from importlib.resources import files as importlib_files
 from subprocess import PIPE, run  # nosec
 from typing import Optional
@@ -282,7 +283,7 @@ def _get_walk_files_to_hash(dir: str, filter: Optional[str] = None):
         hash_file_names = [
             (
                 os.path.join(foldername, filename),
-                relative_foldername + filename.split(".")[0] + ".txt",
+                relative_foldername + filename,
             )
             for filename in filenames
         ]
@@ -329,9 +330,10 @@ def create_sha256(output_dir: str):
     Returns:
         None
     """
-    files_to_hash = _get_walk_files_to_hash(output_dir)
-
     hash_dir = os.path.join(output_dir, "sha256")
+    if os.path.isdir(hash_dir):
+        shutil.rmtree(hash_dir)
+    files_to_hash = _get_walk_files_to_hash(output_dir)
     os.mkdir(hash_dir)
     output_file_hash = os.path.join(hash_dir, "files_metadata.json")
     file_info_dict = {}
