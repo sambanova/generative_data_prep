@@ -30,7 +30,6 @@ from generative_data_prep.utils import (
     TOKENIZER_CLASSES,
     FileExtension,
     add_file_handler,
-    create_sha256,
     data_prep_arg_builder,
     get_config_file_path,
     log_current_datetime,
@@ -372,9 +371,6 @@ def main(args):
 
     log_metrics(metrics)
     log_elapsed_time()
-
-    # Create sha256 of all the files within the directory
-    create_sha256(args.output_path)
 
 
 if __name__ == "__main__":
