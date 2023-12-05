@@ -33,13 +33,16 @@ from .logger import (
     log_metrics,
     log_sep_str,
 )
+from .metadata_generation import DatasetMetadata
 from .path_verify import verify_input_file, verify_output_dir, verify_output_file
 from .utils import (
     GPT2_KEY,
     TOKENIZER_CLASSES,
+    create_sha256,
     data_prep_arg_builder,
     execute_and_return_stdout,
     get_config_file_path,
+    validate_sha256,
 )
 
 __all__ = [
@@ -58,6 +61,8 @@ __all__ = [
     "TOKENIZER_CLASSES",
     "data_prep_arg_builder",
     "execute_and_return_stdout",
+    "create_sha256",
+    "validate_sha256",
     "CATEGORY_JSON_KEY",
     "add_file_handler",
     "log_input_args",
@@ -67,4 +72,5 @@ __all__ = [
     "log_elapsed_time",
     "log_sep_str",
     "get_config_file_path",
+    "DatasetMetadata",
 ]
