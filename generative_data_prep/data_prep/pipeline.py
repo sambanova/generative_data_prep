@@ -40,6 +40,7 @@ from generative_data_prep.utils import (
     BoundaryType,
     PackingConfig,
     balance_hdf5_files,
+    create_sha256,
     execute_and_return_stdout,
     large_file_shuffle,
     log_sep_str,
@@ -624,5 +625,8 @@ def pipeline_main(  # noqa: C901
     metadata_file_path = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file_path, "w") as file:
         yaml.dump(dataset_metadata_json, file, default_flow_style=False)
+
+    # Create sha256 of all the files within the directory
+    create_sha256(output_dir)
 
     return metrics

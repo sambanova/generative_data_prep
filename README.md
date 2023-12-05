@@ -45,7 +45,7 @@ pip install .
 ```
 
 ## Requirements
-- Python version 3.7+, **only verified on python 3.7.6**
+- Python version 3.9+, **only verified on python 3.9**
 - Support for linux and mac OS. Not tested on Windows
 
 ## Introduction
