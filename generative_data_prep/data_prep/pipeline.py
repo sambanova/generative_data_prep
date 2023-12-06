@@ -111,7 +111,7 @@ def rename_files(
             new_name = f"dev_{i-train_count-test_count+1}_of_{dev_count}{file_ext}"
 
         new_file_path = os.path.join(split_dir, new_name)
-    
+
         if os.path.exists(new_file_path) and not overwrite_output_path:
             err_msg = f"{new_file_path} already exists, and you are trying to overwrite it."
             err_msg += " To fix this error either specify --overwrite_output_path or move the conflicting file"
@@ -123,7 +123,9 @@ def rename_files(
         else:
             files_to_tokenize.append(new_name)
         os.path.getsize(new_file_path)
-    assert  os.path.getsize(new_file_path) > 0 , "The number of total splits exceeds the number of data entries. Please reduce the number of splits."
+    assert (
+        os.path.getsize(new_file_path) > 0
+    ), "The number of total splits exceeds the number of data entries. Please reduce the number of splits."
     return files_to_tokenize
 
 
@@ -435,15 +437,16 @@ def pipeline_main(  # noqa: C901
         dev_ratio,
         test_ratio,
     )
-    threshold_splits =  num_training_splits + num_dev_splits + num_test_splits
-    
+
     num_splits_greater_lines = True
     with open(input_file_path, "r") as input_file:
         for i, line in enumerate(input_file):
-            if i > threshold_splits:
+            if i > num_splits:
                 num_splits_greater_lines = True
-    
-    assert not num_splits_greater_lines, "The number of total splits exceeds the number of data entries. Please reduce the number of splits."
+                break
+    assert (
+        num_splits_greater_lines
+    ), "The number of total splits exceeds the number of data entries. Please reduce the number of splits."
     dataset_metadata_json["number_of_training_files"] = train_count
     dataset_metadata_json["number_of_dev_files"] = dev_count
     dataset_metadata_json["number_of_test_files"] = test_count
