@@ -123,9 +123,10 @@ def rename_files(
         else:
             files_to_tokenize.append(new_name)
         os.path.getsize(new_file_path)
-    assert (
-        os.path.getsize(new_file_path) > 0
-    ), "The number of total splits exceeds the number of data entries. Please reduce the number of splits."
+    if not os.path.getsize(new_file_path) > 0:
+        raise ValueError(
+            "The number of total splits exceeds the number of data entries. Please reduce the number of splits."
+        )
     return files_to_tokenize
 
 
@@ -444,9 +445,10 @@ def pipeline_main(  # noqa: C901
             if i > num_splits:
                 num_splits_greater_lines = True
                 break
-    assert (
-        num_splits_greater_lines
-    ), "The number of total splits exceeds the number of data entries. Please reduce the number of splits."
+    if not num_splits_greater_lines:
+        raise ValueError(
+            "The number of total splits exceeds the number of data entries. Please reduce the number of splits."
+        )
     dataset_metadata_json["number_of_training_files"] = train_count
     dataset_metadata_json["number_of_dev_files"] = dev_count
     dataset_metadata_json["number_of_test_files"] = test_count
