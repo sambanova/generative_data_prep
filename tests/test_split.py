@@ -42,5 +42,5 @@ def test_split_should_throw():
 
     assert (
         str(e_info.value)
-        == "The number of total splits exceeds the number of data entries. Please reduce the number of splits."
+        == "The number of total splits exceeds the number of lines in the input path jsonl file. Please reduce the number of splits, or increase the number of lines in the dataset."
     )
