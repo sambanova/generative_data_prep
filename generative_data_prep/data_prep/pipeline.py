@@ -123,7 +123,7 @@ def rename_files(
         else:
             files_to_tokenize.append(new_name)
             
-        if os.path.getsize(new_file_path) <= 0:
+        if  os.path.exists(new_file_path) and os.path.getsize(new_file_path) <= 0:
             raise ValueError(
                 "The number of total splits exceeds the number of lines in the input path jsonl file. Please reduce the number of splits, or increase the number of lines in the dataset."
             )
