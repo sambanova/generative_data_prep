@@ -122,6 +122,13 @@ def rename_files(
             os.rename(os.path.join(split_dir, new_name), os.path.join(test_dir, new_name))
         else:
             files_to_tokenize.append(new_name)
+
+        if os.path.exists(new_file_path) and os.path.getsize(new_file_path) <= 0:
+            raise ValueError(
+                """The number of total splits exceeds the number of
+        lines in the input path jsonl file. Please reduce the number
+        of splits, or increase the number of lines in the dataset."""
+            )
     return files_to_tokenize
 
 
@@ -433,6 +440,19 @@ def pipeline_main(  # noqa: C901
         dev_ratio,
         test_ratio,
     )
+
+    num_splits_greater_lines = False
+    with open(input_file_path, "r") as input_file:
+        for i, line in enumerate(input_file):
+            if i > num_splits:
+                num_splits_greater_lines = True
+                break
+    if not num_splits_greater_lines:
+        raise ValueError(
+            """The number of total splits exceeds the number of
+        lines in the input path jsonl file. Please reduce the number
+        of splits, or increase the number of lines in the dataset."""
+        )
     dataset_metadata_json["number_of_training_files"] = train_count
     dataset_metadata_json["number_of_dev_files"] = dev_count
     dataset_metadata_json["number_of_test_files"] = test_count
