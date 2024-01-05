@@ -29,10 +29,9 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
 import psutil
-from alive_progress import alive_bar
 import yaml
+from alive_progress import alive_bar
 from transformers import PretrainedConfig, PreTrainedTokenizerBase
-
 
 from generative_data_prep.data_prep import data_prep_main
 from generative_data_prep.processors.metrics import Metrics
@@ -325,7 +324,7 @@ def multiprocess_data_prep(  # noqa: C901
                     category_to_id,
                     prompt_prefix,
                     prompt_postfix,
-                    dataset_type
+                    dataset_type,
                 ),
             )
         )
@@ -381,7 +380,8 @@ def multiprocess_data_prep(  # noqa: C901
             with num_tokenized_articles_lock:
                 num_new_tokenized_articles = num_tokenized_articles.value - prev_num_tokenized_articles
                 bar(num_new_tokenized_articles)
-                print(f'Progress: {num_tokenized_articles.value} / {total_num_articles}')
+                perc_complete = round((bar.current / total_num_articles) * 100, 2)
+                LOGGER.debug(f"{total_num_articles}, {perc_complete}% complete => Time remaining: {bar.eta}")
                 prev_num_tokenized_articles = num_tokenized_articles.value
 
             time.sleep(1)
@@ -391,7 +391,6 @@ def multiprocess_data_prep(  # noqa: C901
 
     executor.shutdown()
     manager.shutdown()
-            
 
     return train_hdf5_files, dev_hdf5_files, metrics
 
