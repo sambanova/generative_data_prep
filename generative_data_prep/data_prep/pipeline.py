@@ -334,6 +334,7 @@ def multiprocess_data_prep(  # noqa: C901
     metrics = Metrics()
     max_batch_size_train = None
     max_batch_size_dev = None
+    tokenization_start_time = time.time()
     # Loop while processes are running, update progress bar.
     with alive_bar(total_num_articles) as bar:
         while True:
@@ -381,7 +382,10 @@ def multiprocess_data_prep(  # noqa: C901
                 num_new_tokenized_articles = num_tokenized_articles.value - prev_num_tokenized_articles
                 bar(num_new_tokenized_articles)
                 perc_complete = round((bar.current / total_num_articles) * 100, 2)
-                LOGGER.debug(f"{total_num_articles}, {perc_complete}% complete => Time remaining: {bar.eta}")
+                elapsed_time_str = f"--- elapsed time: {time.time() - tokenization_start_time}"
+                LOGGER.debug(
+                    f"{total_num_articles}, {perc_complete}% complete => Time remaining: {bar.eta} {elapsed_time_str}"
+                )
                 prev_num_tokenized_articles = num_tokenized_articles.value
 
             time.sleep(5)
