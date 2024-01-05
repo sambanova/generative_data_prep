@@ -384,7 +384,7 @@ def multiprocess_data_prep(  # noqa: C901
                 LOGGER.debug(f"{total_num_articles}, {perc_complete}% complete => Time remaining: {bar.eta}")
                 prev_num_tokenized_articles = num_tokenized_articles.value
 
-            time.sleep(1)
+            time.sleep(5)
     if dataset_metadata_json is not None:
         dataset_metadata_json["max_batch_size_train"] = max_batch_size_train
         dataset_metadata_json["max_batch_size_dev"] = max_batch_size_dev
