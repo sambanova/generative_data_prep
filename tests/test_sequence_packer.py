@@ -45,7 +45,7 @@ def sequence_packer(max_seq_length: int, pad_token_id: int, packing_config: Pack
 
 
 @pytest.mark.parametrize(
-    "length,max_seq_length,pad_token_id,packing_style,overflow_type,length_2,max_seq_length_2,eos_token_id_2,\
+    "length,max_seq_length,eos_token_id,packing_style,overflow_type,length_2,max_seq_length_2,eos_token_id_2,\
         expected_token_ids",
     [
         (3, 5, -1, PackingStyleType.SINGLE, OverflowType.DROP, 6, None, None, []),
