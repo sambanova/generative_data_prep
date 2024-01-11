@@ -31,12 +31,12 @@ from .metrics import Metrics
 class SequencePacker:
     """Takes articles and packs them into fixed length sequences."""
 
-    def __init__(self, max_seq_length: int, eos_token_id: int, packing_config: PackingConfig, metrics: Metrics):
+    def __init__(self, max_seq_length: int, pad_token_id: int, packing_config: PackingConfig, metrics: Metrics):
         r"""Create the SequencePacker.
 
         Args:
             max_seq_length:  The maximum length of the tokenized sequences.
-            eos_token_id:   The end of text token.  This is used by the tokenized sequences for padding.
+            pad_token_id: The token used to pad sequences up to the sequence length.
             packing_config:  The method we use to 'pack' the tokenized articles into tokenized sequences.
                 The first argument in the packing config defines the method of placing text into sequences,
                 the second argument defines how to handle jsonls that do not fit within the max_seq_length.
@@ -95,11 +95,11 @@ class SequencePacker:
             [(2, <TokenTypeIds.PROMPT: 0>) (3, <TokenTypeIds.PROMPT: 0>) (-1, <TokenTypeIds.PADDING: 2>)]
             [(4, <TokenTypeIds.PROMPT: 0>) (5, <TokenTypeIds.PROMPT: 0>) (6, <TokenTypeIds.PROMPT: 0>)]
         """
-        self.eos_token_id = eos_token_id
+        self.pad_token_id = pad_token_id
         self.max_seq_length = max_seq_length
         self.packing_config = packing_config
 
-        self.unfinished_sequence = TokenizedSequence.get_empty(self.max_seq_length, self.eos_token_id)
+        self.unfinished_sequence = TokenizedSequence.get_empty(self.max_seq_length, pad_token_id)
         self.metrics = metrics
 
     def __call__(self, tokenized_articles: Optional[List[TokenizedArticle]]) -> List[TokenizedSequence]:
@@ -117,7 +117,7 @@ class SequencePacker:
         if tokenized_articles is None:
             if not self.unfinished_sequence.is_empty():
                 unfinished_sequence.pad()
-                self.unfinished_sequence = TokenizedSequence.get_empty(self.max_seq_length, self.eos_token_id)
+                self.unfinished_sequence = TokenizedSequence.get_empty(self.max_seq_length, self.pad_token_id)
                 return [unfinished_sequence]
             return []
 
@@ -182,7 +182,7 @@ class SequencePacker:
             if not unfinished_sequence.is_empty():
                 unfinished_sequence.pad()
                 newly_packed_sequences.append(unfinished_sequence)
-                unfinished_sequence = TokenizedSequence.get_empty(self.max_seq_length, self.eos_token_id)
+                unfinished_sequence = TokenizedSequence.get_empty(self.max_seq_length, self.pad_token_id)
 
         elif self.packing_config.packing_style == PackingStyleType.GREEDY:
             # if it fits in the unfinished sequence, then add it
@@ -195,7 +195,7 @@ class SequencePacker:
                     unfinished_sequence.pad()
                     newly_packed_sequences.append(unfinished_sequence)
                 # try and fit the tokenized article in the next sequence
-                unfinished_sequence = TokenizedSequence.get_empty(self.max_seq_length, self.eos_token_id)
+                unfinished_sequence = TokenizedSequence.get_empty(self.max_seq_length, self.pad_token_id)
                 tokenized_article = self._handle_overflow(tokenized_article, unfinished_sequence)
                 unfinished_sequence += tokenized_article
 
@@ -204,7 +204,7 @@ class SequencePacker:
             remainder_article = unfinished_sequence.pack(tokenized_article)
             while not remainder_article.is_empty():
                 newly_packed_sequences.append(unfinished_sequence)
-                unfinished_sequence = TokenizedSequence.get_empty(self.max_seq_length, self.eos_token_id)
+                unfinished_sequence = TokenizedSequence.get_empty(self.max_seq_length, self.pad_token_id)
                 remainder_article = unfinished_sequence.pack(remainder_article)
 
         else:

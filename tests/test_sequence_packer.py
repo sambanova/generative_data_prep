@@ -39,9 +39,9 @@ def packing_config(packing_style: PackingStyleType, overflow_type: OverflowType)
 
 
 @pytest.fixture
-def sequence_packer(max_seq_length: int, eos_token_id: int, packing_config: PackingConfig) -> SequencePacker:
+def sequence_packer(max_seq_length: int, packing_config: PackingConfig) -> SequencePacker:
     """Create the sequence packer."""
-    return SequencePacker(max_seq_length, eos_token_id, packing_config, Metrics())
+    return SequencePacker(max_seq_length, packing_config, Metrics())
 
 
 @pytest.mark.parametrize(

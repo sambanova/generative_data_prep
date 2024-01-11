@@ -117,7 +117,10 @@ class ArticleTokenizer:
         self.completion_keyword = completion_keyword
         self.eos_token_id = tokenizer.eos_token_id
         self.metrics = Metrics()
-        self.packer = SequencePacker(max_seq_length, self.eos_token_id, packing_config, self.metrics)
+        pad_token_id = getattr(tokenizer, "pad_token_id", None)
+        if pad_token_id is None:
+            pad_token_id = tokenizer.eos_token_id
+        self.packer = SequencePacker(max_seq_length, pad_token_id, packing_config, self.metrics)
         self.prompt_prefix = prompt_prefix
         self.prompt_postfix = prompt_postfix
         transformers_logging.set_verbosity_error()
