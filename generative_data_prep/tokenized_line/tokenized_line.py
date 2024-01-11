@@ -254,4 +254,4 @@ class TokenizedSequence(TokenizedLine):
     def _get_slice(self, slice_index: slice) -> "TokenizedSequence":
         """See base class."""
         tokenized_article = TokenizedArticle(self.tokens[slice_index])
-        return TokenizedSequence.from_article(tokenized_article, self.max_seq_length)  # type: ignore
+        return TokenizedSequence.from_article(tokenized_article, self.max_seq_length, self.pad_token_id)  # type: ignore
