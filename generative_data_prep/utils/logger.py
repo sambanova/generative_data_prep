@@ -57,10 +57,13 @@ def log_current_datetime():
 
 def log_git_commit_hash():
     """Log the current git commit hash."""
-    repo = git.Repo(os.path.abspath(__file__), search_parent_directories=True)
-    sha = repo.head.object.hexsha
     LOGGER.debug("Running Generative Data Prep repository: https://github.com/sambanova/generative_data_prep/")
-    LOGGER.debug(f"Git commit hash: {sha}")
+    try:
+        repo = git.Repo(os.path.abspath(__file__), search_parent_directories=True)
+        sha = repo.head.object.hexsha
+        LOGGER.debug(f"Git commit hash: {sha}")
+    except git.exc.InvalidGitRepositoryError:
+        LOGGER.debug("Git commit hash not found")
 
 
 def log_input_args(args):

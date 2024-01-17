@@ -20,6 +20,8 @@ from __future__ import absolute_import
 
 import os
 import sys
+from multiprocessing.managers import ValueProxy
+from multiprocessing.synchronize import Lock
 from typing import Dict, Optional
 
 from transformers import PreTrainedTokenizerBase
@@ -42,9 +44,12 @@ def data_prep_main(
     keep_prompt_only_sequences: bool,
     prompt_keyword: str,
     completion_keyword: str,
+    num_tokenized_articles: Optional[ValueProxy] = None,
+    num_tokenized_articles_lock: Optional[Lock] = None,
     category_to_id: Optional[Dict[str, int]] = None,
     prompt_prefix: Optional[str] = None,
     prompt_postfix: Optional[str] = None,
+    dataset_type: Optional[str] = None,
 ):
     """Tokenize input_file into packed sequences stored in output_file.
 
@@ -62,6 +67,8 @@ def data_prep_main(
         prompt_keyword: Prompt keyword to use as key in jsonl.
         completion_keyword: Completion keyword to use as key in jsonl.
         disable_space_separator: Disable adding space separator if true.
+        num_tokenized_articles: Shared variable for number of tokenized articles.
+        num_tokenized_articles_lock: Lock needed in order to updated shared variable.
         category_to_id: Dictionary that maps category string names to IDs.
         prompt_prefix: text to add before the prompt, for chatML conventions use.
         prompt_postfix: text to add after the prompt, for chatML conventions use.
@@ -95,6 +102,9 @@ def data_prep_main(
         with open(input_file, "r") as reader:
             for line in reader:
                 hdf5_text_buffer.write(article_tokenizer(line))
+                if num_tokenized_articles_lock is not None and num_tokenized_articles is not None:
+                    with num_tokenized_articles_lock:
+                        num_tokenized_articles.value += 1
             hdf5_text_buffer.write(article_tokenizer(None))
-
+    article_tokenizer.metrics.dataset_type = dataset_type
     return article_tokenizer.metrics

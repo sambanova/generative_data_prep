@@ -35,10 +35,16 @@ jobs:
           # NOTE: Requires redundant "pip install -U pip" command to avoid OSError
           name: Run Pre-commit
           command: |
-            source .circleci/VERSIONS && pip install pipenv==${PIPENV_VERSION}
+            source .circleci/VERSIONS
+            pip install pip==${PIP_VERSION} pip install pipenv==${PIPENV_VERSION}
             pipenv sync --categories tests-packages
             pipenv run pre-commit run --all-files
-            pipenv check
+      - run:
+          name: Verify Pipfile
+          command: |
+            source .circleci/VERSIONS
+            pipenv lock
+            pipenv check --system
       - save_cache:
           key: v1-{{ arch }}-{{ checksum "pyproject.toml" }}-{{ checksum "circleci_cache_key" }}
           paths:
@@ -60,7 +66,6 @@ jobs:
           name: Instantiate Python Virtual Environment
           command: |
             source .circleci/VERSIONS && pip install pipenv==${PIPENV_VERSION}
-            pipenv run pip install .
             pipenv sync --categories=default,build-packages,docs-packages,tests-packages
       - save_cache:
           key: v2-{{ arch }}-{{ .Branch }}-{{ checksum "circleci_cache_key" }}

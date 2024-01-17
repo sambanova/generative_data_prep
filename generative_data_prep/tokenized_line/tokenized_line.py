@@ -21,7 +21,7 @@ our models.
 """
 
 from abc import ABC, abstractmethod
-from typing import List, TypeVar, Union, overload
+from typing import List, Optional, TypeVar, Union, overload
 
 from generative_data_prep.utils import TokenTypeIds
 
@@ -152,14 +152,13 @@ class TokenizedSequence(TokenizedLine):
     the TokenizedArticles, and must first compress the TokenizedArticles into length-bounded TokenizedSequences.
     """
 
-    def __init__(self, tokens: List[Token], max_seq_length: int, eos_token_id: int):
+    def __init__(self, tokens: List[Token], max_seq_length: int, pad_token_id: Optional[int] = None):
         """Create a TokenizedSequence.
 
         Args:
             tokens:  The tokens that make up this tokenized line, each token has an id, a type_id
             max_seq_length:  The maximum allowed length for a sequence.
-            eos_token_id:  The end of text (sequence) token.  If a sequence's length is less than the max sequence
-                length, the sequence is usually padded with this token.
+            pad_token_id: If this tokenizer has a unique padding token id, use this.
         """
         if max_seq_length < 1:
             err_msg = f"Cannot have zero / negative max_seq_length. Found max_seq_length == {max_seq_length}"
@@ -169,26 +168,26 @@ class TokenizedSequence(TokenizedLine):
             raise ValueError(err_msg)
         super().__init__(tokens)
         self.max_seq_length = max_seq_length
-        self.eos_token_id = eos_token_id
+        self.pad_token_id = pad_token_id
 
     @classmethod
-    def get_empty(cls, max_seq_length: int, eos_token_id: int) -> "TokenizedSequence":
+    def get_empty(cls, max_seq_length: int, pad_token_id: int) -> "TokenizedSequence":
         """See base class."""
-        return cls.from_article(TokenizedArticle.get_empty(), max_seq_length, eos_token_id)  # type: ignore
+        return cls.from_article(TokenizedArticle.get_empty(), max_seq_length, pad_token_id)  # type: ignore
 
     @classmethod
-    def from_article(cls, tokenized_article: TokenizedArticle, max_seq_length: int, eos_token_id: int):
+    def from_article(cls, tokenized_article: TokenizedArticle, max_seq_length: int, pad_token_id: int):
         """Create a TokenizedLine from a TokenizedArticle.
 
         Args:
             tokenized_article: The tokenized article.
             max_seq_length:  The maximum sequence length for this new TokenizedSequence.
-            eos_token_id:  The end of text token for this new TokenizedSequence.
+            pad_token_id: The token used to pad sequence up to sequence length.
 
         Returns:
             The newly created TokenizedLine.
         """
-        return cls(tokenized_article.tokens, max_seq_length, eos_token_id)
+        return cls(tokenized_article.tokens, max_seq_length, pad_token_id)
 
     def __iadd__(self, tokenized_line: TokenizedLine) -> "TokenizedSequence":
         """Add another TokenizedLine to this TokenizedSequence.
@@ -248,11 +247,11 @@ class TokenizedSequence(TokenizedLine):
         return tokenized_line[slice_index:]
 
     def pad(self):
-        """Fill the remaining token ids in the TokenizedSequence with the end of text token."""
+        """Fill the remaining token ids in the TokenizedSequence with padding tokens."""
         padding_size = self.max_seq_length - len(self)
-        self._tokens += [Token(self.eos_token_id, TokenTypeIds.PADDING)] * padding_size
+        self._tokens += [Token(self.pad_token_id, TokenTypeIds.PADDING)] * padding_size
 
     def _get_slice(self, slice_index: slice) -> "TokenizedSequence":
         """See base class."""
         tokenized_article = TokenizedArticle(self.tokens[slice_index])
-        return TokenizedSequence.from_article(tokenized_article, self.max_seq_length, self.eos_token_id)  # type: ignore
+        return TokenizedSequence.from_article(tokenized_article, self.max_seq_length, self.pad_token_id)  # type: ignore

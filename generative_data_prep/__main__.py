@@ -301,10 +301,8 @@ def get_categories(categories_path: str):
     return category_to_id
 
 
-if __name__ == "__main__":
-    logger = logging.getLogger("generative_data_prep_logger")
-    logging.config.fileConfig(get_config_file_path())
-    args = get_args()
+def main(args):
+    """Wrapping function instead of putting into __main__."""
     if os.path.splitext(args.input_file_path)[1] not in FileExtension.as_list():
         err_msg = f"The input file is not a jsonl or txt file {args.input_file_path}"
         raise ValueError(err_msg)
@@ -373,3 +371,10 @@ if __name__ == "__main__":
 
     log_metrics(metrics)
     log_elapsed_time()
+
+
+if __name__ == "__main__":
+    logger = logging.getLogger("generative_data_prep_logger")
+    logging.config.fileConfig(get_config_file_path())
+    args = get_args()
+    main(args)

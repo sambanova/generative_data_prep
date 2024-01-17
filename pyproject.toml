@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "sambanova-generative-data-prep"
 description = "Prepare data that can be used to train generative models."
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 license = {file = "LICENSE"}
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -21,7 +21,10 @@ dependencies = [
     "transformers",
     "tabulate",
     "gitpython",
-    "types-tabulate"
+    "types-tabulate",
+    "alive_progress",
+    "pydantic",
+    "pyyaml"
 ]
 dynamic = ["version"]
 
@@ -42,6 +45,7 @@ filterwarnings = [
     "error",
     # TODO: Fix the Warning and remove this ignore line
     "ignore:unclosed file.*io.TextIOWrapper.*:ResourceWarning",
+    "ignore:Pydantic V1 style.*validators are deprecated.*:pydantic.warnings.PydanticDeprecatedSince20",
 ]
 addopts = """
 -ra -q -vv
