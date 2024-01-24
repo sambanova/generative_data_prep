@@ -335,11 +335,12 @@ def multiprocess_data_prep(  # noqa: C901
     max_batch_size_train = None
     max_batch_size_dev = None
     tokenization_start_time = time.time()
+    finished_futures = set()
     # Loop while processes are running, update progress bar.
     with alive_bar(total_num_articles) as bar:
         while True:
             for i, future in enumerate(futures):
-                if future.done():
+                if future.done() and future not in finished_futures:
                     try:
                         indiv_metric = future.result()
                         if indiv_metric.dataset_type == "train":
@@ -353,6 +354,7 @@ def multiprocess_data_prep(  # noqa: C901
                             else:
                                 max_batch_size_dev = min(max_batch_size_dev, indiv_metric.sequences)
                         metrics += indiv_metric
+                        finished_futures.add(future)
                     except Exception as exc:
                         if isinstance(exc, concurrent.futures.process.BrokenProcessPool):
                             broken_process_indices.append(str(i))
@@ -376,6 +378,8 @@ def multiprocess_data_prep(  # noqa: C901
                             raise broken_process_pool_exc from None
             # If all the processes are done, break the loop
             if all(future.done() for future in futures):
+                if len(finished_futures) != len(futures):
+                    raise ValueError("All futures done, butinished futures set is not the same as all futures.")
                 break
             # Update the progress bar with how every many new articles were tokenized
             with num_tokenized_articles_lock:
