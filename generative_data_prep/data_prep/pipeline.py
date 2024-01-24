@@ -379,7 +379,7 @@ def multiprocess_data_prep(  # noqa: C901
             # If all the processes are done, break the loop
             if all(future.done() for future in futures):
                 if len(finished_futures) != len(futures):
-                    raise ValueError("All futures done, butinished futures set is not the same as all futures.")
+                    raise ValueError("All futures done, but finished futures set does not equal all futures list.")
                 break
             # Update the progress bar with how every many new articles were tokenized
             with num_tokenized_articles_lock:
