@@ -350,7 +350,7 @@ class ArticleTokenizer:
             if (
                 hasattr(self.tokenizer, "bos_token_id")
                 and completion_token_ids[0] == self.tokenizer.bos_token_id
-                and (prompt is not None and len(prompt_token_ids) >= 0)
+                and (prompt and len(prompt_token_ids) >= 0)
                 and len(completion_token_ids) >= 1
             ):
                 completion_token_ids = completion_token_ids[1:]
