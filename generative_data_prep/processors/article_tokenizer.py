@@ -346,10 +346,11 @@ class ArticleTokenizer:
         if completion:
             completion_token_ids = self.tokenizer.encode(completion)
             # If there is a BOS token at the begining of the completion then remove it
+            # Only remove it if there are prompt tokens
             if (
                 hasattr(self.tokenizer, "bos_token_id")
                 and completion_token_ids[0] == self.tokenizer.bos_token_id
-                and len(prompt_token_ids) == 0
+                and (prompt and len(prompt_token_ids) >= 0)
                 and len(completion_token_ids) >= 1
             ):
                 completion_token_ids = completion_token_ids[1:]
