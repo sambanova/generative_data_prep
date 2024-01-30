@@ -247,7 +247,7 @@ def multiprocess_data_prep(  # noqa: C901
     category_to_id: Optional[Dict[str, int]] = None,
     prompt_prefix: Optional[str] = None,
     prompt_postfix: Optional[str] = None,
-    apply_chat_template: bool = False,
+    apply_chat_template: Optional[bool] = False,
 ) -> Tuple[List[str], List[str], Metrics]:
     """Tokenizes all the files in files_to_tokenize efficiently using multirpocessing library.
 
