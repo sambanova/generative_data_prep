@@ -1,0 +1,682 @@
+================================================================================
+Number of Sequences: 42
+Sequence length: 1024
+================================================================================
+SEQUENCE 1
+================================================================================
+----PROMPT-----
+What is your favorite type of dessert?<|endoftext|>
+----COMPLETION-----
+ My favorite dessert is cheesecake.<|endoftext|>
+----PROMPT-----
+What is your favorite flavor of cheesecake?<|endoftext|>
+----COMPLETION-----
+ My favorite flavor of cheesecake is raspberry.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 987
+
+
+================================================================================
+SEQUENCE 2
+================================================================================
+----PROMPT-----
+What do you like to do in your free time?<|endoftext|>
+----COMPLETION-----
+ I like to read books and watch movies.<|endoftext|>
+----PROMPT-----
+That sounds like fun! Do you have any favorite books or movies?<|endoftext|>
+----COMPLETION-----
+ Yeah, I love 'To Kill a Mockingbird' and 'The Shawshank Redemption'.<|endoftext|>
+----PROMPT-----
+Those are great choices! Have you read any other books by Harper Lee?<|endoftext|>
+----COMPLETION-----
+ Yes, I've also read 'Go Set a Watchman'.<|endoftext|>
+----PROMPT-----
+And have you seen any other movies by Frank Darabont?<|endoftext|>
+----COMPLETION-----
+ Yes, I also love 'The Green Mile'.<|endoftext|>
+----PROMPT-----
+Oh, I haven't seen that one yet. Is it good?<|endoftext|>
+----COMPLETION-----
+ Definitely! You should check it out.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 887
+
+
+================================================================================
+SEQUENCE 3
+================================================================================
+----PROMPT-----
+What's your favorite type of music?<|endoftext|>
+----COMPLETION-----
+ I love hip-hop<|endoftext|>
+----PROMPT-----
+That's cool. Who's your favorite rapper?<|endoftext|>
+----COMPLETION-----
+ I really like Kendrick Lamar<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 992
+
+
+================================================================================
+SEQUENCE 4
+================================================================================
+----PROMPT-----
+What is your favorite sport?<|endoftext|>
+----COMPLETION-----
+ My favorite sport is football.<|endoftext|>
+----PROMPT-----
+Who is your favorite football player?<|endoftext|>
+----COMPLETION-----
+ My favorite football player is Tom Brady.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 993
+
+
+================================================================================
+SEQUENCE 5
+================================================================================
+----PROMPT-----
+Have you ever been to a concert?<|endoftext|>
+----COMPLETION-----
+ Yes, I went to a Coldplay concert last year.<|endoftext|>
+----PROMPT-----
+That sounds like fun! What was your favorite song that they played?<|endoftext|>
+----COMPLETION-----
+ Definitely 'Viva La Vida'.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 978
+
+
+================================================================================
+SEQUENCE 6
+================================================================================
+----PROMPT-----
+Do you have any siblings?<|endoftext|>
+----COMPLETION-----
+ Yes, I have two younger sisters.<|endoftext|>
+----PROMPT-----
+What's your favorite memory with them?<|endoftext|>
+----COMPLETION-----
+ Probably when we all went on a family trip to Hawaii.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 986
+
+
+================================================================================
+SEQUENCE 7
+================================================================================
+----PROMPT-----
+What's your favorite season?<|endoftext|>
+----COMPLETION-----
+ I love fall<|endoftext|>
+----PROMPT-----
+Oh yeah, me too. What do you like about it?<|endoftext|>
+----COMPLETION-----
+ I love the cool weather and the changing leaves<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 989
+
+
+================================================================================
+SEQUENCE 8
+================================================================================
+----PROMPT-----
+What is your favorite hobby?<|endoftext|>
+----COMPLETION-----
+ My favorite hobby is reading.<|endoftext|>
+----PROMPT-----
+That's interesting. What book are you currently reading?<|endoftext|>
+----COMPLETION-----
+ I am currently reading 'The Catcher in the Rye' by J.D. Salinger.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 977
+
+
+================================================================================
+SEQUENCE 9
+================================================================================
+----PROMPT-----
+What's your favorite book?<|endoftext|>
+----COMPLETION-----
+ I love The Alchemist by Paulo Coelho<|endoftext|>
+----PROMPT-----
+I've heard that's a great book. Have you read anything else by him?<|endoftext|>
+----COMPLETION-----
+ Yes, I also really enjoyed Eleven Minutes<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 980
+
+
+================================================================================
+SEQUENCE 10
+================================================================================
+----PROMPT-----
+What is your favorite movie?<|endoftext|>
+----COMPLETION-----
+ My favorite movie is The Godfather.<|endoftext|>
+----PROMPT-----
+That's a classic. Who is your favorite character in the movie?<|endoftext|>
+----COMPLETION-----
+ My favorite character is Vito Corleone.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 982
+
+
+================================================================================
+SEQUENCE 11
+================================================================================
+----PROMPT-----
+What is your favorite type of coffee?<|endoftext|>
+----COMPLETION-----
+ My favorite type of coffee is a latte.<|endoftext|>
+----PROMPT-----
+What is your favorite flavor of latte?<|endoftext|>
+----COMPLETION-----
+ My favorite flavor of latte is vanilla.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 984
+
+
+================================================================================
+SEQUENCE 12
+================================================================================
+----PROMPT-----
+What kind of music do you like?<|endoftext|>
+----COMPLETION-----
+ I like all kinds of music, but my favorite genre is jazz.<|endoftext|>
+----PROMPT-----
+Who is your favorite jazz musician?<|endoftext|>
+----COMPLETION-----
+ My favorite jazz musician is Miles Davis.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 983
+
+
+================================================================================
+SEQUENCE 13
+================================================================================
+----PROMPT-----
+Have you ever traveled alone?<|endoftext|>
+----COMPLETION-----
+ Yes, I actually prefer traveling alone.<|endoftext|>
+----PROMPT-----
+That's interesting! What do you like about solo travel?<|endoftext|>
+----COMPLETION-----
+ I like being able to explore at my own pace and not having to compromise with anyone else's preferences.<|endoftext|>
+----PROMPT-----
+Do you have any favorite destinations that you've traveled to alone?<|endoftext|>
+----COMPLETION-----
+ Yeah, I really enjoyed solo traveling in Japan and Thailand.<|endoftext|>
+----PROMPT-----
+What did you like about those places?<|endoftext|>
+----COMPLETION-----
+ I liked the food, the culture, and the people. Everyone was so friendly and welcoming.<|endoftext|>
+----PROMPT-----
+That sounds amazing! Do you have any other solo travel plans?<|endoftext|>
+----COMPLETION-----
+ Yes, I'm planning on going to South America next.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 890
+
+
+================================================================================
+SEQUENCE 14
+================================================================================
+----PROMPT-----
+What's your favorite type of outdoor activity?<|endoftext|>
+----COMPLETION-----
+ I love hiking.<|endoftext|>
+----PROMPT-----
+That sounds like a great way to stay active! Do you have any favorite hiking trails?<|endoftext|>
+----COMPLETION-----
+ Yeah, I really like the Grand Canyon and Yosemite National Park.<|endoftext|>
+----PROMPT-----
+Those are both beautiful places! Have you hiked any other trails?<|endoftext|>
+----COMPLETION-----
+ Yes, I've also hiked the Inca Trail in Peru and the Milford Track in New Zealand.<|endoftext|>
+----PROMPT-----
+Wow, those sound like amazing experiences! Which one was your favorite?<|endoftext|>
+----COMPLETION-----
+ It's hard to choose, but I think the Inca Trail was the most memorable.<|endoftext|>
+----PROMPT-----
+I've always wanted to do that hike! What was the most challenging part?<|endoftext|>
+----COMPLETION-----
+ Definitely the altitude. It's really tough to hike at such high elevations.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 870
+
+
+================================================================================
+SEQUENCE 15
+================================================================================
+----PROMPT-----
+What is your favorite season?<|endoftext|>
+----COMPLETION-----
+ My favorite season is autumn.<|endoftext|>
+----PROMPT-----
+Why do you like autumn?<|endoftext|>
+----COMPLETION-----
+ I like the cooler weather and the changing colors of the leaves.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 989
+
+
+================================================================================
+SEQUENCE 16
+================================================================================
+----PROMPT-----
+Do you prefer the beach or the mountains?<|endoftext|>
+----COMPLETION-----
+ I prefer the mountains<|endoftext|>
+----PROMPT-----
+Why is that?<|endoftext|>
+----COMPLETION-----
+ I love hiking and being surrounded by nature<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 995
+
+
+================================================================================
+SEQUENCE 17
+================================================================================
+----PROMPT-----
+What is your favorite TV show?<|endoftext|>
+----COMPLETION-----
+ My favorite TV show is Breaking Bad.<|endoftext|>
+----PROMPT-----
+Why do you like Breaking Bad?<|endoftext|>
+----COMPLETION-----
+ I think it has a compelling storyline and complex characters.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 987
+
+
+================================================================================
+SEQUENCE 18
+================================================================================
+----PROMPT-----
+What's your favorite hobby?<|endoftext|>
+----COMPLETION-----
+ I love playing guitar<|endoftext|>
+----PROMPT-----
+That's awesome. Do you play in a band?<|endoftext|>
+----COMPLETION-----
+ No, I mostly just play for fun<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 991
+
+
+================================================================================
+SEQUENCE 19
+================================================================================
+----PROMPT-----
+What's your favorite type of music?<|endoftext|>
+----COMPLETION-----
+ I really like indie rock.<|endoftext|>
+----PROMPT-----
+Do you have any favorite indie rock bands?<|endoftext|>
+----COMPLETION-----
+ Yeah, I love The Strokes and Arctic Monkeys.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 985
+
+
+================================================================================
+SEQUENCE 20
+================================================================================
+----PROMPT-----
+Have you ever gone scuba diving?<|endoftext|>
+----COMPLETION-----
+ Yes, I actually got my scuba diving certification last year.<|endoftext|>
+----PROMPT-----
+That's so cool! Where did you go scuba diving?<|endoftext|>
+----COMPLETION-----
+ I went to the Great Barrier Reef in Australia.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 976
+
+
+================================================================================
+SEQUENCE 21
+================================================================================
+----PROMPT-----
+What are you up to?<|endoftext|>
+----COMPLETION-----
+ Not much, hbu?<|endoftext|>
+----PROMPT-----
+Because they were playing the trombones at 2am last night and kept me awake<|endoftext|>
+----COMPLETION-----
+ Oh ok, they deserve it<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 985
+
+
+================================================================================
+SEQUENCE 22
+================================================================================
+----PROMPT-----
+What is your favorite color?<|endoftext|>
+----COMPLETION-----
+ My favorite color is green.<|endoftext|>
+----PROMPT-----
+Why do you like the color green?<|endoftext|>
+----COMPLETION-----
+ I think it is a calming and refreshing color.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 990
+
+
+================================================================================
+SEQUENCE 23
+================================================================================
+----PROMPT-----
+How was your weekend?<|endoftext|>
+----COMPLETION-----
+ It was great, thanks for asking<|endoftext|>
+----PROMPT-----
+Did you do anything fun?<|endoftext|>
+----COMPLETION-----
+ I went on a hike with some friends<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 994
+
+
+================================================================================
+SEQUENCE 24
+================================================================================
+----PROMPT-----
+Have you ever gone on a road trip?<|endoftext|>
+----COMPLETION-----
+ Yes, I actually went on a cross-country road trip last summer.<|endoftext|>
+----PROMPT-----
+Wow, that sounds like an adventure! What was your favorite part of the trip?<|endoftext|>
+----COMPLETION-----
+ Definitely seeing the Grand Canyon.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 973
+
+
+================================================================================
+SEQUENCE 25
+================================================================================
+----PROMPT-----
+Do you have any pets?<|endoftext|>
+----COMPLETION-----
+ Yes, I have a dog named Charlie<|endoftext|>
+----PROMPT-----
+Aw, what kind of dog is he?<|endoftext|>
+----COMPLETION-----
+ He's a golden retriever<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 991
+
+
+================================================================================
+SEQUENCE 26
+================================================================================
+----PROMPT-----
+What is your favorite type of weather?<|endoftext|>
+----COMPLETION-----
+ I love sunny and warm weather.<|endoftext|>
+----PROMPT-----
+What do you like to do when it's sunny and warm outside?<|endoftext|>
+----COMPLETION-----
+ I like to go for a walk or spend time outdoors with friends and family.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 975
+
+
+================================================================================
+SEQUENCE 27
+================================================================================
+----PROMPT-----
+What is your favorite type of cuisine?<|endoftext|>
+----COMPLETION-----
+ I love Italian food.<|endoftext|>
+----PROMPT-----
+What is your favorite Italian dish?<|endoftext|>
+----COMPLETION-----
+ My favorite Italian dish is spaghetti carbonara.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 991
+
+
+================================================================================
+SEQUENCE 28
+================================================================================
+----PROMPT-----
+What's your favorite movie?<|endoftext|>
+----COMPLETION-----
+ I love The Shawshank Redemption<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 1009
+
+
+================================================================================
+SEQUENCE 29
+================================================================================
+----PROMPT-----
+What's your favorite color?<|endoftext|>
+----COMPLETION-----
+ I like blue<|endoftext|>
+----PROMPT-----
+That's cool, what about your favorite food?<|endoftext|>
+----COMPLETION-----
+ I love pizza!<|endoftext|>
+----PROMPT-----
+Who doesn't love pizza :). Do you play any sports?<|endoftext|>
+----COMPLETION-----
+ Yeah, I love playing basketball.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 975
+
+
+================================================================================
+SEQUENCE 30
+================================================================================
+----PROMPT-----
+What's your favorite type of art?<|endoftext|>
+----COMPLETION-----
+ I really like street art and graffiti.<|endoftext|>
+----PROMPT-----
+Do you have any favorite street artists?<|endoftext|>
+----COMPLETION-----
+ Yeah, I love Banksy and Shepard Fairey.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 984
+
+
+================================================================================
+SEQUENCE 31
+================================================================================
+----PROMPT-----
+What is your favorite animal?<|endoftext|>
+----COMPLETION-----
+ My favorite animal is the elephant.<|endoftext|>
+----PROMPT-----
+Why do you like elephants?<|endoftext|>
+----COMPLETION-----
+ I think they are intelligent and fascinating animals.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 992
+
+
+================================================================================
+SEQUENCE 32
+================================================================================
+----PROMPT-----
+Do you have any pets?<|endoftext|>
+----COMPLETION-----
+ Yes, I have a dog named Luna.<|endoftext|>
+----PROMPT-----
+Aw, what kind of dog is she?<|endoftext|>
+----COMPLETION-----
+ She's a golden retriever.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 989
+
+
+================================================================================
+SEQUENCE 33
+================================================================================
+----PROMPT-----
+What is your favorite holiday?<|endoftext|>
+----COMPLETION-----
+ My favorite holiday is Christmas.<|endoftext|>
+----PROMPT-----
+What do you like most about Christmas?<|endoftext|>
+----COMPLETION-----
+ I love spending time with my family and exchanging gifts.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 989
+
+
+================================================================================
+SEQUENCE 34
+================================================================================
+----PROMPT-----
+Have you ever gone skydiving?<|endoftext|>
+----COMPLETION-----
+ Yes, I actually went last summer.<|endoftext|>
+----PROMPT-----
+Wow, that's brave of you! How was it?<|endoftext|>
+----COMPLETION-----
+ It was amazing! The feeling of freefalling is indescribable.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 976
+
+
+================================================================================
+SEQUENCE 35
+================================================================================
+----PROMPT-----
+Have you traveled anywhere recently?<|endoftext|>
+----COMPLETION-----
+ Actually, I just got back from a trip to Japan.<|endoftext|>
+----PROMPT-----
+Wow, that's amazing! What was your favorite part of the trip?<|endoftext|>
+----COMPLETION-----
+ Definitely trying all of the different types of sushi and exploring Tokyo.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 974
+
+
+================================================================================
+SEQUENCE 36
+================================================================================
+----PROMPT-----
+What's your favorite type of book?<|endoftext|>
+----COMPLETION-----
+ I love reading thrillers and mysteries.<|endoftext|>
+----PROMPT-----
+Do you have any favorite authors in that genre?<|endoftext|>
+----COMPLETION-----
+ Yeah, I really like Gillian Flynn and Harlan Coben.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 980
+
+
+================================================================================
+SEQUENCE 37
+================================================================================
+----PROMPT-----
+hello how are you?<|endoftext|>
+----COMPLETION-----
+ I am doing well<|endoftext|>
+----PROMPT-----
+great, how is the weather<|endoftext|>
+----COMPLETION-----
+ It is nice outside<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 1001
+
+
+================================================================================
+SEQUENCE 38
+================================================================================
+----PROMPT-----
+Have you ever gone camping?<|endoftext|>
+----COMPLETION-----
+ Yes, I go camping every summer.<|endoftext|>
+----PROMPT-----
+What's your favorite part about camping?<|endoftext|>
+----COMPLETION-----
+ I love being surrounded by nature and disconnecting from technology.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 986
+
+
+================================================================================
+SEQUENCE 39
+================================================================================
+----PROMPT-----
+What is your favorite book?<|endoftext|>
+----COMPLETION-----
+ My favorite book is 'To Kill a Mockingbird' by Harper Lee.<|endoftext|>
+----PROMPT-----
+Why do you like that book?<|endoftext|>
+----COMPLETION-----
+ I think it is a powerful and important novel that addresses important themes like racial injustice and prejudice.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 972
+
+
+================================================================================
+SEQUENCE 40
+================================================================================
+----PROMPT-----
+Do you like to cook?<|endoftext|>
+----COMPLETION-----
+ Yes, I love cooking!<|endoftext|>
+----PROMPT-----
+What's your favorite thing to cook?<|endoftext|>
+----COMPLETION-----
+ I love making homemade pasta from scratch.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 992
+
+
+================================================================================
+SEQUENCE 41
+================================================================================
+----PROMPT-----
+Do you have any hobbies?<|endoftext|>
+----COMPLETION-----
+ Yes, I like to play guitar and write songs.<|endoftext|>
+----PROMPT-----
+That's cool! Have you written any songs that you're particularly proud of?<|endoftext|>
+----COMPLETION-----
+ Yeah, I wrote a song about my grandmother that I really like.<|endoftext|>
+----PROMPT-----
+What's the song about?<|endoftext|>
+----COMPLETION-----
+ It's about how much she means to me and how much she's influenced my life.<|endoftext|>
+----PROMPT-----
+That's really sweet. Do you have any other hobbies?<|endoftext|>
+----COMPLETION-----
+ Yes, I also like to draw and paint.<|endoftext|>
+----PROMPT-----
+Oh, that's interesting! What kind of things do you like to draw?<|endoftext|>
+----COMPLETION-----
+ I like to draw portraits and landscapes.<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 897
+
+
+================================================================================
+SEQUENCE 42
+================================================================================
+----PROMPT-----
+What do you do for work?<|endoftext|>
+----COMPLETION-----
+ I'm a software engineer<|endoftext|>
+----PROMPT-----
+That sounds interesting. What kind of projects do you work on?<|endoftext|>
+----COMPLETION-----
+ I work on building mobile apps<|endoftext|>
+------------------------------ATTENTION SEPARATOR------------------------------
+Padding tokens: 989
+
+
+================================================================================
