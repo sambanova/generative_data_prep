@@ -179,7 +179,7 @@ class ArticleTokenizer:
         # This is a temporary solution, and the tokenizer should be modified in the future.
         # The tokenizer should be able to get the generation_prompt from the input text.
         # self.tokenizer.chat_template = "{% for message in messages %} {{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}"
-        
+
         """
         The mechanism designed here is to remember the original prompt and completion, 
         despite the transformation of the [prompt, completion] pair into a raw string format with additional instruction tokens.
@@ -224,7 +224,7 @@ class ArticleTokenizer:
         """
         pattern = rf'({DEFAULT_PROMPT_PLACEHOLDER}|{DEFAULT_COMPLETION_PLACEHOLDER})'
         split_chat = re.split(pattern, formatted_chat)
-        
+
         # Merge the tokens except for the DEFAULT_PROMPT_PLACEHOLDER and DEFAULT_COMPLETION_PLACEHOLDER
         for i in range(len(split_chat)):
             if split_chat[i] == DEFAULT_PROMPT_PLACEHOLDER or split_chat[i] == DEFAULT_COMPLETION_PLACEHOLDER:
@@ -241,25 +241,26 @@ class ArticleTokenizer:
             if tok == DEFAULT_PROMPT_PLACEHOLDER:
                 break
             start_instr_of_chat += tok
-            
-        
+
         tokenized_articles = []
         tokens = []
         category_id = -1
         orginal_prompt_completion = None
         prompt_index = 0
 
+        new_prompt = ''
+        new_completion = ''
+
         """
         Automatic conversion back to [prompt, completion] format, especially if prompt_loss_weight is set during the training phase.
         1. For standard prompt and completion tokens, the existing pipeline is retained.
         2. Tokens introduced by the chat template are classified as completion tokens.
         """
-        for _, token in enumerate(split_chat):
-            # Skip empty tokens and eos tokens
-            if not token:
-                continue
-            if token == self.tokenizer.eos_token:
-                continue
+        while split_chat:
+            token = split_chat.pop(0)
+            # Check the start to see if it is a prompt or a completion.
+            if start_instr_of_chat and token == start_instr_of_chat:
+                new_prompt = start_instr_of_chat
 
             if token == DEFAULT_PROMPT_PLACEHOLDER:
                 if not prompts:
@@ -273,8 +274,13 @@ class ArticleTokenizer:
                     raise ValueError(err_msg)
 
                 category_id = self.get_category_id(orginal_prompt_completion)
-                tokens += self.tokenize(completion=None, prompt=prompt, category_id=category_id)
+                # tokens += self.tokenize(completion=None, prompt=prompt, category_id=category_id)
                 prompt_index += 1
+
+                new_prompt += prompt
+                while split_chat[0] != DEFAULT_COMPLETION_PLACEHOLDER:
+                    new_prompt += split_chat.pop(0)
+
             elif token == DEFAULT_COMPLETION_PLACEHOLDER:
                 if not completions:
                     err_msg = f"Completions list is empty, but {DEFAULT_COMPLETION_PLACEHOLDER} found in split_chat"
@@ -284,7 +290,16 @@ class ArticleTokenizer:
                 if completion != orginal_prompt_completion[self.completion_keyword]:
                     err_msg = f"Completion mismatch, {completion} != {orginal_prompt_completion[self.completion_keyword]}"
                     raise ValueError(err_msg)
-                tokens += self.tokenize(completion=completion, prompt=None, category_id=category_id)
+
+                new_completion = completion
+                while split_chat and (split_chat[0] != DEFAULT_PROMPT_PLACEHOLDER or (start_instr_of_chat and split_chat[0] != start_instr_of_chat)):
+                    new_completion += split_chat.pop(0)
+                
+                # remove the duplicated eos tokens from new_completion as we will add it later
+                new_completion = new_completion.replace(self.tokenizer.eos_token, '')
+
+                new_completion, new_prompt = self._add_space_separator(new_completion, new_prompt)
+                tokens += self.tokenize(completion=new_completion, prompt=new_prompt, category_id=category_id)
 
                 if self.attention_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and len(tokens) > 0:
                     tokens[-1].make_article_boundary()
@@ -292,9 +307,15 @@ class ArticleTokenizer:
                     tokenized_article = TokenizedArticle(tokens)
                     tokenized_articles.append(tokenized_article)
                     tokens = []
+                
+                # Reset.
+                new_prompt = ''
+                new_completion = ''
             else:
+                # Should not reach here
+                raise ValueError(f"Invalid token {token}")
                 # Take care of the case where the chat template introduces additional tokens.
-                tokens += self.tokenize(completion=token, prompt=None, category_id=category_id)
+                # tokens += self.tokenize(completion=token, prompt=None, category_id=category_id)
 
         if len(tokens) > 0:
             tokens[-1].make_article_boundary()
