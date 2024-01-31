@@ -91,6 +91,7 @@ class ArticleTokenizer:
             category_to_id: Dictionary that maps category string names to IDs.
             prompt_prefix: text to add before the prompt, for chatML conventions use.
             prompt_postfix: text to add before the prompt, for chatML conventions use.
+            apply_chat_template: If true, apply the chat template to the input jsonl before tokenizing.
 
         Example:
             >>> input_text = [
@@ -150,7 +151,8 @@ class ArticleTokenizer:
     def process_jsonl_with_chat_template(self, jsonl: List[dict]) -> List[TokenizedArticle]:
         """Tokenize a loaded jsonl with the chat template applied and store in a TokenizedArticle object.
 
-        This function processes a list of JSONL (JSON Lines text format) data and converts it into a chat template format.
+        This function processes a list of JSONL (JSON Lines text format) data and
+        converts it into a chat template format.
         It then tokenizes the chat and returns a list of tokenized articles based on self.BoundaryType.
         If self.packing_boundary is BoundaryType.PROMPT_COMPLETION_PAIR, then each tokenized article
         will contain a single tokenized prompt completion pair from the original jsonl.
@@ -164,10 +166,9 @@ class ArticleTokenizer:
             or [{"prompt":"...", "completion":"..."}, {"prompt":"...", "completion":"..."}, ...]
 
         Returns:
-            List[dict]: Tokenized articles that represent input jsonl.
+            List[TokenizedArticle]: Tokenized articles that represent input jsonl.
             A list of dictionaries where each dictionary represents a tokenized article.
         """
-
         if isinstance(jsonl, dict):
             jsonl = [jsonl]
 
@@ -175,14 +176,18 @@ class ArticleTokenizer:
         prompts = []
         completions = []
 
-        # TODO: Add a trick here to get the generation_prompt in tokenizer
-        # This is a temporary solution, and the tokenizer should be modified in the future.
-        # The tokenizer should be able to get the generation_prompt from the input text.
-        # self.tokenizer.chat_template = "{% for message in messages %} {{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}"
+        """
+        TODO: Add a trick here to get the generation_prompt in tokenizer
+        This is a temporary solution, and the tokenizer should be modified in the future.
+        The tokenizer should be able to get the generation_prompt from the input text.
+        self.tokenizer.chat_template = "{% for message in messages %} {{'<|im_start|>' + message['role'] + '\n' +
+            message['content'] + '<|im_end|>' + '\n'}}{% endfor %}"
+        """
 
         """
         The mechanism designed here is to remember the original prompt and completion,
-        despite the transformation of the [prompt, completion] pair into a raw string format with additional instruction tokens.
+        despite the transformation of the [prompt, completion] pair into a raw string
+          format with additional instruction tokens.
 
         The following steps are performed:
         1. Recognizes and preserves the original dialogue data format. (<prompt_placeholder>, <completion_placeholder>)
@@ -208,7 +213,8 @@ class ArticleTokenizer:
             completions.append(completion)
 
         if len(prompts) != len(completions):
-            err_msg = f"Number of prompts and completions must be equal, {len(prompts)} prompts and {len(completions)} completions found"
+            err_msg = f"Number of prompts and completions must be equal, \
+             {len(prompts)} prompts and {len(completions)} completions found"
             raise ValueError(err_msg)
 
         if len(prompts) != len(jsonl):
@@ -220,7 +226,8 @@ class ArticleTokenizer:
         converted_jsonl.clear()
 
         """
-        Align the formatted chat with the original jsonl and convert it back to the [Prompt, Completion] format in the following steps.
+        Align the formatted chat with the original jsonl and convert it back to the [Prompt, Completion]
+          format in the following steps.
         """
         pattern = rf"({DEFAULT_PROMPT_PLACEHOLDER}|{DEFAULT_COMPLETION_PLACEHOLDER})"
         split_chat = re.split(pattern, formatted_chat)
@@ -256,7 +263,8 @@ class ArticleTokenizer:
         new_completion = ""
 
         """
-        Automatic conversion back to [prompt, completion] format, especially if prompt_loss_weight is set during the training phase.
+        Automatic conversion back to [prompt, completion] format, especially if prompt_loss_weight
+        is set during the training phase.
         1. For standard prompt and completion tokens, the existing pipeline is retained.
         2. Tokens introduced by the chat template are classified as completion tokens.
         """
