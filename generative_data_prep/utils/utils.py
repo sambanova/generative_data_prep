@@ -249,7 +249,8 @@ def data_prep_arg_builder(parser: argparse.ArgumentParser):
         action="store_true",
         help="If you want to apply the chat template to your data, include this flag. \
         The chat template is a template that is applied to the data to make it more conversational \
-        which includes a role, like “user” or “assistant”, as well as message text.",  # noqa: E251
+        which includes a role, like “user” or “assistant”, as well as message text. \
+        This chat template will be extracted from tokenizer.apply_chat_template.",
     )
 
 
