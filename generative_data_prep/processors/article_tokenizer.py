@@ -196,15 +196,15 @@ class ArticleTokenizer:
                 {"role": "user", "content": "Hello, how are you?"}, {"role": "assistant", "content": "I'm doing great."}
         """
         for prompt_completion in jsonl:
-            if self.prompt_keyword not in prompt_completion:
-                err_msg = f"Prompt keyword required in every jsonl, {self.prompt_keyword} not found"
-                raise json.JSONDecodeError(err_msg, str(jsonl), 0)
+            # if self.prompt_keyword not in prompt_completion:
+            #     err_msg = f"Prompt keyword required in every jsonl, {self.prompt_keyword} not found"
+            #     raise json.JSONDecodeError(err_msg, str(jsonl), 0)
 
             if self.completion_keyword not in prompt_completion:
                 err_msg = f"Completion keyword required in every jsonl, {self.completion_keyword} not found"
                 raise json.JSONDecodeError(err_msg, str(jsonl), 0)
 
-            prompt = prompt_completion[self.prompt_keyword]
+            prompt = prompt_completion[self.prompt_keyword] if self.prompt_keyword in prompt_completion else ""
             completion = prompt_completion[self.completion_keyword]
             converted_jsonl.append({"role": "user", "content": DEFAULT_PROMPT_PLACEHOLDER})
             converted_jsonl.append({"role": "assistant", "content": DEFAULT_COMPLETION_PLACEHOLDER})
