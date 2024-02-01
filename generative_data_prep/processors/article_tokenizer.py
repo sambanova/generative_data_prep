@@ -221,6 +221,10 @@ class ArticleTokenizer:
             err_msg = f"Number of prompts and jsonl must be equal, {len(prompts)} prompts and {len(jsonl)} jsonl found"
             raise ValueError(err_msg)
 
+        if not hasattr(self.tokenizer, "apply_chat_template"):
+            err_msg = "The tokenizer does not have 'apply_chat_template' method defined."
+            raise ValueError(err_msg)
+
         # Apply specified chat templates using tokenizer (apply_chat_template) without tokenization.
         formatted_chat = self.tokenizer.apply_chat_template(converted_jsonl, tokenize=False)
         converted_jsonl.clear()
