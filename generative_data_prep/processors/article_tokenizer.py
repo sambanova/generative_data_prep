@@ -148,7 +148,7 @@ class ArticleTokenizer:
             self.metrics.completion_tokens += seq.completion_tokens
             self.metrics.padding_tokens += seq.pad_tokens
 
-    def process_jsonl_with_chat_template(self, jsonl: List[dict]) -> List[TokenizedArticle]:
+    def process_jsonl_with_chat_template(self, jsonl: Union[dict, List]) -> List[TokenizedArticle]:
         """Tokenize a loaded jsonl with the chat template applied and store in a TokenizedArticle object.
 
         This function processes a list of JSONL (JSON Lines text format) data and
@@ -160,7 +160,7 @@ class ArticleTokenizer:
         the tokenized text from all the prompt completion pairs in the jsonl.
 
         Args:
-            jsonl (List[dict]): A list of dictionaries where each dictionary represents a JSONL data item.
+            jsonl (Union[dict, List]): A list of dictionaries where each dictionary represents a JSONL data item.
             Each dictionary should contain 'prompt' and 'completion' keys.
             The loaded input jsonl, in the form of {"prompt":"...", "completion":"..."}
             or [{"prompt":"...", "completion":"..."}, {"prompt":"...", "completion":"..."}, ...]
