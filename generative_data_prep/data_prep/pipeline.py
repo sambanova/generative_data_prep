@@ -19,15 +19,18 @@ Data preparation pipeline for converting a jsonl file to tokenized hdf5 files co
 import concurrent.futures
 import json
 import logging
+import multiprocessing
 import os
 import random
 import shutil
+import time
 from sys import platform
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
 import psutil
 import yaml
+from alive_progress import alive_bar
 from transformers import PretrainedConfig, PreTrainedTokenizerBase
 
 from generative_data_prep.data_prep import data_prep_main
@@ -122,7 +125,32 @@ def rename_files(
             os.rename(os.path.join(split_dir, new_name), os.path.join(test_dir, new_name))
         else:
             files_to_tokenize.append(new_name)
+
+        if os.path.exists(new_file_path) and os.path.getsize(new_file_path) <= 0:
+            raise ValueError(
+                """The number of total splits exceeds the number of
+        lines in the input path jsonl file. Please reduce the number
+        of splits, or increase the number of lines in the dataset."""
+            )
     return files_to_tokenize
+
+
+def estimate_total_num_articles(files_to_tokenize, split_dir):
+    """Estimates the total number of articles based on number of artiles in first split times number of splits.
+
+    Args:
+        files_to_tokenize: List of files to tokenize.
+        split_dir: Directory where the split files are located.
+
+    Returns:
+        Estimate of the total number of articles needed to tokenize
+    """
+    lines_per_file = 0
+    with open(os.path.join(split_dir, files_to_tokenize[0]), "r") as file:
+        for _ in file:
+            lines_per_file += 1
+
+    return lines_per_file * len(files_to_tokenize)
 
 
 def get_split_counts(
@@ -237,6 +265,7 @@ def multiprocess_data_prep(  # noqa: C901
         tokenizer: The tokenizer to use for tokenizing text.
         num_workers: Number of workers to use for multiprocessing
         input_file_size_in_gb: Size of the input file in gigabytes.
+        category_to_id: Dictionary that maps category names to ids.
         prompt_prefix: text to add before the prompt, for chatML conventions use.
         prompt_postfix: text to add after the prompt, for chatML conventions use.
 
@@ -259,83 +288,118 @@ def multiprocess_data_prep(  # noqa: C901
     )
     train_hdf5_files = list(filter(lambda file_name: "train" in file_name, sub_output_file_paths))
     dev_hdf5_files = list(filter(lambda file_name: "dev" in file_name, sub_output_file_paths))
-
-    data_prep_main_args_list = []
+    total_num_articles = estimate_total_num_articles(files_to_tokenize, split_dir)
+    # create manager for shared variables to keep track of tokenization progress
+    manager = multiprocessing.Manager()
+    num_tokenized_articles_lock = manager.Lock()
+    num_tokenized_articles = manager.Value(int, 0)
+    prev_num_tokenized_articles = 0
+    # Submit multiprocessing workers
+    executor = concurrent.futures.ProcessPoolExecutor(max_workers=num_workers)
+    futures = []
     for input_file_path, output_file_path in zip(sub_input_file_paths, sub_output_file_paths):
         dataset_type = None
         if output_file_path in train_hdf5_files:
             dataset_type = "train"
         elif output_file_path in dev_hdf5_files:
             dataset_type = "dev"
-        data_prep_main_args_list.append(
-            (
-                True,
-                tokenizer,
-                input_file_path,
-                output_file_path,
-                max_seq_length,
-                input_packing_config,
-                packing_boundary,
-                attention_boundary,
-                disable_space_separator,
-                keep_prompt_only_sequences,
-                prompt_keyword,
-                completion_keyword,
-                category_to_id,
-                prompt_prefix,
-                prompt_postfix,
-                dataset_type,
+        futures.append(
+            executor.submit(
+                data_prep_main_helper,
+                (
+                    True,
+                    tokenizer,
+                    input_file_path,
+                    output_file_path,
+                    max_seq_length,
+                    input_packing_config,
+                    packing_boundary,
+                    attention_boundary,
+                    disable_space_separator,
+                    keep_prompt_only_sequences,
+                    prompt_keyword,
+                    completion_keyword,
+                    num_tokenized_articles,
+                    num_tokenized_articles_lock,
+                    category_to_id,
+                    prompt_prefix,
+                    prompt_postfix,
+                    dataset_type,
+                ),
             )
         )
 
-    futures = []
-    with concurrent.futures.ProcessPoolExecutor(max_workers=num_workers) as executor:
-        futures = [executor.submit(data_prep_main_helper, args) for args in data_prep_main_args_list]
-
-    # if one process fails with an exception such as a RuntimeError, all other processes will fail with a
-    # BrokenProcessPool exception.  In such a situation we only want to show the user the RuntimeError.  We only want
-    # to show the user the BrokenProcessPool exception if all failing processes failed with this error.  This
-    # is why we have this complicated logic below.
     broken_process_indices = []
     broken_process_pool_exc: Optional[BaseException] = None
     metrics = Metrics()
     max_batch_size_train = None
     max_batch_size_dev = None
-    # search for any "interesting" exception (a non-BrokenProcessPool Exception)
-    for i, future in enumerate(futures):
-        try:
-            indiv_metric = future.result()
-            if indiv_metric.dataset_type == "train":
-                if max_batch_size_train is None:
-                    max_batch_size_train = indiv_metric.sequences
-                else:
-                    max_batch_size_train = min(max_batch_size_train, indiv_metric.sequences)
-            elif indiv_metric.dataset_type == "dev":
-                if max_batch_size_dev is None:
-                    max_batch_size_dev = indiv_metric.sequences
-                else:
-                    max_batch_size_dev = min(max_batch_size_dev, indiv_metric.sequences)
-            metrics += indiv_metric
-        except Exception as exc:
-            if isinstance(exc, concurrent.futures.process.BrokenProcessPool):
-                broken_process_indices.append(str(i))
-                broken_process_pool_exc = exc
-            else:
-                log_sep_str()
-                err_msg_1 = f"Process {i} failed with the exception below."
-                err_msg_2 = "If the error is a MemoryError, reduce the number of workers to limit your RAM usage."
-                LOGGER.error(f"\n\n{err_msg_1}\n{err_msg_2}")
-                raise exc from None
-    # if no "interesting" exceptions are found, raise the BrokenProcessPool Exception
-    if len(broken_process_indices) > 0:
-        log_sep_str()
-        LOGGER.error(f'\n\nProcesses {", ".join(broken_process_indices)} failed with the following exception:')
-        assert broken_process_pool_exc is not None  # nosec: B101
-        raise broken_process_pool_exc from None
+    tokenization_start_time = time.time()
+    finished_futures = set()
+    # Loop while processes are running, update progress bar.
+    with alive_bar(total_num_articles) as bar:
+        while True:
+            for i, future in enumerate(futures):
+                if future.done() and future not in finished_futures:
+                    try:
+                        indiv_metric = future.result()
+                        if indiv_metric.dataset_type == "train":
+                            if max_batch_size_train is None:
+                                max_batch_size_train = indiv_metric.sequences
+                            else:
+                                max_batch_size_train = min(max_batch_size_train, indiv_metric.sequences)
+                        elif indiv_metric.dataset_type == "dev":
+                            if max_batch_size_dev is None:
+                                max_batch_size_dev = indiv_metric.sequences
+                            else:
+                                max_batch_size_dev = min(max_batch_size_dev, indiv_metric.sequences)
+                        metrics += indiv_metric
+                        finished_futures.add(future)
+                    except Exception as exc:
+                        if isinstance(exc, concurrent.futures.process.BrokenProcessPool):
+                            broken_process_indices.append(str(i))
+                            broken_process_pool_exc = exc
+                        else:
+                            # If any process fails with NOT a BrokenProcessPool, show this error instead.
+                            log_sep_str()
+                            err_msg_1 = f"Process {i} failed with the exception below."
+                            err_msg_2 = (
+                                "If the error is a MemoryError, reduce the number of workers to limit your RAM usage."
+                            )
+                            LOGGER.error(f"\n\n{err_msg_1}\n{err_msg_2}")
+                            raise exc from None
+                        # if no "interesting" exceptions are found, raise the BrokenProcessPool Exception
+                        if len(broken_process_indices) > 0:
+                            log_sep_str()
+                            LOGGER.error(
+                                f'\n\nProcesses {", ".join(broken_process_indices)} failed with the exception:'
+                            )
+                            assert broken_process_pool_exc is not None  # nosec: B101
+                            raise broken_process_pool_exc from None
+            # If all the processes are done, break the loop
+            if all(future.done() for future in futures):
+                if len(finished_futures) != len(futures):
+                    raise ValueError("All futures done, but finished futures set does not equal all futures list.")
+                break
+            # Update the progress bar with how every many new articles were tokenized
+            with num_tokenized_articles_lock:
+                num_new_tokenized_articles = num_tokenized_articles.value - prev_num_tokenized_articles
+                bar(num_new_tokenized_articles)
+                perc_complete = round((bar.current / total_num_articles) * 100, 2)
+                elapsed_time_str = f"--- elapsed time: {time.time() - tokenization_start_time}"
+                LOGGER.debug(
+                    f"{total_num_articles}, {perc_complete}% complete => Time remaining: {bar.eta} {elapsed_time_str}"
+                )
+                prev_num_tokenized_articles = num_tokenized_articles.value
+
+            time.sleep(5)
 
     if dataset_metadata_json is not None:
         dataset_metadata_json["max_batch_size_train"] = max_batch_size_train
         dataset_metadata_json["max_batch_size_dev"] = max_batch_size_dev
+
+    executor.shutdown()
+    manager.shutdown()
 
     return train_hdf5_files, dev_hdf5_files, metrics
 
@@ -433,6 +497,19 @@ def pipeline_main(  # noqa: C901
         dev_ratio,
         test_ratio,
     )
+
+    num_splits_greater_lines = False
+    with open(input_file_path, "r") as input_file:
+        for i, line in enumerate(input_file):
+            if i > num_splits:
+                num_splits_greater_lines = True
+                break
+    if not num_splits_greater_lines:
+        raise ValueError(
+            """The number of total splits exceeds the number of
+        lines in the input path jsonl file. Please reduce the number
+        of splits, or increase the number of lines in the dataset."""
+        )
     dataset_metadata_json["number_of_training_files"] = train_count
     dataset_metadata_json["number_of_dev_files"] = dev_count
     dataset_metadata_json["number_of_test_files"] = test_count
@@ -553,6 +630,7 @@ def pipeline_main(  # noqa: C901
         prompt_prefix,
         prompt_postfix,
     )
+
     log_sep_str()
     LOGGER.info(f"Tokenization is complete, the output dataset is located at: {output_dir}")
 

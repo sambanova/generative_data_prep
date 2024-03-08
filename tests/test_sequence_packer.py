@@ -39,19 +39,20 @@ def packing_config(packing_style: PackingStyleType, overflow_type: OverflowType)
 
 
 @pytest.fixture
-def sequence_packer(max_seq_length: int, eos_token_id: int, packing_config: PackingConfig) -> SequencePacker:
+def sequence_packer(max_seq_length: int, pad_token_id: int, packing_config: PackingConfig) -> SequencePacker:
     """Create the sequence packer."""
-    return SequencePacker(max_seq_length, eos_token_id, packing_config, Metrics())
+    return SequencePacker(max_seq_length, pad_token_id, packing_config, Metrics())
 
 
 @pytest.mark.parametrize(
-    "length,max_seq_length,eos_token_id,packing_style,overflow_type,length_2,max_seq_length_2,eos_token_id_2,\
+    "length,max_seq_length,pad_token_id,eos_token_id,packing_style,overflow_type,length_2,max_seq_length_2,eos_token_id_2,\
         expected_token_ids",
     [
-        (3, 5, -1, PackingStyleType.SINGLE, OverflowType.DROP, 6, None, None, []),
+        (3, 5, -1, -1, PackingStyleType.SINGLE, OverflowType.DROP, 6, None, None, []),
         (
             3,
             5,
+            -1,
             -1,
             PackingStyleType.SINGLE,
             OverflowType.TRUNCATE_LEFT,
@@ -63,6 +64,7 @@ def sequence_packer(max_seq_length: int, eos_token_id: int, packing_config: Pack
         (
             3,
             5,
+            -1,
             -1,
             PackingStyleType.SINGLE,
             OverflowType.TRUNCATE_RIGHT,
@@ -89,7 +91,7 @@ def test_handle_overflow(
 
 @pytest.mark.fast
 @pytest.mark.parametrize(
-    "max_seq_length,eos_token_id,packing_style,overflow_type,article_lengths,expected",
+    "max_seq_length,pad_token_id,packing_style,overflow_type,article_lengths,expected",
     [
         (
             5,
@@ -161,7 +163,7 @@ def test_handle_overflow(
 def test_sequence_packer(
     sequence_packer: SequencePacker,
     max_seq_length: int,
-    eos_token_id: int,
+    pad_token_id: int,
     article_lengths: List[int],
     expected: List[Tuple[int, int]],
 ):
@@ -192,4 +194,4 @@ def test_sequence_packer(
         for i in range(num_compl_tokens):
             assert sequence.tokens[i].token_type_id == TokenTypeIds.COMPLETION.value
         for i in range(num_pad_tokens):
-            assert sequence.tokens[i + num_compl_tokens] == Token(eos_token_id, TokenTypeIds.PADDING)
+            assert sequence.tokens[i + num_compl_tokens] == Token(pad_token_id, TokenTypeIds.PADDING)

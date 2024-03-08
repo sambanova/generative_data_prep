@@ -61,7 +61,7 @@ def article_tokenizer(
         prompt_postfix=prompt_postfix,
     )
     monkeypatch.setattr(article_tokenizer, "eos_token_id", EOS_TOKEN_ID)
-    monkeypatch.setattr(article_tokenizer.packer, "eos_token_id", EOS_TOKEN_ID)
+    monkeypatch.setattr(article_tokenizer.packer, "pad_token_id", EOS_TOKEN_ID)
     return article_tokenizer
 
 
@@ -82,7 +82,7 @@ def article_tokenizer_for_prompt_sequences(
         keep_prompt_only_sequences=keep_prompt_only_sequences,
     )
     monkeypatch.setattr(article_tokenizer, "eos_token_id", EOS_TOKEN_ID)
-    monkeypatch.setattr(article_tokenizer.packer, "eos_token_id", EOS_TOKEN_ID)
+    monkeypatch.setattr(article_tokenizer.packer, "pad_token_id", EOS_TOKEN_ID)
     return article_tokenizer
 
 

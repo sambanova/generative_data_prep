@@ -117,7 +117,10 @@ class ArticleTokenizer:
         self.completion_keyword = completion_keyword
         self.eos_token_id = tokenizer.eos_token_id
         self.metrics = Metrics()
-        self.packer = SequencePacker(max_seq_length, self.eos_token_id, packing_config, self.metrics)
+        pad_token_id = getattr(tokenizer, "pad_token_id", None)
+        if pad_token_id is None:
+            pad_token_id = tokenizer.eos_token_id
+        self.packer = SequencePacker(max_seq_length, pad_token_id, packing_config, self.metrics)
         self.prompt_prefix = prompt_prefix
         self.prompt_postfix = prompt_postfix
         transformers_logging.set_verbosity_error()
@@ -331,10 +334,33 @@ class ArticleTokenizer:
             if self.prompt_postfix:
                 prompt = prompt + self.prompt_postfix
             prompt_token_ids = self.tokenizer.encode(prompt)
+            # If there is an EOS token at the end of the prompt then remove it
+            if (
+                hasattr(self.tokenizer, "eos_token_id")
+                and prompt_token_ids[-1] == self.tokenizer.eos_token_id
+                and len(prompt_token_ids) >= 1
+            ):
+                prompt_token_ids = prompt_token_ids[:-1]
             tokens += list(map(lambda x: Token(x, TokenTypeIds.PROMPT, category_id), prompt_token_ids))
 
         if completion:
             completion_token_ids = self.tokenizer.encode(completion)
+            # If there is a BOS token at the begining of the completion then remove it
+            # Only remove it if there are prompt tokens
+            if (
+                hasattr(self.tokenizer, "bos_token_id")
+                and completion_token_ids[0] == self.tokenizer.bos_token_id
+                and (prompt and len(prompt_token_ids) >= 0)
+                and len(completion_token_ids) >= 1
+            ):
+                completion_token_ids = completion_token_ids[1:]
+            # If there is an EOS token at the end of completion then remove it
+            if (
+                hasattr(self.tokenizer, "eos_token_id")
+                and completion_token_ids[-1] == self.tokenizer.eos_token_id
+                and len(completion_token_ids) >= 1
+            ):
+                completion_token_ids = completion_token_ids[:-1]
             tokens += list(map(lambda x: Token(x, TokenTypeIds.COMPLETION, category_id), completion_token_ids))
 
         if len(tokens) >= 1:
