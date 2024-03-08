@@ -43,6 +43,13 @@ Local Environment Setup
     .. code-block::
 
         pipenv run pip install -e .
+        pipenv --help  # For help with all "pipenv" commands
+        # For dev environment
+        pipenv install
+        # For production environment
+        pipenv sync
+        # You can provide specific categories defined in "Pipfile" if you wish
+        pipenv install --categories=packages,build-packages,dev-packages,docs-packages,tests-packages
         pipenv sync --categories=default,build-packages,dev-packages,docs-packages,tests-packages
         pipenv --help
 
