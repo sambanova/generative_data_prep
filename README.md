@@ -98,7 +98,11 @@ To do this, include flags from only one of the two options below, only use one o
 - To specify the number of training splits and test splits directly, use the three flags `--num_training_splits=...`, `--num_dev_splits=...` and `--num_test_splits=...`
 - To specify the percentage of the data heldout for testing, you can specify `--dev_ratio=...` and `--test_ratio=0.1`, where 0.1 means that approximately 10% of the data will be included in the test splits. You can also specify the `--num_training_splits=...` flag to control the total number of training splits, but we recommend to let this default.
 
-### Flags
+### Key Flags
+
+- max_seq_length
+
+### All Flags
 <details>
   <summary>CLICK HERE to see flags</summary>
 
