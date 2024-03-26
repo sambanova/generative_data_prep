@@ -122,12 +122,16 @@ vocab_size: 50257
 Here you can see that `max_batch_size_train` is 7, so the batch size hyper-parameter setting cannot be greater than 7.
 
 #### Explanation
+<details>
+With a sufficiently large dataset, you are generally fine with the defaults here and can ignore. However, when the provided dataset is small (think ~1000 data points or less), you need to make sure you are setting the above values correctly or else you will likely run into a training error.
 
-The dataset that you are providing will be split up across multiple hdf5 files based on the input parameters of the `pipeline` command.
+<br /> The dataset that you are providing will be split up across multiple hdf5 files based on the input parameters of the `pipeline` command.
 
 * `max_seq_length` - The maximum sequence length the model you are using can take for a single data point. 
 * `input_packing_config` - Determines how to pack the provided data into sequences that will be split across the hdf5 files for training. See more in the flags section.
 
+Based on the size and strucutre of the dataset provided + these parameter settings, a different `max_batch_size_train` will be shown in the `metadata.yaml` which dictates how large you can set the corresponding training hyper-parameter setting when you kick off a model training job!
+</details>
 
 ### All Flags
 <details>
