@@ -24,7 +24,7 @@ This software package is designed for preparing data that can be used to train g
 - [Introduction](#introduction)
 - [Input format](#input-format)
 - [End to end data preparation](#end-to-end-data-preparation)
-    - [Input Flags](#all-flags)
+    - [Input Flags](#flags)
 - [Tokenizing one file](#tokenizing-one-file)
     - [Input Flags](#tokenize-one-file-flags)
 - [Running tests](#running-tests)
@@ -133,7 +133,7 @@ With a sufficiently large dataset, you are generally fine with the defaults here
 Based on the size and strucutre of the dataset provided + these parameter settings, a different `max_batch_size_train` will be shown in the `metadata.yaml` which dictates how large you can set the corresponding training hyper-parameter setting when you kick off a model training job!
 </details>
 
-### All Flags
+### Flags
 <details>
   <summary>CLICK HERE to see flags</summary>
 
