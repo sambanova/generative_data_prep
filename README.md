@@ -24,7 +24,7 @@ This software package is designed for preparing data that can be used to train g
 - [Introduction](#introduction)
 - [Input format](#input-format)
 - [End to end data preparation](#end-to-end-data-preparation)
-    - [Input Flags](#flags)
+    - [Input Flags](#all-flags)
 - [Tokenizing one file](#tokenizing-one-file)
     - [Input Flags](#tokenize-one-file-flags)
 - [Running tests](#running-tests)
@@ -55,7 +55,7 @@ The `generative_data_prep/data_prep/data_prep.py` script is used for tokenizing 
 
 ## Input format
 
-Each line in the input file must be either plain text or [jsonline](https://jsonlines.org/). if the jsonline has different keywords, refer to the `prompt_keyword`, and `completion_keyword` flag documentation below.
+Each line in the input file must be either plain text or [jsonline](https://jsonlines.org/). If the jsonline has different keywords, refer to the `prompt_keyword`, and `completion_keyword` flag documentation below.
 
 Each line in the input file can be formatted as one of the following:
 - Plain text
@@ -98,13 +98,27 @@ To do this, include flags from only one of the two options below, only use one o
 - To specify the number of training splits and test splits directly, use the three flags `--num_training_splits=...`, `--num_dev_splits=...` and `--num_test_splits=...`
 - To specify the percentage of the data heldout for testing, you can specify `--dev_ratio=...` and `--test_ratio=0.1`, where 0.1 means that approximately 10% of the data will be included in the test splits. You can also specify the `--num_training_splits=...` flag to control the total number of training splits, but we recommend to let this default.
 
-### Flags
+### Key Flags
+
+Here are the key flags to know and set when getting started with data prep:
+
+|          Flag Name          | Type | Description | Instructions |
+|             ---             | ---  |     ---     |      ---     |
+|   `input_file_path`         |  str | An existing file path to the dataset to be processed. File must be in `.jsonl` or `.txt` format.   |      |
+|   `output_path`             |  str | A path to the desired output location for the directory of processed dataset files. If the path doesn't exist, a new directory will be created using the provided path.   |   Processed datasets consist of multiple files under an output directory. If I want my output directory to be named `out`, I could put the path `/Users/johndoe/Documents/datasets/dataset_name/out` for example.  |
+|   `pretrained_tokenizer`    |  str | The tokenizer to use when tokenizing the input dataset. The tokenizers are model specific and can be found on HuggingFace.      |  You can get this value by copying the model path available on the HuggingFace model card. I.e. For Llama-2-7b-hf I would put `"meta-llama/Llama-2-7b-hf"`  |
+|   `max_seq_length`          |  int | The max size of input sequence a model can support. This is model specific - i.e. for `GPT-2` it's __1024__, for `Llama-2` it's __4096__.  |   You can find this information in a few places, but a place you can consistently find this value is in the `config.json` file under the HuffingFace model's File's and Versions tab. Then grab the value for `max_position_embeddings`.  |
+
+
+### All Flags
+Expland the list below to see the full list of flags and their explanations.
+
 <details>
   <summary>CLICK HERE to see flags</summary>
 
 | Flag Name  | Type | Default | Options | Description |
 | --- | --- | --- | --- | --- |
-| `input_file_path`  | str | REQUIRED | Any existing file path | Path to the input dataset which must be in jsonline format, where each line is of the form specified in [Input Format](#input-format).|
+| `input_file_path`  | str | REQUIRED | Any existing file path | Path to the input dataset which must be in `.jsonl` or `.txt` format. If dataset is in `.jsonl` format, the dataset needs to conform to the structure specified in [Input Format](#input-format).|
 | `output_path` | str | `input_file_path`'s directory | Any valid directory path | The directory to store the output files |
 | `log_file_path` | str | `output_path`/logs.log | Any valid file path | The file to save the logs in, this will save the date and time, git commit hash, input arguments and metrics associated with the dataset. |
 | `overwrite_output_path` | bool | False | Include flag for True, no arguments | Permission to delete and overwrite files in `output_path`. |
