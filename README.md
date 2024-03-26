@@ -24,6 +24,7 @@ This software package is designed for preparing data that can be used to train g
 - [Introduction](#introduction)
 - [Input format](#input-format)
 - [End to end data preparation](#end-to-end-data-preparation)
+    - [Key Flags](#key-flags)
     - [Input Flags](#all-flags)
 - [Tokenizing one file](#tokenizing-one-file)
     - [Input Flags](#tokenize-one-file-flags)
