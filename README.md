@@ -127,7 +127,7 @@ With a sufficiently large dataset, you are generally fine with the defaults here
 
 <br /> The dataset that you are providing will be split up across multiple hdf5 files based on the input parameters of the `pipeline` command.
 
-* `max_seq_length` - The maximum sequence length the model you are using can take for a single data point. 
+* `max_seq_length` - The maximum sequence length the model you are using can take for a single data point.
 * `input_packing_config` - Determines how to pack the provided data into sequences that will be split across the hdf5 files for training. See more in the flags section.
 
 Based on the size and strucutre of the dataset provided + these parameter settings, a different `max_batch_size_train` will be shown in the `metadata.yaml` which dictates how large you can set the corresponding training hyper-parameter setting when you kick off a model training job!
