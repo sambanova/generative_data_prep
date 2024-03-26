@@ -24,7 +24,7 @@ This software package is designed for preparing data that can be used to train g
 - [Introduction](#introduction)
 - [Input format](#input-format)
 - [End to end data preparation](#end-to-end-data-preparation)
-    - [Input Flags](#flags)
+    - [Input Flags](#all-flags)
 - [Tokenizing one file](#tokenizing-one-file)
     - [Input Flags](#tokenize-one-file-flags)
 - [Running tests](#running-tests)
@@ -98,9 +98,36 @@ To do this, include flags from only one of the two options below, only use one o
 - To specify the number of training splits and test splits directly, use the three flags `--num_training_splits=...`, `--num_dev_splits=...` and `--num_test_splits=...`
 - To specify the percentage of the data heldout for testing, you can specify `--dev_ratio=...` and `--test_ratio=0.1`, where 0.1 means that approximately 10% of the data will be included in the test splits. You can also specify the `--num_training_splits=...` flag to control the total number of training splits, but we recommend to let this default.
 
-### Key Flags
+### Dataset Size Requirements
+When preparing a dataset for training, different dataset sizes will dictate the maximum batch size you can set for training. It is *__necessary__* to know this maximum batch size so you can set it accordingly for your training job. 
 
-- max_seq_length
+#### How to Check and Set
+
+When kicking off a training job, you need to make sure that batch size hyper-parameter setting is __*no bigger*__ than the value of `max_batch_size_train` shown in the dataset `metadata.yaml` file.
+
+For example:
+```(shell)
+$ cat processed_data_directory/metadata.yaml
+
+max_batch_size_dev: null
+max_batch_size_train: 7
+max_seq_length: 1024
+number_of_dev_files: 0
+number_of_test_files: 0
+number_of_training_files: 32
+token_type_ids: true
+tokenizer_model_type: <class 'transformers.models.gpt2.configuration_gpt2.GPT2Config'>
+vocab_size: 50257
+```
+Here you can see that `max_batch_size_train` is 7, so the batch size hyper-parameter setting cannot be greater than 7.
+
+#### Explanation
+
+The dataset that you are providing will be split up across multiple hdf5 files based on the input parameters of the `pipeline` command.
+
+* `max_seq_length` - The maximum sequence length the model you are using can take for a single data point. 
+* `input_packing_config` - Determines how to pack the provided data into sequences that will be split across the hdf5 files for training. See more in the flags section.
+
 
 ### All Flags
 <details>
