@@ -15,28 +15,33 @@
 </a>
 
 # Generative data preparation
-This software package is designed for preparing data that can be used to train generative models. It offers an efficient way to convert input text files into tokenized sequences that are packed into a fixed sequence length. The resulting output directory can be directly used for training with SambaStudio. This package features many styles of packing text of any length into tokenized sequences, compressed HDF5 file outputs, efficient multiprocessing, shuffling any sized dataset, splitting your data into train/dev/test, and specifying what tokens are attended to during training.
+
+The [`pipeline.py`](https://github.com/sambanova/generative_data_prep/blob/main/generative_data_prep/data_prep/pipeline.py) script streamlines data preparation for machine learning model training. It takes a single input file, shuffles and splits it into train/dev/test files, and tokenizes, sequences, and converts them to HDF5 format using
+the utilities in [`data_prep.py`](https://github.com/sambanova/generative_data_prep/blob/main/generative_data_prep/data_prep/data_prep.py). The output directory contains multiple split HDF5 files that are needed to run data parallel training. This output directory will be directly used as a training dataset in SambaStudio. While this package features simple flows that work out of the box, it also supports more customization allowing for many styles of packing text of any length into tokenized sequences.
+
+</br>
 
 ## Table of contents
-- [Contributing](#Contributing)
-- [Installation](#installation)
 - [Requirements](#requirements)
-- [Introduction](#introduction)
-- [Input format](#input-format)
-- [End to end data preparation](#end-to-end-data-preparation)
-    - [Key Flags](#key-flags)
-    - [Input Flags](#all-flags)
-- [Tokenizing one file](#tokenizing-one-file)
-    - [Input Flags](#tokenize-one-file-flags)
-- [Running tests](#running-tests)
-- [Example use cases](#example-use-cases)
+- [Installation](#installation)
+- [Get Started](#end-to-end-data-preparation)
+- [Input](#input)
+- [Output](#output)
+- [Flags](#flags)
+- [Examples](#example-use-cases)
     - [Pretraining](#pretraining)
     - [Generative tuning](#generative-tuning)
     - [Dialogue](#dialogue)
     - [Meta in context learning](#meta-in-context-learning)
+- [Understanding Command Outputs](#understanding-outputs)
 
-## Contributing
-Please follow the [contribution guide](.github/CONTRIBUTING.rst).
+</br>
+
+## Requirements
+- Python version 3.9+, **only verified on python 3.9**
+- Support for Linux and Mac OS. Not tested on Windows
+
+</br>
 
 ## Installation
 ```
@@ -45,59 +50,51 @@ cd generative_data_prep
 pip install .
 ```
 
-## Requirements
-- Python version 3.9+, **only verified on python 3.9**
-- Support for linux and mac OS. Not tested on Windows
+</br>
 
-## Introduction
-The `generative_data_prep/data_prep/pipeline.py` script is designed to facilitate end-to-end data preparation for training machine learning models. This script takes a single [jsonline](https://jsonlines.org/) or text file as input, shuffles it, splits it into multiple train/dev/test files, then calls `generative_data_prep/data_prep/data_prep.py` on all the splits to tokenize the text, pack into fixed length sequences and convert to [HDF5 format](https://www.geeksforgeeks.org/hdf5-files-in-python/). The directory path passed in to this repo as `output_path` can be used directly as a training dataset.
+## Getting Started
 
-The `generative_data_prep/data_prep/data_prep.py` script is used for tokenizing a single [jsonline](https://jsonlines.org/) or text file, packing it into fixed length sequences and converting it to [HDF5 format](https://www.geeksforgeeks.org/hdf5-files-in-python/).  However, when training with SambaStudio, multiple split HDF5 files are needed to run data parallel training. Therefore, unless you already have multiple split input files that you want to tokenize directly, we recommend using the `pipeline.py` script for end-to-end data preparation.
+The following simple example will help you get started with your first processed dataset. Here are a few key parameters to know about when running this example:
 
-## Input format
-
-Each line in the input file must be either plain text or [jsonline](https://jsonlines.org/). If the jsonline has different keywords, refer to the `prompt_keyword`, and `completion_keyword` flag documentation below.
-
-Each line in the input file can be formatted as one of the following:
-- Plain text
-- `{"prompt": "", "completion": ""}`
-- `[{"prompt": "text...", "completion": "text..."}, {"prompt": "text...", "completion": "text..."}, {"prompt": "text...", "completion": "text..."}, ...]`
-
-
-## End to end data preparation
-The `generative_data_prep/data_prep/pipeline.py` script takes a single jsonline or text file as input, shuffles it, splits it into multiple train/dev/test, tokenizes the text, packs it into fixed sequence lengths and then converts it to HDF5 file format.
+|          Flag Name          | Type | Description | Instructions |
+|             ---             | ---  |     ---     |      ---     |
+|   `input_file_path`         |  str | An existing file path to the dataset to be processed. File must be in `.jsonl` or `.txt` format.   |  Check out the [input format](#input-format) section for more details.    |
+|   `output_path`             |  str | A path to the desired output location for the directory of processed dataset files. If the path doesn't exist, a new directory will be created using the provided path.   |   Processed datasets consist of multiple files under an output directory. If I want my output directory to be named `out`, I could put the path `/Users/johndoe/Documents/datasets/dataset_name/out` for example. Check out the [output](#output) section for more details. |
+|   `pretrained_tokenizer`    |  str | The tokenizer to use when tokenizing the input dataset. The tokenizers are model specific and can be found on HuggingFace.      |  You can get this value by copying the model path available on the HuggingFace model card. I.e. For Llama-2-7b-hf I would put `"meta-llama/Llama-2-7b-hf"`  |
+|   `max_seq_length`          |  int | The max size of input sequence a model can support. This is model specific - i.e. for `GPT-2` it's __1024__, for `Llama-2` it's __4096__.  |   You can find this information in a few places, but a place you can consistently find this value is in the `config.json` file under the HuffingFace model's File's and Versions tab. Then grab the value for `max_position_embeddings`.  |
 
 ### Example
 ```python
-python3 -m generative_data_prep pipeline --input_file_path=path_to_jsonl.jsonl --output_path=path_to_output_directory --pretrained_tokenizer=gpt2 --max_seq_length=1024 --shuffle=on_RAM
+python3 -m generative_data_prep pipeline --input_file_path=<PATH TO DATASET FILE> --output_path=<PATH TO OUTPUT DIRECTORY> --pretrained_tokenizer=gpt2 --max_seq_length=1024 --shuffle=on_RAM
 ```
 
-### Output
-The `output_path` will contain all the tokenized HDF5 split files, and a directory called `tokenizer`. The directory path that is passed in as the `output_path` flag is where the final dataset is saved that can be used as input data to upload and run training. The `tokenizer` directory will be transferred to any output checkpoints that are saved by Sambastudio so the tokenizer can be used for inference. If you include the `keep_split_jsonls` flag, then the `output_path` will additionally contain a `splits` directory that saves the jsonl versions of the HDF5 files, meaning that splits/train_1_of_X.jsonl is the jsonl text version of train_1_of_X.hdf5.
+</br>
 
-The output HDF5 files each contain two datasets:
-- \"input_ids\": sequences of tokens ids
-- \"token_type_ids\": describe the type of each token. The default id assignments are:
-  - id=0 for tokens in the prompt
-  - id=1 for tokens in the completion
-  - id=2 for \<eos\> tokens that serve as padding tokens (will not be trained to predict)
-  - id=3 for \<eos\> tokens at the end of articles, that define the attention boundary when training with article attention
+## Input
 
-### Holdout Evaluation Data
-To evaluate on a holdout set of data during training, pipeline.py can create splits of holdout evaluation data.
+The input file format must be either `.txt` or [`.jsonl`](https://jsonlines.org/)
 
-To do this, include flags from only one of the two options below, only use one option or the other. Please review the [Flags](#flags) section for in detail descriptions of these flags.
-- To specify the number of training splits and evaluation splits directly, use the three flags `--num_training_splits=...`, `--num_dev_splits=...` and `--num_test_splits=...`
-- To specify the percentage of the data heldout for evaluation, you can specify `--dev_ratio=0.1` and `--test_ratio=...`, where 0.1 means that approximately 10% of the data will be included in the evaluation splits. You can also specify the `--num_training_splits=...` flag to control the total number of training splits, but we recommend to let this default.
+### `.txt` Format
 
-All this evaluation data will saved under the `output_path`, if you want to run evaluation on the eval_splits during training you must enable `do_eval` on SambaStudio.
+This format should be used for pre-training or continual pretraining. With text files we use all sequences as completions, so all processed sequences end up having empty prompts in the prompt/completion pair. For example:
 
-### Holdout Test Data
-To create a holdout set of test data that is not tokenized, pipeline.py can create these splits and will leave the data un-tokenized and save it in the `output_path/test` directory. This data is left in jsonl text format because running evaluation or inference usually requires text inputs instead of tokenized inputs.
+```
+{"prompt": "", "completion": "The quick brown fox jumped over the lazy dog"}
+```
 
-To do this, include flags from only one of the two options below, only use one option or the other. Please review the [Flags](#tokenize-one-file-flags) section for in detail descriptions of these flags.
-- To specify the number of training splits and test splits directly, use the three flags `--num_training_splits=...`, `--num_dev_splits=...` and `--num_test_splits=...`
-- To specify the percentage of the data heldout for testing, you can specify `--dev_ratio=...` and `--test_ratio=0.1`, where 0.1 means that approximately 10% of the data will be included in the test splits. You can also specify the `--num_training_splits=...` flag to control the total number of training splits, but we recommend to let this default.
+When processing text files, each line should be considered a *"data point"*. Depending on the `input_packing_config` parameter, these *"data points"* will be processed (and possibly combined) into sequences that are put in the **completion**. There is more information on the `input_packing_config` [below](#input_packing_config).
+
+### `.jsonl` Format
+
+The JSON Lines format can be used for generative tuning (or fine-tuning), pre-training, and continual pre-training. Each line in the `.jsonl` format should be a json object with a `prompt`, and `completion` element. For example:
+
+```
+{"prompt": "What did the fox do?", "completion": "The quick brown fox jumped over the lazy dog."}
+{"prompt": "How much wood does a woodchuck chuck?", "completion": "A woodchuck chucks 1000 wood."}
+{"prompt": "Who sells seashells by the sea shore?", "completion": "She sells seashells by the sea shore."}
+```
+
+If the JSON objects in your `.jsonl` contain keywords other than **prompt** and **completion**, refer to the `prompt_keyword` and `completion_keyword` flags [below](#prompt_keyword)
 
 ### Dataset Size Requirements
 When preparing a dataset for training, different dataset sizes will dictate the maximum batch size you can set. Not all models expose the `batch_size` parameter, however for those that do, it is *__very important__* to know this maximum batch size and set `batch_size` accordingly.
@@ -134,22 +131,53 @@ With a sufficiently large dataset, you are generally fine with the defaults and 
 Based on the size and strucutre of the dataset provided + these parameter settings, a different `max_batch_size_train` will be shown in `metadata.yaml` which dictates how large you can set the corresponding `batch_size` hyper-parameter setting when starting a model training job!
 </details>
 
-### Key Flags
+</br>
 
-Here are the key flags to know and set when getting started with data prep:
+## Output
+The `output_path` should be a directory that will contain all the tokenized HDF5 split files, and a directory called `tokenizer`. This directory constitutes a processed dataset and can be used for training a model after uploading to SambaStudio. The `tokenizer` directory will be transferred to any output checkpoints that are saved by Sambastudio for the tokenizer to be used for inference later on. 
 
-|          Flag Name          | Type | Description | Instructions |
-|             ---             | ---  |     ---     |      ---     |
-|   `input_file_path`         |  str | An existing file path to the dataset to be processed. File must be in `.jsonl` or `.txt` format.   |      |
-|   `output_path`             |  str | A path to the desired output location for the directory of processed dataset files. If the path doesn't exist, a new directory will be created using the provided path.   |   Processed datasets consist of multiple files under an output directory. If I want my output directory to be named `out`, I could put the path `/Users/johndoe/Documents/datasets/dataset_name/out` for example.  |
-|   `pretrained_tokenizer`    |  str | The tokenizer to use when tokenizing the input dataset. The tokenizers are model specific and can be found on HuggingFace.      |  You can get this value by copying the model path available on the HuggingFace model card. I.e. For Llama-2-7b-hf I would put `"meta-llama/Llama-2-7b-hf"`  |
-|   `max_seq_length`          |  int | The max size of input sequence a model can support. This is model specific - i.e. for `GPT-2` it's __1024__, for `Llama-2` it's __4096__.  |   You can find this information in a few places, but a place you can consistently find this value is in the `config.json` file under the HuffingFace model's File's and Versions tab. Then grab the value for `max_position_embeddings`.  |
+### Holdout Evaluation Data
+To evaluate on a holdout set of data during training, `pipeline.py` can create splits of holdout evaluation data.
 
+To do this, include flags from only one of the two options below, only use one option or the other. Please review the [Flags](#flags) section for in detail descriptions of these flags.
+- To specify the number of training splits and evaluation splits directly, use the three flags `--num_training_splits=...`, `--num_dev_splits=...` and `--num_test_splits=...`
+- To specify the percentage of the data heldout for evaluation, you can specify `--dev_ratio=0.1` and `--test_ratio=...`, where 0.1 means that approximately 10% of the data will be included in the evaluation splits. You can also specify the `--num_training_splits=...` flag to control the total number of training splits, but we recommend to let this default.
 
-### All Flags
-Expland the list below to see the full list of flags and their explanations.
+All this evaluation data will saved under the `output_path`, if you want to run evaluation on the eval_splits during training you must enable `do_eval` on SambaStudio.
+
+### Holdout Test Data
+To create a holdout set of test data that is not tokenized, pipeline.py can create these splits and will leave the data un-tokenized and save it in the `output_path/test` directory. This data is left in jsonl text format because running evaluation or inference usually requires text inputs instead of tokenized inputs.
+
+To do this, include flags from only one of the two options below, only use one option or the other. Please review the [Flags](#tokenize-one-file-flags) section for in detail descriptions of these flags.
+- To specify the number of training splits and test splits directly, use the three flags `--num_training_splits=...`, `--num_dev_splits=...` and `--num_test_splits=...`
+- To specify the percentage of the data heldout for testing, you can specify `--dev_ratio=...` and `--test_ratio=0.1`, where 0.1 means that approximately 10% of the data will be included in the test splits. You can also specify the `--num_training_splits=...` flag to control the total number of training splits, but we recommend to let this default.
+
+### Additional Details
 <details>
-  <summary>CLICK HERE to see flags</summary>
+
+If you include the `keep_split_jsonls` flag, then the `output_path` will additionally contain a `splits` directory that saves the jsonl versions of the HDF5 files, meaning that splits/train_1_of_X.jsonl is the jsonl text version of train_1_of_X.hdf5.
+
+The output HDF5 files each contain two datasets:
+- *input_ids*: sequences of tokens ids
+- *token_type_ids*: describe the type of each token. The default id assignments are:
+  - id=0 for tokens in the prompt
+  - id=1 for tokens in the completion
+  - id=2 for \<eos\> tokens that serve as padding tokens (will not be trained to predict)
+  - id=3 for \<eos\> tokens at the end of articles, that define the attention boundary when training with article attention
+
+If you owant to view decoded HDF5 files in human readable text format, you can run the following command:
+
+```python
+python3 generative_data_prep/utils/decode_hdf5.py --hdf5_file_path=<PATH TO HDF5 FILE> --output_decoded_file_path=<PATH TO OUTPUT TXT FILE>
+```
+
+</details>
+
+</br>
+
+## Flags
+
+This section outlines all the flags you can set to customize the data prep pipeline for your use case!
 
 | Flag Name  | Type | Default | Options | Description |
 | --- | --- | --- | --- | --- |
@@ -163,10 +191,10 @@ Expland the list below to see the full list of flags and their explanations.
 | `merges_file` | str | None | Valid file path | The merges file to be used with the tokenizer class specified by `tokenizer_class`. If `pretrained_tokenizer` tokenizer is not specified, this is required. It should be a .txt file for a GPT2 tokenizer. |
 | `special_tokens_dict` | str | None | string representation of json | Any non-standard special tokens in JSON format to add to tokenizer. e.g. \"{'sep_token': \"[SEP]\"}\". Additional tokens can be also added using the "additional_special_tokens" keyword. For example, indentation encoding can be added with \"{'additional_special_tokens': [\"\t\", \"\t\t\", \"\t\t\t\"]}\". |
 | `max_seq_length` | int | 2048 | 512 for gpt2 small, 1024 for gpt-xl, 2048 for gpt3-13B. | The maximum sequence length of the model you are using. |
-| `input_packing_config` | PackingConfig | 'full' | ['full', 'single::truncate_left', 'single::truncate_right', 'single::drop', 'greedy::truncate_left', 'greedy::truncate_right', 'greedy::drop'] | The first argument in the packing config defines the method of placing text into sequences, the second argument defines how to handle jsonls that do not fit within the max_seq_length. 'full': Defines the entire packing config, Completely fill sequences with tokens, as soon as sequences is full start packing into new sequence. Ignore article boundaries, they may be split across multiple sequences. 'greedy': Fit as many articles as possible into a sequence, make sure no article is split across multiple sequences. Fill the left over space in each sequence with padding. 'single': Each sequence contains only 1 article.  Fill the rest of the sequence with padding.  'drop': Drop the entire article if there are any tokens that overflow beyond the max sequence length.  'truncate_left':  Truncate the article from the left if there are any tokens that overflow beyond the max sequence length.  'truncate_right':  Truncate the article from the right if there are any tokens that overflow beyond the max sequence length. |
+| `input_packing_config` <span id="input_packing_config"></span> | str | 'full' | ['full', 'single::truncate_left', 'single::truncate_right', 'single::drop', 'greedy::truncate_left', 'greedy::truncate_right', 'greedy::drop'] | The first argument in the packing config defines the method of placing text into sequences, the second argument defines how to handle jsonls that do not fit within the max_seq_length. 'full': Defines the entire packing config, Completely fill sequences with tokens, as soon as sequences is full start packing into new sequence. Ignore article boundaries, they may be split across multiple sequences. 'greedy': Fit as many articles as possible into a sequence, make sure no article is split across multiple sequences. Fill the left over space in each sequence with padding. 'single': Each sequence contains only 1 article.  Fill the rest of the sequence with padding.  'drop': Drop the entire article if there are any tokens that overflow beyond the max sequence length.  'truncate_left':  Truncate the article from the left if there are any tokens that overflow beyond the max sequence length.  'truncate_right':  Truncate the article from the right if there are any tokens that overflow beyond the max sequence length. |
 | `packing_boundary` | str | 'jsonl' | ['jsonl', 'prompt_completion_pair'] | 'jsonl': When packing text into sequences, keeps json lines together. This means that for greedy or single packing if the entire line does not fit in the sequences it will be thrown out. 'prompt_completion_pair': When packing text into sequences, prompt_completion_pairs together, but may break up json lines that contain a list of prompt completion pairs. |
 | `attention_boundary` | str | 'jsonl' | ['jsonl', 'prompt_completion_pair'] | The boundary to use when training with --article_attention flag. If you choose prompt_completion_pair tokens will only attend to tokens in the prompt_completion_pair. If you choose jsonl, then tokens will attend to all the prompt completion pairs in the jsonl |
-| `prompt_keyword` | str | 'prompt' | | If your input json has a string keyword for prompt other than "prompt", place the keyword here. e.g Input_json: {"source": ... "target": ...} ->`prompt_keyword`='source'. |
+| `prompt_keyword` <span id="prompt_keyword"></span> | str | 'prompt' | | If your input json has a string keyword for prompt other than "prompt", place the keyword here. e.g Input_json: {"source": ... "target": ...} ->`prompt_keyword`='source'. |
 | `completion_keyword` | str | 'completion' | | If your input json has a string keyword for completion other than "completion", place the  keyword here. e.g Input_json: {"source": ... "target": ...} -> --completion_keyword='target'. |
 | `prompt_prefix` | str | 'None' | | text to add before the prompt, for chatML conventions use (e.g. "\<human\>:") |
 | `prompt_postfix` | str | 'None' | | text to add after the prompt, for chatML conventions use (e.g. "\<bot\>:") |
@@ -182,155 +210,11 @@ Expland the list below to see the full list of flags and their explanations.
 | `do_not_balance_hdf5` | bool | False | Include flag for True, no arguments | Include this flag if you DO NOT want to balance HDF5 files, this is not recommended unless the you are dealing with a huge amount of data (many terra bytes), or do not want shuffling between splits. |
 | `keep_split_jsonls` | bool | False | Include flag for True, no arguments | If you DO NOT want to delete split jsonls files that are in text format in the `output_path/splits` directory include this flag. The only reason you would include this flag is if you want to see what text is in each HDF5, meaning that splits/train_1_of_X.jsonl is the jsonl text version of train_1_of_X.hdf5. Including this flag will increase the storage space of your dataset by more than two times. |
 | `num_workers` | int | False | 0 <= `num_workers`<= # of available CPUs | The number of CPU workers to run tokenization with, if the previous run failed due to OOM, you need to decrease this number. |
-</details>
 
+</br>
 
-## Tokenizing one file
-The `generative_data_prep/data_prep/data_prep.py` script tokenizes a single jsonline file and converts it to an HDF5 file. However, training with SambaStudio requires multiple split HDF5 files. So, unless you already have multiple split jsonline files that you want to tokenize directly, we recommend using the `generative_data_prep/data_prep/pipeline.py` script.
+## Examples
 
-### Example
-```python
-python3 -m generative_data_prep data_prep --input_file_path=path_to_jsonl.jsonl --output_path=path_to_output_file --pretrained_tokenizer=gpt2 --max_seq_length=1024
-```
-
-### Output
-Each HDF5 file contains two datasets:
-- \"input_ids\": sequences of token ids
-- \"token_type_ids\": describe the type of each token. The id assignments are:
-  - id=0 for tokens in the prompt
-  - id=1 for tokens in the completion
-  - id=2 for \<eos\> tokens that serve as padding tokens
-  - id=3 for \<eos\> tokens at the end of articles, that serve as separators
-
-### Tokenize One File Flags
-<details>
-  <summary>CLICK HERE to see flags</summary>
-
-
-| Flag Name  | Type | Default | Options | Description |
-| --- | --- | --- | --- | --- |
-| `input_file_path`  | str | REQUIRED | Any existing file path | Path to the input dataset where each line is of the form specified in [Input Format](#input-format).|
-| `output_path` | str | `input_file_path`'s directory | Any valid directory path | The directory to store the output files |
-| `log_file_path` | str | `output_path`'s directory/logs.log | Any valid file path | The file to save the logs in, this will save the date and time, git commit hash, input arguments and metrics associated with the dataset. |
-| `overwrite_output_path` | bool | False | Include flag for True, no arguments | Permission to delete and overwrite files in `output_path`. |
-| `pretrained_tokenizer` | str | None | Valid tokenizer key from Huggingface | The pretrained tokenizer to be used, loaded using transformers.AutoTokenizer.from_pretrained(args.pretrained_tokenizer), in lieu of a --tokenizer_class, --vocab_file and --merges_file. |
-| `tokenizer_class` | str | 'gpt2' | ['gpt2'] | Tokenizer class to use, defaults to "gpt2" (transformers.GPT2Tokenizer). If --pretrained_tokenizer is not specified, this is required. |
-| `vocab_file` | str | None | Valid file path | The vocabulary file for the tokenizer. Should be a .json file for the tokenizer class specified by `tokenizer_class`. If `pretrained_tokenizer` is not specified, this is required. It should be a .json file for a GPT2 tokenizer. |
-| `merges_file` | str | None | Valid file path | The merges file to be used with the tokenizer class specified by `tokenizer_class`. If `pretrained_tokenizer` tokenizer is not specified, this is required. It should be a .txt file for a GPT2 tokenizer. |
-| `special_tokens_dict` | str | None | string representation of json | Any non-standard special tokens in JSON format to add to tokenizer. e.g. \"{'sep_token': \"[SEP]\"}\". |
-| `max_seq_length` | int | 2048 | 512 for gpt2 small, 1024 for gpt-xl, 2048 for gpt3-13B. | The maximum sequence length of the model you are using. |
-| `input_packing_config` | PackingConfig | 'full' | ['full', 'single::truncate_left', 'single::truncate_right', 'single::drop', 'greedy::truncate_left', 'greedy::truncate_right', 'greedy::drop'] | The first argument in the packing config defines the method of placing text into sequences, the second argument defines how to handle jsonls that do not fit within the max_seq_length. 'full': Defines the entire packing config, Completely fill sequences with tokens, as soon as sequences is full start packing into new sequence. Ignore article boundaries, they may be split across multiple sequences. 'greedy': Fit as many articles as possible into a sequence, make sure no article is split across multiple sequences. Fill the left over space in each sequence with padding. 'single': Each sequence contains only 1 article.  Fill the rest of the sequence with padding.  'drop': Drop the entire article if there are any tokens that overflow beyond the max sequence length.  'truncate_left':  Truncate the article from the left if there are any tokens that overflow beyond the max sequence length.  'truncate_right':  Truncate the article from the right if there are any tokens that overflow beyond the max sequence length.|
-| `packing_boundary` | str | 'jsonl' | ['jsonl', 'prompt_completion_pair'] | 'jsonl': When packing text into sequences, keeps json lines together. This means that for greedy or single packing if the entire line does not fit in the sequences it will be thrown out. 'prompt_completion_pair': When packing text into sequences, prompt_completion_pairs together, but may break up json lines that contain a list of prompt completion pairs. |
-| `attention_boundary` | str | 'jsonl' | ['jsonl', 'prompt_completion_pair'] | The boundary to use when training with --article_attention flag. If you choose prompt_completion_pair tokens will only attend to tokens in the prompt_completion_pair. If you choose jsonl, then tokens will attend to all the prompt completion pairs in the jsonl |
-| `prompt_keyword` | str | 'prompt' |  | If your input json has a string keyword for prompt other than "prompt", place the keyword here. e.g Input_json: {"source": ... "target": ...} -> --prompt_keyword='source'. |
-| `completion_keyword` | str | 'completion' |  | If your input json has a string keyword for completion other than "completion", place the  keyword here. e.g Input_json: {"source": ... "target": ...} -> --completion_keyword='target'. |
-| `prompt_prefix` | str | 'None' | | text to add before the prompt, for chatML conventions use (e.g. "\<human\>:") |
-| `prompt_postfix` | str | 'None' | | text to add after the prompt, for chatML conventions use (e.g. "\<bot\>:") |
-| `disable_space_separator` | bool | False | Include flag for True, no arguments |  If you include this flag, NO spaces will be prepended to the completion. (If you do not add this flag then a space is added to every completion if it does not already have a space). Including this flag is dangerous and not recommended because if you have input data like {"prompt": "hello." "completion": "how are you?"}, when the prompt and completion are combined it will look like "hello.how are you?" which will mess up the tokenization.--completion_keyword='target'. |
-| `keep_prompt_only_sequences` | bool | False | Include flag for True, no arguments | If you include this flag, packed sequences with only prompt tokens will not be dropped. Data with only prompt will be dropped by default because training with prompt-only sequences with prompt_loss_weight=0.0 may lead to errors. Data is dropped because of one of the following conditions: 1. the input file data prompt completion pairs contains only a prompt. 2. If the sequence is truncated such that only prompt tokens remain |
-| `categories_path` | bool | False | If you include this flag, then the 'category' field from your input jsonls will be stored in the 'category_id' dataset in your output hdf5 files. This flag must point to the file path of a json file that contains a list of all the strings of the 'category' keys in your dataset.|
-</details>
-
-## Running tests
-```
-pip install .
-pip install -r requirements/tests-requirements.txt
-pytest
-```
-
-## View decoded HDF5 files in human readable text format
-```python
-python3 generative_data_prep/utils/decode_hdf5.py --hdf5_file_path=path_to_hdf5_file --output_decoded_file_path=path_to_output_txt_file
-```
-
-## Track Dataset Metrics
-The metrics associated with this dataset will be printed in the terminal. These metrics give some insight into how the data was packed into sequences, and information about the training dataset.
-| Metric Name      | Definition | How to Interpret? |
-| --------- | --------- | --------- |
-| Articles | The number of lines in the input dataset. | How many text documents in the input dataset. |
-| Dataset Tokens | Number of tokens in the output hdf5 dataset. | How many tokens are in the training dataset. But this includes both prompt tokens and padding tokens, so this metric does not necessarily show how many tokens will learned by the model. |
-| Prompt Tokens | Number of prompt tokens in the output hdf5 dataset. | <- |
-| Completion Tokens | Number of completion tokens in the output hdf5 dataset. | <- |
-| Padding Tokens | Number of padding tokens in the output hdf5 dataset. | <- |
-| Average Completion Length | Number of completion tokens divided by number of input articles. | How long the average completion is the dataset. |
-| Average Prompt Length | Number of prompt tokens divided by number of input articles. |  How long the average prompt is the dataset. |
-| Data Utilization | Percent of non-padding tokens in output HDF5 dataset divided by number of tokens in input dataset. | This metric reveals how much of the input data makes it to the output dataset. If this percent is much less than 100%, that means a lot of the input data will not be trained on. Refer to the "Dropped From Packing" or "Dropped From All Prompt" metrics to see why this is happening. |
-| Dropped From Packing  | Number of tokens dropped during packing, divided by number of tokens in input dataset. | The percent of tokens are dropped because they do not fit into the sequence length, and the `input_packing_config` does not allow them to be overflowed.|
-| Dropped From All Prompt | Number of tokens dropped because all the tokens in a sequence are prompt tokens, divided by the number of tokens in input dataset. | Sequences that are all prompts or padding (no completion tokens) are dropped. This is because the model will not learn anything from these sequences and the loss will be 0, which may cause errors. |
-| Sequence Utilization | Average number of non-padding tokens in a sequence divided by sequence length. | The percent of the tokens in each sequence are actually used for training. This number imrpoved be changed by using different `input_packing_config`. The packing styles from highest sequence utilization to lowest are: `full`, `greedy::truncate_left` (or truncate_right), `greedy::drop`, `single::truncate_left` (or truncate_right), `single::drop`.|
-| Seq Completion Utilization | Average number of completions tokens in a sequence divided by sequence length. | The percent of the tokens in a sequence are learned.|
-
-## Validating training parameters with dataset metadata
-<details>
-  <summary>CLICK HERE to see how to use dataset validation</summary>
-
-To help improve speed and cross-checking we now provide a metadata file along with the dataset. This file is located right under the `output_dir` as `metadata.yaml`. This file is used along with a custom pydantic model which you can import from this library which will verify the dataset parameters and the training parameters. This can be used as a way to catch bugs before training begins.
-#### Structure of Metadata file
-```
-max_seq_length: int
-token_type_ids: bool
-vocab_size: int
-tokenizer_model_type: str
-number_of_training_files: int
-number_of_dev_files: int
-number_of_test_files: int
-max_batch_size_train: int
-max_batch_size_dev: Optional[int]
-```
-
-NOTE:
-* `tokenizer_model_type` is the string conversion of `type(modelConfig)`. Can use this field to compare the model used during training, which can be extracted by using `AutoConfig` in Huggingface transformers. Then wrapping it with `str(type())`.
-* `max_batch_size_dev` will be `None` unless dev files are created during generative data pipeline.
-* `token_type_ids` will always be `True` for now since they are always generated.
-
-#### How to use pydantic model
-
-```
-import yaml
-from generative_data_prep.utils import DatasetMetadata
-from transformers import AutoConfig
-
-# Load in the metadata file using pyyaml
-metadata_file = os.path.join(output_dir, "metadata.yaml")
-with open(metadata_file, "r") as file:
-    metadata_dict = yaml.safe_load(file)
-
-gpt2_config = AutoConfig.from_pretrained("gpt2")
-training_param_dict = {
-    "eval": False,
-    "batch_size": 1,
-    "model_type": str(type(gpt2_config)),
-    "use_token_type_ids": use_token_type_ids,
-    "vocab_size": gpt2_config.vocab_size,
-    "number_of_workers": 4,
-    "max_seq_length": 1024,
-}
-
-DatasetMetadata.model_validate(metadata_dict, context=training_param_dict)
-```
-
-If DatasetMetadata does not error out then that means the training parameters meet the requirements of the dataset!
-
-If DatasetMetadata does error out, that means that the training parameters need to be modified or the dataset needs to be generated again to fit the needs of the training parameters. There will be a detailed error output indicating which parameters of the metadata are not compatible.
-
-#### How to check for corruption
-
-We also create an overall metadata file for each of the files within the output directory! This metadata file contains each of the different files paired with their size, modified date, and sha256 hash. This allows for users to check to see if their dataset has been corrupted; thus invalidating the datasetMetadata pydantic model as there could be some hidden errors. This verification should be used before running the pydantic model to make sure nothing is wrong with the dataset.
-
-Here is an example code of what this would look like!
-
-```
-from generative_data_prep.utils import validate_sha256
-
-validate_sha256(output_dir)
-```
-`output_dir` here should point to the directory which was created using generative data pipeline. This function returns a `bool` and will be `True` if there is NO corruption in the dataset and `False` if there is corruption in the dataset.
-
-Under the hood each file is scrubbed through and is first checked with the size and modified date. If these values are not the same as when the file was first created then the function will calculate the sha256 of the file and compare it to what is saved.
-
-</details>
-
-## Example use cases
 ### Pretraining
 Pretraining on unstructured data enables large languages models to learn general language patterns and structures that are useful for a wide range of downstream tasks. In order to prepare pretraining data, you need a large amount of unstructured text data. To prepare pretraining data use the flag `--input_packing_config=full`.
 
@@ -396,3 +280,45 @@ python3 -m generative_data_prep pipeline --input_file_path=./tests/examples/meta
 ```
 
 > [View decoded output](tests/examples/metaICL/decoded_data_prepped_metaICL.txt)
+
+</br>
+
+## Understanding Command Outputs
+
+### Terminal Output
+The metrics associated with this dataset will be printed in the terminal. These metrics give some insight into how the data was packed into sequences, and information about the training dataset.
+| Metric Name      | Definition | How to Interpret? |
+| --------- | --------- | --------- |
+| Articles | The number of lines in the input dataset. | How many text documents in the input dataset. |
+| Dataset Tokens | Number of tokens in the output hdf5 dataset. | How many tokens are in the training dataset. But this includes both prompt tokens and padding tokens, so this metric does not necessarily show how many tokens will learned by the model. |
+| Prompt Tokens | Number of prompt tokens in the output hdf5 dataset. | <- |
+| Completion Tokens | Number of completion tokens in the output hdf5 dataset. | <- |
+| Padding Tokens | Number of padding tokens in the output hdf5 dataset. | <- |
+| Average Completion Length | Number of completion tokens divided by number of input articles. | How long the average completion is the dataset. |
+| Average Prompt Length | Number of prompt tokens divided by number of input articles. |  How long the average prompt is the dataset. |
+| Data Utilization | Percent of non-padding tokens in output HDF5 dataset divided by number of tokens in input dataset. | This metric reveals how much of the input data makes it to the output dataset. If this percent is much less than 100%, that means a lot of the input data will not be trained on. Refer to the "Dropped From Packing" or "Dropped From All Prompt" metrics to see why this is happening. |
+| Dropped From Packing  | Number of tokens dropped during packing, divided by number of tokens in input dataset. | The percent of tokens are dropped because they do not fit into the sequence length, and the `input_packing_config` does not allow them to be overflowed.|
+| Dropped From All Prompt | Number of tokens dropped because all the tokens in a sequence are prompt tokens, divided by the number of tokens in input dataset. | Sequences that are all prompts or padding (no completion tokens) are dropped. This is because the model will not learn anything from these sequences and the loss will be 0, which may cause errors. |
+| Sequence Utilization | Average number of non-padding tokens in a sequence divided by sequence length. | The percent of the tokens in each sequence are actually used for training. This number imrpoved be changed by using different `input_packing_config`. The packing styles from highest sequence utilization to lowest are: `full`, `greedy::truncate_left` (or truncate_right), `greedy::drop`, `single::truncate_left` (or truncate_right), `single::drop`.|
+| Seq Completion Utilization | Average number of completions tokens in a sequence divided by sequence length. | The percent of the tokens in a sequence are learned.|
+
+### Metadata Output File
+
+To help improve speed and cross-checking we now provide a metadata file along with the dataset. This file is located right under the `output_dir` as `metadata.yaml`. This file is used along with a custom pydantic model which you can import from this library which will verify the dataset parameters and the training parameters. This can be used as a way to catch bugs before training begins.
+
+```
+max_seq_length: int
+token_type_ids: bool
+vocab_size: int
+tokenizer_model_type: str
+number_of_training_files: int
+number_of_dev_files: int
+number_of_test_files: int
+max_batch_size_train: int
+max_batch_size_dev: Optional[int]
+```
+
+NOTE:
+* `tokenizer_model_type` is the string conversion of `type(modelConfig)`. Can use this field to compare the model used during training, which can be extracted by using `AutoConfig` in Huggingface transformers. Then wrapping it with `str(type())`.
+* `max_batch_size_dev` will be `None` unless dev files are created during generative data pipeline.
+* `token_type_ids` will always be `True` for now since they are always generated.
