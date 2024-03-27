@@ -99,7 +99,7 @@ To do this, include flags from only one of the two options below, only use one o
 - To specify the percentage of the data heldout for testing, you can specify `--dev_ratio=...` and `--test_ratio=0.1`, where 0.1 means that approximately 10% of the data will be included in the test splits. You can also specify the `--num_training_splits=...` flag to control the total number of training splits, but we recommend to let this default.
 
 ### Dataset Size Requirements
-When preparing a dataset for training, different dataset sizes will dictate the maximum batch size you can set for training. It is *__necessary__* to know this maximum batch size so you can set it accordingly for your training job. 
+When preparing a dataset for training, different dataset sizes will dictate the maximum batch size you can set for training. It is *__necessary__* to know this maximum batch size so you can set it accordingly for your training job.
 
 #### How to Check and Set
 
