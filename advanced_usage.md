@@ -1,6 +1,6 @@
 # Advanced Usage
 
-Here we have some documentation on some advanced usage patterns for the generative data prep package. 
+Here we have some documentation on some advanced usage patterns for the generative data prep package.
 
 ## Table of contents
 - [Tokenize Individual Files](#tokenize-individual-files)
@@ -13,7 +13,7 @@ Here we have some documentation on some advanced usage patterns for the generati
 </br>
 
 ## Tokenize Individual Files
-The `generative_data_prep/data_prep/data_prep.py` script tokenizes a single jsonline file and converts it to an HDF5 file. Training with SambaStudio requires multiple split HDF5 files, so `generative_data_prep/data_prep/pipeline.py` takes care of the splitting and processing holistically. If you have multiple split jsonline files that have been custom split and you would like to tokenize them directly, you can use the following example command and the flags list to process each file individually. 
+The `generative_data_prep/data_prep/data_prep.py` script tokenizes a single jsonline file and converts it to an HDF5 file. Training with SambaStudio requires multiple split HDF5 files, so `generative_data_prep/data_prep/pipeline.py` takes care of the splitting and processing holistically. If you have multiple split jsonline files that have been custom split and you would like to tokenize them directly, you can use the following example command and the flags list to process each file individually.
 
 ### Example
 ```shell
@@ -84,7 +84,7 @@ If DatasetMetadata does error out, that means that the training parameters need 
 
 The generative data prep package provides a utility for checking if your dataset has been corrupted using metadata recorded during processing. This metadata contains each of the different files paired with their size, modified date, and sha256 hash. If included, this verification should be used before running the pydantic model to make sure nothing is wrong with the dataset.
 
-We also create an overall metadata file for each of the files within the output directory! This metadata file contains each of the different files paired with their size, modified date, and sha256 hash. This allows for users to check to see if their dataset has been corrupted; thus invalidating the datasetMetadata pydantic model as there could be some hidden errors. This verification should be used before running the pydantic model to make sure nothing is wrong with the dataset. 
+We also create an overall metadata file for each of the files within the output directory! This metadata file contains each of the different files paired with their size, modified date, and sha256 hash. This allows for users to check to see if their dataset has been corrupted; thus invalidating the datasetMetadata pydantic model as there could be some hidden errors. This verification should be used before running the pydantic model to make sure nothing is wrong with the dataset.
 
 Here is an example:
 
