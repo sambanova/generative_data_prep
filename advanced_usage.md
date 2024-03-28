@@ -1,7 +1,27 @@
-### Tokenize One File Flags
-<details>
-  <summary>CLICK HERE to see flags</summary>
+# Advanced Usage
 
+Here we have some documentation on some advanced usage patterns for generative data prep package. 
+
+## Table of contents
+- [Tokenize Individual Files](#tokenize-individual-files)
+    - [Individual Tokenization Flags](#individual-tokenization-flags)
+- [Running Tests](#running-tests)
+- [How to use pydantic model](#how-to-use-pydantic-model)
+- [How to check for corruption](#how-to-check-for-corruption)
+- [Contributing](#contributing)
+
+</br>
+
+## Tokenize Individual Files
+The `generative_data_prep/data_prep/data_prep.py` script tokenizes a single jsonline file and converts it to an HDF5 file. Training with SambaStudio requires multiple split HDF5 files, so `generative_data_prep/data_prep/pipeline.py` takes care of the splitting and processing holistically. If you have multiple split jsonline files that have been custom split and you would like to tokenize them directly, you can use the following example command and the flags list to process each file individually. 
+
+### Example
+```shell
+python3 -m generative_data_prep data_prep --input_file_path=<PATH TO DATASET FILE> --output_path=<PATH TO OUTPUT DIRECTORY> --pretrained_tokenizer=gpt2 --max_seq_length=1024
+```
+
+
+### Individual Tokenization Flags
 
 | Flag Name  | Type | Default | Options | Description |
 | --- | --- | --- | --- | --- |
@@ -25,16 +45,24 @@
 | `disable_space_separator` | bool | False | Include flag for True, no arguments |  If you include this flag, NO spaces will be prepended to the completion. (If you do not add this flag then a space is added to every completion if it does not already have a space). Including this flag is dangerous and not recommended because if you have input data like {"prompt": "hello." "completion": "how are you?"}, when the prompt and completion are combined it will look like "hello.how are you?" which will mess up the tokenization.--completion_keyword='target'. |
 | `keep_prompt_only_sequences` | bool | False | Include flag for True, no arguments | If you include this flag, packed sequences with only prompt tokens will not be dropped. Data with only prompt will be dropped by default because training with prompt-only sequences with prompt_loss_weight=0.0 may lead to errors. Data is dropped because of one of the following conditions: 1. the input file data prompt completion pairs contains only a prompt. 2. If the sequence is truncated such that only prompt tokens remain |
 | `categories_path` | bool | False | If you include this flag, then the 'category' field from your input jsonls will be stored in the 'category_id' dataset in your output hdf5 files. This flag must point to the file path of a json file that contains a list of all the strings of the 'category' keys in your dataset.|
-</details>
+
+</br>
 
 ## Running tests
+
+The following commands allow you to run the test suite for this package. Make sure you've set up your virtual environment with the proper dependencies!
+
 ```
 pip install .
 pip install -r requirements/tests-requirements.txt
 pytest
 ```
 
-#### How to use pydantic model
+</br>
+
+## How to use pydantic model
+
+If you want to use the output `metadata.yaml` file to validate your dataset parameters adhere to a certain schema, you can use the custom pydantic model that we provide in this library. Below is an example of how to do that:
 
 ```
 import yaml
@@ -64,11 +92,13 @@ If DatasetMetadata does not error out then that means the training parameters me
 
 If DatasetMetadata does error out, that means that the training parameters need to be modified or the dataset needs to be generated again to fit the needs of the training parameters. There will be a detailed error output indicating which parameters of the metadata are not compatible.
 
-#### How to check for corruption
+## How to check for corruption
 
-We also create an overall metadata file for each of the files within the output directory! This metadata file contains each of the different files paired with their size, modified date, and sha256 hash. This allows for users to check to see if their dataset has been corrupted; thus invalidating the datasetMetadata pydantic model as there could be some hidden errors. This verification should be used before running the pydantic model to make sure nothing is wrong with the dataset.
+The generative data prep package provides a utility for checking if your dataset has been corrupted using metadata recorded during processing. This metadata contains each of the different files paired with their size, modified date, and sha256 hash. If included, this verification should be used before running the pydantic model to make sure nothing is wrong with the dataset.
 
-Here is an example code of what this would look like!
+We also create an overall metadata file for each of the files within the output directory! This metadata file contains each of the different files paired with their size, modified date, and sha256 hash. This allows for users to check to see if their dataset has been corrupted; thus invalidating the datasetMetadata pydantic model as there could be some hidden errors. This verification should be used before running the pydantic model to make sure nothing is wrong with the dataset. 
+
+Here is an example:
 
 ```
 from generative_data_prep.utils import validate_sha256

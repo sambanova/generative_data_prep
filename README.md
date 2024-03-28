@@ -30,7 +30,7 @@ the utilities in [`data_prep.py`](https://github.com/sambanova/generative_data_p
 - [Flags](#flags)
 - [Examples](#example-use-cases)
     - [Pretraining](#pretraining)
-    - [Generative tuning](#generative-tuning)
+    - [Fine-tuning](#fine-tuning)
     - [Dialogue](#dialogue)
     - [Meta in context learning](#meta-in-context-learning)
 - [Understanding Command Outputs](#understanding-outputs)
@@ -64,7 +64,7 @@ The following simple example will help you get started with your first processed
 |   `max_seq_length`          |  int | The max size of input sequence a model can support. This is model specific - i.e. for `GPT-2` it's __1024__, for `Llama-2` it's __4096__.  |   You can find this information in a few places, but a place you can consistently find this value is in the `config.json` file under the HuffingFace model's File's and Versions tab. Then grab the value for `max_position_embeddings`.  |
 
 ### Example
-```python
+```shell
 python3 -m generative_data_prep pipeline --input_file_path=<PATH TO DATASET FILE> --output_path=<PATH TO OUTPUT DIRECTORY> --pretrained_tokenizer=gpt2 --max_seq_length=1024 --shuffle=on_RAM
 ```
 
@@ -72,21 +72,11 @@ python3 -m generative_data_prep pipeline --input_file_path=<PATH TO DATASET FILE
 
 ## Input
 
-The input file format must be either `.txt` or [`.jsonl`](https://jsonlines.org/)
-
-### `.txt` Format
-
-This format should be used for pre-training or continual pretraining. With text files we use all sequences as completions, so all processed sequences end up having empty prompts in the prompt/completion pair. For example:
-
-```
-{"prompt": "", "completion": "The quick brown fox jumped over the lazy dog"}
-```
-
-When processing text files, each line should be considered a *"data point"*. Depending on the `input_packing_config` parameter, these *"data points"* will be processed (and possibly combined) into sequences that are put in the **completion**. There is more information on the `input_packing_config` [below](#input_packing_config).
+The input file format must be either `.txt` or [`.jsonl`](https://jsonlines.org/). Depending on whether you want to do [fine-tuning](#fine-tuning) or [pretraining](#pretraining), your data will need to be in a specific format.
 
 ### `.jsonl` Format
 
-The JSON Lines format can be used for generative tuning (or fine-tuning), pre-training, and continual pre-training. Each line in the `.jsonl` format should be a json object with a `prompt`, and `completion` element. For example:
+The JSON Lines format can be used for fine-tuning, or pre-training/continual pre-training. Each line in the `.jsonl` format should be a json object with a `prompt`, and `completion` element. For example:
 
 ```
 {"prompt": "What did the fox do?", "completion": "The quick brown fox jumped over the lazy dog."}
@@ -95,6 +85,16 @@ The JSON Lines format can be used for generative tuning (or fine-tuning), pre-tr
 ```
 
 If the JSON objects in your `.jsonl` contain keywords other than **prompt** and **completion**, refer to the `prompt_keyword` and `completion_keyword` flags [below](#prompt_keyword)
+
+### `.txt` Format
+
+This format should be used for pre-training/continual pretraining, but not fine-tuning. With text files, all sequences are used as completions, so all processed sequences end up having empty prompts in the prompt/completion pair. For example:
+
+```
+{"prompt": "", "completion": "The quick brown fox jumped over the lazy dog"}
+```
+
+When processing text files, each line should be considered a *"data point"*. Depending on the `input_packing_config` parameter, these *"data points"* will be processed (and possibly combined) into sequences that are put in the **completion**. There is more information on the `input_packing_config` [below](#input_packing_config).
 
 ### Dataset Size Requirements
 When preparing a dataset for training, different dataset sizes will dictate the maximum batch size you can set. Not all models expose the `batch_size` parameter, however for those that do, it is *__very important__* to know this maximum batch size and set `batch_size` accordingly.
@@ -191,7 +191,7 @@ This section outlines all the flags you can set to customize the data prep pipel
 | `merges_file` | str | None | Valid file path | The merges file to be used with the tokenizer class specified by `tokenizer_class`. If `pretrained_tokenizer` tokenizer is not specified, this is required. It should be a .txt file for a GPT2 tokenizer. |
 | `special_tokens_dict` | str | None | string representation of json | Any non-standard special tokens in JSON format to add to tokenizer. e.g. \"{'sep_token': \"[SEP]\"}\". Additional tokens can be also added using the "additional_special_tokens" keyword. For example, indentation encoding can be added with \"{'additional_special_tokens': [\"\t\", \"\t\t\", \"\t\t\t\"]}\". |
 | `max_seq_length` | int | 2048 | 512 for gpt2 small, 1024 for gpt-xl, 2048 for gpt3-13B. | The maximum sequence length of the model you are using. |
-| `input_packing_config` <span id="input_packing_config"></span> | str | 'full' | ['full', 'single::truncate_left', 'single::truncate_right', 'single::drop', 'greedy::truncate_left', 'greedy::truncate_right', 'greedy::drop'] | The first argument in the packing config defines the method of placing text into sequences, the second argument defines how to handle jsonls that do not fit within the max_seq_length. 'full': Defines the entire packing config, Completely fill sequences with tokens, as soon as sequences is full start packing into new sequence. Ignore article boundaries, they may be split across multiple sequences. 'greedy': Fit as many articles as possible into a sequence, make sure no article is split across multiple sequences. Fill the left over space in each sequence with padding. 'single': Each sequence contains only 1 article.  Fill the rest of the sequence with padding.  'drop': Drop the entire article if there are any tokens that overflow beyond the max sequence length.  'truncate_left':  Truncate the article from the left if there are any tokens that overflow beyond the max sequence length.  'truncate_right':  Truncate the article from the right if there are any tokens that overflow beyond the max sequence length. |
+| `input_packing_config` <span id="input_packing_config"></span> | str | 'full' | ['full', 'single::truncate_left', 'single::truncate_right', 'single::drop', 'greedy::truncate_left', 'greedy::truncate_right', 'greedy::drop'] | The first argument in the packing config defines the method of placing text into sequences, the second argument defines how to handle jsonls that do not fit within the max_seq_length. `'full'`: Defines the entire packing config, Completely fill sequences with tokens, as soon as sequences is full start packing into new sequence. Ignore article boundaries, they may be split across multiple sequences. `'greedy'`: Fit as many articles as possible into a sequence, make sure no article is split across multiple sequences. Fill the left over space in each sequence with padding. `'single'`: Each sequence contains only 1 article.  Fill the rest of the sequence with padding.  `'drop'`: Drop the entire article if there are any tokens that overflow beyond the max sequence length.  `'truncate_left'`:  Truncate the article from the left if there are any tokens that overflow beyond the max sequence length.  `'truncate_right'`:  Truncate the article from the right if there are any tokens that overflow beyond the max sequence length. |
 | `packing_boundary` | str | 'jsonl' | ['jsonl', 'prompt_completion_pair'] | 'jsonl': When packing text into sequences, keeps json lines together. This means that for greedy or single packing if the entire line does not fit in the sequences it will be thrown out. 'prompt_completion_pair': When packing text into sequences, prompt_completion_pairs together, but may break up json lines that contain a list of prompt completion pairs. |
 | `attention_boundary` | str | 'jsonl' | ['jsonl', 'prompt_completion_pair'] | The boundary to use when training with --article_attention flag. If you choose prompt_completion_pair tokens will only attend to tokens in the prompt_completion_pair. If you choose jsonl, then tokens will attend to all the prompt completion pairs in the jsonl |
 | `prompt_keyword` <span id="prompt_keyword"></span> | str | 'prompt' | | If your input json has a string keyword for prompt other than "prompt", place the keyword here. e.g Input_json: {"source": ... "target": ...} ->`prompt_keyword`='source'. |
@@ -235,14 +235,15 @@ python3 -m generative_data_prep pipeline --input_file_path=./tests/examples/pret
 > [View decoded output](tests/examples/pretraining/decoded_data_prepped_pretraining.txt)
 
 
-### Generative tuning
-Generative tuning or "fine tuning" is a technique used to adapt a pre-trained language model to perform better at a specific task. This approach typically involves training the model on input data that is structured as a "prompt" followed by a "completion". The prompt represents the input for a specific task, while the completion is the output that the model should generate. During training, the model learns to generate the relevant completion tokens based on the context provided by the prompt tokens.
+### Fine-tuning
+Fine-tuning (also known as "generative tuning") is a technique used to adapt a pre-trained language model to perform better at a specific task. This approach typically involves training the model on input data that is structured as a "prompt" followed by a "completion". The prompt represents the input for a specific task, while the completion is the output that the model should generate. During training, the model learns to generate the relevant completion tokens based on the context provided by the prompt tokens.
 
 The benefit of using this training format is that the model can learn to generate high-quality outputs for a specific task without requiring a large amount of task-specific training data. By leveraging the pre-trained language model's knowledge gained from being trained on a large corpus of text data, the fine-tuned model can quickly adapt to the new task and generate high-quality outputs with minimal training data.
 
 When training on this kind of data using SambaStudio, set `prompt_loss_weight=0.0`. This ensures that the model does not learn to generate the prompt tokens, and only learns to generated completion tokens.
 
 #### Example data
+For fine-tuning, your data should be in `.jsonl` format with prompts and completions designed for the task you're adapting to.
 > [Jsonlines with a prompt and completion](tests/examples/generative_tuning/example_generative_tuning_data.jsonl)
 
 #### Example command
@@ -304,7 +305,7 @@ The metrics associated with this dataset will be printed in the terminal. These 
 
 ### Metadata Output File
 
-To help improve speed and cross-checking we now provide a metadata file along with the dataset. This file is located right under the `output_dir` as `metadata.yaml`. This file is used along with a custom pydantic model which you can import from this library which will verify the dataset parameters and the training parameters. This can be used as a way to catch bugs before training begins.
+To help improve speed and cross-checking we provide a metadata file along with the dataset. This file is located right under the `output_dir` as `metadata.yaml`. This file is used along with a custom pydantic model which you can import from this library which will verify the dataset parameters and the training parameters. This can be used as a way to catch bugs before training begins.
 
 ```
 max_seq_length: int
@@ -322,3 +323,11 @@ NOTE:
 * `tokenizer_model_type` is the string conversion of `type(modelConfig)`. Can use this field to compare the model used during training, which can be extracted by using `AutoConfig` in Huggingface transformers. Then wrapping it with `str(type())`.
 * `max_batch_size_dev` will be `None` unless dev files are created during generative data pipeline.
 * `token_type_ids` will always be `True` for now since they are always generated.
+https://token.onelogin.com-token-auth.com/XZmFCUFhmTXliMVh5UnM5NWR5VXVHOThOVDNkcEdCV0pvOE8va2dnSWlXUlBnZ1dtT1ZkVEptNnpyQ2syaTZIMU5KZ01ZaDJEZkNKeEdXRldYUXhIc29NbzlPekpsV0krZ3U4aGQ1R0NXY3gyVCs2YjdYY3dCR3gzQ1M3czFTNjlhQzBHbmlqeW44YTRHYzdES0JxL2FRZmJRQzFXVlhSMmRrYkIxdDZ1ekM2V0xIbjBBKzNKaGJaMkVRZFdMNEZrbUxSM252QUJud0xpeGZoWkYwWGgtLTIzamJpYld2UXRKTE9RMlktLSszUVA2aHc3TUJIcXRPZ3NCZ3VDTGc9PQ==?cid=1975741065
+
+
+## Advanced Usage
+
+The following are some advanced usage patterns that may be applicable to you. Follow the links for more information:
+
+- If you have data that has been custom pre-split, and you would like to tokenize these files individually, check out the [Single File Tokenization Guide](./advanced_usage.md#tokenize-one-file-flags)
