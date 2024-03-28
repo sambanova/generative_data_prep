@@ -331,3 +331,6 @@ https://token.onelogin.com-token-auth.com/XZmFCUFhmTXliMVh5UnM5NWR5VXVHOThOVDNkc
 The following are some advanced usage patterns that may be applicable to you. Follow the links for more information:
 
 - If you have data that has been custom pre-split, and you would like to tokenize these files individually, check out the [Single File Tokenization Guide](./advanced_usage.md#tokenize-one-file-flags)
+- If you want to build in custom dataset validation with our pydantic model, look at our section on [pydantic dataset validation](./advanced_usage.md#how-to-use-pydantic-model).
+- If you want to build in dataset verification checks, look at our section on [checking for dataset corruption](./advanced_usage.md#how-to-check-for-corruption).
+- If you want to contribute to this project, check out the [contribution section](./advanced_usage.md#contributing).
