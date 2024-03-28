@@ -134,7 +134,7 @@ Based on the size and strucutre of the dataset provided + these parameter settin
 </br>
 
 ## Output
-The `output_path` should be a directory that will contain all the tokenized HDF5 split files, and a directory called `tokenizer`. This directory constitutes a processed dataset and can be used for training a model after uploading to SambaStudio. The `tokenizer` directory will be transferred to any output checkpoints that are saved by Sambastudio for the tokenizer to be used for inference later on. 
+The `output_path` should be a directory that will contain all the tokenized HDF5 split files, and a directory called `tokenizer`. This directory constitutes a processed dataset and can be used for training a model after uploading to SambaStudio. The `tokenizer` directory will be transferred to any output checkpoints that are saved by Sambastudio for the tokenizer to be used for inference later on.
 
 ### Holdout Evaluation Data
 To evaluate on a holdout set of data during training, `pipeline.py` can create splits of holdout evaluation data.
