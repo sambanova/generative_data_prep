@@ -16,7 +16,7 @@ dependencies = [
     "jsonlines",
     "numpy",
     "psutil",
-    "torch",
+    "torch<=2.1.2",
     "tqdm",
     "transformers",
     "tabulate",
