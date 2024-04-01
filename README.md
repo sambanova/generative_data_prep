@@ -99,7 +99,9 @@ To do this, include flags from only one of the two options below, only use one o
 - To specify the percentage of the data heldout for testing, you can specify `--dev_ratio=...` and `--test_ratio=0.1`, where 0.1 means that approximately 10% of the data will be included in the test splits. You can also specify the `--num_training_splits=...` flag to control the total number of training splits, but we recommend to let this default.
 
 ### Dataset Size Requirements
-When preparing a dataset for training, different dataset sizes will dictate the maximum batch size you can set. Not all models expose the `batch_size` parameter, however for those that do, it is *__very important__* to know this maximum batch size and set `batch_size` accordingly.
+1. You need to ensure your input dataset is large enough to run one batch of training.
+2. Make sure that the number of sequences in the output dataset files satisfy this by checking `max_batch_size_train` in the `<OUTPUT_DIR>/metadata.yaml` file.
+3. Use this value to set `batch_size` accordingly when starting a training job!
 
 #### How to Check and Set
 
@@ -131,6 +133,8 @@ With a sufficiently large dataset, you are generally fine with the defaults and 
 * `input_packing_config` - Determines how to pack the provided data into sequences that will be split across the hdf5 files for training. See more in the [flags](#flags) section.
 
 Based on the size and strucutre of the dataset provided + these parameter settings, a different `max_batch_size_train` will be shown in `metadata.yaml` which dictates how large you can set the corresponding `batch_size` hyper-parameter setting when starting a model training job!
+
+**_Note:_**: Not all models trained in studio will expose the `batch_size` parameter. For those that don't you should ensure your `max_batch_size_train` is larger than the default batch size (generally 16).
 </details>
 
 ### Flags
