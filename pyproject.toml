@@ -25,7 +25,6 @@ dependencies = [
     "alive_progress",
     "pydantic",
     "pyyaml",
-    "urllib3",
     "sentencepiece"
 ]
 dynamic = ["version"]
