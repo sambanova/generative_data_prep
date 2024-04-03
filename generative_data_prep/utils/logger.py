@@ -98,7 +98,7 @@ def log_training_details(dataset_metadata: Dict[str, Union[str, int, bool]]):
     LOGGER.info("The dataset you have prepared requires you to set the following training parameters:")
     LOGGER.info(f"    Max sequence length == {dataset_metadata['max_seq_length']}")
     LOGGER.info(f"    Model vocabulary size == {dataset_metadata['vocab_size']}")
-    LOGGER.info(f"    Local batch size <= {dataset_metadata['max_batch_size_train']}")
+    LOGGER.info(f"    Batch size <= {dataset_metadata['max_batch_size_train']}")
     LOGGER.info(f"    Number of RDUs (data parallel workers) {dataset_metadata['number_of_training_files']}")
     LOGGER.info(f"    Do eval: {'True' if int(dataset_metadata['number_of_dev_files']) >= 1 else 'False'}")
 
