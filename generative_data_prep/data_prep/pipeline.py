@@ -471,7 +471,7 @@ def pipeline_main(  # noqa: C901
         RuntimeError: If shuffling on RAM is not possible
 
     Returns:
-        Metrics associated with tokenization
+        Metrics associated with tokenization, Dataset metadata
     """
     # print input file information
     dataset_metadata_json = {
@@ -657,4 +657,4 @@ def pipeline_main(  # noqa: C901
     # Create sha256 of all the files within the directory
     create_sha256(output_dir)
 
-    return metrics
+    return metrics, dataset_metadata_json

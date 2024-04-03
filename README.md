@@ -98,6 +98,45 @@ To do this, include flags from only one of the two options below, only use one o
 - To specify the number of training splits and test splits directly, use the three flags `--num_training_splits=...`, `--num_dev_splits=...` and `--num_test_splits=...`
 - To specify the percentage of the data heldout for testing, you can specify `--dev_ratio=...` and `--test_ratio=0.1`, where 0.1 means that approximately 10% of the data will be included in the test splits. You can also specify the `--num_training_splits=...` flag to control the total number of training splits, but we recommend to let this default.
 
+### Dataset Size Requirements
+1. You need to ensure your input dataset is large enough to run one batch of training.
+2. Make sure that the number of sequences in the output dataset files satisfy this by checking `max_batch_size_train` in the `<OUTPUT_DIR>/metadata.yaml` file.
+3. Use this value to set `batch_size` accordingly when starting a training job!
+
+#### How to Check and Set
+
+When starting a training job, ensure that the `batch_size` hyper-parameter is __*no bigger*__ than the `max_batch_size_train` shown in `metadata.yaml`.
+
+For example:
+```(shell)
+$ cat <PROCESSED DATA DIRECTORY>/metadata.yaml
+
+max_batch_size_dev: null
+max_batch_size_train: 7
+max_seq_length: 1024
+number_of_dev_files: 0
+number_of_test_files: 0
+number_of_training_files: 32
+token_type_ids: true
+tokenizer_model_type: <class 'transformers.models.gpt2.configuration_gpt2.GPT2Config'>
+vocab_size: 50257
+```
+Here you can see that `max_batch_size_train` is 7, so the `batch size` hyper-parameter cannot be greater than 7.
+
+#### Explanation
+<details>
+With a sufficiently large dataset, you are generally fine with the defaults and can ignore. However, when the provided dataset is small (~1000 data points or less), you need to set the above values correctly or else you will likely run into a training error.
+
+<br /> The dataset that you are providing will be split up across multiple hdf5 files based on the input parameters of the `pipeline` command.
+
+* `max_seq_length` - The maximum sequence length the model you are using can take for a single data point. See more in [flags](#flags) section.
+* `input_packing_config` - Determines how to pack the provided data into sequences that will be split across the hdf5 files for training. See more in the [flags](#flags) section.
+
+Based on the size and strucutre of the dataset provided + these parameter settings, a different `max_batch_size_train` will be shown in `metadata.yaml` which dictates how large you can set the corresponding `batch_size` hyper-parameter setting when starting a model training job!
+
+**_Note:_**: Not all models trained in studio will expose the `batch_size` parameter. For those that don't you should ensure your `max_batch_size_train` is larger than the default batch size (generally 16).
+</details>
+
 ### Flags
 <details>
   <summary>CLICK HERE to see flags</summary>
