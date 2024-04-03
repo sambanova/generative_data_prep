@@ -99,7 +99,9 @@ This format should be used for pre-training/continual pretraining, but not fine-
 When processing text files, each line should be considered a *"data point"*. Depending on the `input_packing_config` parameter, these *"data points"* will be processed (and possibly combined) into sequences that are put in the **completion**. There is more information on the `input_packing_config` [below](#input_packing_config).
 
 ### Dataset Size Requirements
-When preparing a dataset for training, different dataset sizes will dictate the maximum batch size you can set. Not all models expose the `batch_size` parameter, however for those that do, it is *__very important__* to know this maximum batch size and set `batch_size` accordingly.
+1. You need to ensure your input dataset is large enough to run one batch of training.
+2. Make sure that the number of sequences in the output dataset files satisfy this by checking `max_batch_size_train` in the `<OUTPUT_DIR>/metadata.yaml` file.
+3. Use this value to set `batch_size` accordingly when starting a training job!
 
 #### How to Check and Set
 
@@ -131,9 +133,9 @@ With a sufficiently large dataset, you are generally fine with the defaults and 
 * `input_packing_config` - Determines how to pack the provided data into sequences that will be split across the hdf5 files for training. See more in the [flags](#flags) section.
 
 Based on the size and strucutre of the dataset provided + these parameter settings, a different `max_batch_size_train` will be shown in `metadata.yaml` which dictates how large you can set the corresponding `batch_size` hyper-parameter setting when starting a model training job!
-</details>
 
-</br>
+**_Note:_**: Not all models trained in studio will expose the `batch_size` parameter. For those that don't you should ensure your `max_batch_size_train` is larger than the default batch size (generally 16).
+</details>
 
 ## Output
 The `output_path` should be a directory that will contain all the tokenized HDF5 split files, and a directory called `tokenizer`. This directory constitutes a processed dataset and can be used for training a model after uploading to SambaStudio. The `tokenizer` directory will be transferred to any output checkpoints that are saved by Sambastudio for the tokenizer to be used for inference later on.
