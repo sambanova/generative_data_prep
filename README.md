@@ -20,6 +20,8 @@ This software package is a flexible and efficient tool that sports features like
 
 The [`pipeline.py`](https://github.com/sambanova/generative_data_prep/blob/main/generative_data_prep/data_prep/pipeline.py) script streamlines the data preparation process. It takes a single input file, shuffles and splits it into train/dev/test files, tokenizes, sequences, and converts them to HDF5 format using the utilities in [`data_prep.py`](https://github.com/sambanova/generative_data_prep/blob/main/generative_data_prep/data_prep/data_prep.py). The output directory contains multiple split HDF5 files that are needed to run data parallel training. This output directory will be directly used as a training dataset in SambaStudio. While this package features simple flows that work out of the box, it also supports more customization allowing for many styles of packing varied length text into tokenized sequences.
 
+If you are an advanced user looking to process data with pre-defined splits, integrate with the package validation tools, or contribute, check out the [Advanced Usage](#advanced-usage) section below!
+
 </br>
 
 ## Table of contents
@@ -35,6 +37,7 @@ The [`pipeline.py`](https://github.com/sambanova/generative_data_prep/blob/main/
     - [Dialogue](#dialogue)
     - [Meta in context learning](#meta-in-context-learning)
 - [Understanding Command Outputs](#understanding-outputs)
+- [Advanced Usage](#advanced-usage)
 
 </br>
 
@@ -55,31 +58,34 @@ pip install .
 
 ## Getting Started
 
-The following simple example will help you get started with your first processed dataset. Here are a few important parameters to know about when running this example:
-
-|          Flag Name          | Type | Description | Instructions |
-|             ---             | ---  |     ---     |      ---     |
-|   `input_file_path`         |  str | An existing file path to the dataset to be processed. File must be in `.jsonl` or `.txt` format.   |  Check out the [input format](#input-format) section for more details.    |
-|   `output_path`             |  str | A path to the desired output location for the directory of processed dataset files. If the path doesn't exist, a new directory will be created using the provided path.   |   Processed datasets consist of multiple files under an output directory. If I want my output directory to be named `out`, I could put the path `/Users/johndoe/Documents/datasets/dataset_name/out` for example. Check out the [output](#output) section for more details. |
-|   `pretrained_tokenizer`    |  str | The tokenizer to use when tokenizing the input dataset. The tokenizers are model specific and can be found on HuggingFace.      |  You can get this value by copying the model path available on the HuggingFace model card. I.e. For Llama-2-7b-hf I would put `"meta-llama/Llama-2-7b-hf"`  |
-|   `max_seq_length`          |  int | The max size of input sequence a model can support. This is model specific - i.e. for `GPT-2` it's __1024__, for `Llama-2` it's __4096__.  |   You can find this information in a few places, but a place you can consistently find this value is in the `config.json` file under the HuffingFace model's File's and Versions tab. Then grab the value for `max_position_embeddings`.  |
-|   `input_packing_config`    |  str | Defines the strategy used to pack the provided data into sequences across the output HDF5 files. |   There are 7 options for this flag: `'full'`, `'single::truncate_left'`, `'single::truncate_right'`, `'single::drop'`, `'greedy::truncate_left'`, `'greedy::truncate_right'`, `'greedy::drop'`. Check out the [`input_packing_config` flag](#input_packing_config) below for an in depth description of these options. |
-|          `shuffle`          |  int | Determines whether to shuffle the input dataset, and whether to shuffle on RAM. |   Check out the [shuffle flag](#shuffle) below for more details.  |
+The following simple example will help you get started with your first processed dataset:
 
 ### Example
 ```shell
-python3 -m generative_data_prep pipeline --input_file_path=<PATH TO DATASET FILE> --output_path=<PATH TO OUTPUT DIRECTORY> --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_config='single::drop' --shuffle=on_RAM
+python3 -m generative_data_prep pipeline --input_file_path=<PATH TO DATASET FILE> --output_path=<PATH TO OUTPUT DIRECTORY> --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_config='greedy::drop' --shuffle=on_RAM
 ```
+
+Here are a few important parameters to know about when running this example:
+
+|          Flag Name          | Type | Description | Instructions |
+|             ---             | ---  |     ---     |      ---     |
+|   `input_file_path`         |  str | An existing file path to the dataset to be processed. File must be in `.jsonl` or `.txt` format.   |  Check out the [input](#input) section for more details.    |
+|   `output_path`             |  str | A path to the desired output location for the directory of processed dataset files. If the path doesn't exist, a new directory will be created using the provided path.   |   Processed datasets consist of multiple files under an output directory. If I want my output directory to be named `out`, I could put the path `/Users/johndoe/Documents/datasets/dataset_name/out` for example. Check out the [output](#output) section for more details. |
+|   `pretrained_tokenizer`    |  str | The tokenizer to use when tokenizing the input dataset. The tokenizers are model specific and can be found on HuggingFace.      |  You can use the model ID from the HuggingFace model card. I.e. For Mistral-7B-v0.1 I would put `"mistralai/Mistral-7B-v0.1"`  |
+|   `max_seq_length`          |  int | The max size of input sequence a model can support. This is model specific - i.e. for `GPT-2` it's __1024__, for `Llama-2` it's __4096__.  |   You can find this information in a few places, but you can often find the models max sequence length by looking in the `config.json` file under the HuffingFace model's _"File's and Versions"_ tab and finding the value of `max_position_embeddings`.  |
+|   `input_packing_config`    |  str | Defines the strategy used to pack the provided data into sequences across the output HDF5 files. |   There are 7 options for this flag: `'full'`, `'single::truncate_left'`, `'single::truncate_right'`, `'single::drop'`, `'greedy::truncate_left'`, `'greedy::truncate_right'`, `'greedy::drop'`. Check out the [`input_packing_config`](#input_packing_config) flag below for an in depth description of these options. |
+|          `shuffle`          |  int | Determines whether to shuffle the input dataset, and whether to shuffle on RAM. |   There are 3 options for this flag: `'False'`, `'on_RAM'`, `'large_file'`. Check out the [`shuffle`](#shuffle) flag below for more details.  |
+
 
 </br>
 
 ## Input
 
-The input file format must be either `.txt` or [`.jsonl`](https://jsonlines.org/). Depending on whether you want to do [fine-tuning](#fine-tuning) or [pretraining](#pretraining), your data will need to be in a specific format.
+The input file format must be either `.txt` or [`.jsonl`](https://jsonlines.org/). 
 
 ### `.jsonl` Format
 
-The JSON Lines format can be used for fine-tuning, or pre-training/continual pre-training. Each line in the `.jsonl` format should be a json object with a `prompt`, and `completion` element. For example:
+The JSON Lines format can be used for [fine-tuning](#fine-tuning), or [pretraining](#pretraining)/continual pre-training. Each line in the `.jsonl` format should be a json object with a `prompt`, and `completion` element. For example:
 
 ```
 {"prompt": "What did the fox do?", "completion": "The quick brown fox jumped over the lazy dog."}
@@ -87,59 +93,41 @@ The JSON Lines format can be used for fine-tuning, or pre-training/continual pre
 {"prompt": "Who sells seashells by the sea shore?", "completion": "She sells seashells by the sea shore."}
 ```
 
+We also support lists of prompt/completion pairs within a `.jsonl` file. This will guarantee that the pairs in the list won't be shuffled apart. In other words, all promp/completion pairs on separate lines get shuffled. Here's an example structure:
+
+```
+{"prompt": "What did the fox do?", "completion": "The quick brown fox jumped over the lazy dog."}
+[{"prompt": "How much wood does a woodchuck chuck?", "completion": "A woodchuck chucks 1000 wood."}, {"prompt": "How much wood can a woodchuck not chuck?", "completion": "A woodchuck cannot chuck more than 5000 wood."}]
+{"prompt": "Who sells seashells by the sea shore?", "completion": "She sells seashells by the sea shore."}
+```
+
+
 If the JSON objects in your `.jsonl` contain keywords other than **prompt** and **completion**, refer to the `prompt_keyword` and `completion_keyword` flags [below](#prompt_keyword)
 
 ### `.txt` Format
 
 This format should be used for pre-training/continual pretraining, but not fine-tuning. With text files, all sequences are used as completions, so all processed sequences end up having empty prompts in the prompt/completion pair. For example:
 
+```txt
+The quick brown fox jumped over the lazy dog
+I come from a land down under
+SambaNova makes extremely good software and hardware that's fun to use
+```
+
+will effectively be turned into this:
+
 ```
 {"prompt": "", "completion": "The quick brown fox jumped over the lazy dog"}
+{"prompt": "", "completion": "I come from a land down under"}
+{"prompt": "", "completion": "SambaNova makes extremely good software and hardware that's fun to use"}
 ```
 
 When processing text files, each line should be considered a *"data point"*. Depending on the `input_packing_config` parameter, these *"data points"* will be processed (and possibly combined) into sequences that are put in the **completion**. There is more information on the `input_packing_config` [below](#input_packing_config).
 
-### Dataset Size Requirements
-1. You need to ensure your input dataset is large enough to run one batch of training.
-2. Make sure that the number of sequences in the output dataset files satisfy this by checking `max_batch_size_train` in the `<OUTPUT_DIR>/metadata.yaml` file.
-3. Use this value to set `batch_size` accordingly when starting a training job!
-
-#### How to Check and Set
-
-When starting a training job, ensure that the `batch_size` hyper-parameter is __*no bigger*__ than the `max_batch_size_train` shown in `metadata.yaml`.
-
-For example:
-```(shell)
-$ cat <PROCESSED DATA DIRECTORY>/metadata.yaml
-
-max_batch_size_dev: null
-max_batch_size_train: 7
-max_seq_length: 1024
-number_of_dev_files: 0
-number_of_test_files: 0
-number_of_training_files: 32
-token_type_ids: true
-tokenizer_model_type: <class 'transformers.models.gpt2.configuration_gpt2.GPT2Config'>
-vocab_size: 50257
-```
-Here you can see that `max_batch_size_train` is 7, so the `batch size` hyper-parameter cannot be greater than 7.
-
-#### Explanation
-<details>
-With a sufficiently large dataset, you are generally fine with the defaults and can ignore. However, when the provided dataset is small (~1000 data points or less), you need to set the above values correctly or else you will likely run into a training error.
-
-<br /> The dataset that you are providing will be split up across multiple hdf5 files based on the input parameters of the `pipeline` command.
-
-* `max_seq_length` - The maximum sequence length the model you are using can take for a single data point. See more in [flags](#flags) section.
-* `input_packing_config` - Determines how to pack the provided data into sequences that will be split across the hdf5 files for training. See more in the [flags](#flags) section.
-
-Based on the size and strucutre of the dataset provided + these parameter settings, a different `max_batch_size_train` will be shown in `metadata.yaml` which dictates how large you can set the corresponding `batch_size` hyper-parameter setting when starting a model training job!
-
-**_Note:_**: Not all models trained in studio will expose the `batch_size` parameter. For those that don't you should ensure your `max_batch_size_train` is larger than the default batch size (generally 16).
-</details>
+</br>
 
 ## Output
-The `output_path` should be a directory that will contain all the tokenized HDF5 split files, and a directory called `tokenizer`. This directory constitutes a processed dataset and can be used for training a model after uploading to SambaStudio. The `tokenizer` directory will be transferred to any output checkpoints that are saved by Sambastudio for the tokenizer to be used for inference later on.
+The `output_path` should be a directory that will contain all the tokenized HDF5 split files, and a sub-directory called `tokenizer`. This output directory constitutes a processed dataset and can be used for training a model after uploading to SambaStudio. The `tokenizer` sub-directory will be transferred to any output checkpoints that are saved by Sambastudio for the tokenizer to be used for inference later on.
 
 ### Holdout Evaluation Data
 To evaluate on a holdout set of data during training, `pipeline.py` can create splits of holdout evaluation data.
@@ -165,6 +153,47 @@ If you want to view the contents of a processed dataset, you can decode an HDF5 
 python3 generative_data_prep/utils/decode_hdf5.py --hdf5_file_path=<PATH TO HDF5 FILE> --output_decoded_file_path=<PATH TO OUTPUT TXT FILE>
 ```
 
+### Dataset Size Requirements
+<details>
+
+1. You need to ensure your dataset is large enough to run one batch of training.
+2. Make sure that the number of sequences in the output dataset files satisfy this by checking `max_batch_size_train` in the `<OUTPUT_DIR>/metadata.yaml` file.
+3. Use this value to set `batch_size` accordingly when starting a training job!
+
+#### How to Check and Set
+
+When starting a training job, ensure that the `batch_size` hyper-parameter is __*no bigger*__ than the `max_batch_size_train` shown in `metadata.yaml`.
+
+For example:
+```(shell)
+$ cat <PROCESSED DATA DIRECTORY>/metadata.yaml
+
+max_batch_size_dev: null
+max_batch_size_train: 7
+max_seq_length: 1024
+number_of_dev_files: 0
+number_of_test_files: 0
+number_of_training_files: 32
+token_type_ids: true
+tokenizer_model_type: <class 'transformers.models.gpt2.configuration_gpt2.GPT2Config'>
+vocab_size: 50257
+```
+Here you can see that `max_batch_size_train` is 7, so the `batch size` hyper-parameter cannot be greater than 7.
+
+#### Explanation
+
+With a sufficiently large dataset, you are generally fine with the defaults and can ignore. However, when the provided dataset is small (~1000 data points or less), you need to set the above values correctly or else you will likely run into a training error.
+
+<br /> The dataset that you are providing will be split up across multiple hdf5 files based on the input parameters of the `pipeline` command.
+
+* `max_seq_length` - The maximum sequence length the model you are using can take for a single data point. See more in [flags](#flags) section.
+* `input_packing_config` - Determines how to pack the provided data into sequences that will be split across the hdf5 files for training. See more in the [flags](#flags) section.
+
+Based on the size and strucutre of the dataset provided + these parameter settings, a different `max_batch_size_train` will be shown in `metadata.yaml` which dictates how large you can set the corresponding `batch_size` hyper-parameter setting when starting a model training job!
+
+**_Note:_**: Not all models trained in studio will expose the `batch_size` parameter. For those that don't you should ensure your `max_batch_size_train` is larger than the default batch size (generally 16).
+</details>
+
 ### Additional Details
 <details>
 
@@ -188,7 +217,7 @@ This section outlines all the flags you can set to customize the data prep pipel
 
 | Flag Name  | Type | Default | Options | Description |
 | --- | --- | --- | --- | --- |
-| `input_file_path`  | str | REQUIRED | Any existing file path | Path to the input dataset which must be in `.jsonl` or `.txt` format. If dataset is in `.jsonl` format, the dataset needs to conform to the structure specified in [Input Format](#input-format).|
+| `input_file_path`  | str | REQUIRED | Any existing file path | Path to the input dataset which must be in `.jsonl` or `.txt` format. If dataset is in `.jsonl` format, the dataset needs to conform to the structure specified in the [Input](#input) section.|
 | `output_path` | str | `input_file_path`'s directory | Any valid directory path | The directory to store the output files |
 | `log_file_path` | str | `output_path`/logs.log | Any valid file path | The file to save the logs in, this will save the date and time, git commit hash, input arguments and metrics associated with the dataset. |
 | `overwrite_output_path` | bool | False | Include flag for True, no arguments | Permission to delete and overwrite files in `output_path`. |
@@ -222,25 +251,6 @@ This section outlines all the flags you can set to customize the data prep pipel
 
 ## Examples
 
-### Pretraining
-Pretraining on unstructured data enables large languages models to learn general language patterns and structures that are useful for a wide range of downstream tasks. In order to prepare pretraining data, you need a large amount of unstructured text data. To prepare pretraining data use the flag `--input_packing_config=full`.
-
-#### Example data
-For pretraining you can have your data in two formats.
-
-> [text separated by newlines.](tests/examples/pretraining_txt/example_pretraining_txt_data.txt)
-
-> [jsonlines with empty prompts and text in the completions.](tests/examples/pretraining/example_pretraining_data.jsonl)
-
-We recommend to use jsonlines with empty prompts and all the text in the completion, this is so that newlines in the text do not separate semantically related articles.
-#### Example command
-
-```
-python3 -m generative_data_prep pipeline --input_file_path=./tests/examples/pretraining/example_pretraining_data.jsonl --output_path=./tests/examples/pretraining/pipelined_pretraining --pretrained_tokenizer=gpt2 --max_seq_length=1024 --shuffle=on_RAM --input_packing_config=full
-```
-
-> [View decoded output](tests/examples/pretraining/decoded_data_prepped_pretraining.txt)
-
 
 ### Fine-tuning
 Fine-tuning (also known as "generative tuning") is a technique used to adapt a pre-trained language model to perform better at a specific task. This approach typically involves training the model on input data that is structured as a "prompt" followed by a "completion". The prompt represents the input for a specific task, while the completion is the output that the model should generate. During training, the model learns to generate the relevant completion tokens based on the context provided by the prompt tokens.
@@ -261,6 +271,27 @@ python3 -m generative_data_prep pipeline --input_file_path=./tests/examples/gene
 
 > [View decoded output](tests/examples/generative_tuning/decoded_data_prepped_generative_tuning.txt)
 
+
+### Pretraining
+Pretraining on unstructured data enables large languages models to learn general language patterns and structures that are useful for a wide range of downstream tasks. In order to prepare pretraining data, you need a large amount of unstructured text data. To prepare pretraining data use the flag `--input_packing_config=full`.
+
+#### Example data
+For pretraining you can have your data in two formats.
+
+> [text separated by newlines.](tests/examples/pretraining_txt/example_pretraining_txt_data.txt)
+
+> [jsonlines with empty prompts and text in the completions.](tests/examples/pretraining/example_pretraining_data.jsonl)
+
+We recommend to use jsonlines with empty prompts and all the text in the completion, this is so that newlines in the text do not separate semantically related articles.
+#### Example command
+
+```
+python3 -m generative_data_prep pipeline --input_file_path=./tests/examples/pretraining/example_pretraining_data.jsonl --output_path=./tests/examples/pretraining/pipelined_pretraining --pretrained_tokenizer=gpt2 --max_seq_length=1024 --shuffle=on_RAM --input_packing_config=full
+```
+
+> [View decoded output](tests/examples/pretraining/decoded_data_prepped_pretraining.txt)
+
+
 ### Dialogue
 Dialogue data often involves multiple turns in a conversation between a user and an agent. In order to train on this data, the entire conversation needs to be in the same sequence of tokens and the model should only learn to generate the agents responses based on the users inputs. To prepare data like this create a list of prompt completion pairs, and if you train with `packing_boundary=jsonl` and `input_packing_config=greedy::truncate_right/` or `input_packing_config=single::truncate_right` then these conversations are guaranteed to be in the provided order in the same sequence. Additionally if you include the `prompt_loss_weight=0.0` option while training on SambaStudio, only the completions will be learned. Also for training dialogue in chat-ml style, users can set `prompt_prefix` and `prompt_postfix`.
 
@@ -274,6 +305,7 @@ python3 -m generative_data_prep pipeline --input_file_path=./tests/examples/dial
 ```
 
 > [View decoded output](tests/examples/dialogue/decoded_data_prepped_dialogue.txt)
+
 
 ### Meta in context learning
 [Meta In Context Learning](https://arxiv.org/pdf/2110.15943.pdf) improves the few shot performance of a model by including training data formatted in a few shot style. This infrastructure allows you to prepare data in a variant of meta in context learning SambaNova uses called "All Shot" learning. In order to prepare data in this format prepare lists of prompt completion pairs, where every list contains prompt completion pairs that are completing the same instruction/task. Then prepare the data with the `input_packing_config=greedy::drop`, `packing_boundary=prompt_completion_pair` and `attention_boundary=jsonl`. This ensures that every sequence contains prompt completion pairs following the same "instruction", and that when learning a completion the model is attending to all the other prompt completion pairs before it.
@@ -294,7 +326,7 @@ python3 -m generative_data_prep pipeline --input_file_path=./tests/examples/meta
 ## Understanding Command Outputs
 
 ### Terminal Output
-The metrics associated with this dataset will be printed in the terminal. These metrics give some insight into how the data was packed into sequences, and information about the training dataset.
+The metrics associated with this dataset will be printed in the terminal as well as being logged at `<OUTPUT DIR PATH>/logs.log`. These metrics give some insight into how the data was packed into sequences, and information about the training dataset.
 | Metric Name      | Definition | How to Interpret? |
 | --------- | --------- | --------- |
 | Articles | The number of lines in the input dataset. | How many text documents in the input dataset. |
@@ -302,8 +334,8 @@ The metrics associated with this dataset will be printed in the terminal. These 
 | Prompt Tokens | Number of prompt tokens in the output hdf5 dataset. | <- |
 | Completion Tokens | Number of completion tokens in the output hdf5 dataset. | <- |
 | Padding Tokens | Number of padding tokens in the output hdf5 dataset. | <- |
-| Average Completion Length | Number of completion tokens divided by number of input articles. | How long the average completion is the dataset. |
-| Average Prompt Length | Number of prompt tokens divided by number of input articles. |  How long the average prompt is the dataset. |
+| Average Completion Length | Number of completion tokens divided by number of input articles. | The length of the average completion in the dataset. |
+| Average Prompt Length | Number of prompt tokens divided by number of input articles. |  The length of the average prompt in the dataset. |
 | Data Utilization | Percent of non-padding tokens in output HDF5 dataset divided by number of tokens in input dataset. | This metric reveals how much of the input data makes it to the output dataset. If this percent is much less than 100%, that means a lot of the input data will not be trained on. Refer to the "Dropped From Packing" or "Dropped From All Prompt" metrics to see why this is happening. |
 | Dropped From Packing  | Number of tokens dropped during packing, divided by number of tokens in input dataset. | The percent of tokens are dropped because they do not fit into the sequence length, and the `input_packing_config` does not allow them to be overflowed.|
 | Dropped From All Prompt | Number of tokens dropped because all the tokens in a sequence are prompt tokens, divided by the number of tokens in input dataset. | Sequences that are all prompts or padding (no completion tokens) are dropped. This is because the model will not learn anything from these sequences and the loss will be 0, which may cause errors. |
@@ -330,7 +362,6 @@ NOTE:
 * `tokenizer_model_type` is the string conversion of `type(modelConfig)`. Can use this field to compare the model used during training, which can be extracted by using `AutoConfig` in Huggingface transformers. Then wrapping it with `str(type())`.
 * `max_batch_size_dev` will be `None` unless dev files are created during generative data pipeline.
 * `token_type_ids` will always be `True` for now since they are always generated.
-https://token.onelogin.com-token-auth.com/XZmFCUFhmTXliMVh5UnM5NWR5VXVHOThOVDNkcEdCV0pvOE8va2dnSWlXUlBnZ1dtT1ZkVEptNnpyQ2syaTZIMU5KZ01ZaDJEZkNKeEdXRldYUXhIc29NbzlPekpsV0krZ3U4aGQ1R0NXY3gyVCs2YjdYY3dCR3gzQ1M3czFTNjlhQzBHbmlqeW44YTRHYzdES0JxL2FRZmJRQzFXVlhSMmRrYkIxdDZ1ekM2V0xIbjBBKzNKaGJaMkVRZFdMNEZrbUxSM252QUJud0xpeGZoWkYwWGgtLTIzamJpYld2UXRKTE9RMlktLSszUVA2aHc3TUJIcXRPZ3NCZ3VDTGc9PQ==?cid=1975741065
 
 
 ## Advanced Usage
