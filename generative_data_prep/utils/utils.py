@@ -19,7 +19,12 @@ import json
 import math
 import os
 import shutil
-from importlib.resources import files as importlib_files
+import sys
+
+if sys.version_info[1] <= 8:
+    from importlib_resources import files as importlib_files
+else:
+    from importlib.resources import files as importlib_files
 from subprocess import PIPE, run  # nosec
 from typing import Optional
 
