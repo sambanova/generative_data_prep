@@ -16,19 +16,20 @@
 
 # Generative data preparation
 
-The [`pipeline.py`](https://github.com/sambanova/generative_data_prep/blob/main/generative_data_prep/data_prep/pipeline.py) script streamlines data preparation for machine learning model training. It takes a single input file, shuffles and splits it into train/dev/test files, and tokenizes, sequences, and converts them to HDF5 format using
-the utilities in [`data_prep.py`](https://github.com/sambanova/generative_data_prep/blob/main/generative_data_prep/data_prep/data_prep.py). The output directory contains multiple split HDF5 files that are needed to run data parallel training. This output directory will be directly used as a training dataset in SambaStudio. While this package features simple flows that work out of the box, it also supports more customization allowing for many styles of packing text of any length into tokenized sequences.
+This software package is a flexible and efficient tool that sports features like efficient multiprocessing, shuffling data that outsizes RAM, and specifying tokens to attend to during training. By using this package, you can prepare datasets that will be used to train generative models on SambaStudio. 
+
+The [`pipeline.py`](https://github.com/sambanova/generative_data_prep/blob/main/generative_data_prep/data_prep/pipeline.py) script streamlines the data preparation process. It takes a single input file, shuffles and splits it into train/dev/test files, tokenizes, sequences, and converts them to HDF5 format using the utilities in [`data_prep.py`](https://github.com/sambanova/generative_data_prep/blob/main/generative_data_prep/data_prep/data_prep.py). The output directory contains multiple split HDF5 files that are needed to run data parallel training. This output directory will be directly used as a training dataset in SambaStudio. While this package features simple flows that work out of the box, it also supports more customization allowing for many styles of packing varied length text into tokenized sequences.
 
 </br>
 
 ## Table of contents
 - [Requirements](#requirements)
 - [Installation](#installation)
-- [Get Started](#end-to-end-data-preparation)
+- [Getting Started](#getting-started)
 - [Input](#input)
 - [Output](#output)
 - [Flags](#flags)
-- [Examples](#example-use-cases)
+- [Examples](#examples)
     - [Pretraining](#pretraining)
     - [Fine-tuning](#fine-tuning)
     - [Dialogue](#dialogue)
@@ -156,6 +157,14 @@ To do this, include flags from only one of the two options below, only use one o
 - To specify the number of training splits and test splits directly, use the three flags `--num_training_splits=...`, `--num_dev_splits=...` and `--num_test_splits=...`
 - To specify the percentage of the data heldout for testing, you can specify `--dev_ratio=...` and `--test_ratio=0.1`, where 0.1 means that approximately 10% of the data will be included in the test splits. You can also specify the `--num_training_splits=...` flag to control the total number of training splits, but we recommend to let this default.
 
+### View Decoded HDF5 Files
+
+If you want to view the contents of a processed dataset, you can decode an HDF5 file into a human readable text format. To do so, run the following command:
+
+```python
+python3 generative_data_prep/utils/decode_hdf5.py --hdf5_file_path=<PATH TO HDF5 FILE> --output_decoded_file_path=<PATH TO OUTPUT TXT FILE>
+```
+
 ### Additional Details
 <details>
 
@@ -168,12 +177,6 @@ The output HDF5 files each contain two datasets:
   - id=1 for tokens in the completion
   - id=2 for \<eos\> tokens that serve as padding tokens (will not be trained to predict)
   - id=3 for \<eos\> tokens at the end of articles, that define the attention boundary when training with article attention
-
-If you owant to view decoded HDF5 files in human readable text format, you can run the following command:
-
-```python
-python3 generative_data_prep/utils/decode_hdf5.py --hdf5_file_path=<PATH TO HDF5 FILE> --output_decoded_file_path=<PATH TO OUTPUT TXT FILE>
-```
 
 </details>
 
