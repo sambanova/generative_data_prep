@@ -19,10 +19,10 @@ import json
 import math
 import os
 import shutil
-from importlib.resources import files as importlib_files
 from subprocess import PIPE, run  # nosec
 from typing import Optional
 
+from importlib_resources import files as importlib_files
 from transformers import (
     GPT2Config,
     GPT2Tokenizer,
