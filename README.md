@@ -66,7 +66,20 @@ python3 -m generative_data_prep pipeline --input_file_path=<PATH TO DATASET FILE
 ```
 
 Here are a few important parameters to know about when running this example:
-<div class="important-params-table">
+<style>
+table th:first-of-type {
+    width: 15%;
+}
+table th:nth-of-type(2) {
+    width: 5%;
+}
+table th:nth-of-type(3) {
+    width: 40%;
+}
+table th:nth-of-type(4) {
+    width: 40%;
+}
+</style>
 
 |          Flag Name          | Type | <div style="width:500px">Description</div> | <div style="width:200px">Instructions</div> |
 |            ---              | ---  |     ---     |     ---      |
@@ -77,7 +90,6 @@ Here are a few important parameters to know about when running this example:
 |   `input_packing_config`    |  str | Defines the strategy used to pack the provided data into sequences across the output HDF5 files. |   There are 7 options for this flag: `'full'`, `'single::truncate_left'`, `'single::truncate_right'`, `'single::drop'`, `'greedy::truncate_left'`, `'greedy::truncate_right'`, `'greedy::drop'`. Check out the [`input_packing_config`](#input_packing_config) flag below for an in depth description of these options. |
 |          `shuffle`          |  int | Determines whether to shuffle the input dataset, and whether to shuffle on RAM. |   There are 3 options for this flag: `'False'`, `'on_RAM'`, `'large_file'`. Check out the [`shuffle`](#shuffle) flag below for more details.  |
 
-</div>
 
 </br>
 
