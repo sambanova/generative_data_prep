@@ -68,7 +68,7 @@ python3 -m generative_data_prep pipeline --input_file_path=<PATH TO DATASET FILE
 Here are a few important parameters to know about when running this example:
 
 |          Flag Name          | Type | Description | Instructions |
-|             ---             | ---  |     ---     |      ---     |
+| ------------- | ---- | ----------- | ------------ |
 |   `input_file_path`         |  str | An existing file path to the dataset to be processed. File must be in `.jsonl` or `.txt` format.   |  Check out the [input](#input) section for more details.    |
 |   `output_path`             |  str | A path to the desired output location for the directory of processed dataset files. If the path doesn't exist, a new directory will be created using the provided path.   |   Processed datasets consist of multiple files under an output directory. If I want my output directory to be named `out`, I could put the path `/Users/johndoe/Documents/datasets/dataset_name/out` for example. Check out the [output](#output) section for more details. |
 |   `pretrained_tokenizer`    |  str | The tokenizer to use when tokenizing the input dataset. The tokenizers are model specific and can be found on HuggingFace.      |  You can use the model ID from the HuggingFace model card. I.e. For Mistral-7B-v0.1 I would put `"mistralai/Mistral-7B-v0.1"`  |
