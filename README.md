@@ -105,24 +105,23 @@ If the JSON objects in your `.jsonl` contain keywords other than **prompt** and 
 
 ### `.txt` Format
 
+<<<<<<< HEAD
 This format should be used for pre-training/continual pre-training, but not fine-tuning. With text files, all sequences are used as completions, so all processed sequences end up having empty prompts in the prompt/completion pair. For example:
+=======
+This format should only be used for pre-training/continual pretraining, but not fine-tuning. Additionally we recommend that you use prompt completion jsonl format instead of text format, because jsonl format can handle newlines in the text. If you use txt format then newlines within text articles will seperate the text into different data points that may be shuffled and not placed into the same contiguous sequences.
+>>>>>>> e6438621bc844ec40135aaa53ddc5f2569a2b94b
 
 ```txt
 The quick brown fox jumped over the lazy dog
 I come from a land down under
 SambaNova makes extremely good software and hardware that's fun to use
 ```
-
-will effectively be turned into this:
-
+The above txt input would be equivalent to this jsonl input
 ```
 {"prompt": "", "completion": "The quick brown fox jumped over the lazy dog"}
 {"prompt": "", "completion": "I come from a land down under"}
 {"prompt": "", "completion": "SambaNova makes extremely good software and hardware that's fun to use"}
 ```
-
-When processing text files, each line should be considered a *"data point"*. Depending on the `input_packing_config` parameter, these *"data points"* will be processed (and possibly combined) into sequences that are put in the **completion**. There is more information on the `input_packing_config` [below](#input_packing_config).
-
 </br>
 
 ## Output
@@ -235,7 +234,7 @@ This section outlines all the flags you can set to customize the data prep pipel
 | `prompt_postfix` | str | 'None' | | text to add after the prompt, for chatML conventions use (e.g. "\<bot\>:") |
 | `disable_space_separator` | bool | False | Include flag for True, no arguments |  If you include this flag, NO spaces will be prepended to the completion. (If you do not add this flag then a space is added to every completion if it does not already have a space). Including this flag is dangerous and not recommended because if you have input data like {"prompt": "hello." "completion": "how are you?"}, when the prompt and completion are combined it will look like "hello.how are you?" which will mess up the tokenization.--completion_keyword='target'. |
 | `keep_prompt_only_sequences` | bool | False | Include flag for True, no arguments | If you include this flag, packed sequences with only prompt tokens will not be dropped. Data with only prompt will be dropped by default because training with prompt-only sequences with prompt_loss_weight=0.0 may lead to errors. Data is dropped because of one of the following conditions: 1. the input file data prompt completion pairs contains only a prompt. 2. If the sequence is truncated such that only prompt tokens remain |
-| `categories_path` | str | False | If you include this flag, then the 'category' field from your input jsonls will be stored in the 'category_id' dataset in your output hdf5 files. This flag must point to the file path of a json file that contains a list of all the strings of the 'category' keys in your dataset.|
+| `categories_path` | str | False | Valid file path	 | If you include this flag, then the 'category' field from your input jsonls will be stored in the 'category_id' dataset in your output hdf5 files. This flag must point to the file path of a json file that contains a list of all the strings of the 'category' keys in your dataset.|
 | `shuffle` <span id="shuffle"></span> | str | 'False' | ['False', 'on_RAM', 'large_file'] | Choose the on_RAM option if your file is small enough to fit on RAM (If you are not sure if it fits on RAM, you can probably use this flag). If you are running a linux operating system and your file is too large to fit on RAM, please choose large_file option, this will run approximate file shuffling that can handle files of any size. If you want to do large file shuffling but you are not on linux, please shuffle the file before using this script. If the input file should not be shuffled, do not include this flag, it defaults to False. |
 | `num_training_splits` | int | 32 if input_file_size < 10GB, 128 if 10GB < input_file_size <100GB, 256 if 100GB < input_file_size | | The number of training files to split input data into. We recommend you do not include this flag and allow it to default. If you do not default this flag, you have two options. Option 1: specify this flag with the `dev_ratio` and `test_ratio` flags, The total number of splits will be (`num_training_splits` / (1-`dev_ratio`-`test_ratio`)), and the number of dev and test splits are calculated accordingly. Option 2: specify this flag with the `num_dev_splits` and `num_test_splits` flags which define the number of splits directly. NOTE: the number of training splits must be greater than the number of training workers you have, and we recommend that the number of splits is a multiple of the number of workers you have. |
 | `dev_ratio` | float | 0.0 | [0 - 1] | The ratio of data that should be excluded from train set and used for evaluation, defaults to 0%. If you specify this flag, do not specify `num_dev_splits` or `num_test_splits`. |
