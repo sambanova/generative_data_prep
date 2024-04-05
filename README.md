@@ -136,9 +136,9 @@ The JSON Lines format can be used for [fine-tuning](#fine-tuning), or [pre-train
 We also support lists of prompt/completion pairs within a `.jsonl` file. This guarantees that the prompt/completion pairs in the list will be placed contiguously in the same sequence. If the input prompt/completion pairs are placed on separate lines rather then a list, then they will get shuffled and appear in different training sequences. Your input file may include lines in both list format and regular prompt/completion pair format. Here's an example structure:
 
 ```
-{"prompt": "What did the fox do?", "completion": "The quick brown fox jumped over the lazy dog."}
+[{"prompt": "What's your favorite type of music?", "completion": "I love hip-hop"}, {"prompt": "That's cool. Who's your favorite rapper?", "completion": "I really like Kendrick Lamar"}]
 [{"prompt": "What is your favorite type of dessert?", "completion": "My favorite dessert is cheesecake."}, {"prompt": "What is your favorite flavor of cheesecake?", "completion": "My favorite flavor of cheesecake is raspberry."}]
-{"prompt": "Who sells seashells by the sea shore?", "completion": "She sells seashells by the sea shore."}
+[{"prompt": "What is your favorite sport?", "completion": "My favorite sport is football."}, {"prompt": "Who is your favorite football player?", "completion": "My favorite football player is Tom Brady."}]
 ```
 
 
@@ -362,20 +362,78 @@ python3 -m generative_data_prep pipeline --input_file_path=./tests/examples/meta
 
 ### Terminal Output
 The metrics associated with this dataset will be printed in the terminal as well as being logged at `<OUTPUT DIR PATH>/logs.log`. These metrics give some insight into how the data was packed into sequences, and information about the training dataset.
-| Metric Name      | Definition | How to Interpret? |
-| --------- | --------- | --------- |
-| Articles | The number of lines in the input dataset. | How many text documents in the input dataset. |
-| Dataset Tokens | Number of tokens in the output hdf5 dataset. | How many tokens are in the training dataset. But this includes both prompt tokens and padding tokens, so this metric does not necessarily show how many tokens will learned by the model. |
-| Prompt Tokens | Number of prompt tokens in the output hdf5 dataset. | <- |
-| Completion Tokens | Number of completion tokens in the output hdf5 dataset. | <- |
-| Padding Tokens | Number of padding tokens in the output hdf5 dataset. | <- |
-| Average Completion Length | Number of completion tokens divided by number of input articles. | The length of the average completion in the dataset. |
-| Average Prompt Length | Number of prompt tokens divided by number of input articles. |  The length of the average prompt in the dataset. |
-| Data Utilization | Percent of non-padding tokens in output HDF5 dataset divided by number of tokens in input dataset. | This metric reveals how much of the input data makes it to the output dataset. If this percent is much less than 100%, that means a lot of the input data will not be trained on. Refer to the "Dropped From Packing" or "Dropped From All Prompt" metrics to see why this is happening. |
-| Dropped From Packing  | Number of tokens dropped during packing, divided by number of tokens in input dataset. | The percent of tokens are dropped because they do not fit into the sequence length, and the `input_packing_config` does not allow them to be overflowed.|
-| Dropped From All Prompt | Number of tokens dropped because all the tokens in a sequence are prompt tokens, divided by the number of tokens in input dataset. | Sequences that are all prompts or padding (no completion tokens) are dropped. This is because the model will not learn anything from these sequences and the loss will be 0, which may cause errors. |
-| Sequence Utilization | Average number of non-padding tokens in a sequence divided by sequence length. | The percent of the tokens in each sequence are actually used for training. This number imrpoved be changed by using different `input_packing_config`. The packing styles from highest sequence utilization to lowest are: `full`, `greedy::truncate_left` (or truncate_right), `greedy::drop`, `single::truncate_left` (or truncate_right), `single::drop`.|
-| Seq Completion Utilization | Average number of completions tokens in a sequence divided by sequence length. | The percent of the tokens in a sequence are learned.|
+
+<table>
+    <thead>
+        <tr>
+            <th>Metric Name</th>
+            <th width="50%">Definition</th>
+            <th width="50%">How to Interpret?</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Articles</td>
+            <td>The number of lines in the input dataset.</td>
+            <td>How many text documents in the input dataset.</td>
+        </tr>
+        <tr>
+            <td>Dataset Tokens</td>
+            <td>Number of tokens in the output hdf5 dataset.</td>
+            <td>How many tokens are in the training dataset. But this includes both prompt tokens and padding tokens, so this metric does not necessarily show how many tokens will learned by the model.</td>
+        </tr>
+        <tr>
+            <td>Prompt Tokens</td>
+            <td>Number of prompt tokens in the output hdf5 dataset.</td>
+            <td>&lt;-</td>
+        </tr>
+        <tr>
+            <td>Completion Tokens</td>
+            <td>Number of completion tokens in the output hdf5 dataset.</td>
+            <td>&lt;-</td>
+        </tr>
+        <tr>
+            <td>Padding Tokens</td>
+            <td>Number of padding tokens in the output hdf5 dataset.</td>
+            <td>&lt;-</td>
+        </tr>
+        <tr>
+            <td>Average Completion Length</td>
+            <td>Number of completion tokens divided by number of input articles.</td>
+            <td>The length of the average completion in the dataset.</td>
+        </tr>
+        <tr>
+            <td>Average Prompt Length</td>
+            <td>Number of prompt tokens divided by number of input articles.</td>
+            <td>The length of the average prompt in the dataset.</td>
+        </tr>
+        <tr>
+            <td>Data Utilization</td>
+            <td>Percent of non-padding tokens in output HDF5 dataset divided by number of tokens in input dataset.</td>
+            <td>This metric reveals how much of the input data makes it to the output dataset. If this percent is much less than 100%, that means a lot of the input data will not be trained on. Refer to the "Dropped From Packing" or "Dropped From All Prompt" metrics to see why this is happening.</td>
+        </tr>
+        <tr>
+            <td>Dropped From Packing</td>
+            <td>Number of tokens dropped during packing, divided by number of tokens in input dataset.</td>
+            <td>The percent of tokens are dropped because they do not fit into the sequence length, and the <code>input_packing_config</code> does not allow them to be overflowed.</td>
+        </tr>
+        <tr>
+            <td>Dropped From All Prompt</td>
+            <td>Number of tokens dropped because all the tokens in a sequence are prompt tokens, divided by the number of tokens in input dataset.</td>
+            <td>Sequences that are all prompts or padding (no completion tokens) are dropped. This is because the model will not learn anything from these sequences and the loss will be 0, which may cause errors.</td>
+        </tr>
+        <tr>
+            <td>Sequence Utilization</td>
+            <td>Average number of non-padding tokens in a sequence divided by sequence length.</td>
+            <td>The percent of the tokens in each sequence are actually used for training. This number imrpoved be changed by using different <code>input_packing_config</code>. The packing styles from highest sequence utilization to lowest are: <code>full</code>, <code>greedy::truncate_left</code> (or truncate_right), <code>greedy::drop</code>, <code>single::truncate_left</code> (or truncate_right), <code>single::drop</code>.</td>
+        </tr>
+        <tr>
+            <td>Seq Completion Utilization</td>
+            <td>Average number of completions tokens in a sequence divided by sequence length.</td>
+            <td>The percent of the tokens in a sequence are learned.</td>
+        </tr>
+    </tbody>
+</table>
 
 ### Metadata Output File
 
