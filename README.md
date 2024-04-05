@@ -32,7 +32,7 @@ If you are an advanced user looking to process data with pre-defined splits, int
 - [Output](#output)
 - [Flags](#flags)
 - [Examples](#examples)
-    - [Pretraining](#pretraining)
+    - [Pre-training](#pre-training)
     - [Fine-tuning](#fine-tuning)
     - [Dialogue](#dialogue)
     - [Meta in context learning](#meta-in-context-learning)
@@ -67,15 +67,14 @@ python3 -m generative_data_prep pipeline --input_file_path=<PATH TO DATASET FILE
 
 Here are a few important parameters to know about when running this example:
 
-|          Flag Name          | Type | Description | Instructions |
-|:------|:---|:-----------|:--------|
-|   `input_file_path`         |  str | An existing file path to the dataset to be processed. File must be in `.jsonl` or `.txt` format.   |  Check out the [input](#input) section for more details.    |
-|   `output_path`             |  str | A path to the desired output location for the directory of processed dataset files. If the path doesn't exist, a new directory will be created using the provided path.   |   Processed datasets consist of multiple files under an output directory. If I want my output directory to be named `out`, I could put the path `/Users/johndoe/Documents/datasets/dataset_name/out` for example. Check out the [output](#output) section for more details. |
-|   `pretrained_tokenizer`    |  str | The tokenizer to use when tokenizing the input dataset. The tokenizers are model specific and can be found on HuggingFace.      |  You can use the model ID from the HuggingFace model card. I.e. For Mistral-7B-v0.1 I would put `"mistralai/Mistral-7B-v0.1"`  |
-|   `max_seq_length`          |  int | The max size of input sequence a model can support. This is model specific - i.e. for `GPT-2` it's __1024__, for `Llama-2` it's __4096__.  |   You can find this information in a few places, but you can often find the models max sequence length by looking in the `config.json` file under the HuffingFace model's _"File's and Versions"_ tab and finding the value of `max_position_embeddings`.  |
-|   `input_packing_config`    |  str | Defines the strategy used to pack the provided data into sequences across the output HDF5 files. |   There are 7 options for this flag: `'full'`, `'single::truncate_left'`, `'single::truncate_right'`, `'single::drop'`, `'greedy::truncate_left'`, `'greedy::truncate_right'`, `'greedy::drop'`. Check out the [`input_packing_config`](#input_packing_config) flag below for an in depth description of these options. |
-|          `shuffle`          |  int | Determines whether to shuffle the input dataset, and whether to shuffle on RAM. |   There are 3 options for this flag: `'False'`, `'on_RAM'`, `'large_file'`. Check out the [`shuffle`](#shuffle) flag below for more details.  |
-
+| Flag Name | Type | Description | Instructions |
+|---|---|---|---|
+| `input_file_path` | str | An existing file path to the dataset to be processed. File must be in `.jsonl` or `.txt` format. | Check out the [input](#input) section for more details. |
+| `output_path` | str | A path to the desired output location for the directory of processed dataset files. If the path doesn't exist, a new directory will be created using the provided path. | Check out the [output](#output) section for more details. |
+| `pretrained_tokenizer` | str | The model specific tokenizer to use when tokenizing the input dataset. | You can use the model ID from the HuggingFace model card. I.e. For Mistral-7B-v0.1 I would put `"mistralai/Mistral-7B-v0.1"` |
+| `max_seq_length` | int | The max size of input sequence a model can support. This is model specific - i.e. for `GPT-2` it's __1024__, for `Llama-2` it's __4096__. | You can find this information in a few places, but we recommend you look at the specific model card in SambaStudio to find this value. |
+| `input_packing_config` | str | Defines the strategy used to pack the provided data into sequences across the output HDF5 files. | There are 7 options for this flag: `'full'`, `'single::truncate_left'`, `'single::truncate_right'`, `'single::drop'`, `'greedy::truncate_left'`, `'greedy::truncate_right'`, `'greedy::drop'`. Check out the [`input _packing_ config`](#input _packing_config) flag below for an in depth description of these options. |
+| `shuffle` | str | Determines whether to shuffle the input dataset, and whether to shuffle on RAM. | There are 3 options for this flag: `'False'`, `'on_RAM'`, `'large_file'`. Check out the [`shuffle`](#shuffle) flag below for more details. |
 
 </br>
 
@@ -85,7 +84,7 @@ The input file format must be either `.txt` or [`.jsonl`](https://jsonlines.org/
 
 ### `.jsonl` Format
 
-The JSON Lines format can be used for [fine-tuning](#fine-tuning), or [pretraining](#pretraining)/continual pre-training. Each line in the `.jsonl` format should be a json object with a `prompt`, and `completion` element. For example:
+The JSON Lines format can be used for [fine-tuning](#fine-tuning), or [pre-training](#pre-training)/continual pre-training. Each line in the `.jsonl` format should be a json object with a `prompt`, and `completion` element. For example:
 
 ```
 {"prompt": "What did the fox do?", "completion": "The quick brown fox jumped over the lazy dog."}
@@ -93,11 +92,11 @@ The JSON Lines format can be used for [fine-tuning](#fine-tuning), or [pretraini
 {"prompt": "Who sells seashells by the sea shore?", "completion": "She sells seashells by the sea shore."}
 ```
 
-We also support lists of prompt/completion pairs within a `.jsonl` file. This will guarantee that the pairs in the list won't be shuffled apart. In other words, all promp/completion pairs on separate lines get shuffled. Here's an example structure:
+We also support lists of prompt/completion pairs within a `.jsonl` file. This guarantees that the prompt/completion pairs in the list will be placed contiguously in the same sequence. If the input prompt/completion pairs are placed on separate lines rather then a list, then they will get shuffled and appear in different training sequences. Your input file may include lines in both list format and regular prompt/completion pair format. Here's an example structure:
 
 ```
 {"prompt": "What did the fox do?", "completion": "The quick brown fox jumped over the lazy dog."}
-[{"prompt": "How much wood does a woodchuck chuck?", "completion": "A woodchuck chucks 1000 wood."}, {"prompt": "How much wood can a woodchuck not chuck?", "completion": "A woodchuck cannot chuck more than 5000 wood."}]
+[{"prompt": "What is your favorite type of dessert?", "completion": "My favorite dessert is cheesecake."}, {"prompt": "What is your favorite flavor of cheesecake?", "completion": "My favorite flavor of cheesecake is raspberry."}]
 {"prompt": "Who sells seashells by the sea shore?", "completion": "She sells seashells by the sea shore."}
 ```
 
@@ -106,7 +105,7 @@ If the JSON objects in your `.jsonl` contain keywords other than **prompt** and 
 
 ### `.txt` Format
 
-This format should be used for pre-training/continual pretraining, but not fine-tuning. With text files, all sequences are used as completions, so all processed sequences end up having empty prompts in the prompt/completion pair. For example:
+This format should be used for pre-training/continual pre-training, but not fine-tuning. With text files, all sequences are used as completions, so all processed sequences end up having empty prompts in the prompt/completion pair. For example:
 
 ```txt
 The quick brown fox jumped over the lazy dog
@@ -154,12 +153,12 @@ python3 generative_data_prep/utils/decode_hdf5.py --hdf5_file_path=<PATH TO HDF5
 ```
 
 ### Dataset Size Requirements
-<details>
 
 1. You need to ensure your dataset is large enough to run one batch of training.
 2. Make sure that the number of sequences in the output dataset files satisfy this by checking `max_batch_size_train` in the `<OUTPUT_DIR>/metadata.yaml` file.
 3. Use this value to set `batch_size` accordingly when starting a training job!
 
+<details>
 #### How to Check and Set
 
 When starting a training job, ensure that the `batch_size` hyper-parameter is __*no bigger*__ than the `max_batch_size_train` shown in `metadata.yaml`.
@@ -272,11 +271,11 @@ python3 -m generative_data_prep pipeline --input_file_path=./tests/examples/gene
 > [View decoded output](tests/examples/generative_tuning/decoded_data_prepped_generative_tuning.txt)
 
 
-### Pretraining
-Pretraining on unstructured data enables large languages models to learn general language patterns and structures that are useful for a wide range of downstream tasks. In order to prepare pretraining data, you need a large amount of unstructured text data. To prepare pretraining data use the flag `--input_packing_config=full`.
+### Pre-training
+Pre-training on unstructured data enables large languages models to learn general language patterns and structures that are useful for a wide range of downstream tasks. In order to prepare pre-training data, you need a large amount of unstructured text data. To prepare pre-training data use the flag `--input_packing_config=full`.
 
 #### Example data
-For pretraining you can have your data in two formats.
+For pre-training you can have your data in two formats.
 
 > [text separated by newlines.](tests/examples/pretraining_txt/example_pretraining_txt_data.txt)
 
