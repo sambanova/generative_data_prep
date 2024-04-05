@@ -67,14 +67,55 @@ python3 -m generative_data_prep pipeline --input_file_path=<PATH TO DATASET FILE
 
 Here are a few important parameters to know about when running this example:
 
-| Flag Name | Type | Description | Instructions |
-|---|---|---|---|
-| `input_file_path` | str | An existing file path to the dataset to be processed. File must be in `.jsonl` or `.txt` format. | Check out the [input](#input) section for more details. |
-| `output_path` | str | A path to the desired output location for the directory of processed dataset files. If the path doesn't exist, a new directory will be created using the provided path. | Check out the [output](#output) section for more details. |
-| `pretrained_tokenizer` | str | The model specific tokenizer to use when tokenizing the input dataset. | You can use the model ID from the HuggingFace model card. I.e. For Mistral-7B-v0.1 I would put `"mistralai/Mistral-7B-v0.1"` |
-| `max_seq_length` | int | The max size of input sequence a model can support. This is model specific - i.e. for `GPT-2` it's __1024__, for `Llama-2` it's __4096__. | You can find this information in a few places, but we recommend you look at the specific model card in SambaStudio to find this value. |
-| `input_packing_config` | str | Defines the strategy used to pack the provided data into sequences across the output HDF5 files. | There are 7 options for this flag: `'full'`, `'single::truncate_left'`, `'single::truncate_right'`, `'single::drop'`, `'greedy::truncate_left'`, `'greedy::truncate_right'`, `'greedy::drop'`. Check out the [`input _packing_ config`](#input _packing_config) flag below for an in depth description of these options. |
-| `shuffle` | str | Determines whether to shuffle the input dataset, and whether to shuffle on RAM. | There are 3 options for this flag: `'False'`, `'on_RAM'`, `'large_file'`. Check out the [`shuffle`](#shuffle) flag below for more details. |
+<table>
+    <thead>
+        <tr>
+            <th>Flag Name</th>
+            <th>Type</th>
+            <th style="width: 50%;">Description</th>
+            <th style="width: 50%;">Instructions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>input_file_path</code></td>
+            <td>str</td>
+            <td>An existing file path to the dataset to be processed. File must be in <code>.jsonl</code> or <code>.txt</code> format.</td>
+            <td>Check out the <a href="#input">input</a> section for more details.</td>
+        </tr>
+        <tr>
+            <td><code>output_path</code></td>
+            <td>str</td>
+            <td>A path to the desired output location for the directory of processed dataset files. If the path doesn't exist, a new directory will be created using the provided path.</td>
+            <td>Check out the <a href="#output">output</a> section for more details.</td>
+        </tr>
+        <tr>
+            <td><code>pretrained_tokenizer</code></td>
+            <td>str</td>
+            <td>The model specific tokenizer to use when tokenizing the input dataset.</td>
+            <td>You can use the model ID from the HuggingFace model card. I.e. For Mistral-7B-v0.1 I would put <code>"mistralai/Mistral-7B-v0.1"</code></td>
+        </tr>
+        <tr>
+            <td><code>max_seq_length</code></td>
+            <td>int</td>
+            <td>The max size of input sequence a model can support. This is model specific - i.e. for <code>GPT-2</code> it's <strong>1024</strong>, for <code>Llama-2</code> it's <strong>4096</strong>.</td>
+            <td>You can find this information in a few places, but we recommend you look at the specific model card in SambaStudio to find this value.</td>
+        </tr>
+        <tr>
+            <td><code>input_packing_config</code></td>
+            <td>str</td>
+            <td>Defines the strategy used to pack the provided data into sequences across the output HDF5 files.</td>
+            <td>There are 7 options for this flag: <code>'full'</code>, <code>'single::truncate_left'</code>, <code>'single::truncate_right'</code>, <code>'single::drop'</code>, <code>'greedy::truncate_left'</code>, <code>'greedy::truncate_right'</code>, <code>'greedy::drop'</code>. Check out the [<code>input _packing_ config</code>](#input _packing_config) flag below for an in depth description of these options.</td>
+        </tr>
+        <tr>
+            <td><code>shuffle</code></td>
+            <td>str</td>
+            <td>Determines whether to shuffle the input dataset, and whether to shuffle on RAM.</td>
+            <td>There are 3 options for this flag: <code>'False'</code>, <code>'on_RAM'</code>, <code>'large_file'</code>. Check out the <a href="#shuffle"><code>shuffle</code></a> flag below for more details.</td>
+        </tr>
+    </tbody>
+</table>
+
 
 </br>
 
@@ -105,11 +146,7 @@ If the JSON objects in your `.jsonl` contain keywords other than **prompt** and 
 
 ### `.txt` Format
 
-<<<<<<< HEAD
-This format should be used for pre-training/continual pre-training, but not fine-tuning. With text files, all sequences are used as completions, so all processed sequences end up having empty prompts in the prompt/completion pair. For example:
-=======
-This format should only be used for pre-training/continual pretraining, but not fine-tuning. Additionally we recommend that you use prompt completion jsonl format instead of text format, because jsonl format can handle newlines in the text. If you use txt format then newlines within text articles will seperate the text into different data points that may be shuffled and not placed into the same contiguous sequences.
->>>>>>> e6438621bc844ec40135aaa53ddc5f2569a2b94b
+This format should only be used for pre-training/continual pre-training, but not fine-tuning. Additionally, even though `.txt` format is supported, we recommend that you still use prompt/completion `.jsonl` format because it can handle newlines in the text. If you use `.txt` format, then newlines within individual text articles will seperate the text into different data points that may be shuffled and not placed into the same contiguous sequences.
 
 ```txt
 The quick brown fox jumped over the lazy dog
