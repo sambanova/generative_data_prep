@@ -1,12 +1,3 @@
----
-title: Generative data preparation
-output: 
-  html_document:
-     css: main.css
-     self_contained: no
-
----
-
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/sambanova/generative_data_prep/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/sambanova/generative_data_prep/tree/main)
 [![Python](https://img.shields.io/badge/python-%3E=3.7-blue.svg)](https://www.python.org/)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
