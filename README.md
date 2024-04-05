@@ -66,8 +66,9 @@ python3 -m generative_data_prep pipeline --input_file_path=<PATH TO DATASET FILE
 ```
 
 Here are a few important parameters to know about when running this example:
+<div class="important-params-table">
 
-|          Flag Name          | Type | Description  <div style="width:1000px"></div> | Instructions |
+|          Flag Name          | Type | Description | Instructions |
 |            ---              | ---  |     ---     |     ---      |
 |   `input_file_path`         |  str | An existing file path to the dataset to be processed. File must be in `.jsonl` or `.txt` format.   |  Check out the [input](#input) section for more details.    |
 |   `output_path`             |  str | A path to the desired output location for the directory of processed dataset files. If the path doesn't exist, a new directory will be created using the provided path.   |   Processed datasets consist of multiple files under an output directory. If I want my output directory to be named `out`, I could put the path `/Users/johndoe/Documents/datasets/dataset_name/out` for example. Check out the [output](#output) section for more details. |
@@ -76,6 +77,7 @@ Here are a few important parameters to know about when running this example:
 |   `input_packing_config`    |  str | Defines the strategy used to pack the provided data into sequences across the output HDF5 files. |   There are 7 options for this flag: `'full'`, `'single::truncate_left'`, `'single::truncate_right'`, `'single::drop'`, `'greedy::truncate_left'`, `'greedy::truncate_right'`, `'greedy::drop'`. Check out the [`input_packing_config`](#input_packing_config) flag below for an in depth description of these options. |
 |          `shuffle`          |  int | Determines whether to shuffle the input dataset, and whether to shuffle on RAM. |   There are 3 options for this flag: `'False'`, `'on_RAM'`, `'large_file'`. Check out the [`shuffle`](#shuffle) flag below for more details.  |
 
+</div>
 
 </br>
 
