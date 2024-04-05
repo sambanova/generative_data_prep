@@ -66,22 +66,8 @@ python3 -m generative_data_prep pipeline --input_file_path=<PATH TO DATASET FILE
 ```
 
 Here are a few important parameters to know about when running this example:
-<style>
-table th:first-of-type {
-    width: 15%;
-}
-table th:nth-of-type(2) {
-    width: 5%;
-}
-table th:nth-of-type(3) {
-    width: 40%;
-}
-table th:nth-of-type(4) {
-    width: 40%;
-}
-</style>
 
-|          Flag Name          | Type | <div style="width:500px">Description</div> | <div style="width:200px">Instructions</div> |
+|          Flag Name          | Type | Description &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | Instructions |
 |            ---              | ---  |     ---     |     ---      |
 |   `input_file_path`         |  str | An existing file path to the dataset to be processed. File must be in `.jsonl` or `.txt` format.   |  Check out the [input](#input) section for more details.    |
 |   `output_path`             |  str | A path to the desired output location for the directory of processed dataset files. If the path doesn't exist, a new directory will be created using the provided path.   |   Processed datasets consist of multiple files under an output directory. If I want my output directory to be named `out`, I could put the path `/Users/johndoe/Documents/datasets/dataset_name/out` for example. Check out the [output](#output) section for more details. |
