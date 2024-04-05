@@ -105,7 +105,7 @@ Here are a few important parameters to know about when running this example:
             <td><code>input_packing_config</code></td>
             <td>str</td>
             <td>Defines the strategy used to pack the provided data into sequences across the output HDF5 files.</td>
-            <td>There are 7 options for this flag: <code>'full'</code>, <code>'single::truncate_left'</code>, <code>'single::truncate_right'</code>, <code>'single::drop'</code>, <code>'greedy::truncate_left'</code>, <code>'greedy::truncate_right'</code>, <code>'greedy::drop'</code>. Check out the [<code>input _packing_ config</code>](#input _packing_config) flag below for an in depth description of these options.</td>
+            <td>There are 7 options for this flag: <code>'full'</code>, <code>'single::truncate_left'</code>, <code>'single::truncate_right'</code>, <code>'single::drop'</code>, <code>'greedy::truncate_left'</code>, <code>'greedy::truncate_right'</code>, <code>'greedy::drop'</code>. Check out the <a href="#input _packing_config"><code>input _packing_ config</code></a> flag below for an in depth description of these options.</td>
         </tr>
         <tr>
             <td><code>shuffle</code></td>
