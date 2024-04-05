@@ -71,9 +71,9 @@ Here are a few important parameters to know about when running this example:
     <thead>
         <tr>
             <th>Flag Name</th>
-            <th width="100%">Type</th>
-            <th style="width: 50%;">Description</th>
-            <th style="width: 50%;">Instructions</th>
+            <th>Type</th>
+            <th width="50%">Description</th>
+            <th width="50%">Instructions</th>
         </tr>
     </thead>
     <tbody>
