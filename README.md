@@ -366,9 +366,9 @@ The metrics associated with this dataset will be printed in the terminal as well
 <table>
     <thead>
         <tr>
-            <th>Metric Name</th>
-            <th width="50%">Definition</th>
-            <th width="50%">How to Interpret?</th>
+            <th width="15%">Metric Name</th>
+            <th width="42.5%">Definition</th>
+            <th width="42.5%">How to Interpret?</th>
         </tr>
     </thead>
     <tbody>
