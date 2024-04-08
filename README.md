@@ -283,8 +283,6 @@ This section outlines all the flags you can set to customize the data prep pipel
 
 ## Examples
 
-</br>
-
 ### Fine-tuning
 Fine-tuning (also known as "generative tuning") is a technique used to adapt a pre-trained language model to perform better at a specific task. This approach typically involves training the model on input data that is structured as a "prompt" followed by a "completion". The prompt represents the input for a specific task, while the completion is the output that the model should generate. During training, the model learns to generate the relevant completion tokens based on the context provided by the prompt tokens.
 
@@ -338,6 +336,7 @@ python3 -m generative_data_prep pipeline --input_file_path=./tests/examples/dial
 ```
 
 > [View decoded output](tests/examples/dialogue/decoded_data_prepped_dialogue.txt)
+
 
 ### Meta in context learning
 [Meta In Context Learning](https://arxiv.org/pdf/2110.15943.pdf) improves the few shot performance of a model by including training data formatted in a few shot style. This infrastructure allows you to prepare data in a variant of meta in context learning SambaNova uses called "All Shot" learning. In order to prepare data in this format prepare lists of prompt completion pairs, where every list contains prompt completion pairs that are completing the same instruction/task. Then prepare the data with the `input_packing_config=greedy::drop`, `packing_boundary=prompt_completion_pair` and `attention_boundary=jsonl`. This ensures that every sequence contains prompt completion pairs following the same "instruction", and that when learning a completion the model is attending to all the other prompt completion pairs before it.
