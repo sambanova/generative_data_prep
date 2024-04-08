@@ -181,8 +181,10 @@ All this evaluation data will saved under the `<OUTPUT_DIR>`, if you want to run
 If you want to view the contents of a processed dataset, you can decode an HDF5 file into a human readable text format. To do so, run the following command:
 
 ```python
-python3 generative_data_prep/utils/decode_hdf5.py --hdf5_file_path=<PATH TO HDF5 FILE> --output_decoded_file_path=<PATH TO OUTPUT TXT FILE>
+python3 generative_data_prep/utils/decode_hdf5.py --pretrained_tokenizer=<HF TOKENIZER KEY> --hdf5_file_path=<PATH TO HDF5 FILE> --output_decoded_file_path=<PATH TO OUTPUT TXT FILE>
 ```
+
+**_Note_**: The same tokenizer used to prepare the data must be used for decoding!
 
 ### Dataset Size Requirements
 
