@@ -355,4 +355,3 @@ def get_config_file_path():
     config_filename = "configs/logger.conf"  # Change this to match your config file name
     config_path = os.path.join(script_dir, config_filename)
     return config_path
-
