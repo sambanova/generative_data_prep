@@ -70,13 +70,7 @@ Local Environment Setup
 
 #. If you update ``setup.cfg``, ``pyproject.toml``, or ``Pipfile``
 
-   - ``requirements`` files would need to be regenrated. For this, you would need to have ``docker`` installed on your machine.
-
-     .. code-block::
-
-        pipenv run pre-commit run --all-files --hook-stage manual pipenv-lock
-
-   - ``Pipfile.lock`` would need to be regenerated
+   - ``Pipfile.lock`` and ``requirements`` files would need to be regenrated. For this, you would need to have ``docker`` installed on your machine.
 
      .. code-block::
 
