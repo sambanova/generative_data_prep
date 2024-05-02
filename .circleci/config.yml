@@ -27,8 +27,8 @@ jobs:
       - run:
           name: Generate Cache Key
           command: |
-            echo date +%Y-%V > circleci_cache_key
-            echo python -V >> circleci_cache_key
+            date +%Y-%V > circleci_cache_key
+            python -V >> circleci_cache_key
       - restore_cache:
           key: v1-{{ arch }}-{{ checksum "pyproject.toml" }}-{{ checksum "circleci_cache_key" }}
       - run:
