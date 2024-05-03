@@ -256,7 +256,7 @@ def test_metadata_end2end_output(tmp_path):
 
     tmp_e2e_output_dir = tmp_path / "e2e_testing_output_directory"
     logging.info(f"temporary e2e output directory is in {tmp_e2e_output_dir}")
-    base_dir = os.path.join(Path.cwd(), "tests", "examples", "pretraining_split_with_new_metadata_and_sha256")
+    base_dir = Path(__file__).parent / "tests" / "examples" / "pretraining_split_with_new_metadata_and_sha256"
     input_file = os.path.join(base_dir, "example_pretraining_data.jsonl")
     num_workers = os.cpu_count()
     if num_workers is None:

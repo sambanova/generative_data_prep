@@ -26,7 +26,7 @@ from .test_utils import EXAMPLE_PATH
 
 def get_split_dir(test_name: str) -> str:
     """Create a absolute path to example input."""
-    return os.path.join(Path.cwd(), EXAMPLE_PATH, test_name, f"pipelined_{test_name}", "splits")
+    return Path(__file__).parent / EXAMPLE_PATH / test_name / f"pipelined_{test_name}" / "splits"
 
 
 def get_files_to_tokenize(test_name: str) -> str:
