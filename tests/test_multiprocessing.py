@@ -14,19 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import os
-from pathlib import Path
 
 import pytest
 
 import generative_data_prep
 from generative_data_prep.data_prep import multiprocess_data_prep
-
-from .test_utils import EXAMPLE_PATH
+from tests.conftest import TESTS_EXAMPLES_PATH
 
 
 def get_split_dir(test_name: str) -> str:
     """Create a absolute path to example input."""
-    return Path(__file__).parent / EXAMPLE_PATH / test_name / f"pipelined_{test_name}" / "splits"
+    return TESTS_EXAMPLES_PATH / test_name / f"pipelined_{test_name}" / "splits"
 
 
 def get_files_to_tokenize(test_name: str) -> str:

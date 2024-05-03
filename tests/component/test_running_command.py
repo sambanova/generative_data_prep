@@ -6,7 +6,8 @@ from pathlib import Path
 
 import pytest
 
-PYTHON_ROOT_DIR = str(Path(__file__).parent.parent.parent.absolute())
+from tests.conftest import PYTHON_ROOT_DIR, TESTS_EXAMPLES_PATH
+
 CURRENT_DIR = str(Path(__file__).parent.absolute())
 
 
@@ -27,6 +28,7 @@ def change_directory_for_testing(new_path):
         os.chdir(original_cwd)
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("run_path", [PYTHON_ROOT_DIR, CURRENT_DIR], ids=["python_rootdir", "home_dir"])
 def test_pipeline_runs_successfully(run_path):
     """
@@ -38,8 +40,9 @@ def test_pipeline_runs_successfully(run_path):
     """
     # TODO: Need to reduce the time limit back down to 9 or get it close to 9
     time_limit_seconds = 19
-    input_file_path = PYTHON_ROOT_DIR + "/tests/examples/generative_tuning/example_generative_tuning_data.jsonl"
-    output_path = f"{PYTHON_ROOT_DIR}/tests/examples/tester_{secrets.token_hex(8)}"
+    input_file_path = TESTS_EXAMPLES_PATH + "/generative_tuning/example_generative_tuning_data.jsonl"
+    input_file_path = TESTS_EXAMPLES_PATH + "/generative_tuning/example_generative_tuning_data.jsonl"
+    output_path = f"{TESTS_EXAMPLES_PATH}/tester_{secrets.token_hex(8)}"
     with change_directory_for_testing(run_path):
         command = "python -m generative_data_prep pipeline "
         command += f"--input_file_path={input_file_path} --output_path={output_path} --max_seq_length=1024"

@@ -1,7 +1,6 @@
 import logging
 import os
 from argparse import Namespace
-from pathlib import Path
 
 import pytest
 import yaml
@@ -10,17 +9,15 @@ from transformers import AutoConfig
 
 from generative_data_prep.__main__ import main
 from generative_data_prep.utils import BoundaryType, DatasetMetadata, PackingConfig
+from tests.conftest import TESTS_EXAMPLES_PATH
+
+PRETRAINING_SPLIT_METADATA_SHA256_PATH = TESTS_EXAMPLES_PATH / "pretraining_split_with_new_metadata_and_sha256"
 
 
 @pytest.mark.parametrize("use_token_type_ids", [(True), (False)])
 def test_pydantic_model_passing(use_token_type_ids):
     """Testing DatasetMetadata loads in variables correctly. This should pass"""
-    output_dir = os.path.join(
-        Path.cwd(),
-        "tests",
-        "examples",
-        "pretraining_split_with_new_metadata_and_sha256",
-    )
+    output_dir = PRETRAINING_SPLIT_METADATA_SHA256_PATH
     metadata_file = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
         metadata_dict = yaml.safe_load(file)
@@ -40,12 +37,7 @@ def test_pydantic_model_passing(use_token_type_ids):
 def test_pydantic_model_wrong_model_type_and_less_vocab_size(use_token_type_ids):
     """Testing DatasetMetadata loads in variables correctly. This should fail"""
     error_keys = ["tokenizer_model_type", "vocab_size"]
-    output_dir = os.path.join(
-        Path.cwd(),
-        "tests",
-        "examples",
-        "pretraining_split_with_new_metadata_and_sha256",
-    )
+    output_dir = PRETRAINING_SPLIT_METADATA_SHA256_PATH
     metadata_file = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
         metadata_dict = yaml.safe_load(file)
@@ -80,12 +72,7 @@ def test_pydantic_model_wrong_model_type_and_less_vocab_size(use_token_type_ids)
 @pytest.mark.parametrize("use_token_type_ids", [(True), (False)])
 def test_pydantic_model_greater_world_size(use_token_type_ids):
     """Testing DatasetMetadata loads in variables correctly. This should fail"""
-    output_dir = os.path.join(
-        Path.cwd(),
-        "tests",
-        "examples",
-        "pretraining_split_with_new_metadata_and_sha256",
-    )
+    output_dir = PRETRAINING_SPLIT_METADATA_SHA256_PATH
     metadata_file = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
         metadata_dict = yaml.safe_load(file)
@@ -116,12 +103,7 @@ def test_pydantic_model_greater_world_size(use_token_type_ids):
 @pytest.mark.parametrize("use_token_type_ids", [(True), (False)])
 def test_pydantic_model_different_sequence_length(use_token_type_ids):
     """Testing DatasetMetadata loads in variables correctly. This should fail"""
-    output_dir = os.path.join(
-        Path.cwd(),
-        "tests",
-        "examples",
-        "pretraining_split_with_new_metadata_and_sha256",
-    )
+    output_dir = PRETRAINING_SPLIT_METADATA_SHA256_PATH
     metadata_file = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
         metadata_dict = yaml.safe_load(file)
@@ -152,12 +134,7 @@ def test_pydantic_model_different_sequence_length(use_token_type_ids):
 @pytest.mark.parametrize("use_token_type_ids", [(True), (False)])
 def test_pydantic_model_greater_batch_size(use_token_type_ids):
     """Testing DatasetMetadata loads in variables correctly. This should fail"""
-    output_dir = os.path.join(
-        Path.cwd(),
-        "tests",
-        "examples",
-        "pretraining_split_with_new_metadata_and_sha256",
-    )
+    output_dir = PRETRAINING_SPLIT_METADATA_SHA256_PATH
     metadata_file = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
         metadata_dict = yaml.safe_load(file)
@@ -189,12 +166,7 @@ def test_pydantic_model_greater_batch_size(use_token_type_ids):
 def test_pydantic_model_no_evaluation_files(use_token_type_ids):
     """Testing DatasetMetadata loads in variables correctly. This should fail"""
     error_keys = ["number_of_dev_files", "max_batch_size_dev"]
-    output_dir = os.path.join(
-        Path.cwd(),
-        "tests",
-        "examples",
-        "pretraining_split_with_new_metadata_and_sha256",
-    )
+    output_dir = PRETRAINING_SPLIT_METADATA_SHA256_PATH
     metadata_file = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
         metadata_dict = yaml.safe_load(file)
@@ -228,12 +200,7 @@ def test_pydantic_model_no_evaluation_files(use_token_type_ids):
 @pytest.mark.parametrize("use_token_type_ids", [(True), (False)])
 def test_pydantic_model_yes_evaluation_files(use_token_type_ids):
     """Testing DatasetMetadata loads in variables correctly. This should pass"""
-    output_dir = os.path.join(
-        Path.cwd(),
-        "tests",
-        "examples",
-        "pretraining_split_with_new_metadata_and_sha256",
-    )
+    output_dir = PRETRAINING_SPLIT_METADATA_SHA256_PATH
     metadata_file = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
         metadata_dict = yaml.safe_load(file)
@@ -256,7 +223,7 @@ def test_metadata_end2end_output(tmp_path):
 
     tmp_e2e_output_dir = tmp_path / "e2e_testing_output_directory"
     logging.info(f"temporary e2e output directory is in {tmp_e2e_output_dir}")
-    base_dir = Path(__file__).parent / "tests" / "examples" / "pretraining_split_with_new_metadata_and_sha256"
+    base_dir = PRETRAINING_SPLIT_METADATA_SHA256_PATH
     input_file = os.path.join(base_dir, "example_pretraining_data.jsonl")
     num_workers = os.cpu_count()
     if num_workers is None:

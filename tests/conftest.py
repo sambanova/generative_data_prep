@@ -13,6 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+from pathlib import Path
 from typing import Optional
 
 import pytest
@@ -23,6 +24,9 @@ from generative_data_prep.tokenized_line import (
     TokenizedLine,
     TokenizedSequence,
 )
+
+PYTHON_ROOT_DIR = str(Path(__file__).parent.parent.absolute())
+TESTS_EXAMPLES_PATH = Path(__file__).parent / "examples"
 
 
 def get_tokenized_line(length: int, max_seq_length: Optional[int], eos_token_id: Optional[int]) -> TokenizedLine:
