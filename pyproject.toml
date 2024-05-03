@@ -16,7 +16,7 @@ dependencies = [
     "jsonlines",
     "numpy",
     "psutil",
-    "torch",
+    "torch>=2.3",
     "tqdm",
     "transformers",
     "tabulate",
@@ -24,7 +24,8 @@ dependencies = [
     "types-tabulate",
     "alive_progress",
     "pydantic",
-    "pyyaml"
+    "pyyaml",
+    "sentencepiece"
 ]
 dynamic = ["version"]
 
@@ -46,6 +47,7 @@ filterwarnings = [
     # TODO: Fix the Warning and remove this ignore line
     "ignore:unclosed file.*io.TextIOWrapper.*:ResourceWarning",
     "ignore:Pydantic V1 style.*validators are deprecated.*:pydantic.warnings.PydanticDeprecatedSince20",
+    "ignore:`resume_download` is deprecated:FutureWarning",
 ]
 addopts = """
 -ra -q -vv

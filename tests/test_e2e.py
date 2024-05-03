@@ -16,7 +16,6 @@ limitations under the License.
 
 import os
 import tempfile
-from pathlib import Path
 from typing import Dict
 
 import pytest
@@ -24,9 +23,9 @@ from transformers import GPT2Config, GPT2Tokenizer, PreTrainedTokenizerBase
 
 from generative_data_prep.data_prep import data_prep_main, pipeline_main
 from generative_data_prep.utils import BoundaryType, PackingConfig
+from tests.conftest import TESTS_EXAMPLES_PATH
 
 from .test_utils import (
-    EXAMPLE_PATH,
     check_balance,
     check_diff_hdf5,
     check_no_split_dir,
@@ -41,17 +40,17 @@ MODEL_CONFIG = GPT2Config.from_pretrained("gpt2")
 def get_input_path(test_name: str) -> str:
     """Create a absolute path to example input."""
     ext = ".txt" if "txt" in test_name else ".jsonl"
-    return os.path.join(Path.cwd(), EXAMPLE_PATH, test_name, f"example_{test_name}_data{ext}")
+    return TESTS_EXAMPLES_PATH / test_name / f"example_{test_name}_data{ext}"
 
 
 def gold_data_prep_path(test_name: str) -> str:
     """Create a absolute path to example gold file."""
-    return os.path.join(Path.cwd(), EXAMPLE_PATH, test_name, f"data_prepped_{test_name}.hdf5")
+    return TESTS_EXAMPLES_PATH / test_name / f"data_prepped_{test_name}.hdf5"
 
 
 def gold_pipeline_path(test_name: str) -> str:
     """Create a absolute path to example gold file."""
-    return os.path.join(Path.cwd(), EXAMPLE_PATH, test_name, f"pipelined_{test_name}")
+    return TESTS_EXAMPLES_PATH / test_name / f"pipelined_{test_name}"
 
 
 @pytest.mark.parametrize(

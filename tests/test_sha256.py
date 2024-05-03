@@ -2,13 +2,13 @@ import logging
 import os
 import shutil
 from argparse import Namespace
-from pathlib import Path
 
 import pytest
 import yaml
 
 from generative_data_prep.__main__ import main
 from generative_data_prep.utils import BoundaryType, PackingConfig, validate_sha256
+from tests.conftest import TESTS_EXAMPLES_PATH
 
 
 @pytest.fixture(scope="session")
@@ -17,7 +17,7 @@ def shared_output_dir_with_split(tmp_path_factory):
     tmp_split_output_dir = tmp_path_factory.mktemp("pretraining_sha256_split")
     logging.info(f"temporary split output directory is in {tmp_split_output_dir}")
 
-    input_file = os.path.join(Path.cwd(), "tests", "examples", "pretraining", "example_pretraining_data.jsonl")
+    input_file = TESTS_EXAMPLES_PATH / "pretraining" / "example_pretraining_data.jsonl"
     num_workers = os.cpu_count()
     if num_workers is None:
         num_workers = 1
@@ -89,7 +89,7 @@ def test_validation_sha_with_split_and_eval(tmp_path):
     tmp_split_with_eval_output_dir = tmp_path / "pretraining_sha256_split_and_eval"
     logging.info(f"temporary split with eval output directory is in {tmp_split_with_eval_output_dir}")
 
-    input_file = os.path.join(Path.cwd(), "tests", "examples", "pretraining", "example_pretraining_data.jsonl")
+    input_file = TESTS_EXAMPLES_PATH / "pretraining" / "example_pretraining_data.jsonl"
 
     num_workers = os.cpu_count()
     if num_workers is None:
@@ -139,7 +139,7 @@ def test_validation_sha_without_split(tmp_path):
     tmp_no_split_output_dir = tmp_path / "pretraining_sha256_no_split"
     logging.info(f"temporary no split output directory is in {tmp_no_split_output_dir}")
 
-    input_file = os.path.join(Path.cwd(), "tests", "examples", "pretraining", "example_pretraining_data.jsonl")
+    input_file = TESTS_EXAMPLES_PATH / "pretraining" / "example_pretraining_data.jsonl"
 
     num_workers = os.cpu_count()
     if num_workers is None:

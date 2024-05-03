@@ -23,8 +23,6 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 
-EXAMPLE_PATH = "tests/examples"
-
 
 class generative_dataset(Dataset):
     """Object to reprent a generative dataset given an input hdf5 file."""
