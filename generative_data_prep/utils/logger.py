@@ -100,8 +100,8 @@ def log_training_details(dataset_metadata: Dict[str, Union[str, int, bool]]):
     LOGGER.info(f"    Model vocabulary size == {dataset_metadata['vocab_size']}")
     LOGGER.info(f"    Batch size <= {dataset_metadata['max_batch_size_train']}")
     LOGGER.info(f"    Number of RDUs (data parallel workers) <= {dataset_metadata['number_of_training_files']}")
-    do_eval_true = 'can be True or False'
-    do_eval_false = 'must be False'
+    do_eval_true = "may be True or False"
+    do_eval_false = "must be False"
     LOGGER.info(f"    Do eval {do_eval_true if int(dataset_metadata['number_of_dev_files']) >= 1 else do_eval_false}")
 
 
