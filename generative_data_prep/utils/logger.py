@@ -19,6 +19,7 @@ import datetime
 import logging
 import logging.config
 import os
+from typing import Dict, Union
 
 import git
 
@@ -89,6 +90,19 @@ def get_header(header_name: str):
 def log_elapsed_time():
     """Log how much time it took to execute entire script."""
     LOGGER.info(f"Elapsed time: {datetime.datetime.now().replace(microsecond=0) - START_TIME.replace(microsecond=0)}")
+
+
+def log_training_details(dataset_metadata: Dict[str, Union[str, int, bool]]):
+    """Log training parameters that need to be used with this dataset."""
+    LOGGER.info(SEP_STR)
+    LOGGER.info("When training, please adhere to the dataset requirements provided below:")
+    LOGGER.info(f"    Max sequence length == {dataset_metadata['max_seq_length']}")
+    LOGGER.info(f"    Model vocabulary size == {dataset_metadata['vocab_size']}")
+    LOGGER.info(f"    Batch size <= {dataset_metadata['max_batch_size_train']}")
+    LOGGER.info(f"    Number of RDUs (data parallel workers) <= {dataset_metadata['number_of_training_files']}")
+    do_eval_true = "may be True or False"
+    do_eval_false = "must be False"
+    LOGGER.info(f"    Do eval {do_eval_true if int(dataset_metadata['number_of_dev_files']) >= 1 else do_eval_false}")
 
 
 def log_sep_str():

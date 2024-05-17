@@ -38,6 +38,7 @@ from generative_data_prep.utils import (
     log_input_args,
     log_metrics,
     log_sep_str,
+    log_training_details,
     verify_input_file,
     verify_output_dir,
     verify_output_file,
@@ -322,7 +323,7 @@ def main(args):
     )
     category_to_id = get_categories(args.categories_path)
     if args.cmd == "pipeline":
-        metrics = pipeline_main(
+        metrics, dataset_metadata = pipeline_main(
             args.input_file_path,
             tokenizer,
             model_config,
@@ -372,6 +373,8 @@ def main(args):
 
     log_metrics(metrics)
     log_elapsed_time()
+    if args.cmd == "pipeline":
+        log_training_details(dataset_metadata)
 
 
 if __name__ == "__main__":

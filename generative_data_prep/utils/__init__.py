@@ -32,6 +32,7 @@ from .logger import (
     log_input_args,
     log_metrics,
     log_sep_str,
+    log_training_details,
 )
 from .metadata_generation import DatasetMetadata
 from .path_verify import verify_input_file, verify_output_dir, verify_output_file
@@ -70,6 +71,7 @@ __all__ = [
     "log_metrics",
     "log_git_commit_hash",
     "log_elapsed_time",
+    "log_training_details",
     "log_sep_str",
     "get_config_file_path",
     "DatasetMetadata",

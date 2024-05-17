@@ -19,7 +19,6 @@ import json
 import math
 import os
 import shutil
-from importlib.resources import files as importlib_files
 from subprocess import PIPE, run  # nosec
 from typing import Optional
 
@@ -32,8 +31,6 @@ from transformers import (
 
 from .arg_configs import PackingConfig
 from .constants import BoundaryType
-
-PACKAGE_ROOT_PATH = importlib_files("generative_data_prep")
 
 
 class TokenizerConfigPair:
@@ -362,4 +359,7 @@ def get_config_file_path():
     Returns:
         Path: absolute path to the logging config file
     """
-    return PACKAGE_ROOT_PATH / "configs" / "logger.conf"
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    config_filename = "configs/logger.conf"  # Change this to match your config file name
+    config_path = os.path.join(script_dir, config_filename)
+    return config_path

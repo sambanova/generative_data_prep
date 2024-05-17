@@ -10,6 +10,25 @@ Local Environment Setup
 
 **NOTE**: Please ensure that your Python version matches the version used in CI flow in ``.circleci/config.yml`` file.
 
+#. ``pipenv`` quick-introduction
+
+   - ``pipenv`` is a tool that aims to bring the best of all packaging worlds (bundler, composer, npm, cargo, yarn, etc.) to the Python world.
+   - ``pipenv`` automatically creates and manages a virtualenv for your projects, as well as adds/removes packages from your ``Pipfile`` as you install/uninstall packages.
+   - It also generates the ever-important ``Pipfile.lock``, which is used to produce deterministic builds.
+   - ``pipenv shell`` can be used to enter the virtual environment
+     - Alterntively: ``pipenv run`` can be used to run any Python commands in the virtual environment
+     - For example:
+
+          .. code-block::
+            # Run pytest in pipenv virtual environment
+            pipenv run pytest
+            # Run pre-commit in pipenv virtual environment
+            pipenv run pre-commit run --all-files
+            # OR enter pipenv shell and run commands
+            pipenv shell
+            pytest
+            pre-commit run --all-files
+
 #. Create Python virtual environment using ``pipenv``
 
     .. code-block::
@@ -22,6 +41,13 @@ Local Environment Setup
     .. code-block::
 
         pipenv run pip install -e .
+        pipenv --help  # For help with all "pipenv" commands
+        # For dev environment
+        pipenv install
+        # For production environment
+        pipenv sync
+        # You can provide specific categories defined in "Pipfile" if you wish
+        pipenv install --categories=packages,build-packages,dev-packages,docs-packages,tests-packages
         pipenv sync --categories=default,build-packages,dev-packages,docs-packages,tests-packages
         pipenv --help
 
@@ -44,13 +70,7 @@ Local Environment Setup
 
 #. If you update ``setup.cfg``, ``pyproject.toml``, or ``Pipfile``
 
-   - ``requirements`` files would need to be regenrated. For this, you would need to have ``docker`` installed on your machine.
-
-     .. code-block::
-
-        pipenv run pre-commit run --all-files --hook-stage manual pipenv-lock
-
-   - ``Pipfile.lock`` would need to be regenerated
+   - ``Pipfile.lock`` and ``requirements`` files would need to be regenrated. For this, you would need to have ``docker`` installed on your machine.
 
      .. code-block::
 
