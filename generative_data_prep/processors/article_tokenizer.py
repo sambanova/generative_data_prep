@@ -148,58 +148,19 @@ class ArticleTokenizer:
             self.metrics.completion_tokens += seq.completion_tokens
             self.metrics.padding_tokens += seq.pad_tokens
 
-    def process_jsonl_with_chat_template(self, jsonl: Union[dict, List]) -> List[TokenizedArticle]:
-        """Tokenize a loaded jsonl with the chat template applied and store in a TokenizedArticle object.
+    def _convert_jsonl_to_user_assitant(self, jsonl: Union[dict, List]) -> Tuple[List[dict], List[str], List[str]]:
+        """Convert the input jsonl into 'user', 'assistant' format.
 
-        This function processes a list of JSONL (JSON Lines text format) data and
-        converts it into a chat template format.
-        It then tokenizes the chat and returns a list of tokenized articles based on self.BoundaryType.
-        If self.packing_boundary is BoundaryType.PROMPT_COMPLETION_PAIR, then each tokenized article
-        will contain a single tokenized prompt completion pair from the original jsonl.
-        If self.packing_boundary is BoundaryType.JSONL, then each tokenized article will contain
-        the tokenized text from all the prompt completion pairs in the jsonl.
+        For now keep the 'user' and 'assistant' text placeholder text to fill in later.
 
         Args:
-            jsonl (Union[dict, List]): A list of dictionaries where each dictionary represents a JSONL data item.
-            Each dictionary should contain 'prompt' and 'completion' keys.
-            The loaded input jsonl, in the form of {"prompt":"...", "completion":"..."}
-            or [{"prompt":"...", "completion":"..."}, {"prompt":"...", "completion":"..."}, ...]
-
-        Returns:
-            List[TokenizedArticle]: Tokenized articles that represent input jsonl.
-            A list of dictionaries where each dictionary represents a tokenized article.
+            jsonl: The input data from input file
         """
-        if isinstance(jsonl, dict):
-            jsonl = [jsonl]
-
         converted_jsonl = []
         prompts = []
         completions = []
 
-        """
-        TODO: Add a trick here to get the generation_prompt in tokenizer
-        This is a temporary solution, and the tokenizer should be modified in the future.
-        The tokenizer should be able to get the generation_prompt from the input text.
-        self.tokenizer.chat_template = "{% for message in messages %} {{'<|im_start|>' + message['role'] + '\n' +
-            message['content'] + '<|im_end|>' + '\n'}}{% endfor %}"
-        """
-
-        """
-        The mechanism designed here is to remember the original prompt and completion,
-        despite the transformation of the [prompt, completion] pair into a raw string
-          format with additional instruction tokens.
-
-        The following steps are performed:
-        1. Recognizes and preserves the original dialogue data format. (<prompt_placeholder>, <completion_placeholder>)
-        2. Converts the original [prompt, completion] format to the standard conversation [role, content] format.
-            {"prompt": "Hello, how are you?", "completion": "I'm doing great"} ->
-                {"role": "user", "content": "Hello, how are you?"}, {"role": "assistant", "content": "I'm doing great."}
-        """
         for prompt_completion in jsonl:
-            # if self.prompt_keyword not in prompt_completion:
-            #     err_msg = f"Prompt keyword required in every jsonl, {self.prompt_keyword} not found"
-            #     raise json.JSONDecodeError(err_msg, str(jsonl), 0)
-
             if self.completion_keyword not in prompt_completion:
                 err_msg = f"Completion keyword required in every jsonl, {self.completion_keyword} not found"
                 raise json.JSONDecodeError(err_msg, str(jsonl), 0)
@@ -222,127 +183,139 @@ class ArticleTokenizer:
             raise ValueError(err_msg)
 
         if not hasattr(self.tokenizer, "apply_chat_template"):
-            err_msg = "The tokenizer does not have 'apply_chat_template' method defined."
+            err_msg = (
+                "--apply_chat_template used, but the tokenizer does not have 'apply_chat_template' method defined."
+            )
             raise ValueError(err_msg)
 
-        # Apply specified chat templates using tokenizer (apply_chat_template) without tokenization.
-        formatted_chat = self.tokenizer.apply_chat_template(converted_jsonl, tokenize=False)
-        converted_jsonl.clear()
+        return converted_jsonl, prompts, completions
 
+    def _convert_tokenized_text_back(
+        self, split_chat: List[str], prompt_prefix: str, prompts: List[str], completions: List[str]
+    ) -> List[TokenizedArticle]:
+        """Automatic conversion back to [prompt, completion] format.
+
+        1. For standard prompt and completion tokens, the existing pipeline is retained.
+        2. Tokens introduced by the chat template are classified as completion tokens.
+
+        Args:
+            split_chat: The list of text to tokenier split by prompts and completions
+            prompt_prefix: The text occuring right before every prompt
+            prompts: List of the prompts
+            completions: list of completions
         """
-        Align the formatted chat with the original jsonl and convert it back to the [Prompt, Completion]
-          format in the following steps.
-        """
-        pattern = rf"({DEFAULT_PROMPT_PLACEHOLDER}|{DEFAULT_COMPLETION_PLACEHOLDER})"
-        split_chat = re.split(pattern, formatted_chat)
-
-        # Merge the tokens except for the DEFAULT_PROMPT_PLACEHOLDER and DEFAULT_COMPLETION_PLACEHOLDER
-        for i in range(len(split_chat)):
-            if split_chat[i] == DEFAULT_PROMPT_PLACEHOLDER or split_chat[i] == DEFAULT_COMPLETION_PLACEHOLDER:
-                continue
-            if (
-                i > 0
-                and split_chat[i - 1] != DEFAULT_PROMPT_PLACEHOLDER
-                and split_chat[i - 1] != DEFAULT_COMPLETION_PLACEHOLDER
-            ):
-                split_chat[i] = split_chat[i - 1] + split_chat[i]
-                split_chat[i - 1] = ""
-        # Filter the empty
-        split_chat = list(filter(None, split_chat))
-
-        # Search for the start instruction of each conversation. We don't have SYSTEM INSTRUCTION yet.
-        start_instr_of_chat = ""
-        for tok in split_chat:
-            if tok == DEFAULT_PROMPT_PLACEHOLDER:
-                break
-            start_instr_of_chat += tok
-
         tokenized_articles = []
         tokens = []
         category_id = -1
-        orginal_prompt_completion = None
-        prompt_index = 0
 
-        new_prompt = ""
-        new_completion = ""
-
-        """
-        Automatic conversion back to [prompt, completion] format, especially if prompt_loss_weight
-        is set during the training phase.
-        1. For standard prompt and completion tokens, the existing pipeline is retained.
-        2. Tokens introduced by the chat template are classified as completion tokens.
-        """
-        while split_chat:
-            token = split_chat.pop(0)
-            # Check the start to see if it is a prompt or a completion.
-            if start_instr_of_chat and token == start_instr_of_chat:
-                new_prompt = start_instr_of_chat
-
-            if token == DEFAULT_PROMPT_PLACEHOLDER:
-                if not prompts:
-                    err_msg = f"Prompts list is empty, but {DEFAULT_PROMPT_PLACEHOLDER} found in split_chat"
-                    raise ValueError(err_msg)
-                prompt = prompts.pop(0)
-
-                orginal_prompt_completion = jsonl[prompt_index]
-                if prompt != orginal_prompt_completion[self.prompt_keyword]:
-                    err_msg = f"Prompt mismatch, {prompt} != {orginal_prompt_completion[self.prompt_keyword]}"
-                    raise ValueError(err_msg)
-
-                category_id = self.get_category_id(orginal_prompt_completion)
-                # tokens += self.tokenize(completion=None, prompt=prompt, category_id=category_id)
-                prompt_index += 1
-
-                new_prompt += prompt
-                while split_chat[0] != DEFAULT_COMPLETION_PLACEHOLDER:
-                    new_prompt += split_chat.pop(0)
-
-            elif token == DEFAULT_COMPLETION_PLACEHOLDER:
-                if not completions:
-                    err_msg = f"Completions list is empty, but {DEFAULT_COMPLETION_PLACEHOLDER} found in split_chat"
-                    raise ValueError(err_msg)
-                completion = completions.pop(0)
-
-                if (orginal_prompt_completion is not None) and completion != orginal_prompt_completion[
-                    self.completion_keyword
-                ]:
-                    err_msg = (
-                        f"Completion mismatch, {completion} != {orginal_prompt_completion[self.completion_keyword]}"
-                    )
-                    raise ValueError(err_msg)
-
-                new_completion = completion
-                while split_chat and (
-                    split_chat[0] != DEFAULT_PROMPT_PLACEHOLDER
-                    or (start_instr_of_chat and split_chat[0] != start_instr_of_chat)
-                ):
-                    new_completion += split_chat.pop(0)
-
-                # remove the duplicated eos tokens from new_completion as we will add it later
-                new_completion = new_completion.replace(self.tokenizer.eos_token, "")
-
-                new_completion, new_prompt = self._add_space_separator(new_completion, new_prompt)
-                tokens += self.tokenize(completion=new_completion, prompt=new_prompt, category_id=category_id)
-
-                if self.attention_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and len(tokens) > 0:
-                    tokens[-1].make_article_boundary()
-                if self.packing_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and prompt_index != len(split_chat) - 1:
-                    tokenized_article = TokenizedArticle(tokens)
-                    tokenized_articles.append(tokenized_article)
-                    tokens = []
-
-                # Reset.
-                new_prompt = ""
-                new_completion = ""
+        curr_prompt_text = ""
+        prompts_index = 0
+        curr_completion_text = ""
+        completions_index = 0
+        state = "PROMPT"
+        # Whether we are adding to the prompt or completion
+        for split in split_chat:
+            if split == DEFAULT_PROMPT_PLACEHOLDER:
+                curr_prompt_text += prompts[prompts_index]
+                prompts_index += 1
+            elif split == DEFAULT_COMPLETION_PLACEHOLDER:
+                curr_completion_text += completions[completions_index]
+                completions_index += 1
+                state = "COMPLETION"
             else:
-                # Should not reach here
-                raise ValueError(f"Invalid token {token}")
-                # Take care of the case where the chat template introduces additional tokens.
-                # tokens += self.tokenize(completion=token, prompt=None, category_id=category_id)
+                # If we are in the prompt state add to the prompt
+                if state == "PROMPT":
+                    curr_prompt_text += split
+                elif state == "COMPLETION":
+                    # If the text ends with prompt prefix, then we should switch to the next prompt
+                    if split.endswith(prompt_prefix):
+                        # We have finished the current article, so token
+                        curr_completion_text += split.split(prompt_prefix)[0]
+                        tokens += self.tokenize(
+                            completion=curr_completion_text,
+                            prompt=curr_prompt_text,
+                            category_id=category_id,
+                            apply_chat_template=True,
+                        )
+
+                        if self.attention_boundary == BoundaryType.PROMPT_COMPLETION_PAIR and len(tokens) > 0:
+                            tokens[-1].make_article_boundary()
+                        if (
+                            self.packing_boundary == BoundaryType.PROMPT_COMPLETION_PAIR
+                            and prompts_index != len(split_chat) - 1
+                        ):
+                            tokenized_article = TokenizedArticle(tokens)
+                            tokenized_articles.append(tokenized_article)
+                            tokens = []
+
+                        curr_prompt_text = prompt_prefix
+                        curr_completion_text = ""
+                        state = "PROMPT"
+                    else:
+                        curr_completion_text += split
 
         if len(tokens) > 0:
             tokens[-1].make_article_boundary()
         tokenized_articles.append(TokenizedArticle(tokens))
+
+        return tokenized_articles
+
+    def process_jsonl_chat(self, jsonl: Union[dict, List]) -> List[TokenizedArticle]:
+        """Tokenize a loaded jsonl with the chat template applied and store in a TokenizedArticle object.
+
+        This function processes a list of JSONL (JSON Lines text format) data and
+        converts it into a chat template format.
+        It then tokenizes the chat and returns a list of tokenized articles based on self.BoundaryType.
+        If self.packing_boundary is BoundaryType.PROMPT_COMPLETION_PAIR, then each tokenized article
+        will contain a single tokenized prompt completion pair from the original jsonl.
+        If self.packing_boundary is BoundaryType.JSONL, then each tokenized article will contain
+        the tokenized text from all the prompt completion pairs in the jsonl.
+
+        The mechanism designed here is to remember the original prompt and completion,
+        despite the transformation of the [prompt, completion] pair into a raw string
+          format with additional instruction tokens.
+
+        The following steps are performed:
+        1. Recognizes and preserves the original dialogue data format. (<prompt_placeholder>, <completion_placeholder>)
+        2. Converts the original [prompt, completion] format to the standard conversation [role, content] format.
+            {"prompt": "Hello, how are you?", "completion": "I'm doing great"} ->
+                {"role": "user", "content": "Hello, how are you?"}, {"role": "assistant", "content": "I'm doing great."}
+
+        Args:
+            jsonl (Union[dict, List]): A list of dictionaries where each dictionary represents a JSONL data item.
+            Each dictionary should contain 'prompt' and 'completion' keys.
+            The loaded input jsonl, in the form of {"prompt":"...", "completion":"..."}
+            or [{"prompt":"...", "completion":"..."}, {"prompt":"...", "completion":"..."}, ...]
+
+        Returns:
+            List[TokenizedArticle]: Tokenized articles that represent input jsonl.
+            A list of dictionaries where each dictionary represents a tokenized article.
+        """
+        if isinstance(jsonl, dict):
+            jsonl = [jsonl]
+        """
+        TODO: Add a trick here to get the generation_prompt in tokenizer
+        This is a temporary solution, and the tokenizer should be modified in the future.
+        The tokenizer should be able to get the generation_prompt from the input text.
+        self.tokenizer.chat_template = "{% for message in messages %} {{'<|im_start|>' + message['role'] + '\n' +
+            message['content'] + '<|im_end|>' + '\n'}}{% endfor %}"
+        """
+        converted_jsonl, prompts, completions = self._convert_jsonl_to_user_assitant(jsonl)
+        # Apply specified chat templates using tokenizer (apply_chat_template) without tokenization.
+        formatted_chat = self.tokenizer.apply_chat_template(converted_jsonl, tokenize=False)
+
+        # Split by the prompt placeholder and completion placeholder
+        pattern = rf"({DEFAULT_PROMPT_PLACEHOLDER}|{DEFAULT_COMPLETION_PLACEHOLDER})"
+        split_chat = re.split(pattern, formatted_chat)
+
+        # Search for the start instruction of each conversation. We don't have SYSTEM INSTRUCTION yet.
+        prompt_prefix = ""
+        for tok in split_chat:
+            if tok == DEFAULT_PROMPT_PLACEHOLDER:
+                break
+            prompt_prefix += tok
+
+        tokenized_articles = self._convert_tokenized_text_back(split_chat, prompt_prefix, prompts, completions)
 
         return tokenized_articles
 
@@ -375,7 +348,7 @@ class ArticleTokenizer:
             # Load from json
             loaded_jsonl = json.loads(article)
             if self.apply_chat_template:
-                tokenized_articles += self.process_jsonl_with_chat_template(loaded_jsonl)
+                tokenized_articles += self.process_jsonl_chat(loaded_jsonl)
             else:
                 tokenized_articles += self.process_jsonl(loaded_jsonl)
         elif self.file_ext == FileExtension.TXT:
@@ -519,7 +492,13 @@ class ArticleTokenizer:
 
         return completion, prompt
 
-    def tokenize(self, completion: str, prompt: Optional[str] = None, category_id: Optional[int] = -1) -> List[Token]:
+    def tokenize(
+        self,
+        completion: str,
+        prompt: Optional[str] = None,
+        category_id: Optional[int] = -1,
+        apply_chat_template: bool = False,
+    ) -> List[Token]:
         """Tokenize the input prompt and completion.
 
         Call self.tokenizer.encode to convert the input prompt and completion into token ids.
@@ -528,6 +507,8 @@ class ArticleTokenizer:
         Args:
             completion: completion text
             prompt: prompt text. Defaults to None.
+            category_id: The category to assign these tokens to
+            apply_chat_template: Whether a chat template will be applied to these tokens
 
         Returns:
             token_ids that represent input prompt and completion, and token_type_ids where
@@ -535,7 +516,6 @@ class ArticleTokenizer:
             token at the corresponding index in token_ids
         """
         tokens = []
-
         if prompt:
             if self.prompt_prefix:
                 prompt = self.prompt_prefix + prompt
@@ -549,6 +529,15 @@ class ArticleTokenizer:
                 and len(prompt_token_ids) >= 1
             ):
                 prompt_token_ids = prompt_token_ids[:-1]
+            # If there is a BOS token at the begining of the prompt, and apply chat template
+            # is used, then remove the extra BOS
+            if (
+                hasattr(self.tokenizer, "bos_token_id")
+                and len(prompt_token_ids) >= 1
+                and prompt_token_ids[0] == self.tokenizer.bos_token_id
+                and apply_chat_template
+            ):
+                prompt_token_ids = prompt_token_ids[1:]
             tokens += list(map(lambda x: Token(x, TokenTypeIds.PROMPT, category_id), prompt_token_ids))
 
         if completion:
