@@ -13,6 +13,7 @@ Local Environment Setup
 #. Running in ``Docker`` container
 
    For repeatability, it's better to run all commands in Docker containers instead of your local machine environment (especially Apple chips have known issues).
+   For details, please refer to `Official Docker Documentation <https://docs.docker.com/manuals/>`_.
 
    .. code-block::
 
@@ -20,13 +21,19 @@ Local Environment Setup
       docker pull <image-name>
 
       # Run the docker container and land on interactive terminal
-      docker run -it --name <container-name> <image-name>
+      docker run -it --name <container-name> <image-name> <command-name>
 
       # Save Container State after running commands
       docker commit <container-name> <new-image-name>
 
       # Run the Saved Container next time
       docker run -it --name <new-container-name> <new-image-name>
+
+      # Example: Please replace container-name, image-name, and mount paths as needed
+      docker pull python:3.9
+      docker run -it -v ${PWD}:/home/project --name example-container python:3.9 /bin/bash
+      # Save the current state of container as a new image as needed by typing this in a separate terminal/shell
+      docker commit example-container python-custom-name-v1
 
 #. ``pipenv`` quick-introduction
 
