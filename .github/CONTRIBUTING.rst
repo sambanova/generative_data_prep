@@ -10,6 +10,24 @@ Local Environment Setup
 
 **NOTE**: Please ensure that your Python version matches the version used in CI flow in ``.circleci/config.yml`` file.
 
+#. Running in ``Docker`` container
+
+   For repeatability, it's better to run all commands in Docker containers instead of your local machine environment (especially Apple chips have known issues).
+
+   .. code-block::
+
+      # Get <image-name> from `.circleci/VERSIONS`
+      docker pull <image-name>
+
+      # Run the docker container and land on interactive terminal
+      docker run -it --name <container-name> <image-name>
+
+      # Save Container State after running commands
+      docker commit <container-name> <new-image-name>
+
+      # Run the Saved Container next time
+      docker run -it --name <new-container-name> <new-image-name>
+
 #. ``pipenv`` quick-introduction
 
    - ``pipenv`` is a tool that aims to bring the best of all packaging worlds (bundler, composer, npm, cargo, yarn, etc.) to the Python world.
@@ -19,54 +37,60 @@ Local Environment Setup
      - Alterntively: ``pipenv run`` can be used to run any Python commands in the virtual environment
      - For example:
 
-          .. code-block::
-            # Run pytest in pipenv virtual environment
-            pipenv run pytest
-            # Run pre-commit in pipenv virtual environment
-            pipenv run pre-commit run --all-files
-            # OR enter pipenv shell and run commands
-            pipenv shell
-            pytest
-            pre-commit run --all-files
+       .. code-block::
+
+         # Run pytest in pipenv virtual environment
+         pipenv run pytest
+
+         # Run pre-commit in pipenv virtual environment
+         pipenv run pre-commit run --all-files
+
+         # OR enter pipenv shell and run commands
+         pipenv shell
+         pytest
+         pre-commit run --all-files
 
 #. Create Python virtual environment using ``pipenv``
 
-    .. code-block::
-
-        pip install pipenv
-        pipenv --python <VERSION>  # Creates a virtual environment for the project with specified VERSION; e.g. pipenv --python 3.9
+   .. code-block::
+   
+      pip install pipenv
+      pipenv --python <VERSION>  # Creates a virtual environment for the project with specified VERSION; e.g. pipenv --python 3.9
 
 #. Install and set-up Required Python Packages in editable mode
 
-    .. code-block::
+   .. code-block::
 
-        pipenv run pip install -e .
-        pipenv --help  # For help with all "pipenv" commands
-        # For dev environment
-        pipenv install
-        # For production environment
-        pipenv sync
-        # You can provide specific categories defined in "Pipfile" if you wish
-        pipenv install --categories=packages,build-packages,dev-packages,docs-packages,tests-packages
-        pipenv sync --categories=default,build-packages,dev-packages,docs-packages,tests-packages
-        pipenv --help
+     pipenv run pip install -e .
+     pipenv --help  # For help with all "pipenv" commands
+
+     # For dev environment
+     pipenv install
+
+     # For production environment
+     pipenv sync
+
+     # You can provide specific categories defined in "Pipfile" if you wish
+     pipenv install --categories=packages,build-packages,dev-packages,docs-packages,tests-packages
+     pipenv sync --categories=default,build-packages,dev-packages,docs-packages,tests-packages
+     pipenv --help
 
 #. Initialize Pre-commit
 
-    .. code-block::
+   .. code-block::
 
-        pipenv run pre-commit install
+     pipenv run pre-commit install
 
 #. To run any Python commands, you should either be in ``pipenv`` shell (``pipenv shell`` to enter) or use ``pipenv run`` in front of the command
 
-    .. code-block::
+   .. code-block::
 
-        # Example to run pytest
-        pipenv run pytest
+     # Example to run pytest
+     pipenv run pytest
 
-        # OR
-        pipenv shell
-        pytest
+     # OR
+     pipenv shell
+     pytest
 
 #. If you update ``setup.cfg``, ``pyproject.toml``, or ``Pipfile``
 
