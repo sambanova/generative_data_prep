@@ -8,7 +8,7 @@ Contributing Guide
 Local Environment Setup
 ***********************
 
-**NOTE**: Please ensure that your Python version matches the version used in CI flow in ``.circleci/config.yml`` file.
+**NOTE**: Please ensure that your Python & Docker version matches the version used in CI flow in `VERSIONS <../.circleci/VERSIONS>`_ file.
 
 #. Running in ``Docker`` container
 
@@ -16,7 +16,7 @@ Local Environment Setup
 
    .. code-block::
 
-      # Get <image-name> from `.circleci/VERSIONS`
+      # Get <image-name> from .circleci/VERSIONS
       docker pull <image-name>
 
       # Run the docker container and land on interactive terminal
@@ -126,12 +126,12 @@ Naming Conventions
 Code Conventions
 ****************
 
-```generative_data_prep`` follows standard [PEP8](https://peps.python.org/pep-0008/) coding conventions.
+```generative_data_prep`` follows standard `PEP8 <https://peps.python.org/pep-0008/>`_ coding conventions.
 
 Docstrings
 **********
 
-``generative_data_prep`` uses [Google style docstrings](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings) for formatting docstrings.
+``generative_data_prep`` uses `Google style docstrings <https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings>`_ for formatting docstrings.
 
 Pull Request (PR) Process
 *************************
