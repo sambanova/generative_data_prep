@@ -113,6 +113,12 @@ Here are a few important parameters to know about when running this example:
             <td>Determines whether to shuffle the input dataset, and whether to shuffle on RAM.</td>
             <td>There are 3 options for this flag: <code>'False'</code>, <code>'on_RAM'</code>, <code>'large_file'</code>. Check out the <a href="#shuffle"><code>shuffle</code></a> flag below for more details.</td>
         </tr>
+        <tr>
+            <td><code>apply_chat_template</code></td>
+            <td>bool</td>
+            <td>If you include this flag, the data will be tokenized using tokenizer.apply_chat_template and include the chatML tags.</td>
+            <td>This should be used when tuning most "Chat" models from HuggingFace, the tokenizer must have apply_chat_template defined.</td>
+        </tr>
     </tbody>
 </table>
 
@@ -143,6 +149,11 @@ We also support lists of prompt/completion pairs within a `.jsonl` file. This gu
 
 
 If the JSON objects in your `.jsonl` contain keywords other than **prompt** and **completion**, refer to the `prompt_keyword` and `completion_keyword` flags [below](#prompt_keyword)
+
+### Preparing data for Chat or Instruct Models
+Many chat and instruct models require very specific formatting to input multi turn conversations for training and inference using the [tokenizer.apply_chat_template function](https://huggingface.co/docs/transformers/main/en/chat_templating). We support tokenizing your data in this format, to do so please prepare your data in jsonl format as specified above, and then inlcude the `--apply_chat_template` flag to automatically prepare your data in this format.
+
+If your data is in the classic chat template format like [{"role": "user", "content": "..."}...], and you would like to convert it into the prompt completion format to be compatible with this repo, please use the [`generative_data_prep/utils/convert_chat_template_to_prompt_completion.py`](https://github.com/sambanova/generative_data_prep/blob/main/generative_data_prep/utils/convert_chat_template_to_prompt_completion.py) script.
 
 ### `.txt` Format
 
@@ -266,6 +277,7 @@ This section outlines all the flags you can set to customize the data prep pipel
 | `attention_boundary` | str | 'jsonl' | ['jsonl', 'prompt_completion_pair'] | The boundary to use when training with --article_attention flag. If you choose prompt_completion_pair tokens will only attend to tokens in the prompt_completion_pair. If you choose jsonl, then tokens will attend to all the prompt completion pairs in the jsonl |
 | `prompt_keyword` <span id="prompt_keyword"></span> | str | 'prompt' | | If your input json has a string keyword for prompt other than "prompt", place the keyword here. e.g Input_json: {"source": ... "target": ...} ->`prompt_keyword`='source'. |
 | `completion_keyword` | str | 'completion' | | If your input json has a string keyword for completion other than "completion", place the  keyword here. e.g Input_json: {"source": ... "target": ...} -> --completion_keyword='target'. |
+| `apply_chat_template` | bool | False | | Whether to tokenize the data using tokenizer.apply_chat_template, to add the chatML tags. The tokenizer must have apply_chat_template defined. |
 | `prompt_prefix` | str | 'None' | | text to add before the prompt, for chatML conventions use (e.g. "\<human\>:") |
 | `prompt_postfix` | str | 'None' | | text to add after the prompt, for chatML conventions use (e.g. "\<bot\>:") |
 | `disable_space_separator` | bool | False | Include flag for True, no arguments |  If you include this flag, NO spaces will be prepended to the completion. (If you do not add this flag then a space is added to every completion if it does not already have a space). Including this flag is dangerous and not recommended because if you have input data like {"prompt": "hello." "completion": "how are you?"}, when the prompt and completion are combined it will look like "hello.how are you?" which will mess up the tokenization.--completion_keyword='target'. |
