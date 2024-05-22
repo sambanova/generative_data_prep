@@ -32,6 +32,7 @@ Local Environment Setup
       # Example: Please replace container-name, image-name, and mount paths as needed
       docker pull python:3.9
       docker run -it -v ${PWD}:/home/project --name example-container python:3.9 /bin/bash
+      ### Run any commands you wish to in the docker container; Mount additional directories as needed for your use-case. ###
       # Save the current state of container as a new image as needed by typing this in a separate terminal/shell
       docker commit example-container python-custom-name-v1
 
