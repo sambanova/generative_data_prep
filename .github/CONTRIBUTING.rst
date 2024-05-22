@@ -53,7 +53,7 @@ Local Environment Setup
 #. Create Python virtual environment using ``pipenv``
 
    .. code-block::
-   
+
       pip install pipenv
       pipenv --python <VERSION>  # Creates a virtual environment for the project with specified VERSION; e.g. pipenv --python 3.9
 
