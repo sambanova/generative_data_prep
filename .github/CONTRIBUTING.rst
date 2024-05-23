@@ -8,7 +8,33 @@ Contributing Guide
 Local Environment Setup
 ***********************
 
-**NOTE**: Please ensure that your Python version matches the version used in CI flow in ``.circleci/config.yml`` file.
+**NOTE**: Please ensure that your Python & Docker version matches the version used in CI flow in `VERSIONS <../.circleci/VERSIONS>`_ file.
+
+#. Running in ``Docker`` container
+
+   For repeatability, it's better to run all commands in Docker containers instead of your local machine environment (especially Apple chips have known issues).
+   For details, please refer to `Official Docker Documentation <https://docs.docker.com/manuals/>`_.
+
+   .. code-block::
+
+      # Get <image-name> from .circleci/VERSIONS
+      docker pull <image-name>
+
+      # Run the docker container and land on interactive terminal
+      docker run -it --name <container-name> <image-name> <command-name>
+
+      # Save Container State after running commands
+      docker commit <container-name> <new-image-name>
+
+      # Run the Saved Container next time
+      docker run -it --name <new-container-name> <new-image-name>
+
+      # Example: Please replace container-name, image-name, and mount paths as needed
+      docker pull python:3.9
+      docker run -it -v ${PWD}:/home/project --name example-container python:3.9 /bin/bash
+      ### Run any commands you wish to in the docker container; Mount additional directories as needed for your use-case. ###
+      # Save the current state of container as a new image as needed by typing this in a separate terminal/shell
+      docker commit example-container python-custom-name-v1
 
 #. ``pipenv`` quick-introduction
 
@@ -19,54 +45,60 @@ Local Environment Setup
      - Alterntively: ``pipenv run`` can be used to run any Python commands in the virtual environment
      - For example:
 
-          .. code-block::
-            # Run pytest in pipenv virtual environment
-            pipenv run pytest
-            # Run pre-commit in pipenv virtual environment
-            pipenv run pre-commit run --all-files
-            # OR enter pipenv shell and run commands
-            pipenv shell
-            pytest
-            pre-commit run --all-files
+       .. code-block::
+
+         # Run pytest in pipenv virtual environment
+         pipenv run pytest
+
+         # Run pre-commit in pipenv virtual environment
+         pipenv run pre-commit run --all-files
+
+         # OR enter pipenv shell and run commands
+         pipenv shell
+         pytest
+         pre-commit run --all-files
 
 #. Create Python virtual environment using ``pipenv``
 
-    .. code-block::
+   .. code-block::
 
-        pip install pipenv
-        pipenv --python <VERSION>  # Creates a virtual environment for the project with specified VERSION; e.g. pipenv --python 3.9
+      pip install pipenv
+      pipenv --python <VERSION>  # Creates a virtual environment for the project with specified VERSION; e.g. pipenv --python 3.9
 
 #. Install and set-up Required Python Packages in editable mode
 
-    .. code-block::
+   .. code-block::
 
-        pipenv run pip install -e .
-        pipenv --help  # For help with all "pipenv" commands
-        # For dev environment
-        pipenv install
-        # For production environment
-        pipenv sync
-        # You can provide specific categories defined in "Pipfile" if you wish
-        pipenv install --categories=packages,build-packages,dev-packages,docs-packages,tests-packages
-        pipenv sync --categories=default,build-packages,dev-packages,docs-packages,tests-packages
-        pipenv --help
+     pipenv run pip install -e .
+     pipenv --help  # For help with all "pipenv" commands
+
+     # For dev environment
+     pipenv install
+
+     # For production environment
+     pipenv sync
+
+     # You can provide specific categories defined in "Pipfile" if you wish
+     pipenv install --categories=packages,build-packages,dev-packages,docs-packages,tests-packages
+     pipenv sync --categories=default,build-packages,dev-packages,docs-packages,tests-packages
+     pipenv --help
 
 #. Initialize Pre-commit
 
-    .. code-block::
+   .. code-block::
 
-        pipenv run pre-commit install
+     pipenv run pre-commit install
 
 #. To run any Python commands, you should either be in ``pipenv`` shell (``pipenv shell`` to enter) or use ``pipenv run`` in front of the command
 
-    .. code-block::
+   .. code-block::
 
-        # Example to run pytest
-        pipenv run pytest
+     # Example to run pytest
+     pipenv run pytest
 
-        # OR
-        pipenv shell
-        pytest
+     # OR
+     pipenv shell
+     pytest
 
 #. If you update ``setup.cfg``, ``pyproject.toml``, or ``Pipfile``
 
@@ -102,12 +134,12 @@ Naming Conventions
 Code Conventions
 ****************
 
-```generative_data_prep`` follows standard [PEP8](https://peps.python.org/pep-0008/) coding conventions.
+```generative_data_prep`` follows standard `PEP8 <https://peps.python.org/pep-0008/>`_ coding conventions.
 
 Docstrings
 **********
 
-``generative_data_prep`` uses [Google style docstrings](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings) for formatting docstrings.
+``generative_data_prep`` uses `Google style docstrings <https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings>`_ for formatting docstrings.
 
 Pull Request (PR) Process
 *************************
