@@ -60,7 +60,7 @@ def gold_pipeline_path(test_name: str) -> str:
 
 
 @pytest.mark.parametrize(
-    "test_name,tokenizer,max_seq_length,input_packing_config,packing_boundary,attention_boundary",
+    "test_name,tokenizer,max_seq_length,input_packing_config,packing_boundary,attention_boundary,apply_chat_template",
     [
         ("data_prep_test", TOKENIZER, 1024, PackingConfig.get_default(), BoundaryType.JSONL, BoundaryType.JSONL, False),
         (
@@ -165,7 +165,8 @@ def test_data_prep(
 @pytest.mark.parametrize(
     "test_name,disable_space_separator,keep_prompt_only_sequences,prompt_keyword,completion_keyword,\
     shuffle,do_not_balance_hdf5,keep_split_jsonls,max_seq_length,input_packing_config,packing_boundary,\
-    attention_boundary,num_training_splits,num_dev_splits,num_test_splits,category_to_id,dev_ratio,test_ratio",
+    attention_boundary,num_training_splits,num_dev_splits,num_test_splits,category_to_id,dev_ratio,test_ratio,\
+    tokenizer,apply_chat_template",
     [
         (
             "pipeline_test",
