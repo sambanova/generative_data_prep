@@ -1,0 +1,9 @@
+max_batch_size_dev: null
+max_batch_size_train: 1
+max_seq_length: 1024
+number_of_dev_files: 0
+number_of_test_files: 0
+number_of_training_files: 16
+token_type_ids: true
+tokenizer_model_type: <class 'transformers.models.llama.configuration_llama.LlamaConfig'>
+vocab_size: 32000
