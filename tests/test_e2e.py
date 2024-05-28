@@ -347,7 +347,6 @@ def test_data_prep(
         (
             "apply_chat_template",
             False,
-            False,
             True,
             "prompt",
             "completion",
