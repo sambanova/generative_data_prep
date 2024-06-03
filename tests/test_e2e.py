@@ -187,7 +187,7 @@ def test_data_prep(
             None,
             0.2,
             0.1,
-            LLAMA_TOKENIZER,
+            TOKENIZER,
             False,
         ),
         (
@@ -209,7 +209,7 @@ def test_data_prep(
             None,
             None,
             None,
-            LLAMA_TOKENIZER,
+            TOKENIZER,
             False,
         ),
         (
@@ -231,7 +231,7 @@ def test_data_prep(
             None,
             None,
             None,
-            LLAMA_TOKENIZER,
+            TOKENIZER,
             False,
         ),
         (
@@ -253,7 +253,7 @@ def test_data_prep(
             None,
             None,
             None,
-            LLAMA_TOKENIZER,
+            TOKENIZER,
             False,
         ),
         (
@@ -275,7 +275,7 @@ def test_data_prep(
             None,
             None,
             None,
-            LLAMA_TOKENIZER,
+            TOKENIZER,
             False,
         ),
         (
@@ -297,7 +297,7 @@ def test_data_prep(
             None,
             None,
             None,
-            LLAMA_TOKENIZER,
+            TOKENIZER,
             False,
         ),
         (
@@ -319,7 +319,7 @@ def test_data_prep(
             None,
             None,
             None,
-            LLAMA_TOKENIZER,
+            TOKENIZER,
             False,
         ),
         (
@@ -341,7 +341,7 @@ def test_data_prep(
             ["example_category_1", "example_category_2", "example_category_3"],
             None,
             None,
-            LLAMA_TOKENIZER,
+            TOKENIZER,
             False,
         ),
         (
