@@ -151,7 +151,7 @@ We also support lists of prompt/completion pairs within a `.jsonl` file. This gu
 If the JSON objects in your `.jsonl` contain keywords other than **prompt** and **completion**, refer to the `prompt_keyword` and `completion_keyword` flags [below](#prompt_keyword)
 
 ### Preparing data for Chat or Instruct Models
-Many chat and instruct models require very specific formatting to input multi turn conversations for training and inference using the [tokenizer.apply_chat_template function](https://huggingface.co/docs/transformers/main/en/chat_templating). We support tokenizing your data in this format, to do so please prepare your data in jsonl format as specified above, and then inlcude the `--apply_chat_template` flag to automatically prepare your data in this format.
+Many chat and instruct models require very specific formatting to input multi turn conversations for training and inference. The [tokenizer.apply_chat_template function](https://huggingface.co/docs/transformers/main/en/chat_templating) easily adapts your jsonl data to this format. To use this feature, prepare your data in jsonl format as specified above, and then include the `--apply_chat_template` flag to automatically prepare your data in this format.
 
 If your data is in the classic chat template format like [{"role": "user", "content": "..."}...], and you would like to convert it into the prompt completion format to be compatible with this repo, please use the [`generative_data_prep/utils/convert_chat_template_to_prompt_completion.py`](https://github.com/sambanova/generative_data_prep/blob/main/generative_data_prep/utils/convert_chat_template_to_prompt_completion.py) script.
 
