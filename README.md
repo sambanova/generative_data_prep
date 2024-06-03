@@ -116,8 +116,8 @@ Here are a few important parameters to know about when running this example:
         <tr>
             <td><code>apply_chat_template</code></td>
             <td>bool</td>
-            <td>If you include this flag, the data will be tokenized using tokenizer.apply_chat_template and include the chatML tags.</td>
-            <td>This should be used when tuning most "Chat" models from HuggingFace, the tokenizer must have apply_chat_template defined.</td>
+            <td>Whether to tokenize the data using `tokenizer.apply_chat_template`, to add the chatML tags during tokenization (Eg <user>: ... <assistant>:). .</td>
+            <td>This should usually be used when instruction tuning or training chat models. The tokenizer you are loading must have a chat_template defined, you can check if it is defined by looking in the `tokenizer_config.json` file and checking for a `chat_template` key in there</td>
         </tr>
     </tbody>
 </table>
@@ -277,7 +277,7 @@ This section outlines all the flags you can set to customize the data prep pipel
 | `attention_boundary` | str | 'jsonl' | ['jsonl', 'prompt_completion_pair'] | The boundary to use when training with --article_attention flag. If you choose prompt_completion_pair tokens will only attend to tokens in the prompt_completion_pair. If you choose jsonl, then tokens will attend to all the prompt completion pairs in the jsonl |
 | `prompt_keyword` <span id="prompt_keyword"></span> | str | 'prompt' | | If your input json has a string keyword for prompt other than "prompt", place the keyword here. e.g Input_json: {"source": ... "target": ...} ->`prompt_keyword`='source'. |
 | `completion_keyword` | str | 'completion' | | If your input json has a string keyword for completion other than "completion", place the  keyword here. e.g Input_json: {"source": ... "target": ...} -> --completion_keyword='target'. |
-| `apply_chat_template` | bool | False | | Whether to tokenize the data using tokenizer.apply_chat_template, to add the chatML tags. The tokenizer must have apply_chat_template defined. |
+| `apply_chat_template` | bool | False | | Whether to tokenize the data using `tokenizer.apply_chat_template`, to add the chatML tags during tokenization (Eg <user>: ... <assistant>:). This should usually be used when instruction tuning or training chat models. The tokenizer you are loading must have a chat_template defined, you can check if it is defined by looking in the `tokenizer_config.json` file and checking for a `chat_template` key in there. |
 | `prompt_prefix` | str | 'None' | | text to add before the prompt, for chatML conventions use (e.g. "\<human\>:") |
 | `prompt_postfix` | str | 'None' | | text to add after the prompt, for chatML conventions use (e.g. "\<bot\>:") |
 | `disable_space_separator` | bool | False | Include flag for True, no arguments |  If you include this flag, NO spaces will be prepended to the completion. (If you do not add this flag then a space is added to every completion if it does not already have a space). Including this flag is dangerous and not recommended because if you have input data like {"prompt": "hello." "completion": "how are you?"}, when the prompt and completion are combined it will look like "hello.how are you?" which will mess up the tokenization.--completion_keyword='target'. |
