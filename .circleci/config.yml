@@ -43,8 +43,8 @@ jobs:
           name: Verify Pipfile
           command: |
             source .circleci/VERSIONS
-            pipenv lock
             pipenv check --system
+            pipenv lock
       - save_cache:
           key: v1-{{ arch }}-{{ checksum "pyproject.toml" }}-{{ checksum "circleci_cache_key" }}
           paths:
