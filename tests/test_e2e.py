@@ -355,7 +355,7 @@ def test_data_prep(
             True,
             1024,
             PackingConfig.from_str("greedy::drop"),
-            BoundaryType.PROMPT_COMPLETION_PAIR,
+            BoundaryType.JSONL,
             BoundaryType.JSONL,
             16,
             0,
