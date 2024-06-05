@@ -105,7 +105,7 @@ def gold_pipeline_path(test_name: str) -> str:
             LLAMA_TOKENIZER,
             1024,
             PackingConfig.from_str("greedy::drop"),
-            BoundaryType.PROMPT_COMPLETION_PAIR,
+            BoundaryType.JSONL,
             BoundaryType.JSONL,
             True,
         ),
