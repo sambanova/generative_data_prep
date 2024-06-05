@@ -260,6 +260,7 @@ def test_metadata_end2end_output(tmp_path):
         "prompt_prefix": None,
         "prompt_postfix": None,
         "categories_path": None,
+        "apply_chat_template": False,
     }
     args = Namespace(**args_dict)
     main(args)

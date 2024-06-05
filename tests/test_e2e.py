@@ -19,7 +19,12 @@ import tempfile
 from typing import Dict
 
 import pytest
-from transformers import GPT2Config, GPT2Tokenizer, PreTrainedTokenizerBase
+from transformers import (
+    AutoTokenizer,
+    GPT2Config,
+    GPT2Tokenizer,
+    PreTrainedTokenizerBase,
+)
 
 from generative_data_prep.data_prep import data_prep_main, pipeline_main
 from generative_data_prep.utils import BoundaryType, PackingConfig
@@ -35,10 +40,11 @@ from .test_utils import (
 
 TOKENIZER = GPT2Tokenizer.from_pretrained("gpt2")
 MODEL_CONFIG = GPT2Config.from_pretrained("gpt2")
+LLAMA_TOKENIZER = AutoTokenizer.from_pretrained("daryl149/llama-2-7b-chat-hf")
 
 
 def get_input_path(test_name: str) -> str:
-    """Create a absolute path to example input."""
+    """Create an absolute path to example input."""
     ext = ".txt" if "txt" in test_name else ".jsonl"
     return TESTS_EXAMPLES_PATH / test_name / f"example_{test_name}_data{ext}"
 
@@ -54,16 +60,9 @@ def gold_pipeline_path(test_name: str) -> str:
 
 
 @pytest.mark.parametrize(
-    "test_name,tokenizer,max_seq_length,input_packing_config,packing_boundary,attention_boundary",
+    "test_name,tokenizer,max_seq_length,input_packing_config,packing_boundary,attention_boundary,apply_chat_template",
     [
-        (
-            "data_prep_test",
-            TOKENIZER,
-            1024,
-            PackingConfig.get_default(),
-            BoundaryType.JSONL,
-            BoundaryType.JSONL,
-        ),
+        ("data_prep_test", TOKENIZER, 1024, PackingConfig.get_default(), BoundaryType.JSONL, BoundaryType.JSONL, False),
         (
             "pretraining_txt",
             TOKENIZER,
@@ -71,15 +70,9 @@ def gold_pipeline_path(test_name: str) -> str:
             PackingConfig.get_default(),
             BoundaryType.JSONL,
             BoundaryType.JSONL,
+            False,
         ),
-        (
-            "pretraining",
-            TOKENIZER,
-            1024,
-            PackingConfig.get_default(),
-            BoundaryType.JSONL,
-            BoundaryType.JSONL,
-        ),
+        ("pretraining", TOKENIZER, 1024, PackingConfig.get_default(), BoundaryType.JSONL, BoundaryType.JSONL, False),
         (
             "generative_tuning",
             TOKENIZER,
@@ -87,6 +80,7 @@ def gold_pipeline_path(test_name: str) -> str:
             PackingConfig.from_str("single::drop"),
             BoundaryType.JSONL,
             BoundaryType.JSONL,
+            False,
         ),
         (
             "dialogue",
@@ -95,6 +89,7 @@ def gold_pipeline_path(test_name: str) -> str:
             PackingConfig.from_str("single::truncate_right"),
             BoundaryType.JSONL,
             BoundaryType.JSONL,
+            False,
         ),
         (
             "metaICL",
@@ -103,6 +98,16 @@ def gold_pipeline_path(test_name: str) -> str:
             PackingConfig.from_str("greedy::drop"),
             BoundaryType.PROMPT_COMPLETION_PAIR,
             BoundaryType.JSONL,
+            False,
+        ),
+        (
+            "apply_chat_template",
+            LLAMA_TOKENIZER,
+            1024,
+            PackingConfig.from_str("greedy::drop"),
+            BoundaryType.JSONL,
+            BoundaryType.JSONL,
+            True,
         ),
     ],
 )
@@ -113,6 +118,7 @@ def test_data_prep(
     input_packing_config: PackingConfig,
     packing_boundary: BoundaryType,
     attention_boundary: BoundaryType,
+    apply_chat_template: bool,
 ):
     """Test the data prep function."""
     input_path = get_input_path(test_name)
@@ -132,6 +138,7 @@ def test_data_prep(
             keep_prompt_only_sequences=True,
             prompt_keyword="prompt",
             completion_keyword="completion",
+            apply_chat_template=apply_chat_template,
         )
         check_diff_hdf5(output_file, gold_path)
 
@@ -158,7 +165,8 @@ def test_data_prep(
 @pytest.mark.parametrize(
     "test_name,disable_space_separator,keep_prompt_only_sequences,prompt_keyword,completion_keyword,\
     shuffle,do_not_balance_hdf5,keep_split_jsonls,max_seq_length,input_packing_config,packing_boundary,\
-    attention_boundary,num_training_splits,num_dev_splits,num_test_splits,category_to_id,dev_ratio,test_ratio",
+    attention_boundary,num_training_splits,num_dev_splits,num_test_splits,category_to_id,dev_ratio,test_ratio,\
+    tokenizer,apply_chat_template",
     [
         (
             "pipeline_test",
@@ -179,6 +187,8 @@ def test_data_prep(
             None,
             0.2,
             0.1,
+            TOKENIZER,
+            False,
         ),
         (
             "pretraining_txt",
@@ -199,6 +209,8 @@ def test_data_prep(
             None,
             None,
             None,
+            TOKENIZER,
+            False,
         ),
         (
             "pretraining",
@@ -219,6 +231,8 @@ def test_data_prep(
             None,
             None,
             None,
+            TOKENIZER,
+            False,
         ),
         (
             "generative_tuning",
@@ -239,6 +253,8 @@ def test_data_prep(
             None,
             None,
             None,
+            TOKENIZER,
+            False,
         ),
         (
             "no_split_dir",
@@ -259,6 +275,8 @@ def test_data_prep(
             None,
             None,
             None,
+            TOKENIZER,
+            False,
         ),
         (
             "dialogue",
@@ -279,6 +297,8 @@ def test_data_prep(
             None,
             None,
             None,
+            TOKENIZER,
+            False,
         ),
         (
             "metaICL",
@@ -299,6 +319,8 @@ def test_data_prep(
             None,
             None,
             None,
+            TOKENIZER,
+            False,
         ),
         (
             "category_ids",
@@ -319,6 +341,30 @@ def test_data_prep(
             ["example_category_1", "example_category_2", "example_category_3"],
             None,
             None,
+            TOKENIZER,
+            False,
+        ),
+        (
+            "apply_chat_template",
+            False,
+            True,
+            "prompt",
+            "completion",
+            "False",
+            False,
+            True,
+            1024,
+            PackingConfig.from_str("greedy::drop"),
+            BoundaryType.JSONL,
+            BoundaryType.JSONL,
+            16,
+            0,
+            0,
+            None,
+            None,
+            None,
+            LLAMA_TOKENIZER,
+            True,
         ),
     ],
 )
@@ -341,6 +387,8 @@ def test_pipeline(
     category_to_id: Dict[str, int],
     dev_ratio: float,
     test_ratio: float,
+    tokenizer: PreTrainedTokenizerBase,
+    apply_chat_template: bool,
 ):
     """Test the pipeline function end to end."""
     num_workers = os.cpu_count()
@@ -351,7 +399,7 @@ def test_pipeline(
     with tempfile.TemporaryDirectory() as output_dir:
         pipeline_main(
             input_file_path=input_path,
-            tokenizer=TOKENIZER,
+            tokenizer=tokenizer,
             model_config=MODEL_CONFIG,
             output_dir=output_dir,
             disable_space_separator=disable_space_separator,
@@ -373,6 +421,7 @@ def test_pipeline(
             category_to_id=category_to_id,
             dev_ratio=dev_ratio,
             test_ratio=test_ratio,
+            apply_chat_template=apply_chat_template,
         )
 
         check_pipeline(output_dir, gold_path)
