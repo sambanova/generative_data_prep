@@ -248,7 +248,7 @@ class ArticleTokenizer:
                     else:
                         curr_completion_text += split
         # Once we have finished iterating over list, add final prompt completion pair
-        if len(curr_prompt_text) > 0:
+        if len(curr_prompt_text) > 0 or len(curr_completion_text) > 0:
             tokens += self.tokenize(
                 completion=curr_completion_text,
                 prompt=curr_prompt_text,
