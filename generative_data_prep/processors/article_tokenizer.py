@@ -249,9 +249,15 @@ class ArticleTokenizer:
                     else:
                         curr_completion_text += split
 
-        if len(tokens) > 0:
+        # Once we have finished iterating over list, add final prompt completion pair
+        if len(curr_prompt_text) > 0 or len(curr_completion_text) > 0:
+            tokens += self.tokenize(
+                completion=curr_completion_text,
+                prompt=curr_prompt_text,
+                apply_chat_template=True,
+            )
             tokens[-1].make_article_boundary()
-        tokenized_articles.append(TokenizedArticle(tokens))
+            tokenized_articles.append(TokenizedArticle(tokens))
 
         return tokenized_articles
 
