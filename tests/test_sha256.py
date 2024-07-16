@@ -53,6 +53,7 @@ def shared_output_dir_with_split(tmp_path_factory):
         "prompt_prefix": None,
         "prompt_postfix": None,
         "categories_path": None,
+        "apply_chat_template": False,
     }
     args = Namespace(**args_dict)
     main(args)
@@ -126,6 +127,7 @@ def test_validation_sha_with_split_and_eval(tmp_path):
         "prompt_prefix": None,
         "prompt_postfix": None,
         "categories_path": None,
+        "apply_chat_template": False,
     }
     args = Namespace(**args_dict)
     main(args)
@@ -176,6 +178,7 @@ def test_validation_sha_without_split(tmp_path):
         "prompt_prefix": None,
         "prompt_postfix": None,
         "categories_path": None,
+        "apply_chat_template": False,
     }
     args = Namespace(**args_dict)
     main(args)

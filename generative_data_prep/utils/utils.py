@@ -241,6 +241,14 @@ def data_prep_arg_builder(parser: argparse.ArgumentParser):
             " file that contains a list of all the strings of the 'category' keys in your dataset."
         ),
     )
+    parser.add_argument(
+        "--apply_chat_template",
+        action="store_true",
+        help="If you want to apply the chat template to your data, include this flag. \
+        The chat template is a template that is applied to the data to make it more conversational \
+        which includes a role, like “user” or “assistant”, as well as message text. \
+        This chat template will be extracted from tokenizer.apply_chat_template.",
+    )
 
 
 def execute_and_return_stdout(command):

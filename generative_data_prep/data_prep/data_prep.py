@@ -50,6 +50,7 @@ def data_prep_main(
     prompt_prefix: Optional[str] = None,
     prompt_postfix: Optional[str] = None,
     dataset_type: Optional[str] = None,
+    apply_chat_template: Optional[bool] = False,
 ):
     """Tokenize input_file into packed sequences stored in output_file.
 
@@ -78,7 +79,6 @@ def data_prep_main(
     """
     if silent:
         sys.stdout = open(os.devnull, "w")
-
     file_ext = FileExtension(os.path.splitext(input_file)[1])
     article_tokenizer = ArticleTokenizer(
         tokenizer,
@@ -94,6 +94,7 @@ def data_prep_main(
         category_to_id,
         prompt_prefix,
         prompt_postfix,
+        apply_chat_template,
     )
 
     dump_categories = category_to_id is not None

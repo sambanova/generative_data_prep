@@ -247,6 +247,7 @@ def multiprocess_data_prep(  # noqa: C901
     category_to_id: Optional[Dict[str, int]] = None,
     prompt_prefix: Optional[str] = None,
     prompt_postfix: Optional[str] = None,
+    apply_chat_template: Optional[bool] = False,
 ) -> Tuple[List[str], List[str], Metrics]:
     """Tokenizes all the files in files_to_tokenize efficiently using multirpocessing library.
 
@@ -325,6 +326,7 @@ def multiprocess_data_prep(  # noqa: C901
                     prompt_prefix,
                     prompt_postfix,
                     dataset_type,
+                    apply_chat_template,
                 ),
             )
         )
@@ -430,6 +432,7 @@ def pipeline_main(  # noqa: C901
     category_to_id: Optional[Dict[str, int]] = None,
     prompt_prefix: Optional[str] = None,
     prompt_postfix: Optional[str] = None,
+    apply_chat_template: Optional[bool] = False,
 ):
     """Endpoint for preparing data, shuffles, splits and tokenize input file.
 
@@ -629,6 +632,7 @@ def pipeline_main(  # noqa: C901
         category_to_id,
         prompt_prefix,
         prompt_postfix,
+        apply_chat_template,
     )
 
     log_sep_str()

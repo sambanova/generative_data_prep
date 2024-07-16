@@ -322,7 +322,6 @@ def main(args):
         args.special_tokens_dict,
     )
     category_to_id = get_categories(args.categories_path)
-
     if args.cmd == "pipeline":
         metrics, dataset_metadata = pipeline_main(
             args.input_file_path,
@@ -350,6 +349,7 @@ def main(args):
             category_to_id,
             args.prompt_prefix,
             args.prompt_postfix,
+            args.apply_chat_template,
         )
     elif args.cmd == "data_prep":
         metrics = data_prep_main(
@@ -368,6 +368,7 @@ def main(args):
             category_to_id,
             args.prompt_prefix,
             args.prompt_postfix,
+            apply_chat_template=args.apply_chat_template,
         )
 
     log_metrics(metrics)
