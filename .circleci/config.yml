@@ -1,17 +1,18 @@
 version: 2.1
 
 orbs:
-  slack: circleci/slack@4.12.5
+  slack: circleci/slack@4.13.3
+  codecov: codecov/codecov@3.3.0
 
 executors:
   python-docker:
     docker:
-      - image: cimg/python:3.9
+      - image: cimg/python:3.8
     resource_class: medium
   pip-tools-docker:
     docker:
-      - image: python:3.9
-    resource_class: medium
+      - image: python:3.8
+    resource_class: small
   base:
     docker:
       - image: cimg/base:stable
@@ -36,14 +37,14 @@ jobs:
           name: Run Pre-commit
           command: |
             source .circleci/VERSIONS
-            pip install pip==${PIP_VERSION} pip install pipenv==${PIPENV_VERSION}
+            pip install pip==${PIP_VERSION} && pip install pipenv==${PIPENV_VERSION}
             pipenv sync --categories tests-packages
             pipenv run pre-commit run --all-files
       - run:
           name: Verify Pipfile
           command: |
             source .circleci/VERSIONS
-            pipenv check --system --policy-file=.circleci/assets/python/.safety-policy.yml
+            pipenv check .circleci/assets/.safety-policy.yml
             pipenv lock
       - save_cache:
           key: v1-{{ arch }}-{{ checksum "pyproject.toml" }}-{{ checksum "circleci_cache_key" }}
@@ -82,6 +83,8 @@ jobs:
       - run:
           name: Build Python Package
           command: pipenv run hatch build
+      - codecov/upload:
+          file: test_reports/coverage/pytest_cov.xml
       - store_test_results:
           path: test_reports/circleci
       - store_artifacts:
