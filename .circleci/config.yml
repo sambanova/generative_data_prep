@@ -37,7 +37,7 @@ jobs:
           name: Run Pre-commit
           command: |
             source .circleci/VERSIONS
-            pip install pip==${PIP_VERSION} pip install pipenv==${PIPENV_VERSION}
+            pip install pip==${PIP_VERSION} && pip install pipenv==${PIPENV_VERSION}
             pipenv sync --categories tests-packages
             pipenv run pre-commit run --all-files
       - run:
