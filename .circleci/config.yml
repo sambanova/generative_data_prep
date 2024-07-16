@@ -7,11 +7,11 @@ orbs:
 executors:
   python-docker:
     docker:
-      - image: cimg/python:3.9
+      - image: cimg/python:3.8
     resource_class: medium
   pip-tools-docker:
     docker:
-      - image: python:3.9
+      - image: python:3.8
     resource_class: medium
   base:
     docker:
