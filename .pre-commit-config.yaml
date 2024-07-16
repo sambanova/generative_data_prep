@@ -37,7 +37,7 @@ repos:
 - repo: local
   hooks:
   - id: pipenv-lock
-    name: Generate pipenv Lock Files for Python Package
+    name: Generate Pipfile.lock for sambanova-generative-data-prep
     stages: [manual]
     language: system
     entry: bash -c 'source .circleci/VERSIONS &&
