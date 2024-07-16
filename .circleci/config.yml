@@ -1,7 +1,8 @@
 version: 2.1
 
 orbs:
-  slack: circleci/slack@4.12.5
+  slack: circleci/slack@4.13.3
+  codecov: codecov/codecov@3.3.0
 
 executors:
   python-docker:
@@ -82,6 +83,7 @@ jobs:
       - run:
           name: Build Python Package
           command: pipenv run hatch build
+      - codecov/upload
       - store_test_results:
           path: test_reports/circleci
       - store_artifacts:
