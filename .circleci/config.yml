@@ -83,7 +83,8 @@ jobs:
       - run:
           name: Build Python Package
           command: pipenv run hatch build
-      - codecov/upload
+      - codecov/upload:
+          file: test_reports/coverage/pytest_cov.xml
       - store_test_results:
           path: test_reports/circleci
       - store_artifacts:
