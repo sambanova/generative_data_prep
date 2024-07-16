@@ -1,4 +1,4 @@
-Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for detailed instructions.
+Please refer to [the contribution guide](https://github.com/sambanova/generative_data_prep/blob/main/.github/CONTRIBUTING.rst) for detailed instructions.
 
 ## Summary
 <!-- Provide a short summary of your changes -->
