@@ -12,7 +12,7 @@ executors:
   pip-tools-docker:
     docker:
       - image: python:3.8
-    resource_class: medium
+    resource_class: small
   base:
     docker:
       - image: cimg/base:stable
