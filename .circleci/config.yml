@@ -44,7 +44,7 @@ jobs:
           name: Verify Pipfile
           command: |
             source .circleci/VERSIONS
-            pipenv check .circleci/assets/.safety-policy.yml
+            pipenv check --policy-file .circleci/assets/.safety-policy.yml
             pipenv lock
       - save_cache:
           key: v1-{{ arch }}-{{ checksum "pyproject.toml" }}-{{ checksum "circleci_cache_key" }}
