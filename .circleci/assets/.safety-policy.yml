@@ -10,4 +10,7 @@ security: # configuration for the `safety check` command
         70612:
             reason: The maintainer and multiple third parties believe that this vulnerability isn't valid because users shouldn't use untrusted templates without sandboxing.
             expires: '2025-07-16'
+        71670:
+            reason: Found in all torch versions >= 0
+            expires: '2025-07-16'
     continue-on-vulnerability-error: False
