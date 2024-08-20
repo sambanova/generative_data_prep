@@ -232,6 +232,7 @@ def multiprocess_data_prep(  # noqa: C901
     files_to_tokenize: List[str],
     split_dir: str,
     hdf5_dir: str,
+    json_error_log_dir: str,
     max_seq_length: int,
     input_packing_config: PackingConfig,
     packing_boundary: BoundaryType,
@@ -240,6 +241,7 @@ def multiprocess_data_prep(  # noqa: C901
     completion_keyword: str,
     disable_space_separator: bool,
     keep_prompt_only_sequences: bool,
+    ignore_input_format_error: bool,
     tokenizer: PreTrainedTokenizerBase,
     num_workers: int,
     input_file_size_in_gb: float,
@@ -294,7 +296,9 @@ def multiprocess_data_prep(  # noqa: C901
     manager = multiprocessing.Manager()
     num_tokenized_articles_lock = manager.Lock()
     num_tokenized_articles = manager.Value(int, 0)
+    num_skipped_articles = manager.Value(int, 0)
     prev_num_tokenized_articles = 0
+    prev_num_skipped_articles = 0
     # Submit multiprocessing workers
     executor = concurrent.futures.ProcessPoolExecutor(max_workers=num_workers)
     futures = []
@@ -312,14 +316,17 @@ def multiprocess_data_prep(  # noqa: C901
                     tokenizer,
                     input_file_path,
                     output_file_path,
+                    json_error_log_dir,
                     max_seq_length,
                     input_packing_config,
                     packing_boundary,
                     attention_boundary,
                     disable_space_separator,
                     keep_prompt_only_sequences,
+                    ignore_input_format_error,
                     prompt_keyword,
                     completion_keyword,
+                    num_skipped_articles,
                     num_tokenized_articles,
                     num_tokenized_articles_lock,
                     category_to_id,
@@ -394,7 +401,14 @@ def multiprocess_data_prep(  # noqa: C901
                 )
                 prev_num_tokenized_articles = num_tokenized_articles.value
 
+                num_new_skipped_articles = num_skipped_articles.value - prev_num_skipped_articles
+                if num_new_skipped_articles > 0:
+                    LOGGER.info(f"{num_new_skipped_articles} more misformatted lines are skipped")
+                    prev_num_skipped_articles = num_skipped_articles.value
             time.sleep(5)
+
+    LOGGER.info(f"Total processed lines: {num_tokenized_articles.value}")
+    LOGGER.info(f"Total skipped lines: {num_skipped_articles.value}")
 
     if dataset_metadata_json is not None:
         dataset_metadata_json["max_batch_size_train"] = max_batch_size_train
@@ -413,6 +427,7 @@ def pipeline_main(  # noqa: C901
     output_dir: str,
     disable_space_separator: bool,
     keep_prompt_only_sequences: bool,
+    ignore_input_format_error: bool,
     prompt_keyword: str,
     completion_keyword: str,
     shuffle: str,
@@ -526,6 +541,9 @@ def pipeline_main(  # noqa: C901
     model_config_path = os.path.join(tokenizer_dir, "config.json")
     model_config.to_json_file(model_config_path)
 
+    json_error_log_dir = os.path.join(output_dir, "json_error_log")
+    verify_output_dir(json_error_log_dir, True)
+
     if category_to_id is not None:
         category_to_id_output_file_path = os.path.join(output_dir, "category_to_id.json")
         verify_output_file(category_to_id_output_file_path, overwrite_output_path)
@@ -617,6 +635,7 @@ def pipeline_main(  # noqa: C901
         files_to_tokenize,
         split_dir,
         output_dir,
+        json_error_log_dir,
         max_seq_length,
         input_packing_config,
         packing_boundary,
@@ -625,6 +644,7 @@ def pipeline_main(  # noqa: C901
         completion_keyword,
         disable_space_separator,
         keep_prompt_only_sequences,
+        ignore_input_format_error,
         tokenizer,
         num_workers,
         input_file_size_in_gb,
@@ -653,6 +673,16 @@ def pipeline_main(  # noqa: C901
 
     if not keep_split_jsonls:
         shutil.rmtree(split_dir)
+
+    file_names = []
+    for file_name in os.listdir(json_error_log_dir):
+        file_names.append(os.path.join(json_error_log_dir, file_name))
+    with open(os.path.join(output_dir, "json_error_log.log"), "w") as outfile:
+        for file_name in file_names:
+            with open(file_name) as reader:
+                for line in reader:
+                    outfile.write(line)
+    shutil.rmtree(json_error_log_dir)
 
     metadata_file_path = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file_path, "w") as file:

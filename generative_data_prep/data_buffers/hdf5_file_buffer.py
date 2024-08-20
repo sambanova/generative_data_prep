@@ -83,9 +83,8 @@ class Hdf5FileBuffer(FileBuffer):
         Raises:
             RuntimeError: If there is an exception
         """
-        if exc_type is not None or exc_val is not None or exc_tb is not None:
-            err_msg = f"Hdf5TextBuffer exit failed with exc_type: {exc_type}, exc_val: {exc_val}, exc_tb: {exc_tb}"
-            raise RuntimeError(err_msg)
+        if exc_val is not None:
+            raise RuntimeError(exc_val)
 
         if len(self._chunk) > 0:
             self._dump_chunk(self._chunk)
