@@ -122,10 +122,12 @@ def data_prep_main(
                                 num_skipped_articles.value += 1
                         continue
                     else:
-                        raise ValueError(
+                        raise json.JSONDecodeError(
                             f"Error occurred loading this misformatted JSON line:\n\n{line}\n"
                             "Please format input dataset properly so that each line can be loaded with json.loads(). "
-                            "Or consider using the --ignore_input_format_error flag to skip misformatted lines."
+                            "Or consider using the --ignore_input_format_error flag to skip misformatted lines.",
+                            exc.doc,
+                            exc.pos,
                         ) from exc
 
             hdf5_text_buffer.write(article_tokenizer(None))

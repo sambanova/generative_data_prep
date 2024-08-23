@@ -401,14 +401,16 @@ def multiprocess_data_prep(  # noqa: C901
                 )
                 prev_num_tokenized_articles = num_tokenized_articles.value
 
-                num_new_skipped_articles = num_skipped_articles.value - prev_num_skipped_articles
-                if num_new_skipped_articles > 0:
-                    LOGGER.info(f"{num_new_skipped_articles} more misformatted lines are skipped")
-                    prev_num_skipped_articles = num_skipped_articles.value
+                if ignore_input_format_error:
+                    num_new_skipped_articles = num_skipped_articles.value - prev_num_skipped_articles
+                    if num_new_skipped_articles > 0:
+                        LOGGER.info(f"{num_skipped_articles.value} misformatted lines are skipped")
+                        prev_num_skipped_articles = num_skipped_articles.value
             time.sleep(5)
 
-    LOGGER.info(f"Total processed lines: {num_tokenized_articles.value}")
-    LOGGER.info(f"Total skipped lines: {num_skipped_articles.value}")
+    if ignore_input_format_error:
+        LOGGER.info(f"Total processed lines: {num_tokenized_articles.value}")
+        LOGGER.info(f"Total skipped lines: {num_skipped_articles.value}")
 
     if dataset_metadata_json is not None:
         dataset_metadata_json["max_batch_size_train"] = max_batch_size_train
@@ -677,7 +679,7 @@ def pipeline_main(  # noqa: C901
     file_names = []
     for file_name in os.listdir(json_error_log_dir):
         file_names.append(os.path.join(json_error_log_dir, file_name))
-    with open(os.path.join(output_dir, "json_error_log.log"), "w") as outfile:
+    with open(os.path.join(output_dir, "json_load_failed_lines.log"), "w") as outfile:
         for file_name in file_names:
             with open(file_name) as reader:
                 for line in reader:
