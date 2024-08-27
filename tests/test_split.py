@@ -27,6 +27,7 @@ def test_split_should_throw():
                 max_seq_length=1024,
                 disable_space_separator=False,
                 keep_prompt_only_sequences=True,
+                ignore_input_format_error=False,
                 input_packing_config=PackingConfig.get_default(),
                 attention_boundary=BoundaryType.JSONL,
                 dev_ratio=None,

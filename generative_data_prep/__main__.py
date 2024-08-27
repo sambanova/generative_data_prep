@@ -314,6 +314,9 @@ def main(args):
     log_current_datetime()
     log_input_args(args)
 
+    json_error_log_dir = os.path.join(output_dir, "json_error_log")
+    verify_output_dir(json_error_log_dir, True)
+
     tokenizer, model_config = get_tokenizer(
         args.pretrained_tokenizer,
         args.tokenizer_class,
@@ -330,6 +333,7 @@ def main(args):
             output_dir,
             args.disable_space_separator,
             args.keep_prompt_only_sequences,
+            args.ignore_input_format_error,
             args.prompt_keyword,
             args.completion_keyword,
             args.shuffle,
@@ -357,12 +361,14 @@ def main(args):
             tokenizer,
             args.input_file_path,
             args.output_path,
+            json_error_log_dir,
             args.max_seq_length,
             args.input_packing_config,
             args.packing_boundary,
             args.attention_boundary,
             args.disable_space_separator,
             args.keep_prompt_only_sequences,
+            args.ignore_input_format_error,
             args.prompt_keyword,
             args.completion_keyword,
             category_to_id,

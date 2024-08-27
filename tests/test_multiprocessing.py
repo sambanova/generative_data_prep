@@ -58,6 +58,7 @@ def test_multiprocess_data_prep_graceful_exit(mock_data_prep_main_helper):
         multiprocess_data_prep(
             files_to_tokenize=get_files_to_tokenize("generative_tuning"),
             split_dir=get_split_dir("generative_tuning"),
+            json_error_log_dir="",
             hdf5_dir="hdf5",
             max_seq_length=1024,
             input_packing_config=None,
@@ -67,6 +68,7 @@ def test_multiprocess_data_prep_graceful_exit(mock_data_prep_main_helper):
             completion_keyword="",
             disable_space_separator=False,
             keep_prompt_only_sequences=False,
+            ignore_input_format_error=False,
             tokenizer=None,
             num_workers=4,
             input_file_size_in_gb=4,

@@ -18,6 +18,7 @@ Endpoint for tokenizing a jsonl file into a jsonl file.
 
 from __future__ import absolute_import
 
+import json
 import os
 import sys
 from multiprocessing.managers import ValueProxy
@@ -36,14 +37,17 @@ def data_prep_main(
     tokenizer: PreTrainedTokenizerBase,
     input_file: str,
     output_file: str,
+    error_log_dir: str,
     max_seq_length: int,
     input_packing_config: PackingConfig,
     packing_boundary: BoundaryType,
     attention_boundary: BoundaryType,
     disable_space_separator: bool,
     keep_prompt_only_sequences: bool,
+    ignore_input_format_error: bool,
     prompt_keyword: str,
     completion_keyword: str,
+    num_skipped_articles: Optional[ValueProxy] = None,
     num_tokenized_articles: Optional[ValueProxy] = None,
     num_tokenized_articles_lock: Optional[Lock] = None,
     category_to_id: Optional[Dict[str, int]] = None,
@@ -97,15 +101,35 @@ def data_prep_main(
         apply_chat_template,
     )
 
+    error_log_path = os.path.join(error_log_dir, f"{os.path.splitext(os.path.basename(input_file))[0]}.log")
+
     dump_categories = category_to_id is not None
 
     with Hdf5FileBuffer(output_file, max_seq_length, dump_categories) as hdf5_text_buffer:
         with open(input_file, "r") as reader:
             for line in reader:
-                hdf5_text_buffer.write(article_tokenizer(line))
-                if num_tokenized_articles_lock is not None and num_tokenized_articles is not None:
-                    with num_tokenized_articles_lock:
-                        num_tokenized_articles.value += 1
+                try:
+                    hdf5_text_buffer.write(article_tokenizer(line))
+                    if num_tokenized_articles_lock is not None and num_tokenized_articles is not None:
+                        with num_tokenized_articles_lock:
+                            num_tokenized_articles.value += 1
+                except json.JSONDecodeError as exc:
+                    if ignore_input_format_error:
+                        with open(error_log_path, "a") as f:
+                            f.write(line)
+                        if num_tokenized_articles_lock is not None and num_skipped_articles is not None:
+                            with num_tokenized_articles_lock:
+                                num_skipped_articles.value += 1
+                        continue
+                    else:
+                        raise json.JSONDecodeError(
+                            f"Error occurred loading this misformatted JSON line:\n\n{line}\n"
+                            "Please format input dataset properly so that each line can be loaded with json.loads(). "
+                            "Or consider using the --ignore_input_format_error flag to skip misformatted lines.",
+                            exc.doc,
+                            exc.pos,
+                        ) from exc
+
             hdf5_text_buffer.write(article_tokenizer(None))
     article_tokenizer.metrics.dataset_type = dataset_type
     return article_tokenizer.metrics

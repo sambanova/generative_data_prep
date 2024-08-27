@@ -79,6 +79,16 @@ def data_prep_arg_builder(parser: argparse.ArgumentParser):
         action="store_true",
         help="If the file or files stored at the output path can be over-written",
     )
+
+    parser.add_argument(
+        "--ignore_input_format_error",
+        action="store_true",
+        help=(
+            "Ignore format errors in the input jsonl file by skipping misformatted lines."
+            " Warning: these lines are dropped from the generated dataset"
+        ),
+    )
+
     parser.add_argument(
         "--tokenizer_class",
         type=str,
