@@ -679,11 +679,12 @@ def pipeline_main(  # noqa: C901
     file_names = []
     for file_name in os.listdir(json_error_log_dir):
         file_names.append(os.path.join(json_error_log_dir, file_name))
-    with open(os.path.join(output_dir, "json_load_failed_lines.log"), "w") as outfile:
-        for file_name in file_names:
-            with open(file_name) as reader:
-                for line in reader:
-                    outfile.write(line)
+    if file_names:
+        with open(os.path.join(output_dir, "json_load_failed_lines.log"), "w") as outfile:
+            for file_name in file_names:
+                with open(file_name) as reader:
+                    for line in reader:
+                        outfile.write(line)
     shutil.rmtree(json_error_log_dir)
 
     metadata_file_path = os.path.join(output_dir, "metadata.yaml")
