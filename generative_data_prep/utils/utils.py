@@ -57,7 +57,7 @@ def data_prep_arg_builder(parser: argparse.ArgumentParser):
     Args:
         parser (argparse.ArgumentParser): parser to add arguments to
     """
-    parser.add_argument("--input_file_path", type=str, required=True, help="The input jsonl file path.")
+    parser.add_argument("--input_path", type=str, required=True, help="The input jsonl file path.")
     parser.add_argument(
         "--output_path",
         type=str,

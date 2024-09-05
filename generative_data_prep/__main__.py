@@ -355,10 +355,10 @@ def main(args):
         args.special_tokens_dict,
     )
     category_to_id = get_categories(args.categories_path)
+
+    input_file_path = args.input_path
     if os.path.isdir(args.input_path):
         input_file_path = process_input_dir(args.input_path)
-    else:
-        input_file_path = args.input_path
 
     if args.cmd == "pipeline":
         metrics, dataset_metadata = pipeline_main(
