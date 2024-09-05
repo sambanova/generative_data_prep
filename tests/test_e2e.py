@@ -50,7 +50,7 @@ def get_input_path(test_name: str) -> str:
         return base_path
     else:
         ext = ".txt" if "txt" in test_name else ".jsonl"
-        return f"base_path{ext}"
+        return f"{base_path}{ext}"
 
 
 def gold_data_prep_path(test_name: str) -> str:
