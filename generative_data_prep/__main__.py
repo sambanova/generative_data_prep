@@ -326,18 +326,19 @@ def process_input_dir(input_path: str) -> str:
     # Open the output file and concatenate all input files
     with open(output_file, "w") as f_out:
         for input_jsonl_file in input_jsonl_files:
-            with open(input_jsonl_file, "r") as f_in:
-                shutil.copyfileobj(f_in, f_out)
+            if "combined_output.jsonl" not in input_jsonl_file:
+                if os.path.splitext(input_jsonl_file)[1] not in FileExtension.as_list():
+                    err_msg = f"The input file is not a jsonl or txt file {input_jsonl_file}"
+                    raise ValueError(err_msg)
+                verify_input_file(input_jsonl_file)
+                with open(input_jsonl_file, "r") as f_in:
+                    shutil.copyfileobj(f_in, f_out)
 
     return output_file
 
 
 def main(args):
     """Wrapping function instead of putting into __main__."""
-    if os.path.splitext(args.input_path)[1] not in FileExtension.as_list():
-        err_msg = f"The input file is not a jsonl or txt file {args.input_path}"
-        raise ValueError(err_msg)
-    verify_input_file(args.input_path)
     output_dir = get_output_dir(args.cmd, args.output_path, args.overwrite_output_path)
     add_file_handler(args.log_file_path, output_dir)
     log_git_commit_hash()
@@ -359,6 +360,11 @@ def main(args):
     input_file_path = args.input_path
     if os.path.isdir(args.input_path):
         input_file_path = process_input_dir(args.input_path)
+    else:
+        if os.path.splitext(args.input_path)[1] not in FileExtension.as_list():
+            err_msg = f"The input file is not a jsonl or txt file {args.input_path}"
+            raise ValueError(err_msg)
+        verify_input_file(args.input_path)
 
     if args.cmd == "pipeline":
         metrics, dataset_metadata = pipeline_main(
@@ -416,6 +422,9 @@ def main(args):
     log_elapsed_time()
     if args.cmd == "pipeline":
         log_training_details(dataset_metadata)
+
+    if os.path.isdir(args.input_path):
+        os.remove(input_file_path)
 
 
 if __name__ == "__main__":
