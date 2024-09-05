@@ -45,8 +45,12 @@ LLAMA_TOKENIZER = AutoTokenizer.from_pretrained("daryl149/llama-2-7b-chat-hf")
 
 def get_input_path(test_name: str) -> str:
     """Create an absolute path to example input."""
-    ext = ".txt" if "txt" in test_name else ".jsonl"
-    return TESTS_EXAMPLES_PATH / test_name / f"example_{test_name}_data{ext}"
+    base_path = TESTS_EXAMPLES_PATH / test_name / f"example_{test_name}_data"
+    if os.path.isdir(base_path):
+        return base_path
+    else:
+        ext = ".txt" if "txt" in test_name else ".jsonl"
+        return f"base_path{ext}"
 
 
 def gold_data_prep_path(test_name: str) -> str:
