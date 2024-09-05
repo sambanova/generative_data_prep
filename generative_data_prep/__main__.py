@@ -19,6 +19,8 @@ import argparse
 import json
 import logging
 import os
+import shutil
+from glob import glob
 from multiprocessing import cpu_count
 from typing import Optional
 
@@ -302,12 +304,40 @@ def get_categories(categories_path: str):
     return category_to_id
 
 
+def process_input_dir(input_path: str) -> str:
+    """Processes a directory containing JSONL files and combines them into a single output file.
+
+    Args:
+        input_path (str): The path to the directory containing the input JSONL files.
+
+    Returns:
+        str: The path to the combined output JSONL file. If there is only one JSONL file
+             in the directory, returns the path to that file directly without combining.
+    """
+    input_jsonl_files = glob(f"{input_path}/*.jsonl")
+
+    # If there's only one file, return it directly
+    if len(input_jsonl_files) == 1:
+        return input_jsonl_files[0]
+
+    # Define the output path for the combined file
+    output_file = os.path.join(input_path, "combined_output.jsonl")
+
+    # Open the output file and concatenate all input files
+    with open(output_file, "w") as f_out:
+        for input_jsonl_file in input_jsonl_files:
+            with open(input_jsonl_file, "r") as f_in:
+                shutil.copyfileobj(f_in, f_out)
+
+    return output_file
+
+
 def main(args):
     """Wrapping function instead of putting into __main__."""
-    if os.path.splitext(args.input_file_path)[1] not in FileExtension.as_list():
-        err_msg = f"The input file is not a jsonl or txt file {args.input_file_path}"
+    if os.path.splitext(args.input_path)[1] not in FileExtension.as_list():
+        err_msg = f"The input file is not a jsonl or txt file {args.input_path}"
         raise ValueError(err_msg)
-    verify_input_file(args.input_file_path)
+    verify_input_file(args.input_path)
     output_dir = get_output_dir(args.cmd, args.output_path, args.overwrite_output_path)
     add_file_handler(args.log_file_path, output_dir)
     log_git_commit_hash()
@@ -325,9 +355,14 @@ def main(args):
         args.special_tokens_dict,
     )
     category_to_id = get_categories(args.categories_path)
+    if os.path.isdir(args.input_path):
+        input_file_path = process_input_dir(args.input_path)
+    else:
+        input_file_path = args.input_path
+
     if args.cmd == "pipeline":
         metrics, dataset_metadata = pipeline_main(
-            args.input_file_path,
+            input_file_path,
             tokenizer,
             model_config,
             output_dir,
@@ -359,7 +394,7 @@ def main(args):
         metrics = data_prep_main(
             args.silent,
             tokenizer,
-            args.input_file_path,
+            input_file_path,
             args.output_path,
             json_error_log_dir,
             args.max_seq_length,

@@ -63,7 +63,7 @@ The following simple example will help you get started with your first processed
 
 ### Example
 ```shell
-python3 -m generative_data_prep pipeline --input_file_path=<PATH TO DATASET FILE> --output_path=<PATH TO OUTPUT DIRECTORY> --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_config='greedy::drop' --shuffle=on_RAM
+python3 -m generative_data_prep pipeline --input_path=<PATH TO DATASET FILE> --output_path=<PATH TO OUTPUT DIRECTORY> --pretrained_tokenizer=gpt2 --max_seq_length=1024 --input_packing_config='greedy::drop' --shuffle=on_RAM
 ```
 
 Here are a few important parameters to know about when running this example:
@@ -79,9 +79,9 @@ Here are a few important parameters to know about when running this example:
     </thead>
     <tbody>
         <tr>
-            <td><code>input_file_path</code></td>
+            <td><code>input_path</code></td>
             <td>str</td>
-            <td>An existing file path to the dataset to be processed. File must be in <code>.jsonl</code> or <code>.txt</code> format.</td>
+            <td>An existing file path to the dataset to be processed, or directory of files. File must be in <code>.jsonl</code> or <code>.txt</code> format.</td>
             <td>Check out the <a href="#input">input</a> section for more details.</td>
         </tr>
         <tr>
@@ -128,7 +128,7 @@ Here are a few important parameters to know about when running this example:
 
 ## Input
 
-The input file format must be either `.txt` or [`.jsonl`](https://jsonlines.org/).
+The `input_path` argument must be a file or a directory containing one files, each file must be a `.txt` or [`.jsonl`](https://jsonlines.org/).
 
 ### `.jsonl` Format
 
@@ -263,8 +263,8 @@ This section outlines all the flags you can set to customize the data prep pipel
 
 | Flag Name  | Type | Default | Options | Description |
 | --- | --- | --- | --- | --- |
-| `input_file_path`  | str | REQUIRED | Any existing file path | Path to the input dataset which must be in `.jsonl` or `.txt` format. If dataset is in `.jsonl` format, the dataset needs to conform to the structure specified in the [Input](#input) section.|
-| `output_path` | str | `input_file_path`'s directory | Any valid directory path | The directory to store the output files |
+| `input_path`  | str | REQUIRED | Any existing file path | Path to the input dataset file or directory of files which must be in `.jsonl` or `.txt` format. If dataset is in `.jsonl` format, the dataset needs to conform to the structure specified in the [Input](#input) section.|
+| `output_path` | str | `input_path`'s directory | Any valid directory path | The directory to store the output files |
 | `log_file_path` | str | `output_path`/logs.log | Any valid file path | The file to save the logs in, this will save the date and time, git commit hash, input arguments and metrics associated with the dataset. |
 | `overwrite_output_path` | bool | False | Include flag for True, no arguments | Permission to delete and overwrite files in `output_path`. |
 | `ignore_input_format_error` | bool | False | Include flag for True, no arguments | Permission to skip misformatted lines in the input file, number of skipped lines will be logged and skipped lines are stored in `output_path/json_load_failed_lines.log`. Warning: the skipped misformatted lines are dropped from the generated dataset. |
@@ -314,7 +314,7 @@ For fine-tuning, your data should be in `.jsonl` format with prompts and complet
 #### Example command
 
 ```python
-python3 -m generative_data_prep pipeline --input_file_path=./tests/examples/generative_tuning/example_generative_tuning_data.jsonl --output_path=./tests/examples/generative_tuning/pipelined_generative_tuning --pretrained_tokenizer=gpt2 --max_seq_length=1024 --shuffle=on_RAM --input_packing_config=single::drop
+python3 -m generative_data_prep pipeline --input_path=./tests/examples/generative_tuning/example_generative_tuning_data.jsonl --output_path=./tests/examples/generative_tuning/pipelined_generative_tuning --pretrained_tokenizer=gpt2 --max_seq_length=1024 --shuffle=on_RAM --input_packing_config=single::drop
 ```
 
 > [View decoded output](tests/examples/generative_tuning/decoded_data_prepped_generative_tuning.txt)
@@ -334,7 +334,7 @@ We recommend to use jsonlines with empty prompts and all the text in the complet
 #### Example command
 
 ```
-python3 -m generative_data_prep pipeline --input_file_path=./tests/examples/pretraining/example_pretraining_data.jsonl --output_path=./tests/examples/pretraining/pipelined_pretraining --pretrained_tokenizer=gpt2 --max_seq_length=1024 --shuffle=on_RAM --input_packing_config=full
+python3 -m generative_data_prep pipeline --input_path=./tests/examples/pretraining/example_pretraining_data.jsonl --output_path=./tests/examples/pretraining/pipelined_pretraining --pretrained_tokenizer=gpt2 --max_seq_length=1024 --shuffle=on_RAM --input_packing_config=full
 ```
 
 > [View decoded output](tests/examples/pretraining/decoded_data_prepped_pretraining.txt)
@@ -349,7 +349,7 @@ Dialogue data often involves multiple turns in a conversation between a user and
 #### Example command
 
 ```python
-python3 -m generative_data_prep pipeline --input_file_path=./tests/examples/dialogue/example_dialogue_data.jsonl --output_path=./tests/examples/dialogue/pipelined_dialogue --pretrained_tokenizer=gpt2 --max_seq_length=1024 --shuffle=on_RAM --input_packing_config=single::truncate_right
+python3 -m generative_data_prep pipeline --input_path=./tests/examples/dialogue/example_dialogue_data.jsonl --output_path=./tests/examples/dialogue/pipelined_dialogue --pretrained_tokenizer=gpt2 --max_seq_length=1024 --shuffle=on_RAM --input_packing_config=single::truncate_right
 ```
 
 > [View decoded output](tests/examples/dialogue/decoded_data_prepped_dialogue.txt)
@@ -364,7 +364,7 @@ python3 -m generative_data_prep pipeline --input_file_path=./tests/examples/dial
 #### Example command
 
 ```python
-python3 -m generative_data_prep pipeline --input_file_path=./tests/examples/metaICL/example_metaICL_data.jsonl --output_path=./tests/examples/metaICL/pipelined_metaICL --pretrained_tokenizer=gpt2 --max_seq_length=1024 --shuffle=on_RAM --input_packing_config=greedy::drop --packing_boundary=prompt_completion_pair --attention_boundary=jsonl
+python3 -m generative_data_prep pipeline --input_path=./tests/examples/metaICL/example_metaICL_data.jsonl --output_path=./tests/examples/metaICL/pipelined_metaICL --pretrained_tokenizer=gpt2 --max_seq_length=1024 --shuffle=on_RAM --input_packing_config=greedy::drop --packing_boundary=prompt_completion_pair --attention_boundary=jsonl
 ```
 
 > [View decoded output](tests/examples/metaICL/decoded_data_prepped_metaICL.txt)
