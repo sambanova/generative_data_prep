@@ -90,12 +90,13 @@ def combine_input_dir_files(input_path: str) -> str:
     # Open the output file and concatenate all input files
     with open(output_file, "w") as f_out:
         for input_file in input_files:
-            verify_input_file(str(input_file))
-            with open(input_file, "r") as f_in:
-                if input_file.stat().st_size == 0:
-                    continue  # Skip empty files
+            if "combined_output_" not in str(input_file):
+                verify_input_file(str(input_file))
+                with open(input_file, "r") as f_in:
+                    if input_file.stat().st_size == 0:
+                        continue  # Skip empty files
 
-                shutil.copyfileobj(f_in, f_out, length=8 * 1024 * 1024)  # 8MB buffer
+                    shutil.copyfileobj(f_in, f_out, length=8 * 1024 * 1024)  # 8MB buffer
 
     return str(output_file)
 
@@ -741,7 +742,6 @@ def pipeline_main(  # noqa: C901
                         outfile.write(line)
     shutil.rmtree(json_error_log_dir)
 
-    breakpoint()
     if os.path.isdir(input_path):
         os.remove(input_file_path)
 
