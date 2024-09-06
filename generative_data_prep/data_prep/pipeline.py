@@ -505,7 +505,7 @@ def pipeline_main(  # noqa: C901
     """Endpoint for preparing data, shuffles, splits and tokenize input file.
 
     Args:
-        input_file_path: Input file path of text to tokenize.
+        input_path: Input file path of text to tokenize.
         tokenizer: Tokenizer used to tokenize text, with encode function.
         output_dir: Directory to output all the tokenized hdf5 and logs.
         disable_space_separator: If true do not add spaces between prompt and completion.
