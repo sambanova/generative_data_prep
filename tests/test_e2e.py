@@ -460,7 +460,7 @@ def test_pipeline(
     gold_path = gold_pipeline_path(test_name)
     with tempfile.TemporaryDirectory() as output_dir:
         pipeline_main(
-            input_file_path=input_path,
+            input_path=input_path,
             tokenizer=tokenizer,
             model_config=MODEL_CONFIG,
             output_dir=output_dir,
