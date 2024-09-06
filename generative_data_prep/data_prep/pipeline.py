@@ -96,10 +96,6 @@ def combine_input_dir_files(input_path: str) -> str:
                     continue  # Skip empty files
 
                 shutil.copyfileobj(f_in, f_out, length=8 * 1024 * 1024)  # 8MB buffer
-                f_in.seek(-1, os.SEEK_END)
-                last_char = f_in.read(1)
-                if last_char != "\n":
-                    f_out.write("\n")
 
     return str(output_file)
 
@@ -745,6 +741,7 @@ def pipeline_main(  # noqa: C901
                         outfile.write(line)
     shutil.rmtree(json_error_log_dir)
 
+    breakpoint()
     if os.path.isdir(input_path):
         os.remove(input_file_path)
 
