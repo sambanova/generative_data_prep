@@ -53,15 +53,16 @@ from generative_data_prep.utils import (
 LOGGER = logging.getLogger("generative_data_prep_logger")
 
 
-def combine_input_dir_files(input_path: str) -> str:
+def combine_input_dir_files(input_path: str) -> Tuple[str, List[Path]]:
     """Processes a directory containing JSONL files and combines them into a single output file.
 
     Args:
         input_path (str): The path to the directory containing the input JSONL files.
 
     Returns:
-        str: The string path to the combined output JSONL file. If there is only one JSONL file
-             in the directory, returns the path to that file directly without combining.
+        Tuple[str, str]: The string path to the combined output JSONL file. If there is only one JSONL file
+            in the directory, returns the path to that file directly without combining. As well as all the
+            input files.
     """
     input_path_obj = Path(input_path)
 
@@ -82,7 +83,7 @@ def combine_input_dir_files(input_path: str) -> str:
 
     # If there's only one file, return it directly
     if len(input_files) == 1:
-        return str(input_files[0])
+        return str(input_files[0]), input_files
 
     # Define the output path for the combined file
     output_file = input_path_obj / f"combined_output_{uuid.uuid4().hex[:8]}{ext}"
@@ -98,7 +99,7 @@ def combine_input_dir_files(input_path: str) -> str:
 
                     shutil.copyfileobj(f_in, f_out, length=8 * 1024 * 1024)  # 8MB buffer
 
-    return str(output_file)
+    return str(output_file), input_files
 
 
 def split_file_linux(num_splits: int, input_file_path: str, split_dir: str) -> None:
@@ -546,7 +547,7 @@ def pipeline_main(  # noqa: C901
     """
     input_file_path = input_path
     if os.path.isdir(input_path):
-        input_file_path = combine_input_dir_files(input_path)
+        input_file_path, input_files = combine_input_dir_files(input_path)
 
     # print input file information
     dataset_metadata_json = {
@@ -742,7 +743,7 @@ def pipeline_main(  # noqa: C901
                         outfile.write(line)
     shutil.rmtree(json_error_log_dir)
 
-    if os.path.isdir(input_path):
+    if os.path.isdir(input_path) and len(input_files) > 1:
         os.remove(input_file_path)
 
     metadata_file_path = os.path.join(output_dir, "metadata.yaml")
