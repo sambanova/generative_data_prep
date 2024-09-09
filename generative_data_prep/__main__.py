@@ -30,6 +30,7 @@ from generative_data_prep.utils import (
     TOKENIZER_CLASSES,
     FileExtension,
     add_file_handler,
+    check_deprecated_args,
     data_prep_arg_builder,
     get_config_file_path,
     log_current_datetime,
@@ -166,7 +167,9 @@ def get_args() -> argparse.Namespace:
     # create the create data subparser
     data_prep_subparser = subparsers.add_parser("data_prep")
     add_data_prep_args(data_prep_subparser)
-    return parser.parse_args()
+    args = parser.parse_args()
+    args = check_deprecated_args(args)
+    return args
 
 
 def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase, special_tokens_dict: str):
@@ -304,10 +307,6 @@ def get_categories(categories_path: str):
 
 def main(args):
     """Wrapping function instead of putting into __main__."""
-    if os.path.splitext(args.input_file_path)[1] not in FileExtension.as_list():
-        err_msg = f"The input file is not a jsonl or txt file {args.input_file_path}"
-        raise ValueError(err_msg)
-    verify_input_file(args.input_file_path)
     output_dir = get_output_dir(args.cmd, args.output_path, args.overwrite_output_path)
     add_file_handler(args.log_file_path, output_dir)
     log_git_commit_hash()
@@ -325,9 +324,16 @@ def main(args):
         args.special_tokens_dict,
     )
     category_to_id = get_categories(args.categories_path)
+
+    if not os.path.isdir(args.input_path):
+        if os.path.splitext(args.input_path)[1] not in FileExtension.as_list():
+            err_msg = f"The input file is not a jsonl or txt file {args.input_path}"
+            raise ValueError(err_msg)
+        verify_input_file(args.input_path)
+
     if args.cmd == "pipeline":
         metrics, dataset_metadata = pipeline_main(
-            args.input_file_path,
+            args.input_path,
             tokenizer,
             model_config,
             output_dir,
@@ -359,7 +365,7 @@ def main(args):
         metrics = data_prep_main(
             args.silent,
             tokenizer,
-            args.input_file_path,
+            args.input_path,
             args.output_path,
             json_error_log_dir,
             args.max_seq_length,

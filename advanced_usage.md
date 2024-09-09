@@ -17,7 +17,7 @@ The `generative_data_prep/data_prep/data_prep.py` script tokenizes a single json
 
 ### Example
 ```shell
-python3 -m generative_data_prep data_prep --input_file_path=<PATH TO DATASET FILE> --output_path=<PATH TO OUTPUT DIRECTORY> --pretrained_tokenizer=gpt2 --max_seq_length=1024
+python3 -m generative_data_prep data_prep --input_path=<PATH TO DATASET FILE> --output_path=<PATH TO OUTPUT DIRECTORY> --pretrained_tokenizer=gpt2 --max_seq_length=1024
 ```
 
 
@@ -25,8 +25,8 @@ python3 -m generative_data_prep data_prep --input_file_path=<PATH TO DATASET FIL
 
 | Flag Name  | Type | Default | Options | Description |
 | --- | --- | --- | --- | --- |
-| `input_file_path`  | str | REQUIRED | Any existing file path | Path to the input dataset where each line is of the form specified in [Input Format](#input-format).|
-| `output_path` | str | `input_file_path`'s directory | Any valid directory path | The directory to store the output files |
+| `input_path`  | str | REQUIRED | Any existing file path or path to input directory | Path to the input dataset jsonl file or directory of jsonl files where each line is of the form specified in [Input Format](#input-format).|
+| `output_path` | str | `input_path`'s directory | Any valid directory path | The directory to store the output files |
 | `log_file_path` | str | `output_path`'s directory/logs.log | Any valid file path | The file to save the logs in, this will save the date and time, git commit hash, input arguments and metrics associated with the dataset. |
 | `overwrite_output_path` | bool | False | Include flag for True, no arguments | Permission to delete and overwrite files in `output_path`. |
 | `pretrained_tokenizer` | str | None | Valid tokenizer key from Huggingface | The pretrained tokenizer to be used, loaded using transformers.AutoTokenizer.from_pretrained(args.pretrained_tokenizer), in lieu of a --tokenizer_class, --vocab_file and --merges_file. |

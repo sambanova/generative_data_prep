@@ -239,7 +239,7 @@ def test_metadata_end2end_output(tmp_path):
         "num_workers": num_workers,
         "keep_split_jsonls": True,
         "ignore_input_format_error": False,
-        "input_file_path": input_file,
+        "input_path": input_file,
         "output_path": tmp_e2e_output_dir,
         "overwrite_output_path": False,
         "disable_space_separator": False,

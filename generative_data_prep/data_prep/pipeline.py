@@ -24,6 +24,8 @@ import os
 import random
 import shutil
 import time
+import uuid
+from pathlib import Path
 from sys import platform
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
@@ -43,11 +45,61 @@ from generative_data_prep.utils import (
     execute_and_return_stdout,
     large_file_shuffle,
     log_sep_str,
+    verify_input_file,
     verify_output_dir,
     verify_output_file,
 )
 
 LOGGER = logging.getLogger("generative_data_prep_logger")
+
+
+def combine_input_dir_files(input_path: str) -> Tuple[str, List[Path]]:
+    """Processes a directory containing JSONL files and combines them into a single output file.
+
+    Args:
+        input_path (str): The path to the directory containing the input JSONL files.
+
+    Returns:
+        Tuple[str, str]: The string path to the combined output JSONL file. If there is only one JSONL file
+            in the directory, returns the path to that file directly without combining. As well as all the
+            input files.
+    """
+    input_path_obj = Path(input_path)
+
+    if not input_path_obj.is_dir():
+        raise ValueError(f"Input to combine_input_dir_files is not a valid directory: {input_path}")
+
+    jsonl_files = list(input_path_obj.glob("*.jsonl"))
+    txt_files = list(input_path_obj.glob("*.txt"))
+
+    if jsonl_files:
+        input_files = jsonl_files
+        ext = ".jsonl"
+    elif txt_files:
+        input_files = txt_files
+        ext = ".txt"
+    else:
+        raise ValueError(f"Invalid input path argument: {input_path}. No JSONL or TXT files found.")
+
+    # If there's only one file, return it directly
+    if len(input_files) == 1:
+        return str(input_files[0]), input_files
+
+    # Define the output path for the combined file
+    output_file = input_path_obj / f"combined_output_{uuid.uuid4().hex[:8]}{ext}"
+
+    # Open the output file and concatenate all input files
+    with open(output_file, "w") as f_out:
+        for input_file in input_files:
+            if "combined_output_" not in str(input_file):
+                verify_input_file(str(input_file))
+                with open(input_file, "r") as f_in:
+                    if input_file.stat().st_size == 0:
+                        continue  # Skip empty files
+
+                    shutil.copyfileobj(f_in, f_out, length=8 * 1024 * 1024)  # 8MB buffer
+
+    return str(output_file), input_files
 
 
 def split_file_linux(num_splits: int, input_file_path: str, split_dir: str) -> None:
@@ -423,7 +475,7 @@ def multiprocess_data_prep(  # noqa: C901
 
 
 def pipeline_main(  # noqa: C901
-    input_file_path: str,
+    input_path: str,
     tokenizer: PreTrainedTokenizerBase,
     model_config: PretrainedConfig,
     output_dir: str,
@@ -454,7 +506,7 @@ def pipeline_main(  # noqa: C901
     """Endpoint for preparing data, shuffles, splits and tokenize input file.
 
     Args:
-        input_file_path: Input file path of text to tokenize.
+        input_path: Input file path of text to tokenize.
         tokenizer: Tokenizer used to tokenize text, with encode function.
         output_dir: Directory to output all the tokenized hdf5 and logs.
         disable_space_separator: If true do not add spaces between prompt and completion.
@@ -493,6 +545,10 @@ def pipeline_main(  # noqa: C901
     Returns:
         Metrics associated with tokenization, Dataset metadata
     """
+    input_file_path = input_path
+    if os.path.isdir(input_path):
+        input_file_path, input_files = combine_input_dir_files(input_path)
+
     # print input file information
     dataset_metadata_json = {
         "max_seq_length": max_seq_length,
@@ -686,6 +742,9 @@ def pipeline_main(  # noqa: C901
                     for line in reader:
                         outfile.write(line)
     shutil.rmtree(json_error_log_dir)
+
+    if os.path.isdir(input_path) and len(input_files) > 1:
+        os.remove(input_file_path)
 
     metadata_file_path = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file_path, "w") as file:

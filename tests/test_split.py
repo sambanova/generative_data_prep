@@ -16,7 +16,7 @@ def test_split_should_throw():
     with pytest.raises(Exception) as e_info:
         with tempfile.TemporaryDirectory() as output_dir:
             pipeline_main(
-                input_file_path=file_path,
+                input_path=file_path,
                 tokenizer=TOKENIZER,
                 model_config=MODEL_CONFIG,
                 output_dir=output_dir,
