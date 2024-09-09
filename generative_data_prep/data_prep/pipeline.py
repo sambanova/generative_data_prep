@@ -31,7 +31,6 @@ import numpy as np
 import psutil
 import yaml
 from alive_progress import alive_bar
-from transformers import PretrainedConfig, PreTrainedTokenizerBase
 
 from generative_data_prep.data_prep import data_prep_main
 from generative_data_prep.processors.metrics import Metrics
@@ -280,7 +279,6 @@ def multiprocess_data_prep(  # noqa: C901
     Returns:
         List of output training and dev hdf5 file paths, and the metrics associated with tokenization
     """
-    tokenizer = get_tokenizer(pretrained_tokenizer, tokenizer_class, vocab_file, merges_file, special_tokens_dict)
     if input_file_size_in_gb > 10:
         log_sep_str()
         warning_msg = f"WARNING: your input file size is {input_file_size_in_gb} GB, "

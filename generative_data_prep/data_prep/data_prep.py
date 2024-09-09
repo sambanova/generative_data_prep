@@ -25,8 +25,6 @@ from multiprocessing.managers import ValueProxy
 from multiprocessing.synchronize import Lock
 from typing import Dict, Optional
 
-from transformers import PreTrainedTokenizerBase
-
 from generative_data_prep.data_buffers import Hdf5FileBuffer
 from generative_data_prep.processors import ArticleTokenizer
 from generative_data_prep.utils import (

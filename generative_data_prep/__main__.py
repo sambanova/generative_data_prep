@@ -20,14 +20,9 @@ import json
 import logging
 import os
 from multiprocessing import cpu_count
-from typing import Optional
-
-from transformers import AutoConfig, AutoTokenizer, PreTrainedTokenizerBase
 
 from generative_data_prep.data_prep import data_prep_main, pipeline_main
 from generative_data_prep.utils import (
-    GPT2_KEY,
-    TOKENIZER_CLASSES,
     FileExtension,
     add_file_handler,
     data_prep_arg_builder,
@@ -37,7 +32,6 @@ from generative_data_prep.utils import (
     log_git_commit_hash,
     log_input_args,
     log_metrics,
-    log_sep_str,
     log_training_details,
     verify_input_file,
     verify_output_dir,

@@ -34,7 +34,6 @@ from transformers import (
 from .arg_configs import PackingConfig
 from .constants import BoundaryType
 from .logger import LOGGER, log_sep_str
-from .path_verify import verify_input_file
 
 
 class TokenizerConfigPair:
@@ -395,8 +394,8 @@ def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase, special_tokens_d
 def get_tokenizer(
     pretrained_tokenizer: Optional[str],
     tokenizer_class: Optional[str],
-    vocab_file: str,
-    merges_file: str,
+    vocab_file: Optional[str],
+    merges_file: Optional[str],
     special_tokens_dict: Optional[str],
 ) -> PreTrainedTokenizerBase:
     """Create a tokenizer based on input arguments.
@@ -436,8 +435,6 @@ def get_tokenizer(
         tokenizer = AutoTokenizer.from_pretrained(pretrained_tokenizer)
         model_config = AutoConfig.from_pretrained(pretrained_tokenizer)
     else:
-        verify_input_file(vocab_file)
-        verify_input_file(merges_file)
         if tokenizer_class in TOKENIZER_CLASSES:
             tokenizer = TOKENIZER_CLASSES[tokenizer_class].tokenizer(vocab_file, merges_file)
             model_config = TOKENIZER_CLASSES[tokenizer_class].config(vocab_size=tokenizer.vocab_size)
