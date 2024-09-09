@@ -43,6 +43,7 @@ from .utils import (
     data_prep_arg_builder,
     execute_and_return_stdout,
     get_config_file_path,
+    get_tokenizer,
     validate_sha256,
 )
 
@@ -75,4 +76,5 @@ __all__ = [
     "log_sep_str",
     "get_config_file_path",
     "DatasetMetadata",
+    "get_tokenizer",
 ]

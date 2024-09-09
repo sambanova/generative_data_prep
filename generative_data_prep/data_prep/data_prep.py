@@ -29,12 +29,16 @@ from transformers import PreTrainedTokenizerBase
 
 from generative_data_prep.data_buffers import Hdf5FileBuffer
 from generative_data_prep.processors import ArticleTokenizer
-from generative_data_prep.utils import BoundaryType, FileExtension, PackingConfig
+from generative_data_prep.utils import (
+    BoundaryType,
+    FileExtension,
+    PackingConfig,
+    get_tokenizer,
+)
 
 
 def data_prep_main(
     silent: bool,
-    tokenizer: PreTrainedTokenizerBase,
     input_file: str,
     output_file: str,
     error_log_dir: str,
@@ -55,6 +59,11 @@ def data_prep_main(
     prompt_postfix: Optional[str] = None,
     dataset_type: Optional[str] = None,
     apply_chat_template: Optional[bool] = False,
+    pretrained_tokenizer: Optional[str] = None,
+    tokenizer_class: Optional[str] = None,
+    vocab_file: Optional[str] = None,
+    merges_file: Optional[str] = None,
+    special_tokens_dict: Optional[str] = None,
 ):
     """Tokenize input_file into packed sequences stored in output_file.
 
@@ -81,6 +90,7 @@ def data_prep_main(
     Returns:
         Metrics associated with tokenization
     """
+    tokenizer, _ = get_tokenizer(pretrained_tokenizer, tokenizer_class, vocab_file, merges_file, special_tokens_dict)
     if silent:
         sys.stdout = open(os.devnull, "w")
     file_ext = FileExtension(os.path.splitext(input_file)[1])

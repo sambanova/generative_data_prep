@@ -41,6 +41,7 @@ from generative_data_prep.utils import (
     balance_hdf5_files,
     create_sha256,
     execute_and_return_stdout,
+    get_tokenizer,
     large_file_shuffle,
     log_sep_str,
     verify_output_dir,
@@ -242,7 +243,6 @@ def multiprocess_data_prep(  # noqa: C901
     disable_space_separator: bool,
     keep_prompt_only_sequences: bool,
     ignore_input_format_error: bool,
-    tokenizer: PreTrainedTokenizerBase,
     num_workers: int,
     input_file_size_in_gb: float,
     dataset_metadata_json: Optional[Dict[str, Union[str, int, bool, None]]] = None,
@@ -250,6 +250,11 @@ def multiprocess_data_prep(  # noqa: C901
     prompt_prefix: Optional[str] = None,
     prompt_postfix: Optional[str] = None,
     apply_chat_template: Optional[bool] = False,
+    pretrained_tokenizer: Optional[str] = None,
+    tokenizer_class: Optional[str] = None,
+    vocab_file: Optional[str] = None,
+    merges_file: Optional[str] = None,
+    special_tokens_dict: Optional[str] = None,
 ) -> Tuple[List[str], List[str], Metrics]:
     """Tokenizes all the files in files_to_tokenize efficiently using multirpocessing library.
 
@@ -275,6 +280,7 @@ def multiprocess_data_prep(  # noqa: C901
     Returns:
         List of output training and dev hdf5 file paths, and the metrics associated with tokenization
     """
+    tokenizer = get_tokenizer(pretrained_tokenizer, tokenizer_class, vocab_file, merges_file, special_tokens_dict)
     if input_file_size_in_gb > 10:
         log_sep_str()
         warning_msg = f"WARNING: your input file size is {input_file_size_in_gb} GB, "
@@ -313,7 +319,6 @@ def multiprocess_data_prep(  # noqa: C901
                 data_prep_main_helper,
                 (
                     True,
-                    tokenizer,
                     input_file_path,
                     output_file_path,
                     json_error_log_dir,
@@ -334,6 +339,11 @@ def multiprocess_data_prep(  # noqa: C901
                     prompt_postfix,
                     dataset_type,
                     apply_chat_template,
+                    pretrained_tokenizer,
+                    tokenizer_class,
+                    vocab_file,
+                    merges_file,
+                    special_tokens_dict,
                 ),
             )
         )
@@ -424,8 +434,6 @@ def multiprocess_data_prep(  # noqa: C901
 
 def pipeline_main(  # noqa: C901
     input_file_path: str,
-    tokenizer: PreTrainedTokenizerBase,
-    model_config: PretrainedConfig,
     output_dir: str,
     disable_space_separator: bool,
     keep_prompt_only_sequences: bool,
@@ -450,6 +458,11 @@ def pipeline_main(  # noqa: C901
     prompt_prefix: Optional[str] = None,
     prompt_postfix: Optional[str] = None,
     apply_chat_template: Optional[bool] = False,
+    pretrained_tokenizer: Optional[str] = None,
+    tokenizer_class: Optional[str] = None,
+    vocab_file: Optional[str] = None,
+    merges_file: Optional[str] = None,
+    special_tokens_dict: Optional[str] = None,
 ):
     """Endpoint for preparing data, shuffles, splits and tokenize input file.
 
@@ -493,6 +506,10 @@ def pipeline_main(  # noqa: C901
     Returns:
         Metrics associated with tokenization, Dataset metadata
     """
+    tokenizer, model_config = get_tokenizer(
+        pretrained_tokenizer, tokenizer_class, vocab_file, merges_file, special_tokens_dict
+    )
+
     # print input file information
     dataset_metadata_json = {
         "max_seq_length": max_seq_length,
@@ -533,7 +550,6 @@ def pipeline_main(  # noqa: C901
     dataset_metadata_json["number_of_training_files"] = train_count
     dataset_metadata_json["number_of_dev_files"] = dev_count
     dataset_metadata_json["number_of_test_files"] = test_count
-
     split_dir = os.path.join(output_dir, "splits")
     verify_output_dir(split_dir, False)
 
@@ -647,7 +663,6 @@ def pipeline_main(  # noqa: C901
         disable_space_separator,
         keep_prompt_only_sequences,
         ignore_input_format_error,
-        tokenizer,
         num_workers,
         input_file_size_in_gb,
         dataset_metadata_json,
@@ -655,6 +670,11 @@ def pipeline_main(  # noqa: C901
         prompt_prefix,
         prompt_postfix,
         apply_chat_template,
+        pretrained_tokenizer,
+        tokenizer_class,
+        vocab_file,
+        merges_file,
+        special_tokens_dict,
     )
 
     log_sep_str()

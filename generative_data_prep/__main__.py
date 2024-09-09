@@ -169,82 +169,6 @@ def get_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase, special_tokens_dict: str):
-    """Add the special tokens dictionary to tokenizer.
-
-    Args:
-        tokenizer: tokenizer to add special tokens to
-        special_tokens_dict: special tokens dictionary
-    """
-    log_sep_str()
-    logger.info(f"Adding special tokens dict:\n{special_tokens_dict}")
-    dict_string = special_tokens_dict.replace("'", '"')
-    tokenizer.add_special_tokens(json.loads(dict_string))
-
-
-def get_tokenizer(
-    pretrained_tokenizer: Optional[str],
-    tokenizer_class: Optional[str],
-    vocab_file: str,
-    merges_file: str,
-    special_tokens_dict: Optional[str],
-) -> PreTrainedTokenizerBase:
-    """Create a tokenizer based on input arguments.
-
-    Args:
-        pretrained_tokenizer: key to load pretrained tokenizer from huggingface using AutoTokenizer.from_pretrained
-        tokenizer_class: class of tokenizer, must be from TOKENIZER_CLASSES
-        vocab_file: path to vocab file
-        merges_file: path to merges file
-        special_tokens_dict: string representation of special tokens dictionary
-
-    Raises:
-        ValueError: If the input arguments are not compatible
-        NotImplementedError: If the tokenizer class selected has not been implemented
-
-    Returns:
-        Tokenizer, ModelConfig
-    """
-    tokenizer = None
-    model_config = None
-    if pretrained_tokenizer is None and tokenizer_class is None:
-        pretrained_tokenizer = GPT2_KEY
-
-    if not pretrained_tokenizer and not (merges_file and vocab_file and tokenizer_class):
-        err_msg = "You must include either --pretrained_tokenizer, \
-        or all three flags: --merges_file, --vocab_file and --tokenizer_class"
-
-        raise ValueError(err_msg)
-
-    if pretrained_tokenizer and (merges_file or vocab_file or tokenizer_class):
-        err_msg = "You may not include --pretrained_tokenizer along with any of the following flags: \
-        --merges_file, --vocab_file and --tokenizer_class"
-
-        raise ValueError(err_msg)
-
-    if pretrained_tokenizer is not None:
-        tokenizer = AutoTokenizer.from_pretrained(pretrained_tokenizer)
-        model_config = AutoConfig.from_pretrained(pretrained_tokenizer)
-    else:
-        verify_input_file(vocab_file)
-        verify_input_file(merges_file)
-        if tokenizer_class in TOKENIZER_CLASSES:
-            tokenizer = TOKENIZER_CLASSES[tokenizer_class].tokenizer(vocab_file, merges_file)
-            model_config = TOKENIZER_CLASSES[tokenizer_class].config(vocab_size=tokenizer.vocab_size)
-
-        if tokenizer is None:
-            raise NotImplementedError(f"The tokenizer_class you selected ({tokenizer_class}) has not been implemented")
-        if model_config is None:
-            raise NotImplementedError(
-                f"The tokenizer_class you selected ({tokenizer_class}) is missing a config associated with it"
-            )
-
-    if special_tokens_dict:
-        add_special_tokens_dict(tokenizer, special_tokens_dict)
-
-    return tokenizer, model_config
-
-
 def get_output_dir(cmd, output_path, overwrite_output_path):
     """Get the output directory based in the input arguments, if input path then return parent dir.
 
@@ -317,19 +241,10 @@ def main(args):
     json_error_log_dir = os.path.join(output_dir, "json_error_log")
     verify_output_dir(json_error_log_dir, True)
 
-    tokenizer, model_config = get_tokenizer(
-        args.pretrained_tokenizer,
-        args.tokenizer_class,
-        args.vocab_file,
-        args.merges_file,
-        args.special_tokens_dict,
-    )
     category_to_id = get_categories(args.categories_path)
     if args.cmd == "pipeline":
         metrics, dataset_metadata = pipeline_main(
             args.input_file_path,
-            tokenizer,
-            model_config,
             output_dir,
             args.disable_space_separator,
             args.keep_prompt_only_sequences,
@@ -354,11 +269,15 @@ def main(args):
             args.prompt_prefix,
             args.prompt_postfix,
             args.apply_chat_template,
+            args.pretrained_tokenizer,
+            args.tokenizer_class,
+            args.vocab_file,
+            args.merges_file,
+            args.special_tokens_dict,
         )
     elif args.cmd == "data_prep":
         metrics = data_prep_main(
             args.silent,
-            tokenizer,
             args.input_file_path,
             args.output_path,
             json_error_log_dir,
@@ -374,7 +293,12 @@ def main(args):
             category_to_id,
             args.prompt_prefix,
             args.prompt_postfix,
-            apply_chat_template=args.apply_chat_template,
+            args.apply_chat_template,
+            args.pretrained_tokenizer,
+            args.tokenizer_class,
+            args.vocab_file,
+            args.merges_file,
+            args.special_tokens_dict,
         )
 
     log_metrics(metrics)

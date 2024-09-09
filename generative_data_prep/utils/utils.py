@@ -23,6 +23,8 @@ from subprocess import PIPE, run  # nosec
 from typing import Optional
 
 from transformers import (
+    AutoConfig,
+    AutoTokenizer,
     GPT2Config,
     GPT2Tokenizer,
     PretrainedConfig,
@@ -31,6 +33,8 @@ from transformers import (
 
 from .arg_configs import PackingConfig
 from .constants import BoundaryType
+from .logger import LOGGER, log_sep_str
+from .path_verify import verify_input_file
 
 
 class TokenizerConfigPair:
@@ -373,3 +377,79 @@ def get_config_file_path():
     config_filename = "configs/logger.conf"  # Change this to match your config file name
     config_path = os.path.join(script_dir, config_filename)
     return config_path
+
+
+def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase, special_tokens_dict: str):
+    """Add the special tokens dictionary to tokenizer.
+
+    Args:
+        tokenizer: tokenizer to add special tokens to
+        special_tokens_dict: special tokens dictionary
+    """
+    log_sep_str()
+    LOGGER.info(f"Adding special tokens dict:\n{special_tokens_dict}")
+    dict_string = special_tokens_dict.replace("'", '"')
+    tokenizer.add_special_tokens(json.loads(dict_string))
+
+
+def get_tokenizer(
+    pretrained_tokenizer: Optional[str],
+    tokenizer_class: Optional[str],
+    vocab_file: str,
+    merges_file: str,
+    special_tokens_dict: Optional[str],
+) -> PreTrainedTokenizerBase:
+    """Create a tokenizer based on input arguments.
+
+    Args:
+        pretrained_tokenizer: key to load pretrained tokenizer from huggingface using AutoTokenizer.from_pretrained
+        tokenizer_class: class of tokenizer, must be from TOKENIZER_CLASSES
+        vocab_file: path to vocab file
+        merges_file: path to merges file
+        special_tokens_dict: string representation of special tokens dictionary
+
+    Raises:
+        ValueError: If the input arguments are not compatible
+        NotImplementedError: If the tokenizer class selected has not been implemented
+
+    Returns:
+        Tokenizer, ModelConfig
+    """
+    tokenizer = None
+    model_config = None
+    if pretrained_tokenizer is None and tokenizer_class is None:
+        pretrained_tokenizer = GPT2_KEY
+
+    if not pretrained_tokenizer and not (merges_file and vocab_file and tokenizer_class):
+        err_msg = "You must include either --pretrained_tokenizer, \
+        or all three flags: --merges_file, --vocab_file and --tokenizer_class"
+
+        raise ValueError(err_msg)
+
+    if pretrained_tokenizer and (merges_file or vocab_file or tokenizer_class):
+        err_msg = "You may not include --pretrained_tokenizer along with any of the following flags: \
+        --merges_file, --vocab_file and --tokenizer_class"
+
+        raise ValueError(err_msg)
+
+    if pretrained_tokenizer is not None:
+        tokenizer = AutoTokenizer.from_pretrained(pretrained_tokenizer)
+        model_config = AutoConfig.from_pretrained(pretrained_tokenizer)
+    else:
+        verify_input_file(vocab_file)
+        verify_input_file(merges_file)
+        if tokenizer_class in TOKENIZER_CLASSES:
+            tokenizer = TOKENIZER_CLASSES[tokenizer_class].tokenizer(vocab_file, merges_file)
+            model_config = TOKENIZER_CLASSES[tokenizer_class].config(vocab_size=tokenizer.vocab_size)
+
+        if tokenizer is None:
+            raise NotImplementedError(f"The tokenizer_class you selected ({tokenizer_class}) has not been implemented")
+        if model_config is None:
+            raise NotImplementedError(
+                f"The tokenizer_class you selected ({tokenizer_class}) is missing a config associated with it"
+            )
+
+    if special_tokens_dict:
+        add_special_tokens_dict(tokenizer, special_tokens_dict)
+
+    return tokenizer, model_config
