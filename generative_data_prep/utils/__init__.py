@@ -26,6 +26,7 @@ from .constants import (
 from .large_file_shuffle import large_file_shuffle
 from .logger import (
     add_file_handler,
+    check_deprecated_args,
     log_current_datetime,
     log_elapsed_time,
     log_git_commit_hash,
@@ -75,4 +76,5 @@ __all__ = [
     "log_sep_str",
     "get_config_file_path",
     "DatasetMetadata",
+    "check_deprecated_args",
 ]

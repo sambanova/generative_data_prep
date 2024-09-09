@@ -30,6 +30,7 @@ from generative_data_prep.utils import (
     TOKENIZER_CLASSES,
     FileExtension,
     add_file_handler,
+    check_deprecated_args,
     data_prep_arg_builder,
     get_config_file_path,
     log_current_datetime,
@@ -166,7 +167,9 @@ def get_args() -> argparse.Namespace:
     # create the create data subparser
     data_prep_subparser = subparsers.add_parser("data_prep")
     add_data_prep_args(data_prep_subparser)
-    return parser.parse_args()
+    args = parser.parse_args()
+    args = check_deprecated_args(args)
+    return args
 
 
 def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase, special_tokens_dict: str):

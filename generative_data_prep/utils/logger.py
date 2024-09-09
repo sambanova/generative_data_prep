@@ -15,6 +15,7 @@ limitations under the License.
 
 This class creates a common logger.
 """
+import argparse
 import datetime
 import logging
 import logging.config
@@ -108,3 +109,13 @@ def log_training_details(dataset_metadata: Dict[str, Union[str, int, bool]]):
 def log_sep_str():
     """Log the seperator string."""
     LOGGER.info(SEP_STR)
+
+
+def check_deprecated_args(args: argparse.Namespace):
+    """Check if any deprecated arguments are used, if so warn the user."""
+    if args.input_file_path is not None:
+        if args.input_path is not None:
+            raise ValueError("Please only specify --input_path argument only, you also included --input_file_path")
+        LOGGER.warning("WARNING: --input_file_path argument will be deprecated soon, please use --input_path instead")
+        args.input_path = args.input_file_path
+    return args
