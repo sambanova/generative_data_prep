@@ -133,7 +133,9 @@ def data_prep_main(
                             exc.doc,
                             exc.pos,
                         ) from exc
-
+            if num_tokenized_articles_lock is not None and num_tokenized_articles is not None:
+                with num_tokenized_articles_lock:
+                    num_tokenized_articles.value += i % 100
             hdf5_text_buffer.write(article_tokenizer(None))
     article_tokenizer.metrics.dataset_type = dataset_type
     return article_tokenizer.metrics
