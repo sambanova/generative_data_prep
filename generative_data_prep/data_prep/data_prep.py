@@ -107,12 +107,16 @@ def data_prep_main(
 
     with Hdf5FileBuffer(output_file, max_seq_length, dump_categories) as hdf5_text_buffer:
         with open(input_file, "r") as reader:
-            for line in reader:
+            for i, line in enumerate(reader):
                 try:
                     hdf5_text_buffer.write(article_tokenizer(line))
-                    if num_tokenized_articles_lock is not None and num_tokenized_articles is not None:
+                    if (
+                        (i != 0 and i % 100 == 0)
+                        and num_tokenized_articles_lock is not None
+                        and num_tokenized_articles is not None
+                    ):
                         with num_tokenized_articles_lock:
-                            num_tokenized_articles.value += 1
+                            num_tokenized_articles.value += 100
                 except json.JSONDecodeError as exc:
                     if ignore_input_format_error:
                         with open(error_log_path, "a") as f:
@@ -129,7 +133,9 @@ def data_prep_main(
                             exc.doc,
                             exc.pos,
                         ) from exc
-
+            if num_tokenized_articles_lock is not None and num_tokenized_articles is not None:
+                with num_tokenized_articles_lock:
+                    num_tokenized_articles.value += i % 100
             hdf5_text_buffer.write(article_tokenizer(None))
     article_tokenizer.metrics.dataset_type = dataset_type
     return article_tokenizer.metrics
