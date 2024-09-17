@@ -1,6 +1,5 @@
 import logging
 import os
-from argparse import Namespace
 
 import pytest
 import yaml
@@ -263,8 +262,8 @@ def test_metadata_end2end_output(tmp_path):
         "categories_path": None,
         "apply_chat_template": False,
     }
-    args = Namespace(**args_dict)
-    main(args)
+
+    main(**args_dict)
     metadata_file = os.path.join(tmp_e2e_output_dir, "metadata.yaml")
     with open(metadata_file, "r") as file:
         metadata_dict = yaml.safe_load(file)

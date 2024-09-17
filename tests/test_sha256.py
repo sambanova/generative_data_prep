@@ -1,7 +1,6 @@
 import logging
 import os
 import shutil
-from argparse import Namespace
 
 import pytest
 import yaml
@@ -56,8 +55,8 @@ def shared_output_dir_with_split(tmp_path_factory):
         "categories_path": None,
         "apply_chat_template": False,
     }
-    args = Namespace(**args_dict)
-    main(args)
+
+    main(**args_dict)
 
     return tmp_split_output_dir
 
@@ -131,8 +130,7 @@ def test_validation_sha_with_split_and_eval(tmp_path):
         "categories_path": None,
         "apply_chat_template": False,
     }
-    args = Namespace(**args_dict)
-    main(args)
+    main(**args_dict)
 
     assert validate_sha256(tmp_split_with_eval_output_dir)
 
@@ -183,8 +181,8 @@ def test_validation_sha_without_split(tmp_path):
         "categories_path": None,
         "apply_chat_template": False,
     }
-    args = Namespace(**args_dict)
-    main(args)
+
+    main(**args_dict)
 
     assert validate_sha256(tmp_no_split_output_dir)
 
