@@ -28,7 +28,9 @@ from generative_data_prep.data_prep import data_prep_main, pipeline_main
 from generative_data_prep.utils import (
     GPT2_KEY,
     TOKENIZER_CLASSES,
+    BoundaryType,
     FileExtension,
+    PackingConfig,
     add_file_handler,
     check_deprecated_args,
     data_prep_arg_builder,
@@ -305,87 +307,123 @@ def get_categories(categories_path: str):
     return category_to_id
 
 
-def main(args):
+def main(
+    cmd: str,
+    output_path: str,
+    overwrite_output_path: bool,
+    log_file_path: str,
+    pretrained_tokenizer: str,
+    tokenizer_class: Optional[str],
+    vocab_file: str,
+    merges_file: str,
+    special_tokens_dict: Optional[str],
+    categories_path: str,
+    input_path: str,
+    disable_space_separator: bool,
+    keep_prompt_only_sequences: bool,
+    ignore_input_format_error: bool,
+    prompt_keyword: str,
+    completion_keyword: str,
+    shuffle: str,
+    num_workers: int,
+    do_not_balance_hdf5: bool,
+    keep_split_jsonls: bool,
+    max_seq_length: int,
+    input_packing_config: PackingConfig,
+    packing_boundary: BoundaryType,
+    attention_boundary: BoundaryType,
+    num_training_splits: int,
+    num_dev_splits: int,
+    num_test_splits: int,
+    dev_ratio: float,
+    test_ratio: float,
+    prompt_prefix: Optional[str],
+    prompt_postfix: Optional[str],
+    apply_chat_template: bool,
+    silent: bool,
+):
     """Wrapping function instead of putting into __main__."""
-    output_dir = get_output_dir(args.cmd, args.output_path, args.overwrite_output_path)
-    add_file_handler(args.log_file_path, output_dir)
+    output_dir = get_output_dir(cmd, output_path, overwrite_output_path)
+    add_file_handler(log_file_path, output_dir)
     log_git_commit_hash()
     log_current_datetime()
-    log_input_args(args)
+
+    log_input_args(locals())  # Log all input arguments using locals()
 
     json_error_log_dir = os.path.join(output_dir, "json_error_log")
     verify_output_dir(json_error_log_dir, True)
 
     tokenizer, model_config = get_tokenizer(
-        args.pretrained_tokenizer,
-        args.tokenizer_class,
-        args.vocab_file,
-        args.merges_file,
-        args.special_tokens_dict,
+        pretrained_tokenizer,
+        tokenizer_class,
+        vocab_file,
+        merges_file,
+        special_tokens_dict,
     )
-    category_to_id = get_categories(args.categories_path)
+    category_to_id = get_categories(categories_path)
 
-    if not os.path.isdir(args.input_path):
-        if os.path.splitext(args.input_path)[1] not in FileExtension.as_list():
-            err_msg = f"The input file is not a jsonl or txt file {args.input_path}"
+    if not os.path.isdir(input_path):
+        if os.path.splitext(input_path)[1] not in FileExtension.as_list():
+            err_msg = f"The input file is not a jsonl or txt file {input_path}"
             raise ValueError(err_msg)
-        verify_input_file(args.input_path)
+        verify_input_file(input_path)
 
-    if args.cmd == "pipeline":
+    if cmd == "pipeline":
         metrics, dataset_metadata = pipeline_main(
-            args.input_path,
-            tokenizer,
-            model_config,
-            output_dir,
-            args.disable_space_separator,
-            args.keep_prompt_only_sequences,
-            args.ignore_input_format_error,
-            args.prompt_keyword,
-            args.completion_keyword,
-            args.shuffle,
-            args.overwrite_output_path,
-            args.num_workers,
-            args.do_not_balance_hdf5,
-            args.keep_split_jsonls,
-            args.max_seq_length,
-            args.input_packing_config,
-            args.packing_boundary,
-            args.attention_boundary,
-            args.num_training_splits,
-            args.num_dev_splits,
-            args.num_test_splits,
-            args.dev_ratio,
-            args.test_ratio,
-            category_to_id,
-            args.prompt_prefix,
-            args.prompt_postfix,
-            args.apply_chat_template,
+            input_path=input_path,
+            tokenizer=tokenizer,
+            model_config=model_config,
+            output_dir=output_dir,
+            disable_space_separator=disable_space_separator,
+            keep_prompt_only_sequences=keep_prompt_only_sequences,
+            ignore_input_format_error=ignore_input_format_error,
+            prompt_keyword=prompt_keyword,
+            completion_keyword=completion_keyword,
+            shuffle=shuffle,
+            overwrite_output_path=overwrite_output_path,
+            num_workers=num_workers,
+            do_not_balance_hdf5=do_not_balance_hdf5,
+            keep_split_jsonls=keep_split_jsonls,
+            max_seq_length=max_seq_length,
+            input_packing_config=input_packing_config,
+            packing_boundary=packing_boundary,
+            attention_boundary=attention_boundary,
+            num_training_splits=num_training_splits,
+            num_dev_splits=num_dev_splits,
+            num_test_splits=num_test_splits,
+            dev_ratio=dev_ratio,
+            test_ratio=test_ratio,
+            category_to_id=category_to_id,
+            prompt_prefix=prompt_prefix,
+            prompt_postfix=prompt_postfix,
+            apply_chat_template=apply_chat_template,
         )
-    elif args.cmd == "data_prep":
+
+    elif cmd == "data_prep":
         metrics = data_prep_main(
-            args.silent,
-            tokenizer,
-            args.input_path,
-            args.output_path,
-            json_error_log_dir,
-            args.max_seq_length,
-            args.input_packing_config,
-            args.packing_boundary,
-            args.attention_boundary,
-            args.disable_space_separator,
-            args.keep_prompt_only_sequences,
-            args.ignore_input_format_error,
-            args.prompt_keyword,
-            args.completion_keyword,
-            category_to_id,
-            args.prompt_prefix,
-            args.prompt_postfix,
-            apply_chat_template=args.apply_chat_template,
+            silent=silent,
+            tokenizer=tokenizer,
+            input_file=input_path,
+            output_file=output_path,
+            error_log_dir=json_error_log_dir,
+            max_seq_length=max_seq_length,
+            input_packing_config=input_packing_config,
+            packing_boundary=packing_boundary,
+            attention_boundary=attention_boundary,
+            disable_space_separator=disable_space_separator,
+            keep_prompt_only_sequences=keep_prompt_only_sequences,
+            ignore_input_format_error=ignore_input_format_error,
+            prompt_keyword=prompt_keyword,
+            completion_keyword=completion_keyword,
+            category_to_id=category_to_id,
+            prompt_prefix=prompt_prefix,
+            prompt_postfix=prompt_postfix,
+            apply_chat_template=apply_chat_template,
         )
 
     log_metrics(metrics)
     log_elapsed_time()
-    if args.cmd == "pipeline":
+    if cmd == "pipeline":
         log_training_details(dataset_metadata)
 
 
@@ -393,4 +431,39 @@ if __name__ == "__main__":
     logger = logging.getLogger("generative_data_prep_logger")
     logging.config.fileConfig(get_config_file_path())
     args = get_args()
-    main(args)
+
+    main(
+        args.cmd,
+        args.output_path,
+        args.overwrite_output_path,
+        args.log_file_path,
+        args.pretrained_tokenizer,
+        args.tokenizer_class,
+        args.vocab_file,
+        args.merges_file,
+        args.special_tokens_dict,
+        args.categories_path,
+        args.input_path,
+        args.disable_space_separator,
+        args.keep_prompt_only_sequences,
+        args.ignore_input_format_error,
+        args.prompt_keyword,
+        args.completion_keyword,
+        args.shuffle,
+        args.num_workers,
+        args.do_not_balance_hdf5,
+        args.keep_split_jsonls,
+        args.max_seq_length,
+        args.input_packing_config,
+        args.packing_boundary,
+        args.attention_boundary,
+        args.num_training_splits,
+        args.num_dev_splits,
+        args.num_test_splits,
+        args.dev_ratio,
+        args.test_ratio,
+        args.prompt_prefix,
+        args.prompt_postfix,
+        args.apply_chat_template,
+        args.silent,
+    )
