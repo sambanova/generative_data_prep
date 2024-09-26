@@ -15,6 +15,13 @@ limitations under the License.
 
 from enum import Enum
 
+from transformers import (
+    GPT2Config,
+    GPT2Tokenizer,
+    PretrainedConfig,
+    PreTrainedTokenizerBase,
+)
+
 CATEGORY_JSON_KEY = "category"
 
 
@@ -92,3 +99,22 @@ class FileExtension(str, BaseEnum):
 
     TXT = ".txt"
     JSONL = ".jsonl"
+
+
+class TokenizerConfigPair:
+    """New datastructure to store tokenizer and config pairs for same model type."""
+
+    def __init__(self, tokenizer: PreTrainedTokenizerBase, config: PretrainedConfig) -> None:
+        """Initialization of TokenizerConfigPair.
+
+        Args:
+            tokenizer: Tokenizer associated with key
+            config: Config associated with key
+        """
+        self.tokenizer = tokenizer
+        self.config = config
+
+
+GPT2_KEY = "gpt2"
+
+TOKENIZER_CLASSES = {GPT2_KEY: TokenizerConfigPair(tokenizer=GPT2Tokenizer, config=GPT2Config)}
