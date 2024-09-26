@@ -501,7 +501,7 @@ def test_pipeline(
 
 @pytest.mark.parametrize(
     "test_name, checkpoint_path, number_of_rdus, grad_accum_steps,\
-        pef_batch_size, evaluation_ratio, custom_tokenizer_path,\
+        pef_batch_size, custom_tokenizer_path,\
         input_packing_config, apply_chat_template",
     [
         (
@@ -510,8 +510,6 @@ def test_pipeline(
             1,  # number_of_rdus
             1,  # grad_accum_steps
             1,  # pef_batch_size
-            0.0,  # evaluation_ratio
-            None,  # custom_tokenizer_path
             "full",  # input_packing_config
             False,  # apply_chat_template
         ),
@@ -521,8 +519,6 @@ def test_pipeline(
             1,  # number_of_rdus
             1,  # grad_accum_steps
             1,  # pef_batch_size
-            0.0,  # evaluation_ratio
-            None,  # custom_tokenizer_path
             None,  # input_packing_config
             True,  # apply_chat_template
         ),
@@ -534,8 +530,6 @@ def test_main_from_training_args(
     number_of_rdus: int,
     grad_accum_steps: int,
     pef_batch_size: int,
-    evaluation_ratio: Optional[float] = None,
-    custom_tokenizer_path: Optional[str] = None,
     input_packing_config: str = "greedy::drop",
     apply_chat_template: Optional[bool] = None,
 ):
@@ -555,10 +549,8 @@ def test_main_from_training_args(
             number_of_rdus,
             grad_accum_steps,
             pef_batch_size,
-            evaluation_ratio,
-            num_workers,
-            custom_tokenizer_path,
-            input_packing_config,
-            apply_chat_template,
+            num_workers=num_workers,
+            input_packing_config=input_packing_config,
+            apply_chat_template=apply_chat_template,
         )
         check_pipeline(output_path, gold_path)
