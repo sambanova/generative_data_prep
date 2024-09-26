@@ -84,6 +84,9 @@ def validate_sha256(output_dir: str):
         file_info_dict = json.load(output_file)
     for file, hash_file_name in files_to_hash:
         if hash_file_name not in file_info_dict:
+            print("Error 1")
+            print(f"hash_file_name: {hash_file_name}")
+            print(f"file_info_dict: {file_info_dict}")
             return False
         current_modified_time = os.path.getmtime(file)
         current_size = os.path.getsize(file)
@@ -93,6 +96,9 @@ def validate_sha256(output_dir: str):
             file_hash = file_info_dict[hash_file_name]["sha256"]
             current_file_hash = _calculate_sha256(file)
             if file_hash != current_file_hash:
+                print("Error 2")
+                print(f"file_hash: {file_hash}")
+                print(f"current_file_hash: {current_file_hash}")
                 return False
     return True
 

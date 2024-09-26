@@ -16,7 +16,7 @@ limitations under the License.
 
 import os
 import tempfile
-from typing import Dict
+from typing import Dict, Optional
 
 import pytest
 from transformers import (
@@ -26,6 +26,7 @@ from transformers import (
     PreTrainedTokenizerBase,
 )
 
+from generative_data_prep.__main__ import main_from_training_args
 from generative_data_prep.data_prep import data_prep_main, pipeline_main
 from generative_data_prep.utils import BoundaryType, PackingConfig
 from tests.conftest import TESTS_EXAMPLES_PATH
@@ -496,3 +497,68 @@ def test_pipeline(
 
         if not do_not_balance_hdf5:
             check_balance(os.path.join(output_dir))
+
+
+@pytest.mark.parametrize(
+    "test_name, log_file_path, checkpoint_path, number_of_rdus,\
+        grad_accum_steps, pef_batch_size, evaluation_ratio, custom_tokenizer_path,\
+        input_packing_config, apply_chat_template",
+    [
+        (
+            "pretraining_txt",
+            "openai-community/gpt2",
+            1,  # number_of_rdus
+            1,  # grad_accum_steps
+            1,  # pef_batch_size
+            0.0,  # evaluation_ratio
+            None,  # custom_tokenizer_path
+            "full",  # input_packing_config
+            False,  # apply_chat_template
+        ),
+        (
+            "apply_chat_template",
+            "daryl149/llama-2-7b-chat-hf",
+            1,  # number_of_rdus
+            1,  # grad_accum_steps
+            1,  # pef_batch_size
+            0.0,  # evaluation_ratio
+            None,  # custom_tokenizer_path
+            None,  # input_packing_config
+            True,  # apply_chat_template
+        ),
+    ],
+)
+def test_main_from_training_args(
+    test_name: str,
+    checkpoint_path: str,
+    number_of_rdus: int,
+    grad_accum_steps: int,
+    pef_batch_size: int,
+    evaluation_ratio: Optional[float] = None,
+    custom_tokenizer_path: Optional[str] = None,
+    input_packing_config: str = "greedy::drop",
+    apply_chat_template: Optional[bool] = None,
+):
+    """Test if we can call main function using training arguments."""
+    num_workers = os.cpu_count()
+    if num_workers is None:
+        num_workers = 1
+    input_path = get_input_path(test_name)
+    gold_path = gold_pipeline_path(test_name)
+    with tempfile.TemporaryDirectory() as output_path:
+        log_file_path = os.path.join(output_path, "logs.log")
+        main_from_training_args(
+            input_path,
+            output_path,
+            log_file_path,
+            checkpoint_path,
+            number_of_rdus,
+            grad_accum_steps,
+            pef_batch_size,
+            evaluation_ratio,
+            num_workers,
+            custom_tokenizer_path,
+            input_packing_config,
+            apply_chat_template,
+        )
+        check_pipeline(output_path, gold_path)
