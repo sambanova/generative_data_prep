@@ -500,8 +500,8 @@ def test_pipeline(
 
 
 @pytest.mark.parametrize(
-    "test_name, log_file_path, checkpoint_path, number_of_rdus,\
-        grad_accum_steps, pef_batch_size, evaluation_ratio, custom_tokenizer_path,\
+    "test_name, checkpoint_path, number_of_rdus, grad_accum_steps,\
+        pef_batch_size, evaluation_ratio, custom_tokenizer_path,\
         input_packing_config, apply_chat_template",
     [
         (
