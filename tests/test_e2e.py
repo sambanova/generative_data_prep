@@ -16,7 +16,7 @@ limitations under the License.
 
 import os
 import tempfile
-from typing import Dict, Optional
+from typing import Dict
 
 import pytest
 from transformers import (
@@ -518,7 +518,7 @@ def test_pipeline(
             1,  # number_of_rdus
             1,  # grad_accum_steps
             1,  # pef_batch_size
-            None,  # input_packing_config
+            "greedy::drop",  # input_packing_config
             True,  # apply_chat_template
         ),
     ],
@@ -529,8 +529,8 @@ def test_main_from_training_args(
     number_of_rdus: int,
     grad_accum_steps: int,
     pef_batch_size: int,
-    input_packing_config: str = "greedy::drop",
-    apply_chat_template: Optional[bool] = None,
+    input_packing_config: str,
+    apply_chat_template: bool,
 ):
     """Test if we can call main function using training arguments."""
     num_workers = os.cpu_count()
