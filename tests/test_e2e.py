@@ -516,7 +516,7 @@ def test_pipeline(
         ),
         (
             "data_prep_from_main",
-            "arcee-ai/Llama-3.1-SuperNova-Lite",
+            "princeton-nlp/gemma-2-9b-it-SimPO",
             1,  # number_of_rdus
             1,  # grad_accum_steps
             1,  # pef_batch_size
