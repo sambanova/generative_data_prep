@@ -320,6 +320,7 @@ def main_from_training_args(
         apply_chat_template,
     )
     data_prep_args = check_deprecated_args(data_prep_args)
+    print(data_prep_args)
     main(data_prep_args)
 
 

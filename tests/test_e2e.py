@@ -513,12 +513,12 @@ def test_pipeline(
             False,  # apply_chat_template
         ),
         (
-            "apply_chat_template",
+            "data_prep_from_main",
             "daryl149/llama-2-7b-chat-hf",
-            1,  # number_of_rdus
-            1,  # grad_accum_steps
-            1,  # pef_batch_size
-            "greedy::drop",  # input_packing_config
+            2,  # number_of_rdus
+            4,  # grad_accum_steps
+            4,  # pef_batch_size
+            "single::drop",  # input_packing_config
             True,  # apply_chat_template
         ),
     ],
