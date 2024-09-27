@@ -273,11 +273,13 @@ def main_from_training_args(
     number_of_rdus: int,
     grad_accum_steps: int,
     pef_batch_size: int,
+    max_seq_length: Optional[int] = None,
     evaluation_ratio: Optional[float] = None,
     num_workers: int = 16,
     custom_tokenizer_path: Optional[str] = None,
     input_packing_config: str = "greedy::drop",
     apply_chat_template: Optional[bool] = None,
+    shuffle: Optional[str] = None,
 ):
     """Runs the main pipeline for data preparation and training configuration based on provided arguments.
 
@@ -313,11 +315,13 @@ def main_from_training_args(
         number_of_rdus,
         grad_accum_steps,
         pef_batch_size,
+        max_seq_length,
         evaluation_ratio,
         num_workers,
         custom_tokenizer_path,
         input_packing_config,
         apply_chat_template,
+        shuffle,
     )
     data_prep_args = check_deprecated_args(data_prep_args)
     print(data_prep_args)

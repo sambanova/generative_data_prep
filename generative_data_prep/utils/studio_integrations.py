@@ -182,11 +182,13 @@ def training_to_data_prep_params(  # noqa: C901
     number_of_rdus: int,
     grad_accum_steps: int,
     pef_batch_size: int,
+    max_seq_length: Optional[int] = None,
     evaluation_ratio: Optional[float] = None,
     num_workers: int = 16,
     custom_tokenizer_path: Optional[str] = None,
     input_packing_config: str = "greedy::drop",
     apply_chat_template: Optional[bool] = None,
+    shuffle: Optional[str] = None,
 ):  # noqa: C901
     """Convert training hyper-parameters to data prep hyper-parameters.
 
@@ -252,8 +254,11 @@ def training_to_data_prep_params(  # noqa: C901
     # if not a positive multiple then find the smallest positive multiple larger then the default
     num_training_splits = adjust_splits(num_training_splits, number_of_rdus)
 
-    shuffle = get_shuffle_arg(input_path)
-    max_seq_length = get_max_seq_length_arg(model_config)
+    if shuffle is None:
+        shuffle = get_shuffle_arg(input_path)
+
+    if max_seq_length is None:
+        max_seq_length = get_max_seq_length_arg(model_config)
 
     # verify that there are approximately enough lines to have enough data to
     # run with this configuration where the amount of data needed to run one batch is
@@ -290,17 +295,3 @@ def training_to_data_prep_params(  # noqa: C901
     data_prep_args = arg_parser.parse_args(input_arguments)
 
     return data_prep_args
-
-
-if __name__ == "__main__":
-    data_prep_args = training_to_data_prep_params(
-        "/Users/zoltanc/Desktop/generative_data_prep/tests/examples/metaICL/example_metaICL_data.jsonl",
-        "/Users/zoltanc/Desktop/generative_data_prep/tests/examples/metaICL/test",
-        "/Users/zoltanc/Desktop/generative_data_prep/tests/examples/metaICL/test/logs.log",
-        "daryl149/llama-2-7b-chat-hf",
-        1,
-        2,
-        2,
-        0.0,
-        8,
-    )

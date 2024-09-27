@@ -41,7 +41,7 @@ from .test_utils import (
 
 TOKENIZER = GPT2Tokenizer.from_pretrained("gpt2")
 MODEL_CONFIG = GPT2Config.from_pretrained("gpt2")
-LLAMA_TOKENIZER = AutoTokenizer.from_pretrained("daryl149/llama-2-7b-chat-hf")
+LLAMA_TOKENIZER = AutoTokenizer.from_pretrained("arcee-ai/Llama-3.1-SuperNova-Lite")
 
 
 def get_input_path(test_name: str) -> str:
@@ -501,25 +501,29 @@ def test_pipeline(
 
 @pytest.mark.parametrize(
     "test_name, checkpoint_path, number_of_rdus, grad_accum_steps, pef_batch_size,\
-        input_packing_config, apply_chat_template",
+        input_packing_config, apply_chat_template, shuffle, max_seq_length",
     [
         (
-            "pretraining_txt",
+            "pretraining",
             "openai-community/gpt2",
             1,  # number_of_rdus
             1,  # grad_accum_steps
             1,  # pef_batch_size
             "full",  # input_packing_config
             False,  # apply_chat_template
+            "False",
+            None,
         ),
         (
             "data_prep_from_main",
-            "daryl149/llama-2-7b-chat-hf",
-            2,  # number_of_rdus
-            4,  # grad_accum_steps
-            4,  # pef_batch_size
-            "single::drop",  # input_packing_config
+            "arcee-ai/Llama-3.1-SuperNova-Lite",
+            1,  # number_of_rdus
+            1,  # grad_accum_steps
+            1,  # pef_batch_size
+            "greedy::drop",  # input_packing_config
             True,  # apply_chat_template
+            "False",
+            4096,
         ),
     ],
 )
@@ -531,6 +535,8 @@ def test_main_from_training_args(
     pef_batch_size: int,
     input_packing_config: str,
     apply_chat_template: bool,
+    shuffle: str,
+    max_seq_length: int,
 ):
     """Test if we can call main function using training arguments."""
     num_workers = os.cpu_count()
@@ -548,8 +554,10 @@ def test_main_from_training_args(
             number_of_rdus,
             grad_accum_steps,
             pef_batch_size,
+            max_seq_length=max_seq_length,
             num_workers=num_workers,
             input_packing_config=input_packing_config,
             apply_chat_template=apply_chat_template,
+            shuffle=shuffle,
         )
         check_pipeline(output_path, gold_path)

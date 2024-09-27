@@ -1,22 +1,15 @@
 {
   "bos_token": {
-    "content": "<s>",
+    "content": "<|begin_of_text|>",
     "lstrip": false,
-    "normalized": true,
+    "normalized": false,
     "rstrip": false,
     "single_word": false
   },
   "eos_token": {
-    "content": "</s>",
+    "content": "<|eot_id|>",
     "lstrip": false,
-    "normalized": true,
-    "rstrip": false,
-    "single_word": false
-  },
-  "unk_token": {
-    "content": "<unk>",
-    "lstrip": false,
-    "normalized": true,
+    "normalized": false,
     "rstrip": false,
     "single_word": false
   }
