@@ -516,7 +516,7 @@ def test_pipeline(
         ),
         (
             "data_prep_from_main",
-            "princeton-nlp/gemma-2-9b-it-SimPO",
+            "Qwen/Qwen2-1.5B",
             1,  # number_of_rdus
             1,  # grad_accum_steps
             1,  # pef_batch_size
