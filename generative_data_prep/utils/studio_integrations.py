@@ -53,7 +53,7 @@ def get_max_seq_length_arg(model_config):
         elif hasattr(model_config, "n_positions"):
             return model_config.n_positions
         else:
-            return "Sequence length not found in config"
+            raise ValueError("Sequence length not found in model config under max_position_embeddings or n_positions")
     except Exception as e:
         return f"Error: {str(e)}"
 
@@ -226,8 +226,10 @@ def training_to_data_prep_params(  # noqa: C901
 
     # Validate that the tokenizer vocab size is <= model vocab size
     if not tokenizer.vocab_size <= model_config.vocab_size:
-        err_msg = f"Tokenizers vocab size: {tokenizer.vocab_size}"
-        err_msg += " is not compatible with model vocab size: {model_config.vocab_size}"
+        err_msg = (
+            f"Tokenizers vocab size: {tokenizer.vocab_size} "
+            f"is not compatible with model vocab size: {model_config.vocab_size}"
+        )
         raise ValueError(err_msg)
     if custom_tokenizer_path is not None and not isinstance(tokenizer, AutoTokenizer.from_pretrained(checkpoint_path)):
         custom_tok_type = type(tokenizer)
@@ -245,6 +247,9 @@ def training_to_data_prep_params(  # noqa: C901
                 apply_chat_template = True
             except ValueError:
                 apply_chat_template = False
+
+    if not os.path.exists(input_path):
+        raise ValueError(f"input path: {input_path} is not a valid file path")
 
     input_file_size_in_bytes = os.stat(input_path).st_size
     input_file_size_in_gb = input_file_size_in_bytes / (1024**3)

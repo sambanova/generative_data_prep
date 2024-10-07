@@ -26,7 +26,7 @@ from transformers import (
     PreTrainedTokenizerBase,
 )
 
-from generative_data_prep.__main__ import main_from_training_args
+from generative_data_prep.__main__ import run_with_training_args
 from generative_data_prep.data_prep import data_prep_main, pipeline_main
 from generative_data_prep.utils import BoundaryType, PackingConfig
 from tests.conftest import TESTS_EXAMPLES_PATH
@@ -527,7 +527,7 @@ def test_pipeline(
         ),
     ],
 )
-def test_main_from_training_args(
+def test_run_with_training_args(
     test_name: str,
     checkpoint_path: str,
     number_of_rdus: int,
@@ -546,7 +546,7 @@ def test_main_from_training_args(
     gold_path = gold_pipeline_path(test_name)
     with tempfile.TemporaryDirectory() as output_path:
         log_file_path = os.path.join(output_path, "logs.log")
-        main_from_training_args(
+        run_with_training_args(
             input_path,
             output_path,
             log_file_path,

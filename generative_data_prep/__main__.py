@@ -264,8 +264,10 @@ def main(args):
     if args.cmd == "pipeline":
         log_training_details(dataset_metadata)
 
+    return metrics
 
-def main_from_training_args(
+
+def run_with_training_args(
     input_path: str,
     output_path: str,
     log_file_path: str,
@@ -301,7 +303,7 @@ def main_from_training_args(
             it is inferred based on the tokenizer's capabilities. Defaults to None.
 
     Returns:
-        None: The function executes the training pipeline and does not return any value.
+       metrics: Dataset metrics related to the dataset we just prepared.
 
     Raises:
         ValueError: If the arguments provided to `training_to_data_prep_params` are invalid,
@@ -324,8 +326,8 @@ def main_from_training_args(
         shuffle,
     )
     data_prep_args = check_deprecated_args(data_prep_args)
-    print(data_prep_args)
-    main(data_prep_args)
+
+    return main(data_prep_args)
 
 
 if __name__ == "__main__":

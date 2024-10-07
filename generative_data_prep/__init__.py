@@ -15,4 +15,4 @@ limitations under the License.
 
 from .__main__ import main
 
-__all__ = ["main", "main_from_training_args"]
+__all__ = ["main", "run_with_training_args"]
