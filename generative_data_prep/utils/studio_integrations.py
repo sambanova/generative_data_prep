@@ -235,7 +235,7 @@ def training_to_data_prep_params(  # noqa: C901
         custom_tok_type = type(tokenizer)
         base_ckpt_tok_type = type(AutoTokenizer.from_pretrained(checkpoint_path))
         raise ValueError(
-            f"The custome tokenizer class({custom_tok_type}) is not the same as base checkpoint({base_ckpt_tok_type})"
+            f"The custom tokenizer class({custom_tok_type}) is not the same as base checkpoint({base_ckpt_tok_type})"
         )
 
     if apply_chat_template is None:
