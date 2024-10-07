@@ -227,7 +227,7 @@ def training_to_data_prep_params(  # noqa: C901
     # Validate that the tokenizer vocab size is <= model vocab size
     if not tokenizer.vocab_size <= model_config.vocab_size:
         err_msg = f"Tokenizers vocab size: {tokenizer.vocab_size}"
-        err_msg += " is not compatible with model vocab size: {model_config.vocab_size}"
+        err_msg += f" is not compatible with model vocab size: {model_config.vocab_size}"
         raise ValueError(err_msg)
     if custom_tokenizer_path is not None and not isinstance(tokenizer, AutoTokenizer.from_pretrained(checkpoint_path)):
         custom_tok_type = type(tokenizer)
