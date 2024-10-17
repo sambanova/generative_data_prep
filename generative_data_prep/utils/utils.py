@@ -83,23 +83,25 @@ def validate_sha256(output_dir: str):
     with open(sha_info_file, "r") as output_file:
         file_info_dict = json.load(output_file)
     for file, hash_file_name in files_to_hash:
-        if hash_file_name not in file_info_dict:
-            print("Error: The hash for this file was not found in the metadata.")
-            print(f"Missing hash file: {hash_file_name}")
-            print(f"Available metadata: {list(file_info_dict.keys())}")
-            return False
-        current_modified_time = os.path.getmtime(file)
-        current_size = os.path.getsize(file)
-        if current_size != file_info_dict[hash_file_name]["size"] or not math.isclose(
-            current_modified_time, file_info_dict[hash_file_name]["modified_time"]
-        ):
-            file_hash = file_info_dict[hash_file_name]["sha256"]
-            current_file_hash = _calculate_sha256(file)
-            if file_hash != current_file_hash:
-                print("Error: File has been modified or the SHA256 hash does not match.")
-                print(f"Expected hash: {file_hash}")
-                print(f"Actual hash: {current_file_hash}")
+        if "logs" not in hash_file_name:
+            if hash_file_name not in file_info_dict:
+                print("Error: The hash for this file was not found in the metadata.")
+                print(f"Missing hash file: {hash_file_name}")
+                print(f"Available metadata: {list(file_info_dict.keys())}")
                 return False
+            current_modified_time = os.path.getmtime(file)
+            current_size = os.path.getsize(file)
+            if current_size != file_info_dict[hash_file_name]["size"] or not math.isclose(
+                current_modified_time, file_info_dict[hash_file_name]["modified_time"]
+            ):
+                file_hash = file_info_dict[hash_file_name]["sha256"]
+                current_file_hash = _calculate_sha256(file)
+                if file_hash != current_file_hash:
+                    print(f"hash_file_name: {hash_file_name}")
+                    print("Error: File has been modified or the SHA256 hash does not match.")
+                    print(f"Expected hash: {file_hash}")
+                    print(f"Actual hash: {current_file_hash}")
+                    return False
     return True
 
 
