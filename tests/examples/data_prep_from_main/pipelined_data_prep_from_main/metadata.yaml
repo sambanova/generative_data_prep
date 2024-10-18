@@ -1,5 +1,5 @@
 max_batch_size_dev: null
-max_batch_size_train: 2
+max_batch_size_train: 1
 max_seq_length: 4096
 number_of_dev_files: 0
 number_of_test_files: 0

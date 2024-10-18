@@ -39,9 +39,9 @@ from .test_utils import (
     check_splits,
 )
 
-TOKENIZER = GPT2Tokenizer.from_pretrained("gpt2", clean_up_tokenization_spaces=False)
+TOKENIZER = GPT2Tokenizer.from_pretrained("gpt2")
 MODEL_CONFIG = GPT2Config.from_pretrained("gpt2")
-LLAMA_TOKENIZER = AutoTokenizer.from_pretrained("arcee-ai/Llama-3.1-SuperNova-Lite", clean_up_tokenization_spaces=False)
+LLAMA_TOKENIZER = AutoTokenizer.from_pretrained("arcee-ai/Llama-3.1-SuperNova-Lite")
 
 
 def get_input_path(test_name: str) -> str:

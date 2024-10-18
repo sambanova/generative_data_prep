@@ -102,15 +102,13 @@ def get_tokenizer(
         raise ValueError(err_msg)
 
     if pretrained_tokenizer is not None:
-        tokenizer = AutoTokenizer.from_pretrained(pretrained_tokenizer, clean_up_tokenization_spaces=False)
-        model_config = AutoConfig.from_pretrained(pretrained_tokenizer, clean_up_tokenization_spaces=False)
+        tokenizer = AutoTokenizer.from_pretrained(pretrained_tokenizer)
+        model_config = AutoConfig.from_pretrained(pretrained_tokenizer)
     else:
         verify_input_file(vocab_file)
         verify_input_file(merges_file)
         if tokenizer_class in TOKENIZER_CLASSES:
-            tokenizer = TOKENIZER_CLASSES[tokenizer_class].tokenizer(
-                vocab_file, merges_file, clean_up_tokenization_spaces=False
-            )
+            tokenizer = TOKENIZER_CLASSES[tokenizer_class].tokenizer(vocab_file, merges_file)
             model_config = TOKENIZER_CLASSES[tokenizer_class].config(vocab_size=tokenizer.vocab_size)
 
         if tokenizer is None:

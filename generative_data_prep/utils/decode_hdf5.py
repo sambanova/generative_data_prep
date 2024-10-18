@@ -39,7 +39,7 @@ def decode_hdf5(hdf5_file_path: str, output_decoded_file_path: str, pretrained_t
         output_decoded_file_path (str): Path to output the decoded text.
         pretrained_tokenizer (bool): Tokenizer to use to decode the text.
     """
-    tokenizer = AutoTokenizer.from_pretrained(pretrained_tokenizer, clean_up_tokenization_spaces=False)
+    tokenizer = AutoTokenizer.from_pretrained(pretrained_tokenizer)
 
     with h5py.File(hdf5_file_path, "r") as file_h5:
         with open(output_decoded_file_path, "w") as wf:
