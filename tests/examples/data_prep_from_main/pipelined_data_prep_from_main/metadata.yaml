@@ -1,9 +1,9 @@
 max_batch_size_dev: null
-max_batch_size_train: 1
+max_batch_size_train: 14
 max_seq_length: 4096
 number_of_dev_files: 0
 number_of_test_files: 0
-number_of_training_files: 32
+number_of_training_files: 2
 token_type_ids: true
 tokenizer_model_type: <class 'transformers.models.qwen2.configuration_qwen2.Qwen2Config'>
 vocab_size: 151643
