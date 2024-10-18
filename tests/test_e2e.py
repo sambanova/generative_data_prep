@@ -39,13 +39,13 @@ from .test_utils import (
     check_splits,
 )
 
-TOKENIZER = GPT2Tokenizer.from_pretrained("gpt2")
+TOKENIZER = GPT2Tokenizer.from_pretrained("gpt2", clean_up_tokenization_spaces=False)
 MODEL_CONFIG = GPT2Config.from_pretrained("gpt2")
-LLAMA_TOKENIZER = AutoTokenizer.from_pretrained("arcee-ai/Llama-3.1-SuperNova-Lite")
+LLAMA_TOKENIZER = AutoTokenizer.from_pretrained("arcee-ai/Llama-3.1-SuperNova-Lite", clean_up_tokenization_spaces=False)
 
 
 def get_input_path(test_name: str) -> str:
-    """Create an absolute path to example input."""
+    """Create an absolute path to an example input."""
     base_path = TESTS_EXAMPLES_PATH / test_name / f"example_{test_name}_data"
     if os.path.isdir(base_path):
         return base_path

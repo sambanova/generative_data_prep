@@ -46,16 +46,13 @@ def get_max_seq_length_arg(model_config):
     Raises:
         None: This function handles exceptions and returns an error message in case of failure.
     """
-    try:
-        # Extract the max sequence length
-        if hasattr(model_config, "max_position_embeddings"):
-            return model_config.max_position_embeddings
-        elif hasattr(model_config, "n_positions"):
-            return model_config.n_positions
-        else:
-            raise ValueError("Sequence length not found in model config under max_position_embeddings or n_positions")
-    except Exception as e:
-        return f"Error: {str(e)}"
+    # Extract the max sequence length
+    if hasattr(model_config, "max_position_embeddings") and model_config.max_position_embeddings is not None:
+        return model_config.max_position_embeddings
+    elif hasattr(model_config, "n_positions") and model_config.n_positions is not None:
+        return model_config.n_positions
+    else:
+        raise ValueError("Sequence length not found in model config under max_position_embeddings or n_positions")
 
 
 def get_shuffle_arg(input_file_path: str):

@@ -22,7 +22,7 @@ from generative_data_prep.processors import ArticleTokenizer
 from generative_data_prep.tokenized_line import Token, TokenizedSequence
 from generative_data_prep.utils import BoundaryType, FileExtension, TokenTypeIds
 
-TOKENIZER = GPT2Tokenizer.from_pretrained("gpt2")
+TOKENIZER = GPT2Tokenizer.from_pretrained("gpt2", clean_up_tokenization_spaces=False)
 MAX_SEQ_LEN = 6
 EOS_TOKEN_ID = 0
 SEP = TokenTypeIds.SEP
