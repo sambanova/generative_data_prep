@@ -26,6 +26,7 @@ from transformers import (
     PreTrainedTokenizerBase,
 )
 
+from generative_data_prep.__main__ import run_with_training_args
 from generative_data_prep.data_prep import data_prep_main, pipeline_main
 from generative_data_prep.utils import BoundaryType, PackingConfig
 from tests.conftest import TESTS_EXAMPLES_PATH
@@ -40,11 +41,11 @@ from .test_utils import (
 
 TOKENIZER = GPT2Tokenizer.from_pretrained("gpt2")
 MODEL_CONFIG = GPT2Config.from_pretrained("gpt2")
-LLAMA_TOKENIZER = AutoTokenizer.from_pretrained("daryl149/llama-2-7b-chat-hf")
+LLAMA_TOKENIZER = AutoTokenizer.from_pretrained("arcee-ai/Llama-3.1-SuperNova-Lite")
 
 
 def get_input_path(test_name: str) -> str:
-    """Create an absolute path to example input."""
+    """Create an absolute path to an example input."""
     base_path = TESTS_EXAMPLES_PATH / test_name / f"example_{test_name}_data"
     if os.path.isdir(base_path):
         return base_path
@@ -496,3 +497,67 @@ def test_pipeline(
 
         if not do_not_balance_hdf5:
             check_balance(os.path.join(output_dir))
+
+
+@pytest.mark.parametrize(
+    "test_name, checkpoint_path, number_of_rdus, grad_accum_steps, pef_batch_size,\
+        input_packing_config, apply_chat_template, shuffle, max_seq_length",
+    [
+        (
+            "pretraining",
+            "openai-community/gpt2",
+            1,  # number_of_rdus
+            1,  # grad_accum_steps
+            1,  # pef_batch_size
+            "full",  # input_packing_config
+            False,  # apply_chat_template
+            "False",
+            None,
+        ),
+        (
+            "data_prep_from_main",
+            "Qwen/Qwen2-1.5B",
+            1,  # number_of_rdus
+            1,  # grad_accum_steps
+            1,  # pef_batch_size
+            "greedy::drop",  # input_packing_config
+            True,  # apply_chat_template
+            "False",
+            4096,
+        ),
+    ],
+)
+def test_run_with_training_args(
+    test_name: str,
+    checkpoint_path: str,
+    number_of_rdus: int,
+    grad_accum_steps: int,
+    pef_batch_size: int,
+    input_packing_config: str,
+    apply_chat_template: bool,
+    shuffle: str,
+    max_seq_length: int,
+):
+    """Test if we can call main function using training arguments."""
+    num_workers = os.cpu_count()
+    if num_workers is None:
+        num_workers = 1
+    input_path = get_input_path(test_name)
+    gold_path = gold_pipeline_path(test_name)
+    with tempfile.TemporaryDirectory() as output_path:
+        log_file_path = os.path.join(output_path, "logs.log")
+        run_with_training_args(
+            input_path,
+            output_path,
+            log_file_path,
+            checkpoint_path,
+            number_of_rdus,
+            grad_accum_steps,
+            pef_batch_size,
+            max_seq_length=max_seq_length,
+            num_workers=num_workers,
+            input_packing_config=input_packing_config,
+            apply_chat_template=apply_chat_template,
+            shuffle=shuffle,
+        )
+        check_pipeline(output_path, gold_path)

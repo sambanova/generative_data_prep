@@ -18,6 +18,6 @@ from generative_data_prep.utils import PackingConfig
 
 
 def test_config_instantiation():
-    """Basic test to verify that every Packing Config choice can be instantiated using from_str."""
+    """Basic test to verify that every Packing Config can be instantiated using from_str."""
     for choice in PackingConfig.get_choices():
         assert choice == PackingConfig.from_str(str(choice))

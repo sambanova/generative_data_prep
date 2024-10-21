@@ -22,7 +22,7 @@ class Token:
     """Class to represent a token, and all the metadata associated with it."""
 
     def __init__(self, token_id: int, token_type_id: TokenTypeIds, category_id: Optional[int] = -1):
-        """Initialize a token.
+        """Initialize a token object.
 
         Args:
             token_id: The token id for this token.
