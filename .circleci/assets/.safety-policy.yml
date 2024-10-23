@@ -13,4 +13,7 @@ security: # configuration for the `safety check` command
         71670:
             reason: Found in all torch versions >= 0
             expires: '2025-07-16'
+        71037:
+            reason: Need this version to be compatible with Studio
+            expires: '2025-10-23'
     continue-on-vulnerability-error: False
