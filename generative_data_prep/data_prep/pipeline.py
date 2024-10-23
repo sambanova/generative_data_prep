@@ -43,6 +43,7 @@ from generative_data_prep.utils import (
     balance_hdf5_files,
     create_sha256,
     execute_and_return_stdout,
+    get_num_training_splits,
     large_file_shuffle,
     log_sep_str,
     verify_input_file,
@@ -257,16 +258,7 @@ def get_split_counts(
         test_ratio = test_ratio if test_ratio is not None else 0.0
 
         # determine number of train and test files
-        if num_training_splits is None:
-            # number of splits by default
-            if input_file_size_in_gb < 10:
-                train_count = 32
-            elif input_file_size_in_gb < 100:
-                train_count = 128
-            else:
-                train_count = 256
-        else:
-            train_count = num_training_splits
+        train_count = get_num_training_splits(input_file_size_in_gb, num_training_splits)
 
         num_splits = int(train_count / (1 - dev_ratio - test_ratio))
         test_count = int(num_splits * test_ratio)

@@ -15,11 +15,9 @@ limitations under the License.
 
 Entry point to the Text Processing Pipeline.
 """
-import argparse
 import json
 import logging
 import os
-from multiprocessing import cpu_count
 from typing import Optional
 
 from transformers import AutoConfig, AutoTokenizer, PreTrainedTokenizerBase
@@ -31,7 +29,7 @@ from generative_data_prep.utils import (
     FileExtension,
     add_file_handler,
     check_deprecated_args,
-    data_prep_arg_builder,
+    get_arg_parser,
     get_config_file_path,
     log_current_datetime,
     log_elapsed_time,
@@ -40,136 +38,14 @@ from generative_data_prep.utils import (
     log_metrics,
     log_sep_str,
     log_training_details,
+    training_to_data_prep_params,
     verify_input_file,
     verify_output_dir,
     verify_output_file,
 )
 
-
-def add_data_prep_args(subparser: argparse.ArgumentParser):
-    """Create the argparser for the generative_data_prep/data_prep/data_prep.py script.
-
-    Args:
-        subparser: The parser to add the arguments to.
-    """
-    subparser.add_argument(
-        "--silent",
-        default=False,
-        action="store_true",
-        required=False,
-        help="Do not allow this script to print",
-    )
-    data_prep_arg_builder(subparser)
-
-
-def add_pipeline_args(subparser: argparse.ArgumentParser):
-    """Create the argparser for the generative_data_prep/data_prep/pipeline.py script.
-
-    Args:
-        subparser: The parser to add the arguments to
-    """
-    subparser.add_argument(
-        "--num_training_splits",
-        default=None,
-        type=int,
-        required=False,
-        help="The number of training files to split input data into. If you specify the --dev_ratio and --test_ratio \
-        flags, The total number of splits will be (num_training_splits / (1-dev_ratio-test_ratio)), and the number \
-        of dev and test splits are calculated accordingly. If you specify --num_dev_splits and --num_test_splits \
-        flags then those will  directory define the number of splits and therefore the ratios. We recommend you do \
-        not include this flag and allow it to default, because the number of training splits must be greater than \
-        the number of parallel workers and it is best if the number of training splits is a multiple of the number \
-        of workers. It defaults to 32 training splits if input_file_size < 10GB, 128 training splits if 10GB < \
-        input_file_size <100GB, 256 training splits if 100GB < input_file_size.",  # noqa: E251
-    )
-    subparser.add_argument(
-        "--dev_ratio",
-        default=None,
-        type=float,
-        required=False,
-        help="The ratio of data that should be excluded from train set and used for evaluation, defaults to 10%%. If \
-        you specify this flag, do not specify --num_dev_splits or --num_test_splits.",  # noqa: E251
-    )
-    subparser.add_argument(
-        "--num_dev_splits",
-        default=None,
-        type=int,
-        required=False,
-        help="If you do not specify --dev_ratio, you may specify num_dev_splits. If you include this flag, you must \
-        also include the --num_dev_splits and --num_training_splits flags",  # noqa: E251
-    )
-    subparser.add_argument(
-        "--test_ratio",
-        default=None,
-        type=float,
-        required=False,
-        help="The ratio of data that should be excluded from train set and is saved for testing. This data is not \
-        tokenized and left in jsonl format, defaults to 0%%. If you specify this flag, do not specify \
-        --num_dev_splits or --num_test_splits.",  # noqa: E251
-    )
-    subparser.add_argument(
-        "--num_test_splits",
-        default=None,
-        type=int,
-        required=False,
-        help="If you do not specify --test_ratio, you may specify num_dev_splits. If you include this flag, you must \
-        also include the --num_dev_splits and --num_training_splits flags.",  # noqa: E251
-    )
-    subparser.add_argument(
-        "--shuffle",
-        default="False",
-        const="False",
-        nargs="?",
-        choices=["False", "on_RAM", "large_file"],
-        help="Choose the on_RAM option if your file is small enough to fit on RAM (If you are not sure if it fits \
-        on RAM, default to this flag). If you are running a linux operating system and your file is too large to fit \
-        on RAM, please choose large_file option, this will run approximate file shuffling that can handle files of \
-        any size. If you want to do large file shuffling but you are not on linux, please shuffle the file before \
-        using this script. If the input file should not be shuffled, do not include this flag, it defaults to False.",
-    )
-    subparser.add_argument(
-        "--do_not_balance_hdf5",
-        action="store_true",
-        help="If you DO NOT want to balance hdf5 files, this is not recommended unless the you are dealing with a \
-        huge amount of data (many terabytes), or do not want shuffling among splits.",  # noqa: E251
-    )
-    subparser.add_argument(
-        "--num_workers",
-        default=min(cpu_count(), 16),
-        type=int,
-        required=False,
-        help="The number of CPU workers to multi-process run tokenization over, if the previous run failed you need to \
-        decrease this number.",  # noqa: E251
-    )
-    subparser.add_argument(
-        "--keep_split_jsonls",
-        action="store_true",
-        help="If you DO NOT want to delete split jsonls files that are in text format, include this flag. \
-        The only reason you would include this flag is if you want to see what text is in what hdf5. \
-        Including this flag will over 2x the storage space taken up by your dataset.",  # noqa: E251
-    )
-
-    # add arguments that are required to be passed on to generative_data_prep/data_prep/data_prep.py
-    data_prep_arg_builder(subparser)
-
-
-def get_args() -> argparse.Namespace:
-    """Get the command line arguments.
-
-    Returns:
-        The command line arguments as a argparse Namespace.
-    """
-    parser = argparse.ArgumentParser(description="Text Processing Pipeline")
-    subparsers = parser.add_subparsers(dest="cmd")
-    # create the train test data subparser
-    pipeline_subparser = subparsers.add_parser("pipeline")
-    add_pipeline_args(pipeline_subparser)
-    # create the create data subparser
-    data_prep_subparser = subparsers.add_parser("data_prep")
-    add_data_prep_args(data_prep_subparser)
-    args = parser.parse_args()
-    args = check_deprecated_args(args)
-    return args
+logger = logging.getLogger("generative_data_prep_logger")
+logging.config.fileConfig(get_config_file_path())
 
 
 def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase, special_tokens_dict: str):
@@ -266,7 +142,7 @@ def get_output_dir(cmd, output_path, overwrite_output_path):
     if cmd == "pipeline":
         verify_output_dir(output_path, overwrite_output_path)
         output_dir = output_path
-    elif args.cmd == "data_prep":
+    elif cmd == "data_prep":
         verify_output_file(output_path, overwrite_output_path)
         if os.path.splitext(output_path)[-1] != ".hdf5":
             raise ValueError(f"The output path {output_path} does not end with .hdf5")
@@ -388,9 +264,74 @@ def main(args):
     if args.cmd == "pipeline":
         log_training_details(dataset_metadata)
 
+    return metrics
+
+
+def run_with_training_args(
+    input_path: str,
+    output_path: str,
+    log_file_path: str,
+    checkpoint_path: str,
+    number_of_rdus: int,
+    grad_accum_steps: int,
+    pef_batch_size: int,
+    max_seq_length: Optional[int] = None,
+    evaluation_ratio: Optional[float] = None,
+    num_workers: int = 16,
+    custom_tokenizer_path: Optional[str] = None,
+    input_packing_config: str = "greedy::drop",
+    apply_chat_template: Optional[bool] = None,
+    shuffle: Optional[str] = None,
+):
+    """Runs the main pipeline for data preparation and training configuration based on provided arguments.
+
+    Args:
+        input_path (str): Path to the input data file.
+        output_path (str): Path to save the processed output.
+        log_file_path (str): Path to the log file for storing training logs.
+        checkpoint_path (str): Path to the model checkpoint for loading the tokenizer and config.
+        number_of_rdus (int): Number of RDUs to be used for parallel processing.
+        grad_accum_steps (int): Number of gradient accumulation steps.
+        pef_batch_size (int): Size of each batch for PEF.
+        evaluation_ratio (float, optional): Ratio for splitting data into evaluation sets.
+        num_workers (int, optional): Number of workers for data loading. Defaults to 16.
+        custom_tokenizer_path (str, optional): Path to a custom tokenizer, if any. If not provided, defaults to
+            the tokenizer from `checkpoint_path`.
+        input_packing_config (str, optional): Strategy for packing input sequences.
+            Defaults to "greedy::drop".
+        apply_chat_template (bool, optional): Whether to apply chat formatting to inputs. If None,
+            it is inferred based on the tokenizer's capabilities. Defaults to None.
+
+    Returns:
+       metrics: Dataset metrics related to the dataset we just prepared.
+
+    Raises:
+        ValueError: If the arguments provided to `training_to_data_prep_params` are invalid,
+            such as incompatible tokenizers or missing required parameters.
+    """
+    data_prep_args = training_to_data_prep_params(
+        input_path,
+        output_path,
+        log_file_path,
+        checkpoint_path,
+        number_of_rdus,
+        grad_accum_steps,
+        pef_batch_size,
+        max_seq_length,
+        evaluation_ratio,
+        num_workers,
+        custom_tokenizer_path,
+        input_packing_config,
+        apply_chat_template,
+        shuffle,
+    )
+    data_prep_args = check_deprecated_args(data_prep_args)
+
+    return main(data_prep_args)
+
 
 if __name__ == "__main__":
-    logger = logging.getLogger("generative_data_prep_logger")
-    logging.config.fileConfig(get_config_file_path())
-    args = get_args()
-    main(args)
+    parser = get_arg_parser()
+    data_prep_args = parser.parse_args()
+    data_prep_args = check_deprecated_args(data_prep_args)
+    main(data_prep_args)

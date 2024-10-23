@@ -14,9 +14,12 @@ limitations under the License.
 """
 
 from .arg_configs import PackingConfig
+from .arg_parser import get_arg_parser
 from .balance_hdf5_files import balance_hdf5_files
 from .constants import (
     CATEGORY_JSON_KEY,
+    GPT2_KEY,
+    TOKENIZER_CLASSES,
     BoundaryType,
     FileExtension,
     OverflowType,
@@ -37,13 +40,18 @@ from .logger import (
 )
 from .metadata_generation import DatasetMetadata
 from .path_verify import verify_input_file, verify_output_dir, verify_output_file
+from .studio_integrations import (
+    adjust_splits,
+    get_max_seq_length_arg,
+    get_shuffle_arg,
+    training_to_data_prep_params,
+    verify_enough_data_to_run_one_batch,
+)
 from .utils import (
-    GPT2_KEY,
-    TOKENIZER_CLASSES,
     create_sha256,
-    data_prep_arg_builder,
     execute_and_return_stdout,
     get_config_file_path,
+    get_num_training_splits,
     validate_sha256,
 )
 
@@ -61,7 +69,6 @@ __all__ = [
     "verify_output_file",
     "GPT2_KEY",
     "TOKENIZER_CLASSES",
-    "data_prep_arg_builder",
     "execute_and_return_stdout",
     "create_sha256",
     "validate_sha256",
@@ -77,4 +84,11 @@ __all__ = [
     "get_config_file_path",
     "DatasetMetadata",
     "check_deprecated_args",
+    "training_to_data_prep_params",
+    "get_arg_parser",
+    "get_num_training_splits",
+    "get_max_seq_length_arg",
+    "get_shuffle_arg",
+    "adjust_splits",
+    "verify_enough_data_to_run_one_batch",
 ]
