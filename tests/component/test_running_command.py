@@ -44,7 +44,9 @@ def test_pipeline_runs_successfully(run_path):
     output_path = TESTS_EXAMPLES_PATH / f"tester_{secrets.token_hex(8)}"
     with change_directory_for_testing(run_path):
         command = "python -m generative_data_prep pipeline "
-        command += f"--input_path={input_path} --output_path={output_path} --max_seq_length=1024"
+        command += f"--input_path={input_path} --output_path={output_path} "
+        command += "--max_seq_length=1024 --pretrained_tokenizer=openai-community/gpt2"
+
         try:
             result = subprocess.run(command.split(), check=True, timeout=time_limit_seconds)
         except subprocess.TimeoutExpired as e:
