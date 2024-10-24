@@ -100,7 +100,7 @@ class ArticleTokenizer:
             ...      None
             ... ]
             >>> from transformers import GPT2Tokenizer
-            >>> tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
+            >>> tokenizer = AutoTokenizer.from_pretrained('openai-community/gpt2')
             >>> article_tokenizer = ArticleTokenizer(tokenizer, 3, '.jsonl')
             >>> sequences = []
             >>> for text in input_text:

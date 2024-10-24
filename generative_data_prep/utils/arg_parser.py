@@ -29,7 +29,7 @@ import argparse
 from multiprocessing import cpu_count
 
 from .arg_configs import PackingConfig
-from .constants import TOKENIZER_CLASSES, BoundaryType
+from .constants import BoundaryType
 
 
 def data_prep_arg_builder(parser: argparse.ArgumentParser):
@@ -80,45 +80,14 @@ def data_prep_arg_builder(parser: argparse.ArgumentParser):
             " Warning: these lines are dropped from the generated dataset"
         ),
     )
-
-    parser.add_argument(
-        "--tokenizer_class",
-        type=str,
-        choices=list(TOKENIZER_CLASSES.keys()),
-        default=None,
-        required=False,
-        help=(
-            "pre-specified tokenizer class to run, defaults to gpt2, must be a choice from"
-            f" {list(TOKENIZER_CLASSES.keys())}"
-        ),
-    )
     parser.add_argument(
         "--pretrained_tokenizer",
-        default=None,
         type=str,
-        required=False,
+        required=True,
         help=(
             "The pretrained tokenizer to be used, loaded using"
-            " transformers.AutoTokenizer.from_pretrained(args.pretrained_tokenizer), in lieu of a custom vocab and"
-            " merges file."
+            " transformers.AutoTokenizer.from_pretrained(args.pretrained_tokenizer)"
         ),
-    )
-    parser.add_argument(
-        "--vocab_file",
-        default=None,
-        type=str,
-        required=False,
-        help=(
-            "The vocabulary file for the tokenizer. Should be a .json file for the tokenizer class specified by"
-            " --tokenizer_class."
-        ),
-    )
-    parser.add_argument(
-        "--merges_file",
-        type=str,
-        default=None,
-        required=False,
-        help="The merges file to be used with the tokenizer class specified by --tokenizer_class.",
     )
     parser.add_argument(
         "--max_seq_length",

@@ -91,6 +91,6 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--hdf5_file_path", required=True, type=str)
     parser.add_argument("--output_decoded_file_path", default=None, type=str, required=True)
-    parser.add_argument("--pretrained_tokenizer", default="gpt2", type=str, required=False)
+    parser.add_argument("--pretrained_tokenizer", default="openai-community/gpt2", type=str, required=False)
     args = parser.parse_args()
     decode_hdf5(args.hdf5_file_path, args.output_decoded_file_path, args.pretrained_tokenizer)

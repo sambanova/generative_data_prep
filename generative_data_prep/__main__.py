@@ -24,8 +24,6 @@ from transformers import AutoConfig, AutoTokenizer, PreTrainedTokenizerBase
 
 from generative_data_prep.data_prep import data_prep_main, pipeline_main
 from generative_data_prep.utils import (
-    GPT2_KEY,
-    TOKENIZER_CLASSES,
     FileExtension,
     add_file_handler,
     check_deprecated_args,
@@ -63,18 +61,12 @@ def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase, special_tokens_d
 
 def get_tokenizer(
     pretrained_tokenizer: Optional[str],
-    tokenizer_class: Optional[str],
-    vocab_file: str,
-    merges_file: str,
     special_tokens_dict: Optional[str],
 ) -> PreTrainedTokenizerBase:
     """Create a tokenizer based on input arguments.
 
     Args:
         pretrained_tokenizer: key to load pretrained tokenizer from huggingface using AutoTokenizer.from_pretrained
-        tokenizer_class: class of tokenizer, must be from TOKENIZER_CLASSES
-        vocab_file: path to vocab file
-        merges_file: path to merges file
         special_tokens_dict: string representation of special tokens dictionary
 
     Raises:
@@ -86,37 +78,9 @@ def get_tokenizer(
     """
     tokenizer = None
     model_config = None
-    if pretrained_tokenizer is None and tokenizer_class is None:
-        pretrained_tokenizer = GPT2_KEY
 
-    if not pretrained_tokenizer and not (merges_file and vocab_file and tokenizer_class):
-        err_msg = "You must include either --pretrained_tokenizer, \
-        or all three flags: --merges_file, --vocab_file and --tokenizer_class"
-
-        raise ValueError(err_msg)
-
-    if pretrained_tokenizer and (merges_file or vocab_file or tokenizer_class):
-        err_msg = "You may not include --pretrained_tokenizer along with any of the following flags: \
-        --merges_file, --vocab_file and --tokenizer_class"
-
-        raise ValueError(err_msg)
-
-    if pretrained_tokenizer is not None:
-        tokenizer = AutoTokenizer.from_pretrained(pretrained_tokenizer)
-        model_config = AutoConfig.from_pretrained(pretrained_tokenizer)
-    else:
-        verify_input_file(vocab_file)
-        verify_input_file(merges_file)
-        if tokenizer_class in TOKENIZER_CLASSES:
-            tokenizer = TOKENIZER_CLASSES[tokenizer_class].tokenizer(vocab_file, merges_file)
-            model_config = TOKENIZER_CLASSES[tokenizer_class].config(vocab_size=tokenizer.vocab_size)
-
-        if tokenizer is None:
-            raise NotImplementedError(f"The tokenizer_class you selected ({tokenizer_class}) has not been implemented")
-        if model_config is None:
-            raise NotImplementedError(
-                f"The tokenizer_class you selected ({tokenizer_class}) is missing a config associated with it"
-            )
+    tokenizer = AutoTokenizer.from_pretrained(pretrained_tokenizer)
+    model_config = AutoConfig.from_pretrained(pretrained_tokenizer)
 
     if special_tokens_dict:
         add_special_tokens_dict(tokenizer, special_tokens_dict)
@@ -194,9 +158,6 @@ def main(args):
 
     tokenizer, model_config = get_tokenizer(
         args.pretrained_tokenizer,
-        args.tokenizer_class,
-        args.vocab_file,
-        args.merges_file,
         args.special_tokens_dict,
     )
     category_to_id = get_categories(args.categories_path)

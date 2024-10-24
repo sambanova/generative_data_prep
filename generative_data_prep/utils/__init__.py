@@ -18,8 +18,6 @@ from .arg_parser import get_arg_parser
 from .balance_hdf5_files import balance_hdf5_files
 from .constants import (
     CATEGORY_JSON_KEY,
-    GPT2_KEY,
-    TOKENIZER_CLASSES,
     BoundaryType,
     FileExtension,
     OverflowType,
@@ -67,8 +65,6 @@ __all__ = [
     "verify_input_file",
     "verify_output_dir",
     "verify_output_file",
-    "GPT2_KEY",
-    "TOKENIZER_CLASSES",
     "execute_and_return_stdout",
     "create_sha256",
     "validate_sha256",

@@ -15,12 +15,7 @@ limitations under the License.
 
 from enum import Enum
 
-from transformers import (
-    GPT2Config,
-    GPT2Tokenizer,
-    PretrainedConfig,
-    PreTrainedTokenizerBase,
-)
+from transformers import PretrainedConfig, PreTrainedTokenizerBase
 
 CATEGORY_JSON_KEY = "category"
 
@@ -113,8 +108,3 @@ class TokenizerConfigPair:
         """
         self.tokenizer = tokenizer
         self.config = config
-
-
-GPT2_KEY = "gpt2"
-
-TOKENIZER_CLASSES = {GPT2_KEY: TokenizerConfigPair(tokenizer=GPT2Tokenizer, config=GPT2Config)}
