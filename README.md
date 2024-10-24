@@ -311,7 +311,7 @@ For fine-tuning, your data should be in `.jsonl` format with prompts and complet
 #### Example command
 
 ```python
-python3 -m generative_data_prep pipeline --input_path=./tests/examples/generative_tuning/example_generative_tuning_data.jsonl --output_path=./tests/examples/generative_tuning/pipelined_generative_tuning --pretrained_tokenizer=gpt2 --max_seq_length=1024 --shuffle=on_RAM --input_packing_config=single::drop
+python3 -m generative_data_prep pipeline --input_path=./tests/examples/generative_tuning/example_generative_tuning_data.jsonl --output_path=./tests/examples/generative_tuning/pipelined_generative_tuning --pretrained_tokenizer=openai-community/gpt2 --max_seq_length=1024 --shuffle=on_RAM --input_packing_config=single::drop
 ```
 
 > [View decoded output](tests/examples/generative_tuning/decoded_data_prepped_generative_tuning.txt)
@@ -331,7 +331,7 @@ We recommend to use jsonlines with empty prompts and all the text in the complet
 #### Example command
 
 ```
-python3 -m generative_data_prep pipeline --input_path=./tests/examples/pretraining/example_pretraining_data.jsonl --output_path=./tests/examples/pretraining/pipelined_pretraining --pretrained_tokenizer=gpt2 --max_seq_length=1024 --shuffle=on_RAM --input_packing_config=full
+python3 -m generative_data_prep pipeline --input_path=./tests/examples/pretraining/example_pretraining_data.jsonl --output_path=./tests/examples/pretraining/pipelined_pretraining --pretrained_tokenizer=openai-community/gpt2 --max_seq_length=1024 --shuffle=on_RAM --input_packing_config=full
 ```
 
 > [View decoded output](tests/examples/pretraining/decoded_data_prepped_pretraining.txt)
@@ -346,7 +346,7 @@ Dialogue data often involves multiple turns in a conversation between a user and
 #### Example command
 
 ```python
-python3 -m generative_data_prep pipeline --input_path=./tests/examples/dialogue/example_dialogue_data.jsonl --output_path=./tests/examples/dialogue/pipelined_dialogue --pretrained_tokenizer=gpt2 --max_seq_length=1024 --shuffle=on_RAM --input_packing_config=single::truncate_right
+python3 -m generative_data_prep pipeline --input_path=./tests/examples/dialogue/example_dialogue_data.jsonl --output_path=./tests/examples/dialogue/pipelined_dialogue --pretrained_tokenizer=openai-community/gpt2 --max_seq_length=1024 --shuffle=on_RAM --input_packing_config=single::truncate_right
 ```
 
 > [View decoded output](tests/examples/dialogue/decoded_data_prepped_dialogue.txt)
@@ -361,7 +361,7 @@ python3 -m generative_data_prep pipeline --input_path=./tests/examples/dialogue/
 #### Example command
 
 ```python
-python3 -m generative_data_prep pipeline --input_path=./tests/examples/metaICL/example_metaICL_data.jsonl --output_path=./tests/examples/metaICL/pipelined_metaICL --pretrained_tokenizer=gpt2 --max_seq_length=1024 --shuffle=on_RAM --input_packing_config=greedy::drop --packing_boundary=prompt_completion_pair --attention_boundary=jsonl
+python3 -m generative_data_prep pipeline --input_path=./tests/examples/metaICL/example_metaICL_data.jsonl --output_path=./tests/examples/metaICL/pipelined_metaICL --pretrained_tokenizer=openai-community/gpt2 --max_seq_length=1024 --shuffle=on_RAM --input_packing_config=greedy::drop --packing_boundary=prompt_completion_pair --attention_boundary=jsonl
 ```
 
 > [View decoded output](tests/examples/metaICL/decoded_data_prepped_metaICL.txt)
