@@ -17,7 +17,7 @@
 
 # Generative data preparation
 
-This software package is a flexible and efficient tool that sports features like efficient multiprocessing, shuffling data that outsizes RAM, and specifying tokens to attend to during training. By using this package, you can prepare datasets that will be used to train generative models on SambaStudio.
+This software package is a allows you to prepare datasets for training generative LLMs on SambaStudio and SambaNova's Reconfigurable Data Units (RDUs). Some features include efficient multiprocessing, shuffling data that outsizes RAM, and specifying tokens to attend to during training.
 
 The [`pipeline.py`](https://github.com/sambanova/generative_data_prep/blob/main/generative_data_prep/data_prep/pipeline.py) script streamlines the data preparation process. It takes a single input file, shuffles and splits it into train/dev/test files, tokenizes, sequences, and converts them to HDF5 format using the utilities in [`data_prep.py`](https://github.com/sambanova/generative_data_prep/blob/main/generative_data_prep/data_prep/data_prep.py). The output directory contains multiple split HDF5 files that are needed to run data parallel training. This output directory will be directly used as a training dataset in SambaStudio. While this package features simple flows that work out of the box, it also supports more customization allowing for many styles of packing varied length text into tokenized sequences.
 
@@ -30,6 +30,7 @@ If you are an advanced user looking to process data with pre-defined splits, int
 - [Installation](#installation)
 - [Getting Started](#getting-started)
 - [Input](#input)
+- []
 - [Output](#output)
 - [Flags](#flags)
 - [Examples](#examples)
@@ -43,7 +44,7 @@ If you are an advanced user looking to process data with pre-defined splits, int
 </br>
 
 ## Requirements
-- Python version 3.9+, **only verified on python 3.9**
+- Python version 3.8.10+
 - Support for Linux and Mac OS. Not tested on Windows
 
 </br>
@@ -91,22 +92,24 @@ Here are a few important parameters to know about when running this example:
             <td>Check out the <a href="#output">output</a> section for more details.</td>
         </tr>
         <tr>
-            <td><code>pretrained_tokenizer</code></td>
-            <td>str</td>
-            <td>The model specific tokenizer to use when tokenizing the input dataset.</td>
-            <td>You can use the model ID from the HuggingFace model card. I.e. For Mistral-7B-v0.1 I would put <code>"mistralai/Mistral-7B-v0.1"</code></td>
+        <td><code>pretrained_tokenizer</code></td>
+        <td>str</td>
+        <td>The model-specific tokenizer to use when tokenizing the input dataset.</td>
+        <td>There are two ways you can specify the tokenizer. The first and preferred option is to provide the directory path to the base checkpoint that you have downloaded locally. The second option is to pass in the model ID from the Hugging Face model card. For example, for Mistral-7B-v0.1, use <code>"mistralai/Mistral-7B-v0.1"</code>. If the model is gated on Hugging Face, you will need to request access and [log in on the Hugging Face CLI](https://huggingface.co/docs/huggingface_hub/en/guides/cli#huggingface-cli-login) before executing the data preparation command.</td>
         </tr>
         <tr>
             <td><code>max_seq_length</code></td>
             <td>int</td>
-            <td>The max input sequence size (in tokens) a model can support. This is model specific - i.e. for <code>GPT-2</code> it's <strong>1024 tokens</strong>, for <code>Llama-2</code> it's <strong>4096 tokens</strong>.</td>
-            <td>You can find this information in a few places, but we recommend you look at the specific model card in SambaStudio to find this value.</td>
+            <td>The maximum sequence length (in tokens) that an RDU model training configuration can support.</td>
+            <td>When launching the training job on SambaStudio, under "Hyperparameters and Settings," ensure that the max_seq_length value during training matches exactly with this input flag. Note that the available <code>max_seq_length</code> training configurations may not align with the model’s maximum sequence length on Hugging Face.</td>
         </tr>
         <tr>
             <td><code>input_packing_config</code></td>
             <td>str</td>
-            <td>Defines the strategy used to pack the provided data into sequences across the output HDF5 files.</td>
-            <td>There are 7 options for this flag: <code>'full'</code>, <code>'single::truncate_left'</code>, <code>'single::truncate_right'</code>, <code>'single::drop'</code>, <code>'greedy::truncate_left'</code>, <code>'greedy::truncate_right'</code>, <code>'greedy::drop'</code>. Check out the <a href="#input_packing_config"><code>input _packing_ config</code></a> flag below for an in depth description of these options.</td>
+            <td>
+                Defines the strategy used to pack the provided text data into fixed-length sequences. For pre-training, we recommend <code>'full'</code>. For fine-tuning, we suggest <code>'greedy::truncate_right'</code> for efficient training with many data points packed into the same sequence, or <code>'single::truncate_right'</code> if you have a limited amount of data and want only one data point per sequence.
+                See the <a href="#input_packing_config"><code>input_packing_config</code></a> section below for an in-depth description of all options.
+            </td>
         </tr>
         <tr>
             <td><code>shuffle</code></td>
@@ -115,11 +118,11 @@ Here are a few important parameters to know about when running this example:
             <td>There are 3 options for this flag: <code>'False'</code>, <code>'on_RAM'</code>, <code>'large_file'</code>. Check out the <a href="#shuffle"><code>shuffle</code></a> flag below for more details.</td>
         </tr>
         <tr>
-            <td><code>apply_chat_template</code></td>
-            <td>bool</td>
-            <td>Whether to tokenize the data using `tokenizer.apply_chat_template`, to add the chatML tags during tokenization (Eg <user>: ... <assistant>:). .</td>
-            <td>This should usually be used when instruction tuning or training chat models. The tokenizer you are loading must have a chat_template defined, you can check if it is defined by looking in the `tokenizer_config.json` file and checking for a `chat_template` key in there</td>
-        </tr>
+    <td><code>apply_chat_template</code></td>
+    <td>bool</td>
+    <td>Whether to tokenize the data using <code>tokenizer.apply_chat_template</code>, adding chatML tags during tokenization (e.g., <code>&lt;user&gt;:</code> ... <code>&lt;assistant&gt;:</code>).</td>
+    <td>This option is typically used for instruction tuning or fine-tuning chat models. To enable this flag, the tokenizer you are loading must have a chat template defined. You can verify this by checking the <code>tokenizer_config.json</code> file for a <code>chat_template</code> key.</td>
+</tr>
     </tbody>
 </table>
 
@@ -151,11 +154,6 @@ We also support lists of prompt/completion pairs within a `.jsonl` file. This gu
 
 If the JSON objects in your `.jsonl` contain keywords other than **prompt** and **completion**, refer to the `prompt_keyword` and `completion_keyword` flags [below](#prompt_keyword)
 
-### Preparing data for Chat or Instruct Models
-Many chat and instruct models require very specific formatting to input multi turn conversations for training and inference. The [tokenizer.apply_chat_template function](https://huggingface.co/docs/transformers/main/en/chat_templating) easily adapts your jsonl data to this format. To use this feature, prepare your data in jsonl format as specified above, and then include the `--apply_chat_template` flag to automatically prepare your data in this format.
-
-If your data is in the classic chat template format like [{"role": "user", "content": "..."}...], and you would like to convert it into the prompt completion format to be compatible with this repo, please use the [`generative_data_prep/utils/convert_chat_template_to_prompt_completion.py`](https://github.com/sambanova/generative_data_prep/blob/main/generative_data_prep/utils/convert_chat_template_to_prompt_completion.py) script.
-
 ### `.txt` Format
 
 This format should only be used for pre-training/continual pre-training, but not fine-tuning. Additionally, even though `.txt` format is supported, we recommend that you still use prompt/completion `.jsonl` format because it can handle newlines in the text. If you use `.txt` format, then newlines within individual text articles will seperate the text into different data points that may be shuffled and not placed into the same contiguous sequences.
@@ -172,6 +170,11 @@ The above txt input would be equivalent to this jsonl input
 {"prompt": "", "completion": "SambaNova makes extremely good software and hardware that's fun to use"}
 ```
 </br>
+
+## Preparing data for Chat/Instruction/Fine Tuned Models
+Many chat and instruct models require very specific formatting to input multi turn conversations for training and inference. The [tokenizer.apply_chat_template function](https://huggingface.co/docs/transformers/main/en/chat_templating) easily adapts your jsonl data to this format. To use this feature, prepare your data in jsonl format as specified above, and then include the `--apply_chat_template` flag to automatically prepare your data in this format.
+
+If your data is in the classic chat template format like [{"role": "user", "content": "..."}...], and you would like to convert it into the prompt completion format to be compatible with this repo, please use the [`generative_data_prep/utils/convert_chat_template_to_prompt_completion.py`](https://github.com/sambanova/generative_data_prep/blob/main/generative_data_prep/utils/convert_chat_template_to_prompt_completion.py) script.
 
 ## Output
 The `output_path` should be a directory that will contain all the tokenized HDF5 split files, and a sub-directory called `tokenizer`. This output directory constitutes a processed dataset and can be used for training a model after uploading to SambaStudio. The `tokenizer` sub-directory will be transferred to any output checkpoints that are saved by Sambastudio for the tokenizer to be used for inference later on.
