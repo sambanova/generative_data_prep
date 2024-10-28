@@ -95,7 +95,7 @@ Here are a few important parameters to know about when running this example:
         <tr>
         <td><code>pretrained_tokenizer</code></td>
         <td>str</td>
-        <td>The model-specific tokenizer to use when tokenizing the input dataset.</td>
+        <td>The model specific tokenizer to use when tokenizing the input dataset.</td>
         <td>You can specify the tokenizer in two ways. The preferred method is to provide the directory path to the locally downloaded base checkpoint. The alternative method is to use the model ID from the Hugging Face model card, such as <code>"mistralai/Mistral-7B-v0.1"</code> for Mistral-7B-v0.1. If the model is gated on Hugging Face, you must request access and <a href="https://huggingface.co/docs/huggingface_hub/en/guides/cli#huggingface-cli-login">log in via the Hugging Face CLI</a> before executing the data preparation command.</td>
         </tr>
         <tr>
