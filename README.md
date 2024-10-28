@@ -17,7 +17,7 @@
 
 # Generative data preparation
 
-This software package is a allows you to prepare datasets for training generative LLMs on SambaStudio and SambaNova's Reconfigurable Data Units (RDUs). Some features include efficient multiprocessing, shuffling data that outsizes RAM, and specifying tokens to attend to during training.
+This software package allows you to prepare datasets for training generative LLMs on SambaStudio and SambaNova's Reconfigurable Data Units (RDUs). Some features include efficient multiprocessing, shuffling data that outsizes RAM, and specifying tokens to attend to during training.
 
 The [`pipeline.py`](https://github.com/sambanova/generative_data_prep/blob/main/generative_data_prep/data_prep/pipeline.py) script streamlines the data preparation process. It takes a single input file, shuffles and splits it into train/dev/test files, tokenizes, sequences, and converts them to HDF5 format using the utilities in [`data_prep.py`](https://github.com/sambanova/generative_data_prep/blob/main/generative_data_prep/data_prep/data_prep.py). The output directory contains multiple split HDF5 files that are needed to run data parallel training. This output directory will be directly used as a training dataset in SambaStudio. While this package features simple flows that work out of the box, it also supports more customization allowing for many styles of packing varied length text into tokenized sequences.
 
