@@ -30,7 +30,7 @@ If you are an advanced user looking to process data with pre-defined splits, int
 - [Installation](#installation)
 - [Getting Started](#getting-started)
 - [Input](#input)
-- [Preparing data for Chat/Instruction/Fine Tuned Models] (#Preparing-data-for-Chat/Instruction/Fine-Tuned-Models)
+- [Preparing data for Chat/Instruction/Fine Tuned Models](#preparing-data-for-chatinstructionfine-tuned-models)
 - [Output](#output)
 - [Flags](#flags)
 - [Examples](#examples)
@@ -108,7 +108,10 @@ Here are a few important parameters to know about when running this example:
             <td><code>input_packing_config</code></td>
             <td>str</td>
             <td>
-                Defines the strategy used to pack the provided text data into fixed-length sequences. For pre-training, we recommend <code>'full'</code>. For fine-tuning, we suggest <code>'greedy::truncate_right'</code> for efficient training with many data points packed into the same sequence, or <code>'single::truncate_right'</code> if you have a limited amount of data and want only one data point per sequence.
+                Defines the strategy used to pack the provided text data into fixed-length sequences.
+            </td>
+            <td>
+            For pre-training, we recommend <code>'full'</code>. For fine-tuning, we suggest <code>'greedy::truncate_right'</code> for efficient training with many data points packed into the same sequence, or <code>'single::truncate_right'</code> if you have a limited amount of data and want only one data point per sequence.
                 See the <a href="#input_packing_config"><code>input_packing_config</code></a> section below for an in-depth description of all options.
             </td>
         </tr>
@@ -482,8 +485,8 @@ This error will occur if you try to run training with a batch size that is great
 
 To fix this, you can:
 1. Increase the amount of input data you use.
-2. Change to a single input packing configuration like single::truncate_right, which will ensure that each training sequence has only one data point. However, this may cause training to be inefficient because a lot of the available sequence length is wasted with padding tokens.
-3. Decrease the `num_training_splits` so that each split has more data. Keep in mind, however, that you must have more training splits than the number of parallel RDUs training.
+2. Change to a "single" input packing configuration like `single::truncate_right`, which will not pack the sequences with multple data points, and therefore create more training sequences. However, this may cause training to be inefficient because a lot of the available sequence length is wasted with padding tokens.
+3. Decrease the `num_training_splits` so that each split has more data. Keep in mind, however, that you must have more training splits than the number of parallel RDUs you use to train.
 
 ## Advanced Usage
 
