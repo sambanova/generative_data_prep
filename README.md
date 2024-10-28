@@ -30,7 +30,7 @@ If you are an advanced user looking to process data with pre-defined splits, int
 - [Installation](#installation)
 - [Getting Started](#getting-started)
 - [Input](#input)
-- []
+- [Preparing data for Chat/Instruction/Fine Tuned Models] (#Preparing-data-for-Chat/Instruction/Fine-Tuned-Models)
 - [Output](#output)
 - [Flags](#flags)
 - [Examples](#examples)
@@ -39,6 +39,7 @@ If you are an advanced user looking to process data with pre-defined splits, int
     - [Dialogue](#dialogue)
     - [Meta in context learning](#meta-in-context-learning)
 - [Understanding Command Outputs](#understanding-outputs)
+- [FAQs] (#faqs)
 - [Advanced Usage](#advanced-usage)
 
 </br>
@@ -469,6 +470,20 @@ NOTE:
 * `max_batch_size_dev` will be `None` unless dev files are created during generative data pipeline.
 * `token_type_ids` will always be `True` for now since they are always generated.
 
+## FAQs
+
+### "Cannot access gated repo" error
+If you pass in a `--pretrained_tokenizer` for a model tokenizer that is gated on Huggingface, you need to get access to the model on HuggingFace by going to the model card and requesting access, then follow [this documentation](https://huggingface.co/docs/huggingface_hub/en/guides/cli#huggingface-cli-login) to generate a HuggingFace API key and finally log in on the HuggingFace CLI.
+
+If you have the model checkpoint downloaded locally you can also pass in the path to the model checkpoint as the `--pretrained_tokenizer`!
+
+### Number of samples in each file must be greater than or equal to batch size
+This error will occur if you try to run training with a batch size that is greater than the maximum batch size of the prepared dataset. The maximum batch size is printed in the terminal as "Batch size <=..." and also logged in the logs.log file in the output directory.
+
+To fix this, you can:
+1. Increase the amount of input data you use.
+2. Change to a single input packing configuration like single::truncate_right, which will ensure that each training sequence has only one data point. However, this may cause training to be inefficient because a lot of the available sequence length is wasted with padding tokens.
+3. Decrease the `num_training_splits` so that each split has more data. Keep in mind, however, that you must have more training splits than the number of parallel RDUs training.
 
 ## Advanced Usage
 
