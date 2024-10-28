@@ -113,9 +113,9 @@ Here are a few important parameters to know about when running this example:
             <td>
             For pre-training, use <code>'full'</code>.<br><br>
             For fine-tuning:<br>
-            &bull; Use <code>'greedy::truncate_right'</code> for efficient training with multiple data points per sequence<br>
-            &bull; Use <code>'single::truncate_right'</code> for limited data with one data point per sequence<br><br>
-            See <a href="#input_packing_config"><code>input_packing_config</code></a> for all options.
+            &bull; <code>'greedy::truncate_right'</code> for efficient training with multiple data points per sequence<br>
+            &bull; <code>'single::truncate_right'</code> for limited data with one data point per sequence<br><br>
+            See <a href="#input_packing_config"><code>input_packing_config</code></a> for all options and details.
             </td>
         </tr>
         <tr>
@@ -212,7 +212,7 @@ python3 generative_data_prep/utils/decode_hdf5.py --pretrained_tokenizer=<HF TOK
 
 1. You need to ensure your dataset is large enough to run one batch of training.
 2. Make sure that the number of sequences in the output dataset files satisfy this by checking `max_batch_size_train` in the `<OUTPUT_DIR>/metadata.yaml` file.
-3. Use this value to set `batch_size` accordingly when starting a training job!
+3. Ensure that the `batch_size` hyper-parameter during training is <= `max_batch_size_train`, to understand for more expand below or see [FAQs](#max_batch_size)
 
 <details>
 
@@ -483,7 +483,7 @@ If you pass in a `--pretrained_tokenizer` for a model tokenizer that is gated on
 
 If you have the model checkpoint downloaded locally you can also pass in the path to the model checkpoint as the `--pretrained_tokenizer`!
 
-### Number of samples in each file must be greater than or equal to batch size
+### Number of samples in each file must be greater than or equal to batch size (#max_batch_size)
 This error will occur if you try to run training with a batch size that is greater than the maximum batch size of the prepared dataset. The maximum batch size is printed in the terminal as "Batch size <=..." and also logged in the logs.log file in the output directory.
 
 To fix this, you can do one of the following:
