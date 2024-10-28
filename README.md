@@ -212,7 +212,7 @@ python3 generative_data_prep/utils/decode_hdf5.py --pretrained_tokenizer=<HF TOK
 
 1. You need to ensure your dataset is large enough to run one batch of training.
 2. Make sure that the number of sequences in the output dataset files satisfy this by checking `max_batch_size_train` in the `<OUTPUT_DIR>/metadata.yaml` file.
-3. Ensure that the `batch_size` hyper-parameter during training is <= `max_batch_size_train`, to understand for more expand the Details below or see [FAQs](#number-of-samples-in-each-file-must-be-greater-than-or-equal-to-batch-size)
+3. Ensure that the `batch_size` hyper-parameter is <= `max_batch_size_train` during training. To understand more, expand the **details** section below or see [FAQs](#number-of-samples-in-each-file-must-be-greater-than-or-equal-to-batch-size)
 
 <details>
 
