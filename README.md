@@ -30,7 +30,7 @@ If you are an advanced user looking to process data with pre-defined splits, int
 - [Installation](#installation)
 - [Getting Started](#getting-started)
 - [Input](#input)
-- [Preparing data for Chat/Instruction/Fine Tuned Models](#preparing-data-for-chatinstructionfine-tuned-models)
+- [Formatting data for Chat/Instruction/Fine Tuned Models](#formatting-data-for-chatinstructionfine-tuned-models)
 - [Output](#output)
 - [Flags](#flags)
 - [Examples](#examples)
@@ -39,7 +39,7 @@ If you are an advanced user looking to process data with pre-defined splits, int
     - [Dialogue](#dialogue)
     - [Meta in context learning](#meta-in-context-learning)
 - [Understanding Command Outputs](#understanding-outputs)
-- [FAQs] (#faqs)
+- [FAQs](#faqs)
 - [Advanced Usage](#advanced-usage)
 
 </br>
@@ -96,7 +96,7 @@ Here are a few important parameters to know about when running this example:
         <td><code>pretrained_tokenizer</code></td>
         <td>str</td>
         <td>The model-specific tokenizer to use when tokenizing the input dataset.</td>
-        <td>There are two ways you can specify the tokenizer. The first and preferred option is to provide the directory path to the base checkpoint that you have downloaded locally. The second option is to pass in the model ID from the Hugging Face model card. For example, for Mistral-7B-v0.1, use <code>"mistralai/Mistral-7B-v0.1"</code>. If the model is gated on Hugging Face, you will need to request access and [log in on the Hugging Face CLI](https://huggingface.co/docs/huggingface_hub/en/guides/cli#huggingface-cli-login) before executing the data preparation command.</td>
+        <td>There are two ways you can specify the tokenizer. The first and preferred option is to provide the directory path to the base checkpoint that you have downloaded locally. The second option is to pass in the model ID from the Hugging Face model card. For example, for Mistral-7B-v0.1, use <code>"mistralai/Mistral-7B-v0.1"</code>. If the model is gated on Hugging Face, you will need to request access and <a href="https://huggingface.co/docs/huggingface_hub/en/guides/cli#huggingface-cli-login">log in on the Hugging Face CLI</a> before executing the data preparation command.</td>
         </tr>
         <tr>
             <td><code>max_seq_length</code></td>
@@ -175,7 +175,7 @@ The above txt input would be equivalent to this jsonl input
 ```
 </br>
 
-## Preparing data for Chat/Instruction/Fine Tuned Models
+## Formatting data for Chat/Instruction/Fine Tuned Models
 Many chat and instruct models require very specific formatting to input multi turn conversations for training and inference. The [tokenizer.apply_chat_template function](https://huggingface.co/docs/transformers/main/en/chat_templating) easily adapts your jsonl data to this format. To use this feature, prepare your data in jsonl format as specified above, and then include the `--apply_chat_template` flag to automatically prepare your data in this format.
 
 If your data is in the classic chat template format like [{"role": "user", "content": "..."}...], and you would like to convert it into the prompt completion format to be compatible with this repo, please use the [`generative_data_prep/utils/convert_chat_template_to_prompt_completion.py`](https://github.com/sambanova/generative_data_prep/blob/main/generative_data_prep/utils/convert_chat_template_to_prompt_completion.py) script.
@@ -483,7 +483,7 @@ If you have the model checkpoint downloaded locally you can also pass in the pat
 ### Number of samples in each file must be greater than or equal to batch size
 This error will occur if you try to run training with a batch size that is greater than the maximum batch size of the prepared dataset. The maximum batch size is printed in the terminal as "Batch size <=..." and also logged in the logs.log file in the output directory.
 
-To fix this, you can:
+To fix this, you can do one of the following:
 1. Increase the amount of input data you use.
 2. Change to a "single" input packing configuration like `single::truncate_right`, which will not pack the sequences with multple data points, and therefore create more training sequences. However, this may cause training to be inefficient because a lot of the available sequence length is wasted with padding tokens.
 3. Decrease the `num_training_splits` so that each split has more data. Keep in mind, however, that you must have more training splits than the number of parallel RDUs you use to train.
