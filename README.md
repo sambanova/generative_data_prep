@@ -96,7 +96,7 @@ Here are a few important parameters to know about when running this example:
         <td><code>pretrained_tokenizer</code></td>
         <td>str</td>
         <td>The model-specific tokenizer to use when tokenizing the input dataset.</td>
-        <td>There are two ways you can specify the tokenizer. The first and preferred option is to provide the directory path to the base checkpoint that you have downloaded locally. The second option is to pass in the model ID from the Hugging Face model card. For example, for Mistral-7B-v0.1, use <code>"mistralai/Mistral-7B-v0.1"</code>. If the model is gated on Hugging Face, you will need to request access and <a href="https://huggingface.co/docs/huggingface_hub/en/guides/cli#huggingface-cli-login">log in on the Hugging Face CLI</a> before executing the data preparation command.</td>
+        <td>You can specify the tokenizer in two ways. The first, preferred option is to provide the directory path to the locally downloaded base checkpoint. The second option is to use the model ID from the Hugging Face model card, such as <code>"mistralai/Mistral-7B-v0.1"</code> for Mistral-7B-v0.1. If the model is gated on Hugging Face, you must request access and <a href="https://huggingface.co/docs/huggingface_hub/en/guides/cli#huggingface-cli-login">log in via the Hugging Face CLI</a> before executing the data preparation command.</td>
         </tr>
         <tr>
             <td><code>max_seq_length</code></td>
@@ -111,8 +111,11 @@ Here are a few important parameters to know about when running this example:
                 Defines the strategy used to pack the provided text data into fixed-length sequences.
             </td>
             <td>
-            For pre-training, we recommend <code>'full'</code>. For fine-tuning, we suggest <code>'greedy::truncate_right'</code> for efficient training with many data points packed into the same sequence, or <code>'single::truncate_right'</code> if you have a limited amount of data and want only one data point per sequence.
-                See the <a href="#input_packing_config"><code>input_packing_config</code></a> section below for an in-depth description of all options.
+            For pre-training, use <code>'full'</code>.<br><br>
+            For fine-tuning:<br>
+            &bull; Use <code>'greedy::truncate_right'</code> for efficient training with multiple data points per sequence<br>
+            &bull; Use <code>'single::truncate_right'</code> for limited data with one data point per sequence<br><br>
+            See <a href="#input_packing_config"><code>input_packing_config</code></a> for all options.
             </td>
         </tr>
         <tr>
