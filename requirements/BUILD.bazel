@@ -1,0 +1,8 @@
+# Copyright © 2024 by SambaNova Systems, Inc. Disclosure, reproduction,
+# reverse engineering, or any other use made without the advance written
+# permission of SambaNova Systems, Inc. is unauthorized and strictly
+# prohibited. All rights of ownership and enforcement are reserved.
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["requirements.txt"])

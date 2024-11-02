@@ -141,3 +141,6 @@ docs/source/_autosummary
 
 # VS code
 .vscode
+
+# Bazel convenience links
+bazel-*

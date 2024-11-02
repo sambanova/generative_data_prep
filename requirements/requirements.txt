@@ -39,7 +39,6 @@ pyyaml==6.0.1; python_version >= '3.6'
 regex==2024.5.15; python_version >= '3.8'
 requests==2.32.3; python_version >= '3.8'
 safetensors==0.4.3; python_version >= '3.7'
-.
 sentencepiece==0.2.0
 smmap==5.0.1; python_version >= '3.7'
 sympy==1.13.0; python_version >= '3.8'

@@ -1,0 +1,33 @@
+module(name = "generative_data_prep")
+
+# The following stanza defines the dependency rules_python.
+bazel_dep(
+    name = "rules_python",
+    version = "0.37.2",
+)
+
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    python_version = "3.8",
+)
+
+# The following stanza defines the dependency rules_python_gazelle_plugin.
+# For typical setups you set the version.
+bazel_dep(name = "rules_python_gazelle_plugin", version = "0.37.2")
+
+# The following stanza defines the dependency gazelle.
+bazel_dep(name = "gazelle", version = "0.39.1", repo_name = "bazel_gazelle")
+
+
+# TODO the autodetecting toolchain is only required for RBE on sambaflow image
+#register_toolchains("@bazel_tools//tools/python:autodetecting_toolchain")
+
+
+pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+pip.parse(
+    hub_name = "pip",
+    python_version = "3.8",
+    requirements_lock = "requirements_lock.txt",
+)
+use_repo(pip, "pip")
+

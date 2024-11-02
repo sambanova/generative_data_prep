@@ -1,0 +1,72 @@
+# GENERATED FILE - DO NOT EDIT!
+#
+# To update this file, run:
+#   bazel run //requirements:gazelle_python_manifest.update
+
+manifest:
+  modules_mapping:
+    anyio: anyio
+    backports: backports.tarfile
+    certifi: certifi
+    cffi: cffi
+    charset_normalizer: charset_normalizer
+    click: click
+    cryptography: cryptography
+    distlib: distlib
+    docutils: docutils
+    exceptiongroup: exceptiongroup
+    filelock: filelock
+    h11: h11
+    h5py: h5py
+    hatch: hatch
+    hatch_vcs: hatch_vcs
+    hatchling: hatchling
+    httpcore: httpcore
+    httpx: httpx
+    hyperlink: hyperlink
+    idna: idna
+    importlib_metadata: importlib_metadata
+    importlib_resources: importlib_resources
+    jaraco.classes: jaraco.classes
+    jaraco.context: jaraco.context
+    jaraco.functools: jaraco.functools
+    keyring: keyring
+    markdown_it: markdown_it_py
+    mdurl: mdurl
+    more_itertools: more_itertools
+    nh3: nh3
+    numpy: numpy
+    packaging: packaging
+    pathspec: pathspec
+    pexpect: pexpect
+    pkg_resources: setuptools
+    pkginfo: pkginfo
+    platformdirs: platformdirs
+    pluggy: pluggy
+    ptyprocess: ptyprocess
+    pycparser: pycparser
+    pygments: pygments
+    readme_renderer: readme_renderer
+    requests: requests
+    requests_toolbelt: requests_toolbelt
+    rfc3986: rfc3986
+    rich: rich
+    setuptools: setuptools
+    setuptools_scm: setuptools_scm
+    shellingham: shellingham
+    sniffio: sniffio
+    tomli: tomli
+    tomli_w: tomli_w
+    tomlkit: tomlkit
+    trove_classifiers: trove_classifiers
+    twine: twine
+    typing_extensions: typing_extensions
+    urllib3: urllib3
+    userpath: userpath
+    uv: uv
+    virtualenv: virtualenv
+    zipp: zipp
+    zstandard: zstandard
+  pip_repository:
+    name: pip
+integrity: 84da57f8cbdcddc81765d24938fd1af27c24032d2e76e2b5ec8f5fb78c61ff17
