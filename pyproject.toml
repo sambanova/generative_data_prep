@@ -18,7 +18,7 @@ dependencies = [
     "psutil",
     "torch>=2.3",
     "tqdm",
-    "transformers==4.40.0",
+    "transformers==4.43.1",
     "tabulate",
     "gitpython",
     "types-tabulate",
