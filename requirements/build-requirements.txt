@@ -13,7 +13,7 @@ filelock==3.16.1; python_version >= '3.8'
 h11==0.14.0; python_version >= '3.7'
 hatch==1.13.0; python_version >= '3.8'
 hatch-vcs==0.4.0; python_version >= '3.8'
-hatchling==1.26.2; python_version >= '3.8'
+hatchling==1.26.3; python_version >= '3.8'
 httpcore==1.0.6; python_version >= '3.8'
 httpx==0.27.2; python_version >= '3.8'
 hyperlink==21.0.0
