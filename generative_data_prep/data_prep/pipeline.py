@@ -21,6 +21,7 @@ import json
 import logging
 import multiprocessing
 import os
+import subprocess
 import random
 import shutil
 import time
@@ -53,6 +54,12 @@ from generative_data_prep.utils import (
 
 LOGGER = logging.getLogger("generative_data_prep_logger")
 
+def log_installed_packages(output_dir):
+        
+    result = subprocess.run(["pip", "freeze"], capture_output=True, text=True)
+    install_packages_log_file = os.path.join(output_dir,"installed_packages.log")
+    with open(install_packages_log_file, "w") as file:
+        file.write(result.stdout)
 
 def combine_input_dir_files(input_path: str) -> Tuple[str, List[Path]]:
     """Processes a directory containing JSONL files and combines them into a single output file.
@@ -744,5 +751,8 @@ def pipeline_main(  # noqa: C901
 
     # Create sha256 of all the files within the directory
     create_sha256(output_dir)
+
+    #Dump all installed packages to a log file
+    log_installed_packages(output_dir)
 
     return metrics, dataset_metadata_json
