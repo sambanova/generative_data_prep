@@ -33,6 +33,7 @@ from generative_data_prep.utils import (
     log_elapsed_time,
     log_git_commit_hash,
     log_input_args,
+    log_installed_packages,
     log_metrics,
     log_sep_str,
     log_training_details,
@@ -152,6 +153,7 @@ def main(args):
     log_git_commit_hash()
     log_current_datetime()
     log_input_args(args)
+    log_installed_packages()
 
     json_error_log_dir = os.path.join(output_dir, "json_error_log")
     verify_output_dir(json_error_log_dir, True)

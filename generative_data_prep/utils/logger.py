@@ -17,9 +17,11 @@ This class creates a common logger.
 """
 import argparse
 import datetime
+import importlib.metadata
 import logging
 import logging.config
 import os
+import sys
 from typing import Dict, Union
 
 import git
@@ -122,3 +124,18 @@ def check_deprecated_args(args: argparse.Namespace):
         LOGGER.warning("WARNING: --input_file_path argument will be deprecated soon, please use --input_path instead")
         args.input_path = args.input_file_path
     return args
+
+
+def log_installed_packages():
+    """Log all the installed packages in user environment."""
+    log_sep_str()
+    LOGGER.debug("The Installed Packaged When This Script Was Run: ")
+    loaded_modules = list(sys.modules.keys())
+    for module in loaded_modules:
+        try:
+            version = importlib.metadata.version(module)
+            LOGGER.debug(f"{module}: {version}")
+        except importlib.metadata.PackageNotFoundError:
+            pass
+
+    log_sep_str()
