@@ -129,7 +129,7 @@ def check_deprecated_args(args: argparse.Namespace):
 def log_installed_packages():
     """Log all the installed packages in user environment."""
     log_sep_str()
-    LOGGER.debug("The Installed Packaged When This Script Was Run: ")
+    LOGGER.debug("The installed packages when this dataset was created: ")
     loaded_modules = list(sys.modules.keys())
     for module in loaded_modules:
         try:
