@@ -18,6 +18,7 @@ def test_split_should_throw():
             pipeline_main(
                 input_path=file_path,
                 tokenizer=TOKENIZER,
+                pretrained_tokenizer="gpt2",
                 model_config=MODEL_CONFIG,
                 output_dir=output_dir,
                 overwrite_output_path=False,

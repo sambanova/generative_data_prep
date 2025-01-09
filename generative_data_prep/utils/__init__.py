@@ -51,6 +51,7 @@ from .utils import (
     execute_and_return_stdout,
     get_config_file_path,
     get_num_training_splits,
+    save_tokenizer,
     validate_sha256,
 )
 
@@ -89,4 +90,5 @@ __all__ = [
     "get_shuffle_arg",
     "adjust_splits",
     "verify_enough_data_to_run_one_batch",
+    "save_tokenizer",
 ]

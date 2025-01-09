@@ -169,3 +169,28 @@ def get_num_training_splits(input_file_size_in_gb: float, num_training_splits: O
             num_training_splits = 256
 
     return num_training_splits
+
+
+def save_tokenizer(tokenizer, tokenizer_dir, pretrained_tokenizer):
+    """Save a tokenizer to a specified directory, also save the user input pretrained_tokenizer.
+
+    Args:
+        tokenizer: The tokenizer object to be saved. Must support the `save_pretrained` method.
+        tokenizer_dir (str): The directory where the tokenizer should be saved.
+        pretrained_tokenizer (str): Either the path to a pretrained tokenizer directory or
+            a Hugging Face model ID string.
+    """
+    user_input_tokenizer_path = os.path.join(tokenizer_dir, "user_input_tokenizer")
+    os.mkdir(user_input_tokenizer_path)
+
+    if os.path.isdir(pretrained_tokenizer):
+        shutil.copy(pretrained_tokenizer, user_input_tokenizer_path)
+    else:
+        user_input_tokenizer_path_huggingface_model_id = os.path.join(
+            user_input_tokenizer_path, "huggingface_model_id.txt"
+        )
+        with open(user_input_tokenizer_path_huggingface_model_id, "w") as write_f:
+            write_f.write(pretrained_tokenizer)
+
+    # Save the pretrained tokenizer into tokenizer directory
+    tokenizer.save_pretrained(tokenizer_dir)

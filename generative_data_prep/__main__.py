@@ -174,6 +174,7 @@ def main(args):
         metrics, dataset_metadata = pipeline_main(
             args.input_path,
             tokenizer,
+            args.pretrained_tokenizer,
             model_config,
             output_dir,
             args.disable_space_separator,

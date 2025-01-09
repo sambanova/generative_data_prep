@@ -46,6 +46,7 @@ from generative_data_prep.utils import (
     get_num_training_splits,
     large_file_shuffle,
     log_sep_str,
+    save_tokenizer,
     verify_input_file,
     verify_output_dir,
     verify_output_file,
@@ -469,6 +470,7 @@ def multiprocess_data_prep(  # noqa: C901
 def pipeline_main(  # noqa: C901
     input_path: str,
     tokenizer: PreTrainedTokenizerBase,
+    pretrained_tokenizer: Optional[str],
     model_config: PretrainedConfig,
     output_dir: str,
     disable_space_separator: bool,
@@ -587,7 +589,8 @@ def pipeline_main(  # noqa: C901
 
     tokenizer_dir = os.path.join(output_dir, "tokenizer")
     verify_output_dir(tokenizer_dir, True)
-    tokenizer.save_pretrained(tokenizer_dir)
+    save_tokenizer(tokenizer, tokenizer_dir, pretrained_tokenizer)
+
     model_config_path = os.path.join(tokenizer_dir, "config.json")
     model_config.to_json_file(model_config_path)
 

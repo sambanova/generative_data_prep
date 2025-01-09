@@ -463,6 +463,7 @@ def test_pipeline(
         pipeline_main(
             input_path=input_path,
             tokenizer=tokenizer,
+            pretrained_tokenizer="gpt2",
             model_config=MODEL_CONFIG,
             output_dir=output_dir,
             disable_space_separator=disable_space_separator,
