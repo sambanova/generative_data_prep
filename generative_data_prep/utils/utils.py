@@ -184,7 +184,7 @@ def save_tokenizer(tokenizer, tokenizer_dir, pretrained_tokenizer):
     os.mkdir(user_input_tokenizer_path)
 
     if os.path.isdir(pretrained_tokenizer):
-        shutil.copy(pretrained_tokenizer, user_input_tokenizer_path)
+        shutil.copytree(pretrained_tokenizer, user_input_tokenizer_path)
     else:
         user_input_tokenizer_path_huggingface_model_id = os.path.join(
             user_input_tokenizer_path, "huggingface_model_id.txt"
