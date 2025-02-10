@@ -17,11 +17,15 @@ limitations under the License.
 import os
 from filecmp import cmpfiles
 from glob import glob
+from tempfile import TemporaryDirectory
 
 import h5py
 import numpy as np
 import torch
 from torch.utils.data import Dataset
+from transformers import AutoTokenizer
+
+from generative_data_prep.utils import save_tokenizer
 
 
 class generative_dataset(Dataset):
@@ -128,3 +132,44 @@ def check_balance(hdf5_dir: str, split: str = ""):
     err_msg = f"hdf5 files under dir: {ttid_shapes} did not have the same number if sequences for token type ids, "
     err_msg += f"largest hdf5 {max(input_id_shapes)}, smallest {min(ttid_shapes)}"
     assert abs(max(ttid_shapes) - min(ttid_shapes)) <= 1, err_msg
+
+
+def test_save_tokenizer():
+    """Tests save tokenizer for pretrained directory."""
+    with TemporaryDirectory() as tokenizer_dir, TemporaryDirectory() as pretrained_dir:
+        # Initialize a tokenizer and save it to the pretrained directory
+        model_name = "bert-base-uncased"
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        tokenizer.save_pretrained(pretrained_dir)
+
+        # Call the function with the temporary directories
+        save_tokenizer(tokenizer, tokenizer_dir, pretrained_dir)
+
+        # Check if the tokenizer directory contains the expected files
+        expected_files = set(os.listdir(pretrained_dir))
+        saved_files = set(os.listdir(os.path.join(tokenizer_dir, "user_input_tokenizer")))
+        assert expected_files.intersection(saved_files) == expected_files, "Not all files were copied correctly."
+
+        # Ensure the tokenizer directory itself is saved
+        assert os.path.exists(os.path.join(tokenizer_dir, "config.json")), "Tokenizer config file is missing."
+        assert os.path.exists(os.path.join(tokenizer_dir, "vocab.txt")) or os.path.exists(
+            os.path.join(tokenizer_dir, "tokenizer.json")
+        ), "Tokenizer files are missing."
+
+
+def test_save_tokenizer_with_huggingface_id():
+    """Tests save tokenizer for pretrained directory"""
+    with TemporaryDirectory() as tokenizer_dir:
+        model_name = "bert-base-uncased"
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+        # Call the function with a Hugging Face model ID
+        save_tokenizer(tokenizer, tokenizer_dir, model_name)
+
+        # Check if the Hugging Face model ID file exists
+        hf_model_id_file = os.path.join(tokenizer_dir, "user_input_tokenizer", "huggingface_model_id.txt")
+        assert os.path.exists(hf_model_id_file), "Hugging Face model ID file is missing."
+
+        # Verify the content of the file
+        with open(hf_model_id_file, "r") as f:
+            assert f.read().strip() == model_name, "Hugging Face model ID does not match."
