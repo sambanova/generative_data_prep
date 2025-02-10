@@ -184,7 +184,24 @@ def save_tokenizer(tokenizer, tokenizer_dir, pretrained_tokenizer):
     os.mkdir(user_input_tokenizer_path)
 
     if os.path.isdir(pretrained_tokenizer):
-        shutil.copytree(pretrained_tokenizer, user_input_tokenizer_path, dirs_exist_ok=True)  # pragma: no cover
+        # save our existing tokenizer in output directory and figure out what files get saved
+        tokenizer.save_pretrained(user_input_tokenizer_path)
+        tokenizer_files = set(os.listdir(user_input_tokenizer_path))
+        for file_name in tokenizer_files:
+            file_path = os.path.join(user_input_tokenizer_path, file_name)
+            os.remove(file_path)
+
+        # Step 4: Get List of Files from Source Directory
+        source_files = set(os.listdir(pretrained_tokenizer))
+
+        # Step 5: Find Matching Files and Copy Them
+        matching_files = tokenizer_files.intersection(source_files)
+
+        for file_name in matching_files:
+            src_path = os.path.join(pretrained_tokenizer, file_name)
+            dest_path = os.path.join(user_input_tokenizer_path, file_name)
+            shutil.copy(src_path, dest_path)
+            print(f"Copied: {file_name}")
     else:
         user_input_tokenizer_path_huggingface_model_id = os.path.join(
             user_input_tokenizer_path, "huggingface_model_id.txt"
