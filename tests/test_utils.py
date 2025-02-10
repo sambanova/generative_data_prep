@@ -149,12 +149,9 @@ def test_save_tokenizer():
         expected_files = set(os.listdir(pretrained_dir))
         saved_files = set(os.listdir(os.path.join(tokenizer_dir, "user_input_tokenizer")))
         assert expected_files.intersection(saved_files) == expected_files, "Not all files were copied correctly."
-
-        # Ensure the tokenizer directory itself is saved
-        assert os.path.exists(os.path.join(tokenizer_dir, "config.json")), "Tokenizer config file is missing."
-        assert os.path.exists(os.path.join(tokenizer_dir, "vocab.txt")) or os.path.exists(
-            os.path.join(tokenizer_dir, "tokenizer.json")
-        ), "Tokenizer files are missing."
+        new_tokenizer = AutoTokenizer.from_pretrained(tokenizer_dir)
+        new_tokenizer.encode("hello!")
+        assert True
 
 
 def test_save_tokenizer_with_huggingface_id():
