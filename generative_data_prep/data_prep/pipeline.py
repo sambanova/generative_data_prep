@@ -741,6 +741,7 @@ def pipeline_main(  # noqa: C901
     if os.path.isdir(input_path) and len(input_files) > 1:
         os.remove(input_file_path)
 
+    dataset_metadata_json.update(vars(metrics))
     metadata_file_path = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file_path, "w") as file:
         yaml.dump(dataset_metadata_json, file, default_flow_style=False)

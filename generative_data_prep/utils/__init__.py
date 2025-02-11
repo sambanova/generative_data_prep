@@ -13,6 +13,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+from .add_sequence_metadata_to_dataset import (
+    add_seq_metadata_dataset,
+    add_seq_metadata_to_dir_of_datasets,
+)
 from .arg_configs import PackingConfig
 from .arg_parser import get_arg_parser
 from .balance_hdf5_files import balance_hdf5_files
@@ -91,4 +95,6 @@ __all__ = [
     "adjust_splits",
     "verify_enough_data_to_run_one_batch",
     "save_tokenizer",
+    "add_seq_metadata_dataset",
+    "add_seq_metadata_to_dir_of_datasets",
 ]
