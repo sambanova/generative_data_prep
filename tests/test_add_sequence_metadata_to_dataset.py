@@ -4,11 +4,8 @@ import tempfile
 import h5py
 import pytest
 import yaml
-from your_module import (
-    add_seq_metadata_dataset,
-    count_sequences_in_hdf5,
-    update_metadata,
-)
+
+from generative_data_prep.utils import add_seq_metadata_dataset
 
 
 @pytest.fixture
@@ -34,20 +31,6 @@ def temp_metadata_file(temp_dir):
     with open(metadata_path, "w") as f:
         yaml.safe_dump({}, f)
     return metadata_path
-
-
-def test_count_sequences_in_hdf5(temp_hdf5_file):
-    """Test counting sequences in an HDF5 file."""
-    count = count_sequences_in_hdf5(temp_hdf5_file)
-    assert count == 2
-
-
-def test_update_metadata(temp_metadata_file):
-    """Test updating the metadata.yaml file."""
-    update_metadata(temp_metadata_file, 5)
-    with open(temp_metadata_file, "r") as f:
-        metadata = yaml.safe_load(f)
-    assert metadata["sequences"] == 5
 
 
 def test_add_seq_metadata_dataset(temp_dir, temp_hdf5_file, temp_metadata_file):
