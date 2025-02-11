@@ -235,7 +235,7 @@ def test_metadata_end2end_output(tmp_path):
         "num_dev_splits": None,
         "test_ratio": None,
         "num_test_splits": None,
-        "shuffle": "on_RAM",
+        "shuffle": "False",
         "num_workers": num_workers,
         "keep_split_jsonls": True,
         "ignore_input_format_error": False,
