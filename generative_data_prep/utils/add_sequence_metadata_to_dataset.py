@@ -36,16 +36,19 @@ def count_sequences_in_hdf5(file_path):
 
 def update_metadata(metadata_path, total_sequences):
     """Update the metadata.yaml file with the sequence count."""
-    try:
-        with open(metadata_path, "r") as f:
-            metadata = yaml.safe_load(f) or {}
+    if os.path.exists(metadata_path):
+        try:
+            with open(metadata_path, "r") as f:
+                metadata = yaml.safe_load(f) or {}
 
-        metadata["sequences"] = total_sequences
+            metadata["sequences"] = total_sequences
 
-        with open(metadata_path, "w") as f:
-            yaml.safe_dump(metadata, f, default_flow_style=False)
-    except Exception as e:
-        print(f"Error updating metadata {metadata_path}: {e}")
+            with open(metadata_path, "w") as f:
+                yaml.safe_dump(metadata, f, default_flow_style=False)
+        except Exception as e:
+            print(f"Error updating metadata {metadata_path}: {e}")
+    else:
+        print(f"No metadata.yaml found in {metadata_path}")
 
 
 def add_seq_metadata_dataset(dataset_path):
@@ -60,10 +63,8 @@ def add_seq_metadata_dataset(dataset_path):
 
     # Update metadata.yaml
     metadata_path = os.path.join(dataset_path, "metadata.yaml")
-    if os.path.exists(metadata_path):
-        update_metadata(metadata_path, total_sequences)
-    else:
-        print(f"No metadata.yaml found in {dataset_path}")
+
+    update_metadata(metadata_path, total_sequences)
 
 
 def add_seq_metadata_to_dir_of_datasets(root_dir):
@@ -72,10 +73,3 @@ def add_seq_metadata_to_dir_of_datasets(root_dir):
         subdir_path = os.path.join(root_dir, subdir)
         if os.path.isdir(subdir_path):
             add_seq_metadata_dataset(subdir_path)
-
-
-if __name__ == "__main__":
-    root_directory = (
-        "/Users/zoltanc/Desktop/generative_data_prep/tests/add_seq_datasets"  # Change this to your root directory
-    )
-    add_seq_metadata_to_dir_of_datasets(root_directory)
