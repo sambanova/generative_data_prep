@@ -34,37 +34,47 @@ def count_sequences_in_hdf5(file_path):
     return total_sequences
 
 
-def update_metadata(metadata_path, total_sequences):
-    """Update the metadata.yaml file with the sequence count."""
-    if os.path.exists(metadata_path):
-        try:
-            with open(metadata_path, "r") as f:
-                metadata = yaml.safe_load(f) or {}
+def update_metadata(metadata, key, total_sequences):
+    """Update the metadata dictionary with the sequence count."""
+    metadata[key] = total_sequences
+    return metadata
 
-            metadata["sequences"] = total_sequences
 
-            with open(metadata_path, "w") as f:
-                yaml.safe_dump(metadata, f, default_flow_style=False)
-        except Exception as e:
-            print(f"Error updating metadata {metadata_path}: {e}")
-    else:
-        print(f"No metadata.yaml found in {metadata_path}")
+def save_metadata(metadata_path, metadata):
+    """Save the metadata dictionary to the metadata file."""
+    with open(metadata_path, "w") as f:
+        yaml.safe_dump(metadata, f, default_flow_style=False)
 
 
 def add_seq_metadata_dataset(dataset_path):
     """Iterate through subdirectories, count sequences in HDF5 files, and update metadata."""
-    total_sequences = 0
+    metadata_path = os.path.join(dataset_path, "metadata.yaml")
+    metadata = {}
+    if os.path.exists(metadata_path):
+        try:
+            with open(metadata_path, "r") as f:
+                metadata = yaml.safe_load(f) or {}
+        except Exception as e:
+            print(f"Error loading metadata {metadata_path}: {e}")
 
-    # Process HDF5 files
+    train_sequences = 0
+    dev_sequences = 0
+
     for file in os.listdir(dataset_path):
         if file.endswith(".h5") or file.endswith(".hdf5"):
             file_path = os.path.join(dataset_path, file)
-            total_sequences += count_sequences_in_hdf5(file_path)
+            total_sequences = count_sequences_in_hdf5(file_path)
+            if "train" in file.lower():
+                train_sequences += total_sequences
+            elif "dev" in file.lower():
+                dev_sequences += total_sequences
 
-    # Update metadata.yaml
-    metadata_path = os.path.join(dataset_path, "metadata.yaml")
+    if train_sequences > 0:
+        metadata = update_metadata(metadata, "train_sequences", train_sequences)
+    if dev_sequences > 0:
+        metadata = update_metadata(metadata, "dev_sequences", dev_sequences)
 
-    update_metadata(metadata_path, total_sequences)
+    save_metadata(metadata_path, metadata)
 
 
 def add_seq_metadata_to_dir_of_datasets(root_dir):
