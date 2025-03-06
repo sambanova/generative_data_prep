@@ -18,7 +18,7 @@ def temp_dir():
 @pytest.fixture
 def temp_hdf5_file(temp_dir):
     """Create a temporary HDF5 file with an input_ids dataset."""
-    hdf5_path = os.path.join(temp_dir, "test.h5")
+    hdf5_path = os.path.join(temp_dir, "train_1.hdf5")
     with h5py.File(hdf5_path, "w") as f:
         f.create_dataset("input_ids", data=[[1, 2, 3], [4, 5, 6]])
     return hdf5_path
@@ -38,4 +38,4 @@ def test_add_seq_metadata_dataset(temp_dir, temp_hdf5_file, temp_metadata_file):
     add_seq_metadata_dataset(temp_dir)
     with open(temp_metadata_file, "r") as f:
         metadata = yaml.safe_load(f)
-    assert metadata["sequences"] == 2
+    assert metadata["train_sequences"] == 2
