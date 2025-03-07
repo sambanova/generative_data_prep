@@ -74,9 +74,6 @@ def add_seq_metadata_dataset(dataset_path):
     save_metadata(metadata_path, metadata)
 
 
-add_seq_metadata_dataset("/Users/zoltanc/Desktop/generative_data_prep/tests/examples/generative_tuning/out")
-
-
 def add_seq_metadata_to_dir_of_datasets(root_dir):
     """Iterate through subdirectories, count sequences in HDF5 files, and update metadata."""
     for subdir in os.listdir(root_dir):
