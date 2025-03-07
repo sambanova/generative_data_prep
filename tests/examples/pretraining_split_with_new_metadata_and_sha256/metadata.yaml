@@ -1,6 +1,5 @@
 train_articles: 100
 train_completion_tokens: 53020
-dataset_type: null
 train_input_tokens: 53020
 max_batch_size_dev: null
 max_batch_size_train: 13
