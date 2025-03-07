@@ -268,6 +268,15 @@ def get_split_counts(
     return train_count, dev_count, test_count, num_splits
 
 
+def update_dataset_metadata(metrics: Metrics, dataset_metadata_json):
+    """Update dataset metadata with prefixed or non-prefixed metric names."""
+    if not metrics.is_empty:
+        prefix = f"{metrics.dataset_type}_" if metrics.dataset_type else ""
+        for key, value in vars(metrics).items():
+            if key != "dataset_type":
+                dataset_metadata_json.update({f"{prefix}{key}": value})
+
+
 def data_prep_main_helper(args: Iterable[Any]):
     """Helper function to apply the star operator on the arguments when calling the data_prep_main function."""
     return data_prep_main(*args)
@@ -295,7 +304,7 @@ def multiprocess_data_prep(  # noqa: C901
     prompt_prefix: Optional[str] = None,
     prompt_postfix: Optional[str] = None,
     apply_chat_template: Optional[bool] = False,
-) -> Tuple[List[str], List[str], Metrics]:
+) -> Tuple[List[str], List[str], Metrics, Metrics]:
     """Tokenizes all the files in files_to_tokenize efficiently using multirpocessing library.
 
     Args:
@@ -385,7 +394,8 @@ def multiprocess_data_prep(  # noqa: C901
 
     broken_process_indices = []
     broken_process_pool_exc: Optional[BaseException] = None
-    metrics = Metrics()
+    train_metrics = Metrics("train")
+    dev_metrics = Metrics("dev")
     max_batch_size_train = None
     max_batch_size_dev = None
     tokenization_start_time = time.time()
@@ -402,12 +412,13 @@ def multiprocess_data_prep(  # noqa: C901
                                 max_batch_size_train = indiv_metric.sequences
                             else:
                                 max_batch_size_train = min(max_batch_size_train, indiv_metric.sequences)
+                            train_metrics += indiv_metric
                         elif indiv_metric.dataset_type == "dev":
                             if max_batch_size_dev is None:
                                 max_batch_size_dev = indiv_metric.sequences
                             else:
                                 max_batch_size_dev = min(max_batch_size_dev, indiv_metric.sequences)
-                        metrics += indiv_metric
+                            dev_metrics += indiv_metric
                         finished_futures.add(future)
                     except Exception as exc:
                         if isinstance(exc, concurrent.futures.process.BrokenProcessPool):
@@ -464,7 +475,7 @@ def multiprocess_data_prep(  # noqa: C901
     executor.shutdown()
     manager.shutdown()
 
-    return train_hdf5_files, dev_hdf5_files, metrics
+    return train_hdf5_files, dev_hdf5_files, train_metrics, dev_metrics
 
 
 def pipeline_main(  # noqa: C901
@@ -684,7 +695,7 @@ def pipeline_main(  # noqa: C901
         overwrite_output_path,
     )
 
-    train_hdf5_files, dev_hdf5_files, metrics = multiprocess_data_prep(
+    train_hdf5_files, dev_hdf5_files, train_metrics, dev_metrics = multiprocess_data_prep(
         files_to_tokenize,
         split_dir,
         output_dir,
@@ -741,7 +752,8 @@ def pipeline_main(  # noqa: C901
     if os.path.isdir(input_path) and len(input_files) > 1:
         os.remove(input_file_path)
 
-    dataset_metadata_json.update(vars(metrics))
+    update_dataset_metadata(train_metrics, dataset_metadata_json)
+    update_dataset_metadata(dev_metrics, dataset_metadata_json)
     metadata_file_path = os.path.join(output_dir, "metadata.yaml")
     with open(metadata_file_path, "w") as file:
         yaml.dump(dataset_metadata_json, file, default_flow_style=False)
@@ -749,4 +761,4 @@ def pipeline_main(  # noqa: C901
     # Create sha256 of all the files within the directory
     create_sha256(output_dir)
 
-    return metrics, dataset_metadata_json
+    return train_metrics, dev_metrics, dataset_metadata_json

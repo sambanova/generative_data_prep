@@ -81,7 +81,8 @@ def log_input_args(args):
 
 def log_metrics(metrics):
     """Log the metrics table."""
-    LOGGER.info(f"{get_header('Metrics')}\n{metrics}\n{get_header('Complete')}")
+    if not metrics.is_empty:
+        LOGGER.info(f"{get_header('')}\n{metrics}\n{get_header('')}")
 
 
 def get_header(header_name: str):

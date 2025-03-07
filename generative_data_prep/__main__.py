@@ -171,7 +171,7 @@ def main(args):
         verify_input_file(args.input_path)
 
     if args.cmd == "pipeline":
-        metrics, dataset_metadata = pipeline_main(
+        train_metrics, dev_metrics, dataset_metadata = pipeline_main(
             args.input_path,
             tokenizer,
             args.pretrained_tokenizer,
@@ -201,8 +201,9 @@ def main(args):
             args.prompt_postfix,
             args.apply_chat_template,
         )
+        all_metrics = [train_metrics, dev_metrics]
     elif args.cmd == "data_prep":
-        metrics = data_prep_main(
+        data_prep_metrics = data_prep_main(
             args.silent,
             tokenizer,
             args.input_path,
@@ -222,8 +223,11 @@ def main(args):
             args.prompt_postfix,
             apply_chat_template=args.apply_chat_template,
         )
+        all_metrics = [data_prep_metrics]
 
-    log_metrics(metrics)
+    for metrics in all_metrics:
+        log_metrics(metrics)
+
     log_elapsed_time()
     if args.cmd == "pipeline":
         log_training_details(dataset_metadata)

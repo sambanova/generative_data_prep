@@ -29,7 +29,7 @@ MetricsSubClass = TypeVar("MetricsSubClass", bound="Metrics")
 class Metrics:
     """Store all the metrics associated with a tokenization process."""
 
-    def __init__(self):
+    def __init__(self, dataset_type=None):
         """Create a metrics tracking object."""
         self.input_tokens: int = 0  # how many tokens are in the input jsonl dataset
         self.output_tokens: int = 0  # how many tokens are in the output hdf5 dataset
@@ -42,7 +42,7 @@ class Metrics:
         self.tokens_dropped_from_all_prompt: int = (
             0  # how many tokens are dropped because no completions in the entire sequence
         )
-        self.dataset_type: Union[str, None] = None
+        self.dataset_type: Union[str, None] = dataset_type
 
     def __iadd__(self: MetricsSubClass, new_metrics: "Metrics") -> MetricsSubClass:
         """Implement += for Metrics."""
@@ -57,6 +57,11 @@ class Metrics:
         self.tokens_dropped_from_all_prompt += new_metrics.tokens_dropped_from_all_prompt
 
         return self
+
+    @property
+    def is_empty(self) -> bool:
+        """Return if any metrics have been put into this dataset."""
+        return self.articles == 0 and self.sequences == 0
 
     @property
     def percent_tokens_dropped_from_all_prompt(self) -> float:
@@ -99,6 +104,13 @@ class Metrics:
 
     def __str__(self):
         """String representation of metrics."""
+        if self.is_empty:
+            return ""
+
+        if self.dataset_type is not None:
+            title = f"{self.dataset_type.capitalize()} Metrics"
+        else:
+            title = "Metrics"
         table = [
             ["Sequences", self.sequences],
             ["Articles", self.articles],
@@ -115,4 +127,4 @@ class Metrics:
             ["Seq Completion Utilization", self._to_str_percent(self.sequence_completion_utilization)],
         ]
 
-        return tabulate(table, tablefmt="fancy_grid")
+        return f"{title}\n{tabulate(table, tablefmt='fancy_grid')}"
