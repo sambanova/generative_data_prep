@@ -51,11 +51,8 @@ def add_seq_metadata_dataset(dataset_path):
     metadata_path = os.path.join(dataset_path, "metadata.yaml")
     metadata = {}
     if os.path.exists(metadata_path):
-        try:
-            with open(metadata_path, "r") as f:
-                metadata = yaml.safe_load(f) or {}
-        except Exception as e:
-            print(f"Error loading metadata {metadata_path}: {e}")
+        with open(metadata_path, "r") as f:
+            metadata = yaml.safe_load(f) or {}
 
     train_sequences = 0
     dev_sequences = 0
@@ -75,6 +72,9 @@ def add_seq_metadata_dataset(dataset_path):
         metadata = update_metadata(metadata, "dev_sequences", dev_sequences)
 
     save_metadata(metadata_path, metadata)
+
+
+add_seq_metadata_dataset("/Users/zoltanc/Desktop/generative_data_prep/tests/examples/generative_tuning/out")
 
 
 def add_seq_metadata_to_dir_of_datasets(root_dir):
