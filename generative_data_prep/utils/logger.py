@@ -24,7 +24,7 @@ import os
 import sys
 from typing import Dict, Union
 
-import git
+DEV = os.getenv("ENVIRONMENT", "dev") == "dev"
 
 LOGGER = logging.getLogger("generative_data_prep_logger")
 START_TIME = datetime.datetime.now()
@@ -61,6 +61,12 @@ def log_current_datetime():
 
 def log_git_commit_hash():
     """Log the current git commit hash."""
+    if not DEV:
+        LOGGER.debug("Running in production")
+        return
+
+    import git
+
     LOGGER.debug("Running Generative Data Prep repository: https://github.com/sambanova/generative_data_prep/")
     try:
         repo = git.Repo(os.path.abspath(__file__), search_parent_directories=True)
