@@ -13,7 +13,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from .add_sequence_metadata_to_dataset import (
+from .add_metadata_to_dataset import (
+    add_all_metadata_to_dataset,
+    add_all_metadata_to_dir_of_datasets,
     add_seq_metadata_dataset,
     add_seq_metadata_to_dir_of_datasets,
 )
@@ -97,4 +99,6 @@ __all__ = [
     "save_tokenizer",
     "add_seq_metadata_dataset",
     "add_seq_metadata_to_dir_of_datasets",
+    "add_all_metadata_to_dataset",
+    "add_all_metadata_to_dir_of_datasets",
 ]
