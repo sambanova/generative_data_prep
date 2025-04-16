@@ -9,8 +9,9 @@ import os
 import h5py
 import numpy as np
 import yaml
-from constants import TokenTypeIds
 from transformers import AutoTokenizer
+
+from .constants import TokenTypeIds
 
 
 def count_sequences_in_hdf5(file_path):
