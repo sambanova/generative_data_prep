@@ -183,3 +183,6 @@ def test_add_all_metadata_to_dataset_reproducibility(
             assert (
                 v == regenerated_metadata[k]
             ), f"key {k}, Value in original_metadata {v}, Value in regenerated_metadata {regenerated_metadata[k]}"
+
+    for k in regenerated_metadata.keys():
+        assert k in original_metadata

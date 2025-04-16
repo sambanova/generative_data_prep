@@ -30,13 +30,10 @@ def count_sequences_in_hdf5(file_path):
         int: Total number of sequences.
     """
     total_sequences = 0
-    try:
-        with h5py.File(file_path, "r") as hdf5_file:
-            data = hdf5_file["input_ids"]
-            if len(data.shape) > 1:
-                total_sequences += data.shape[0]
-    except Exception as e:
-        print(f"Error processing {file_path}: {e}")
+    with h5py.File(file_path, "r") as hdf5_file:
+        data = hdf5_file["input_ids"]
+        if len(data.shape) > 1:
+            total_sequences += data.shape[0]
     return total_sequences
 
 
