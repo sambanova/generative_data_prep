@@ -9,15 +9,13 @@ import os
 import h5py
 import numpy as np
 import yaml
-from transformers import AutoTokenizer
+from transformers import AutoConfig, AutoTokenizer
 
 from .constants import TokenTypeIds
 
 METADATA_KEYS_CANT_ADD = [
-    "tokenizer_model_type",
     "train_tokens_dropped_from_all_prompt",
     "train_tokens_dropped_from_packing",
-    "vocab_size",
     "train_input_tokens",
 ]
 
@@ -126,13 +124,15 @@ def add_all_metadata_to_dataset(dataset_path):  # noqa: C901
     if not os.path.exists(tokenizer_dir):
         tokenizer_dir = dataset_path
 
+    metadata["tokenizer_model_type"] = None
+    metadata["vocab_size"] = None
     try:
         tokenizer = AutoTokenizer.from_pretrained(tokenizer_dir)
-        metadata["tokenizer_model_type"] = str(type(tokenizer.config))
         metadata["vocab_size"] = tokenizer.vocab_size
-    except Exception:
-        metadata["tokenizer_model_type"] = None
-        metadata["vocab_size"] = None
+        config = AutoConfig.from_pretrained(tokenizer.name_or_path)
+        metadata["tokenizer_model_type"] = str(type(config))
+    except Exception as e:
+        print(f"Unable to add tokenizer related metadata because of error {e}")
 
     train_sequences = 0
     train_completion_tokens = 0
