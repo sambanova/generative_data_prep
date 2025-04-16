@@ -14,6 +14,7 @@ limitations under the License.
 """
 
 from .add_metadata_to_dataset import (
+    METADATA_KEYS_CANT_ADD,
     add_all_metadata_to_dataset,
     add_all_metadata_to_dir_of_datasets,
     add_seq_metadata_dataset,
@@ -101,4 +102,5 @@ __all__ = [
     "add_seq_metadata_to_dir_of_datasets",
     "add_all_metadata_to_dataset",
     "add_all_metadata_to_dir_of_datasets",
+    "METADATA_KEYS_CANT_ADD",
 ]

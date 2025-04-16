@@ -13,6 +13,14 @@ from transformers import AutoTokenizer
 
 from .constants import TokenTypeIds
 
+METADATA_KEYS_CANT_ADD = [
+    "tokenizer_model_type",
+    "train_tokens_dropped_from_all_prompt",
+    "train_tokens_dropped_from_packing",
+    "vocab_size",
+    "train_input_tokens",
+]
+
 
 def count_sequences_in_hdf5(file_path):
     """Count the total number of sequences in an HDF5 file.
@@ -114,8 +122,10 @@ def add_all_metadata_to_dataset(dataset_path):  # noqa: C901
         dataset_path (str): Path to the dataset directory.
     """
     metadata = {}
-
     tokenizer_dir = os.path.join(dataset_path, "tokenizer")
+    if not os.path.exists(tokenizer_dir):
+        tokenizer_dir = dataset_path
+
     try:
         tokenizer = AutoTokenizer.from_pretrained(tokenizer_dir)
         metadata["tokenizer_model_type"] = str(type(tokenizer.config))

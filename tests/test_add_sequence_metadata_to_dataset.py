@@ -9,6 +9,7 @@ from transformers import AutoTokenizer, GPT2Config, PreTrainedTokenizerBase
 
 from generative_data_prep.data_prep import pipeline_main
 from generative_data_prep.utils import (
+    METADATA_KEYS_CANT_ADD,
     BoundaryType,
     PackingConfig,
     add_all_metadata_to_dataset,
@@ -177,15 +178,8 @@ def test_add_all_metadata_to_dataset_reproducibility(
         with open(metadata_path, "r") as f:
             regenerated_metadata = yaml.safe_load(f)
 
-    IGNORE_KEYS = [
-        "tokenizer_model_type",
-        "train_tokens_dropped_from_all_prompt",
-        "train_tokens_dropped_from_packing",
-        "vocab_size",
-        "train_input_tokens",
-    ]
     for k, v in original_metadata.items():
-        if k not in IGNORE_KEYS:
+        if k not in METADATA_KEYS_CANT_ADD:
             assert (
                 v == regenerated_metadata[k]
             ), f"key {k}, Value in original_metadata {v}, Value in regenerated_metadata {regenerated_metadata[k]}"
