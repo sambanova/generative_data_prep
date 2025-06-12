@@ -13,6 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from .__main__ import main
+from .__main__ import main, run_with_training_args
 
 __all__ = ["main", "run_with_training_args"]

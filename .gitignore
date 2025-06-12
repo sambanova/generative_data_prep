@@ -141,3 +141,4 @@ docs/source/_autosummary
 
 # VS code
 .vscode
+*venv
