@@ -28,4 +28,16 @@ security: # configuration for the `safety check` command
         74882:
             reason: Need this version to be compatible with Studio
             expires: '2025-11-30'
+        76769:
+            reason: Need this version to be compatible with Studio
+            expires: '2025-11-30'
+        76771:
+            reason: Need this version to be compatible with Studio
+            expires: '2025-11-30'
+        76262:
+            reason: Need this version to be compatible with Studio
+            expires: '2025-11-30'
+        77149:
+            reason: Need this version to be compatible with Studio
+            expires: '2025-11-30'
     continue-on-vulnerability-error: False
