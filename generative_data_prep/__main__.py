@@ -17,7 +17,9 @@ Entry point to the Text Processing Pipeline.
 """
 import json
 import logging
+import logging.config
 import os
+import sys
 from typing import Optional
 
 from transformers import AutoConfig, AutoTokenizer, PreTrainedTokenizerBase
@@ -47,8 +49,6 @@ logger = logging.getLogger("generative_data_prep_logger")
 logging.config.fileConfig(get_config_file_path())
 
 # Fix Unicode encoding issues on Windows console
-import sys
-
 # Configure stdout/stderr to handle Unicode encoding errors on Windows
 if sys.platform == "win32":
     # Try to reconfigure streams to use UTF-8 with error replacement

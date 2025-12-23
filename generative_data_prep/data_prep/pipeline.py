@@ -27,7 +27,6 @@ import sys
 import time
 import uuid
 from pathlib import Path
-from sys import platform
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
@@ -50,7 +49,6 @@ from generative_data_prep.utils import (
     PackingConfig,
     balance_hdf5_files,
     create_sha256,
-    execute_and_return_stdout,
     get_num_training_splits,
     large_file_shuffle,
     log_sep_str,
@@ -576,21 +574,30 @@ def multiprocess_data_prep(  # noqa: C901
                 prev_num_tokenized_articles = num_tokenized_articles.value
 
                 if ignore_input_format_error:
-                    num_new_skipped_articles = num_skipped_articles.value - prev_num_skipped_articles
+                    num_new_skipped_articles = (
+                        num_skipped_articles.value - prev_num_skipped_articles
+                    )
                     if num_new_skipped_articles > 0:
-                        LOGGER.info(f"{num_skipped_articles.value} misformatted lines are skipped")
+                        LOGGER.info(
+                            f"{num_skipped_articles.value} misformatted lines are skipped"
+                        )
                         prev_num_skipped_articles = num_skipped_articles.value
             time.sleep(5)
 
     # Log final article count and validate 100% completion
     log_sep_str()
     total_actual_articles = train_metrics.articles + dev_metrics.articles
-    LOGGER.info(f"Total articles processed (from metrics): {total_actual_articles} (Train: {train_metrics.articles}, Dev: {dev_metrics.articles})")
+    LOGGER.info(
+        f"Total articles processed (from metrics): {total_actual_articles} "
+        f"(Train: {train_metrics.articles}, Dev: {dev_metrics.articles})"
+    )
     LOGGER.info(f"Total articles counted in input files: {total_num_articles}")
-    
+
     if ignore_input_format_error:
         LOGGER.info(f"Progress counter value: {num_tokenized_articles.value}")
-        LOGGER.info(f"Total skipped lines (format errors): {num_skipped_articles.value}")
+        LOGGER.info(
+            f"Total skipped lines (format errors): {num_skipped_articles.value}"
+        )
     
     # Validate 100% completion
     if total_num_articles > 0:
@@ -599,46 +606,72 @@ def multiprocess_data_prep(  # noqa: C901
         skipped_articles = num_skipped_articles.value if ignore_input_format_error else 0
         
         # Calculate expected articles (total - skipped due to format errors)
-        # Note: Articles dropped during processing (prompt-only, packing drops) are still counted in metrics.articles
-        # because metrics.articles is incremented before processing/dropping
+        # Note: Articles dropped during processing (prompt-only, packing drops)
+        # are still counted in metrics.articles because metrics.articles is
+        # incremented before processing/dropping
         expected_articles = total_num_articles - skipped_articles
-        
+
         # Compare metrics with expected count
         metrics_diff = abs(metrics_articles - expected_articles)
-        metrics_diff_percent = (metrics_diff / total_num_articles) * 100 if total_num_articles > 0 else 0
-        
+        metrics_diff_percent = (
+            (metrics_diff / total_num_articles) * 100
+            if total_num_articles > 0
+            else 0
+        )
+
         log_sep_str()
         if metrics_diff == 0:
-            LOGGER.info(f"[SUCCESS] 100% DATA UTILIZATION: All {total_num_articles} articles from input files were processed!")
+            LOGGER.info(
+                f"[SUCCESS] 100% DATA UTILIZATION: All {total_num_articles} "
+                f"articles from input files were processed!"
+            )
             if skipped_articles > 0:
-                LOGGER.info(f"  Note: {skipped_articles} articles were skipped due to JSON format errors (expected)")
-            LOGGER.info(f"  All {metrics_articles} processed articles are included in the output dataset.")
+                LOGGER.info(
+                    f"  Note: {skipped_articles} articles were skipped due to "
+                    f"JSON format errors (expected)"
+                )
+            LOGGER.info(
+                f"  All {metrics_articles} processed articles are included in "
+                f"the output dataset."
+            )
         elif metrics_diff_percent <= 0.1:  # Less than 0.1% difference
             LOGGER.warning(
-                f"Near-complete data utilization: {metrics_articles}/{expected_articles} articles processed "
-                f"({metrics_diff_percent:.3f}% difference). This is likely due to rounding or minor counting differences."
+                f"Near-complete data utilization: {metrics_articles}/"
+                f"{expected_articles} articles processed "
+                f"({metrics_diff_percent:.3f}% difference). This is likely due "
+                f"to rounding or minor counting differences."
             )
-            LOGGER.info(f"  {metrics_articles} articles are included in the output dataset.")
+            LOGGER.info(
+                f"  {metrics_articles} articles are included in the output "
+                f"dataset."
+            )
         else:
             LOGGER.error(
-                f"[WARNING] INCOMPLETE DATA UTILIZATION: Only {metrics_articles}/{expected_articles} articles processed "
-                f"({metrics_diff_percent:.2f}% difference, {expected_articles - metrics_articles} articles missing)."
+                f"[WARNING] INCOMPLETE DATA UTILIZATION: Only "
+                f"{metrics_articles}/{expected_articles} articles processed "
+                f"({metrics_diff_percent:.2f}% difference, "
+                f"{expected_articles - metrics_articles} articles missing)."
             )
             LOGGER.error(
-                f"  This means {expected_articles - metrics_articles} articles from your input files were not processed. "
+                f"  This means {expected_articles - metrics_articles} articles "
+                f"from your input files were not processed. "
                 f"Please check for errors in processing or data format issues."
             )
-        
+
         # Compare counter with metrics to identify counting issues
         if abs(counter_articles - metrics_articles) > 10:
             LOGGER.warning(
-                f"Counter discrepancy detected: Progress counter shows {counter_articles} articles, "
-                f"but metrics show {metrics_articles} articles were actually processed. "
+                f"Counter discrepancy detected: Progress counter shows "
+                f"{counter_articles} articles, but metrics show "
+                f"{metrics_articles} articles were actually processed. "
                 f"Difference: {abs(metrics_articles - counter_articles)} articles. "
                 f"The metrics count ({metrics_articles}) is the accurate one."
             )
         else:
-            LOGGER.info(f"[OK] Progress counter matches metrics: {counter_articles} articles counted, {metrics_articles} articles processed.")
+            LOGGER.info(
+                f"[OK] Progress counter matches metrics: {counter_articles} "
+                f"articles counted, {metrics_articles} articles processed."
+            )
         
         log_sep_str()
 
