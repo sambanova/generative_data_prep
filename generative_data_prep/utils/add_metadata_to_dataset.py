@@ -59,7 +59,7 @@ def save_metadata(metadata_path, metadata):
         metadata_path (str): Path to the metadata YAML file.
         metadata (dict): Metadata dictionary to save.
     """
-    with open(metadata_path, "w") as f:
+    with open(metadata_path, "w", encoding="utf-8") as f:
         yaml.safe_dump(metadata, f, default_flow_style=False)
 
 
@@ -72,7 +72,7 @@ def add_seq_metadata_dataset(dataset_path):
     metadata_path = os.path.join(dataset_path, "metadata.yaml")
     metadata = {}
     if os.path.exists(metadata_path):
-        with open(metadata_path, "r") as f:
+        with open(metadata_path, "r", encoding="utf-8") as f:
             metadata = yaml.safe_load(f) or {}
 
     train_sequences = 0

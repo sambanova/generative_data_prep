@@ -106,12 +106,16 @@ def data_prep_main(
     dump_categories = category_to_id is not None
 
     with Hdf5FileBuffer(output_file, max_seq_length, dump_categories) as hdf5_text_buffer:
+        total_processed = 0
         with open(input_file, "r", encoding="utf-8", errors="replace") as reader:
             for i, line in enumerate(reader):
                 try:
                     hdf5_text_buffer.write(article_tokenizer(line))
+                    total_processed = i + 1  # Track total processed (i is 0-indexed)
+                    # Update counter every 100 articles (including the first batch)
+                    # When i+1 is a multiple of 100, we've processed exactly that many
                     if (
-                        (i != 0 and i % 100 == 0)
+                        total_processed % 100 == 0
                         and num_tokenized_articles_lock is not None
                         and num_tokenized_articles is not None
                     ):
@@ -133,9 +137,15 @@ def data_prep_main(
                             exc.doc,
                             exc.pos,
                         ) from exc
-            if num_tokenized_articles_lock is not None and num_tokenized_articles is not None:
+            # Add remaining articles that weren't counted in the batch updates
+            if num_tokenized_articles_lock is not None and num_tokenized_articles is not None and total_processed > 0:
                 with num_tokenized_articles_lock:
-                    num_tokenized_articles.value += i % 100
+                    # Calculate remaining articles: total processed minus what we already counted
+                    # We count in batches of 100, so we need to add the remainder
+                    already_counted = (total_processed // 100) * 100  # How many we've already counted
+                    remaining = total_processed - already_counted
+                    if remaining > 0:
+                        num_tokenized_articles.value += remaining
             hdf5_text_buffer.write(article_tokenizer(None))
     article_tokenizer.metrics.dataset_type = dataset_type
     return article_tokenizer.metrics

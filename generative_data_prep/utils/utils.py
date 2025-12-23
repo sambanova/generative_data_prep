@@ -128,7 +128,7 @@ def create_sha256(output_dir: str):
             "size": os.path.getsize(file),
             "modified_time": os.path.getmtime(file),
         }
-    with open(output_file_hash, "w") as output_file:
+    with open(output_file_hash, "w", encoding="utf-8") as output_file:
         json.dump(file_info_dict, output_file)
 
 
