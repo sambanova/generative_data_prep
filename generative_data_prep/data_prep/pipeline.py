@@ -11,7 +11,6 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
- 
 
 Data preparation pipeline for converting a jsonl file to tokenized hdf5 files consumable by SambaSuite.
 """
@@ -126,7 +125,7 @@ def split_file_round_robin(num_splits: int, input_file_path: str, split_dir: str
     for i in range(num_splits):
         out_file_path = os.path.join(split_dir, str(i).zfill(max(2, num_digits)))
         split_files.append(open(out_file_path, "w", encoding="utf-8", errors="replace"))
-    
+
     try:
         # Read input file and distribute lines in round-robin fashion
         with open(input_file_path, "r", encoding="utf-8", errors="replace") as infile:
@@ -137,6 +136,7 @@ def split_file_round_robin(num_splits: int, input_file_path: str, split_dir: str
         # Close all file handles
         for f in split_files:
             f.close()
+
 
 def check_RAM(input_file_size_in_bytes: int):
     """Check to make sure there is enough RAM on the system to fit [input_file_size_in_bytes].
@@ -183,11 +183,11 @@ def rename_files(
     num_digits = len(str(num_splits))
     for i in range(num_splits):
         if i < train_count:
-            new_name = f"train_{i+1}_of_{train_count}{file_ext}"
+            new_name = f"train_{i + 1}_of_{train_count}{file_ext}"
         elif i < train_count + test_count:
-            new_name = f"test_{i-train_count+1}_of_{test_count}{file_ext}"
+            new_name = f"test_{i - train_count + 1}_of_{test_count}{file_ext}"
         else:
-            new_name = f"dev_{i-train_count-test_count+1}_of_{dev_count}{file_ext}"
+            new_name = f"dev_{i - train_count - test_count + 1}_of_{dev_count}{file_ext}"
 
         new_file_path = os.path.join(split_dir, new_name)
 
@@ -223,10 +223,10 @@ def count_exact_total_num_articles(files_to_tokenize, split_dir):
     """
     if not files_to_tokenize:
         return 0
-    
+
     total_lines = 0
     LOGGER.info(f"Counting articles in {len(files_to_tokenize)} files to get exact total...")
-    
+
     for file_name in files_to_tokenize:
         file_path = os.path.join(split_dir, file_name)
         lines_in_file = 0
@@ -236,14 +236,14 @@ def count_exact_total_num_articles(files_to_tokenize, split_dir):
                 if line.strip():
                     lines_in_file += 1
         total_lines += lines_in_file
-    
+
     LOGGER.info(f"Exact total articles counted: {total_lines}")
     return total_lines
 
 
 def estimate_total_num_articles(files_to_tokenize, split_dir):
     """Estimates the total number of articles based on number of articles in sample files times number of splits.
-    
+
     DEPRECATED: Use count_exact_total_num_articles for exact count instead.
 
     Args:
@@ -255,12 +255,12 @@ def estimate_total_num_articles(files_to_tokenize, split_dir):
     """
     if not files_to_tokenize:
         return 0
-    
+
     # Sample up to 5 files to get a better average estimate
     sample_size = min(5, len(files_to_tokenize))
     total_lines = 0
     files_sampled = 0
-    
+
     for i in range(sample_size):
         file_path = os.path.join(split_dir, files_to_tokenize[i])
         lines_in_file = 0
@@ -271,10 +271,10 @@ def estimate_total_num_articles(files_to_tokenize, split_dir):
                     lines_in_file += 1
         total_lines += lines_in_file
         files_sampled += 1
-    
+
     if files_sampled == 0:
         return 0
-    
+
     # Calculate average lines per file and multiply by total files
     avg_lines_per_file = total_lines / files_sampled
     return int(avg_lines_per_file * len(files_to_tokenize))
@@ -538,7 +538,11 @@ def multiprocess_data_prep(  # noqa: C901
                             if max_update > 0:
                                 bar_update_tracker += max_update
                                 # Set bar to exact position (as fraction of total, capped at 1.0)
-                                bar_position = min(1.0, bar_update_tracker / total_num_articles) if total_num_articles > 0 else 0.0
+                                bar_position = (
+                                    min(1.0, bar_update_tracker / total_num_articles)
+                                    if total_num_articles > 0
+                                    else 0.0
+                                )
                                 bar(bar_position)
                 # Ensure progress bar reaches exactly 100% (1.0 in manual mode)
                 # Use tracker to set final position
@@ -558,7 +562,11 @@ def multiprocess_data_prep(  # noqa: C901
                         if max_update > 0:
                             bar_update_tracker += max_update
                             # Set bar to exact position (as fraction of total, capped at 1.0)
-                            bar_position = min(1.0, bar_update_tracker / total_num_articles) if total_num_articles > 0 else 0.0
+                            bar_position = (
+                                min(1.0, bar_update_tracker / total_num_articles)
+                                if total_num_articles > 0
+                                else 0.0
+                            )
                             bar(bar_position)
                 # Calculate percentage based on our tracker (more accurate than bar.current in manual mode)
                 if total_num_articles > 0:
@@ -569,7 +577,9 @@ def multiprocess_data_prep(  # noqa: C901
                     perc_complete = 0.0
                 elapsed_time_str = f"--- elapsed time: {time.time() - tokenization_start_time}"
                 LOGGER.debug(
-                    f"Counter: {num_tokenized_articles.value}, Progress tracker: {bar_update_tracker}/{total_num_articles}, {perc_complete}% complete => Time remaining: {bar.eta} {elapsed_time_str}"
+                    f"Counter: {num_tokenized_articles.value}, Progress tracker: "
+                    f"{bar_update_tracker}/{total_num_articles}, {perc_complete}% complete => "
+                    f"Time remaining: {bar.eta} {elapsed_time_str}"
                 )
                 prev_num_tokenized_articles = num_tokenized_articles.value
 
@@ -598,13 +608,13 @@ def multiprocess_data_prep(  # noqa: C901
         LOGGER.info(
             f"Total skipped lines (format errors): {num_skipped_articles.value}"
         )
-    
+
     # Validate 100% completion
     if total_num_articles > 0:
         counter_articles = num_tokenized_articles.value
         metrics_articles = total_actual_articles
         skipped_articles = num_skipped_articles.value if ignore_input_format_error else 0
-        
+
         # Calculate expected articles (total - skipped due to format errors)
         # Note: Articles dropped during processing (prompt-only, packing drops)
         # are still counted in metrics.articles because metrics.articles is
@@ -672,7 +682,7 @@ def multiprocess_data_prep(  # noqa: C901
                 f"[OK] Progress counter matches metrics: {counter_articles} "
                 f"articles counted, {metrics_articles} articles processed."
             )
-        
+
         log_sep_str()
 
     if dataset_metadata_json is not None:
@@ -849,12 +859,11 @@ def pipeline_main(  # noqa: C901
             with open(out_file_path, "w", encoding="utf-8", errors="replace") as out_file:
                 out_file.writelines(split)
 
-   # Case 3: Do not shuffle, split file (cross-platform)
+    # Case 3: Do not shuffle, split file (cross-platform)
     elif shuffle == "False":
         log_sep_str()
         LOGGER.warning("WARNING: you did not specify the --shuffle flag, so no shuffling was done!")
         split_file_round_robin(num_splits, input_file_path, split_dir)
-
 
     # rename files to include the corresponding names of 'test', 'dev' and 'train'
     files_to_tokenize = rename_files(

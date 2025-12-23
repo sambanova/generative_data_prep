@@ -64,7 +64,6 @@ if sys.platform == "win32":
             pass
 
 
-
 def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase, special_tokens_dict: str):
     """Add the special tokens dictionary to tokenizer.
 
@@ -320,4 +319,4 @@ if __name__ == "__main__":
     parser = get_arg_parser()
     data_prep_args = parser.parse_args()
     data_prep_args = check_deprecated_args(data_prep_args)
-    main(data_prep_args) 
+    main(data_prep_args)
