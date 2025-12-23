@@ -80,7 +80,7 @@ def validate_sha256(output_dir: str):
     """
     files_to_hash = _get_walk_files_to_hash(output_dir, "sha256")
     sha_info_file = os.path.join(output_dir, "sha256", "files_metadata.json")
-    with open(sha_info_file, "r") as output_file:
+    with open(sha_info_file, "r", encoding="utf-8", errors="replace") as output_file:
         file_info_dict = json.load(output_file)
     for file, hash_file_name in files_to_hash:
         if "logs" not in hash_file_name:

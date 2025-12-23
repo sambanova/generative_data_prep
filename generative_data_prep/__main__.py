@@ -46,6 +46,24 @@ from generative_data_prep.utils import (
 logger = logging.getLogger("generative_data_prep_logger")
 logging.config.fileConfig(get_config_file_path())
 
+# Fix Unicode encoding issues on Windows console
+import sys
+
+# Configure stdout/stderr to handle Unicode encoding errors on Windows
+if sys.platform == "win32":
+    # Try to reconfigure streams to use UTF-8 with error replacement
+    if hasattr(sys.stdout, 'reconfigure'):
+        try:
+            sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+        except (AttributeError, ValueError):
+            pass
+    if hasattr(sys.stderr, 'reconfigure'):
+        try:
+            sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+        except (AttributeError, ValueError):
+            pass
+
+
 
 def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase, special_tokens_dict: str):
     """Add the special tokens dictionary to tokenizer.
@@ -302,4 +320,4 @@ if __name__ == "__main__":
     parser = get_arg_parser()
     data_prep_args = parser.parse_args()
     data_prep_args = check_deprecated_args(data_prep_args)
-    main(data_prep_args)
+    main(data_prep_args) 

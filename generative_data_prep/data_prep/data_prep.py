@@ -106,7 +106,7 @@ def data_prep_main(
     dump_categories = category_to_id is not None
 
     with Hdf5FileBuffer(output_file, max_seq_length, dump_categories) as hdf5_text_buffer:
-        with open(input_file, "r") as reader:
+        with open(input_file, "r", encoding="utf-8", errors="replace") as reader:
             for i, line in enumerate(reader):
                 try:
                     hdf5_text_buffer.write(article_tokenizer(line))
@@ -119,7 +119,7 @@ def data_prep_main(
                             num_tokenized_articles.value += 100
                 except json.JSONDecodeError as exc:
                     if ignore_input_format_error:
-                        with open(error_log_path, "a") as f:
+                        with open(error_log_path, "a", encoding="utf-8", errors="replace") as f:
                             f.write(line)
                         if num_tokenized_articles_lock is not None and num_skipped_articles is not None:
                             with num_tokenized_articles_lock:

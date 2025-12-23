@@ -11,7 +11,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
+ 
 
 Data preparation pipeline for converting a jsonl file to tokenized hdf5 files consumable by SambaSuite.
 """
@@ -23,6 +23,7 @@ import multiprocessing
 import os
 import random
 import shutil
+import sys
 import time
 import uuid
 from pathlib import Path
@@ -35,6 +36,13 @@ import yaml
 from alive_progress import alive_bar
 from transformers import PretrainedConfig, PreTrainedTokenizerBase
 
+# Set multiprocessing start method for Windows compatibility
+if sys.platform == "win32":
+    try:
+        multiprocessing.set_start_method("spawn", force=True)
+    except RuntimeError:
+        # Start method already set, ignore
+        pass
 from generative_data_prep.data_prep import data_prep_main
 from generative_data_prep.processors.metrics import Metrics
 from generative_data_prep.utils import (
@@ -91,11 +99,11 @@ def combine_input_dir_files(input_path: str) -> Tuple[str, List[Path]]:
     output_file = input_path_obj / f"combined_output_{uuid.uuid4().hex[:8]}{ext}"
 
     # Open the output file and concatenate all input files
-    with open(output_file, "w") as f_out:
+    with open(output_file, "w", encoding="utf-8", errors="replace") as f_out:
         for input_file in input_files:
             if "combined_output_" not in str(input_file):
                 verify_input_file(str(input_file))
-                with open(input_file, "r") as f_in:
+                with open(input_file, "r", encoding="utf-8", errors="replace") as f_in:
                     if input_file.stat().st_size == 0:
                         continue  # Skip empty files
 
@@ -104,17 +112,33 @@ def combine_input_dir_files(input_path: str) -> Tuple[str, List[Path]]:
     return str(output_file), input_files
 
 
-def split_file_linux(num_splits: int, input_file_path: str, split_dir: str) -> None:
-    """Split the [input_file_path] into num_splits and places it in [split_dir].
+def split_file_round_robin(num_splits: int, input_file_path: str, split_dir: str) -> None:
+    """Split the [input_file_path] into num_splits and places it in [split_dir] using round-robin distribution.
+
+    This is a cross-platform replacement for the Linux 'split -d -n r/' command.
 
     Args:
         num_splits (int): number of output file splits
         input_file_path (str): input jsonl file path
         split_dir (str): The directory to place all the outputted splits
     """
-    split_command = f"split -d -n r/{num_splits} {input_file_path} {split_dir}/"
-    execute_and_return_stdout(split_command)
-
+    # Create file handles for all split files
+    split_files = []
+    num_digits = len(str(num_splits))
+    for i in range(num_splits):
+        out_file_path = os.path.join(split_dir, str(i).zfill(max(2, num_digits)))
+        split_files.append(open(out_file_path, "w", encoding="utf-8", errors="replace"))
+    
+    try:
+        # Read input file and distribute lines in round-robin fashion
+        with open(input_file_path, "r", encoding="utf-8", errors="replace") as infile:
+            for line_num, line in enumerate(infile):
+                split_index = line_num % num_splits
+                split_files[split_index].write(line)
+    finally:
+        # Close all file handles
+        for f in split_files:
+            f.close()
 
 def check_RAM(input_file_size_in_bytes: int):
     """Check to make sure there is enough RAM on the system to fit [input_file_size_in_bytes].
@@ -200,7 +224,7 @@ def estimate_total_num_articles(files_to_tokenize, split_dir):
         Estimate of the total number of articles needed to tokenize
     """
     lines_per_file = 0
-    with open(os.path.join(split_dir, files_to_tokenize[0]), "r") as file:
+    with open(os.path.join(split_dir, files_to_tokenize[0]), "r", encoding="utf-8", errors="replace") as file:
         for _ in file:
             lines_per_file += 1
 
@@ -354,6 +378,10 @@ def multiprocess_data_prep(  # noqa: C901
     prev_num_tokenized_articles = 0
     prev_num_skipped_articles = 0
     # Submit multiprocessing workers
+    # On Windows, reduce workers to avoid pickling issues with large tokenizers
+    if sys.platform == "win32" and num_workers > 4:
+        LOGGER.warning(f"Reducing workers from {num_workers} to 4 on Windows to avoid multiprocessing issues.")
+        num_workers = 4
     executor = concurrent.futures.ProcessPoolExecutor(max_workers=num_workers)
     futures = []
     for input_file_path, output_file_path in zip(sub_input_file_paths, sub_output_file_paths):
@@ -580,7 +608,7 @@ def pipeline_main(  # noqa: C901
     )
 
     num_splits_greater_lines = False
-    with open(input_file_path, "r") as input_file:
+    with open(input_file_path, "r", encoding="utf-8", errors="replace") as input_file:
         for i, line in enumerate(input_file):
             if i > num_splits:
                 num_splits_greater_lines = True
@@ -622,66 +650,32 @@ def pipeline_main(  # noqa: C901
     # =========================================================
     # Case 1: large file shuffle specified. REQUIRES: linux OS
     if shuffle == "large_file":
-        err_msg = "You specified --shuffle=large_file, but this is only supported on linux operating systems, "
-        err_msg += f"your operating system is {platform}. Please change the flag to --shuffle=on_RAM or --shuffle=False"
-        if "linux" not in platform.lower():
-            raise OSError(err_msg)
         split_dir = large_file_shuffle(input_file_path, output_dir, False, num_splits)
 
-    # Case 2: Shuffling on RAM with linux OS
-    elif shuffle == "on_RAM" and "linux" in platform.lower():
+    # Case 2: Shuffling on RAM (cross-platform)
+    elif shuffle == "on_RAM":
         check_RAM(input_file_size_in_bytes)
         log_sep_str()
         LOGGER.info("Shuffling input file, please be patient.")
-        file_ext = os.path.splitext(input_file_path)[1]
-        shuffle_file_path = os.path.join(output_dir, f"tmp_shuf{file_ext}")
-        shuffle_command = f"shuf {input_file_path} > {shuffle_file_path}"
-        try:
-            out = execute_and_return_stdout(shuffle_command)
-            err_msg = f"Shuffle command killed, with print stdout:{out.stdout} stderr:{out.stderr}"
-            if "killed" in out.stdout or "killed" in out.stderr:
-                raise MemoryError(err_msg)
-        except Exception as e:
-            err_msg = f"Failed with exception {e}, shuffling on RAM is not possible,"
-            err_msg += " try specifying argument --shuffle=large_file"
-            raise RuntimeError(err_msg)
-        split_file_linux(num_splits, shuffle_file_path, split_dir)
-        os.remove(shuffle_file_path)
-
-    # Case 3: shuffle on RAM without linux OS
-    elif shuffle == "on_RAM" and "linux" not in platform.lower():
-        check_RAM(input_file_size_in_bytes)
-        lines = open(input_file_path).readlines()
+        # Read all lines into memory
+        with open(input_file_path, "r", encoding="utf-8", errors="replace") as f:
+            lines = f.readlines()
+        # Shuffle the lines
         random.shuffle(lines)
+        # Split into chunks
         splits = np.array_split(lines, num_splits)
         num_digits = len(str(num_splits))
         for i, split in enumerate(splits):
             out_file_path = os.path.join(split_dir, str(i).zfill(max(2, num_digits)))
-            with open(out_file_path, "w") as out_file:
+            with open(out_file_path, "w", encoding="utf-8", errors="replace") as out_file:
                 out_file.writelines(split)
 
-    # Case 4: Do not shuffle, split file without linux OS
-    elif shuffle == "False" and "linux" not in platform.lower():
+   # Case 3: Do not shuffle, split file (cross-platform)
+    elif shuffle == "False":
         log_sep_str()
         LOGGER.warning("WARNING: you did not specify the --shuffle flag, so no shuffling was done!")
-        out_files = []
-        num_digits = len(str(num_splits))
-        for i in range(num_splits):
-            out_file_path = os.path.join(split_dir, str(i).zfill(max(2, num_digits)))
-            out_files.append(out_file_path)
-            with open(out_file_path, "w") as _:
-                pass
+        split_file_round_robin(num_splits, input_file_path, split_dir)
 
-        with open(input_file_path, "r") as input_file:
-            for i, line in enumerate(input_file):
-                with open(out_files[i % len(out_files)], "a") as out_f:
-                    out_f.write(line)
-
-    # Case 5: Do not shuffle, split file with linux OS
-    elif shuffle == "False" and "linux" in platform.lower():
-        log_sep_str()
-        LOGGER.warning("WARNING: you did not specify the --shuffle flag, so no shuffling was done!")
-        split_file_linux(num_splits, input_file_path, split_dir)
 
     # rename files to include the corresponding names of 'test', 'dev' and 'train'
     files_to_tokenize = rename_files(

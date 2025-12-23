@@ -25,6 +25,54 @@ from .logger import log_sep_str
 LOGGER = logging.getLogger("generative_data_prep_logger")
 
 
+def _split_file_round_robin(input_file_path: str, split_dir: str, num_splits: int):
+    """Split a file into multiple files using round-robin distribution.
+    
+    This is a cross-platform replacement for the Linux 'split -d -n r/' command.
+    Each line from the input file is distributed to output files in round-robin fashion.
+    
+    Args:
+        input_file_path (str): Path to the input file to split
+        split_dir (str): Directory where split files will be created
+        num_splits (int): Number of split files to create
+    """
+    # Create file handles for all split files
+    split_files = []
+    for i in range(num_splits):
+        split_file_path = os.path.join(split_dir, f"x{i:02d}")
+        split_files.append(open(split_file_path, "w", encoding="utf-8", errors="replace"))
+    
+    try:
+        # Read input file and distribute lines in round-robin fashion
+        with open(input_file_path, "r", encoding="utf-8", errors="replace") as infile:
+            for line_num, line in enumerate(infile):
+                split_index = line_num % num_splits
+                split_files[split_index].write(line)
+    finally:
+        # Close all file handles
+        for f in split_files:
+            f.close()
+
+
+def _shuffle_file(file_path: str):
+    """Shuffle the lines of a file in-place.
+    
+    This is a cross-platform replacement for the Linux 'shuf' command.
+    
+    Args:
+        file_path (str): Path to the file to shuffle
+    """
+    # Read all lines
+    with open(file_path, "r", encoding="utf-8", errors="replace") as f:
+        lines = f.readlines()
+    
+    # Shuffle the lines
+    random.shuffle(lines)
+    
+    # Write back to file
+    with open(file_path, "w", encoding="utf-8", errors="replace") as f:
+        f.writelines(lines)
+
 def large_file_shuffle(
     input_file_path: str,
     output_dir: str,
@@ -86,8 +134,7 @@ def large_file_shuffle(
 
     prev_time = time.time()
     LOGGER.info("splitting file")
-    split_command = f"split -d -n r/{num_splits} {input_file_path} {split_dir}/"
-    os.system(split_command)  # nosec
+    _split_file_round_robin(input_file_path, split_dir, num_splits)
     LOGGER.info(f"splitting took {time.time() - prev_time} seconds (used round robin splitting).")
 
     prev_time = time.time()
@@ -95,19 +142,19 @@ def large_file_shuffle(
     file_list = list(os.listdir(split_dir))
     for file in tqdm(file_list):
         curr_file_path = os.path.join(split_dir, file)
-        shuf_command = f"shuf {curr_file_path} --output={curr_file_path}"
-        os.system(shuf_command)  # nosec
+        _shuffle_file(curr_file_path)
 
     if concat_splits:
         random_split_list = list(range(num_splits))
         random.shuffle(random_split_list)
         prev_time = time.time()
         LOGGER.info("Concatenating shuffled splits.")
-        for rand_ind in tqdm(random_split_list):
-            curr_file_path = os.path.join(split_dir, file_list[rand_ind])
-            concat_command = f"cat {curr_file_path} >> {output_path}"
-            os.system(concat_command)  # nosec
-            os.remove(curr_file_path)
+        with open(output_path, "wb") as outfile:
+            for rand_ind in tqdm(random_split_list):
+                curr_file_path = os.path.join(split_dir, file_list[rand_ind])
+                with open(curr_file_path, "rb") as infile:
+                    shutil.copyfileobj(infile, outfile)
+                os.remove(curr_file_path)
         LOGGER.info(f"Finished concatenating files. Took {time.time() - prev_time} seconds.")
         shutil.rmtree(split_dir)
 
