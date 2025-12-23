@@ -15,6 +15,7 @@ limitations under the License.
 
 Entry point to the Text Processing Pipeline.
 """
+
 import json
 import logging
 import logging.config
@@ -52,14 +53,14 @@ logging.config.fileConfig(get_config_file_path())
 # Configure stdout/stderr to handle Unicode encoding errors on Windows
 if sys.platform == "win32":
     # Try to reconfigure streams to use UTF-8 with error replacement
-    if hasattr(sys.stdout, 'reconfigure'):
+    if hasattr(sys.stdout, "reconfigure"):
         try:
-            sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
         except (AttributeError, ValueError):
             pass
-    if hasattr(sys.stderr, 'reconfigure'):
+    if hasattr(sys.stderr, "reconfigure"):
         try:
-            sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+            sys.stderr.reconfigure(encoding="utf-8", errors="replace")
         except (AttributeError, ValueError):
             pass
 

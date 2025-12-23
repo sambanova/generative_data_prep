@@ -539,9 +539,7 @@ def multiprocess_data_prep(  # noqa: C901
                                 bar_update_tracker += max_update
                                 # Set bar to exact position (as fraction of total, capped at 1.0)
                                 bar_position = (
-                                    min(1.0, bar_update_tracker / total_num_articles)
-                                    if total_num_articles > 0
-                                    else 0.0
+                                    min(1.0, bar_update_tracker / total_num_articles) if total_num_articles > 0 else 0.0
                                 )
                                 bar(bar_position)
                 # Ensure progress bar reaches exactly 100% (1.0 in manual mode)
@@ -563,9 +561,7 @@ def multiprocess_data_prep(  # noqa: C901
                             bar_update_tracker += max_update
                             # Set bar to exact position (as fraction of total, capped at 1.0)
                             bar_position = (
-                                min(1.0, bar_update_tracker / total_num_articles)
-                                if total_num_articles > 0
-                                else 0.0
+                                min(1.0, bar_update_tracker / total_num_articles) if total_num_articles > 0 else 0.0
                             )
                             bar(bar_position)
                 # Calculate percentage based on our tracker (more accurate than bar.current in manual mode)
@@ -584,13 +580,9 @@ def multiprocess_data_prep(  # noqa: C901
                 prev_num_tokenized_articles = num_tokenized_articles.value
 
                 if ignore_input_format_error:
-                    num_new_skipped_articles = (
-                        num_skipped_articles.value - prev_num_skipped_articles
-                    )
+                    num_new_skipped_articles = num_skipped_articles.value - prev_num_skipped_articles
                     if num_new_skipped_articles > 0:
-                        LOGGER.info(
-                            f"{num_skipped_articles.value} misformatted lines are skipped"
-                        )
+                        LOGGER.info(f"{num_skipped_articles.value} misformatted lines are skipped")
                         prev_num_skipped_articles = num_skipped_articles.value
             time.sleep(5)
 
@@ -605,9 +597,7 @@ def multiprocess_data_prep(  # noqa: C901
 
     if ignore_input_format_error:
         LOGGER.info(f"Progress counter value: {num_tokenized_articles.value}")
-        LOGGER.info(
-            f"Total skipped lines (format errors): {num_skipped_articles.value}"
-        )
+        LOGGER.info(f"Total skipped lines (format errors): {num_skipped_articles.value}")
 
     # Validate 100% completion
     if total_num_articles > 0:
@@ -623,11 +613,7 @@ def multiprocess_data_prep(  # noqa: C901
 
         # Compare metrics with expected count
         metrics_diff = abs(metrics_articles - expected_articles)
-        metrics_diff_percent = (
-            (metrics_diff / total_num_articles) * 100
-            if total_num_articles > 0
-            else 0
-        )
+        metrics_diff_percent = (metrics_diff / total_num_articles) * 100 if total_num_articles > 0 else 0
 
         log_sep_str()
         if metrics_diff == 0:
@@ -637,13 +623,9 @@ def multiprocess_data_prep(  # noqa: C901
             )
             if skipped_articles > 0:
                 LOGGER.info(
-                    f"  Note: {skipped_articles} articles were skipped due to "
-                    f"JSON format errors (expected)"
+                    f"  Note: {skipped_articles} articles were skipped due to " f"JSON format errors (expected)"
                 )
-            LOGGER.info(
-                f"  All {metrics_articles} processed articles are included in "
-                f"the output dataset."
-            )
+            LOGGER.info(f"  All {metrics_articles} processed articles are included in " f"the output dataset.")
         elif metrics_diff_percent <= 0.1:  # Less than 0.1% difference
             LOGGER.warning(
                 f"Near-complete data utilization: {metrics_articles}/"
@@ -651,10 +633,7 @@ def multiprocess_data_prep(  # noqa: C901
                 f"({metrics_diff_percent:.3f}% difference). This is likely due "
                 f"to rounding or minor counting differences."
             )
-            LOGGER.info(
-                f"  {metrics_articles} articles are included in the output "
-                f"dataset."
-            )
+            LOGGER.info(f"  {metrics_articles} articles are included in the output " f"dataset.")
         else:
             LOGGER.error(
                 f"[WARNING] INCOMPLETE DATA UTILIZATION: Only "

@@ -12,6 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+
 import logging
 import os
 import random
@@ -27,10 +28,10 @@ LOGGER = logging.getLogger("generative_data_prep_logger")
 
 def _split_file_round_robin(input_file_path: str, split_dir: str, num_splits: int):
     """Split a file into multiple files using round-robin distribution.
-    
+
     This is a cross-platform replacement for the Linux 'split -d -n r/' command.
     Each line from the input file is distributed to output files in round-robin fashion.
-    
+
     Args:
         input_file_path (str): Path to the input file to split
         split_dir (str): Directory where split files will be created
@@ -41,7 +42,7 @@ def _split_file_round_robin(input_file_path: str, split_dir: str, num_splits: in
     for i in range(num_splits):
         split_file_path = os.path.join(split_dir, f"x{i:02d}")
         split_files.append(open(split_file_path, "w", encoding="utf-8", errors="replace"))
-    
+
     try:
         # Read input file and distribute lines in round-robin fashion
         with open(input_file_path, "r", encoding="utf-8", errors="replace") as infile:
@@ -56,22 +57,23 @@ def _split_file_round_robin(input_file_path: str, split_dir: str, num_splits: in
 
 def _shuffle_file(file_path: str):
     """Shuffle the lines of a file in-place.
-    
+
     This is a cross-platform replacement for the Linux 'shuf' command.
-    
+
     Args:
         file_path (str): Path to the file to shuffle
     """
     # Read all lines
     with open(file_path, "r", encoding="utf-8", errors="replace") as f:
         lines = f.readlines()
-    
+
     # Shuffle the lines
     random.shuffle(lines)
-    
+
     # Write back to file
     with open(file_path, "w", encoding="utf-8", errors="replace") as f:
         f.writelines(lines)
+
 
 def large_file_shuffle(
     input_file_path: str,

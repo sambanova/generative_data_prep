@@ -15,6 +15,7 @@ limitations under the License.
 
 This class creates a common logger.
 """
+
 import argparse
 import datetime
 import importlib.metadata
@@ -93,9 +94,18 @@ def log_metrics(metrics):
         # Replace Unicode box-drawing characters with ASCII equivalents for Windows compatibility
         if sys.platform == "win32":
             replacements = {
-                '╒': '+', '═': '=', '╤': '+', '╕': '+',
-                '├': '+', '─': '-', '┼': '+', '┤': '+',
-                '╘': '+', '╧': '+', '╛': '+', '│': '|'
+                "╒": "+",
+                "═": "=",
+                "╤": "+",
+                "╕": "+",
+                "├": "+",
+                "─": "-",
+                "┼": "+",
+                "┤": "+",
+                "╘": "+",
+                "╧": "+",
+                "╛": "+",
+                "│": "|",
             }
             for old, new in replacements.items():
                 metrics_str = metrics_str.replace(old, new)
@@ -103,7 +113,7 @@ def log_metrics(metrics):
             LOGGER.info(metrics_str)
         except UnicodeEncodeError:
             # Fallback: encode as ASCII with replacement
-            safe_str = metrics_str.encode('ascii', errors='replace').decode('ascii')
+            safe_str = metrics_str.encode("ascii", errors="replace").decode("ascii")
             LOGGER.info(safe_str)
 
 
