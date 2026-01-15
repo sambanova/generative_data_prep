@@ -46,7 +46,7 @@ If you are an advanced user looking to process data with pre-defined splits, int
 
 ## Requirements
 - Python version 3.8.10+
-- Support for Linux and Mac OS. Not tested on Windows
+- Support for Linux, Mac OS and Windows.
 
 </br>
 
