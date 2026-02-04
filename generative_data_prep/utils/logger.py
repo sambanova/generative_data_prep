@@ -15,6 +15,7 @@ limitations under the License.
 
 This class creates a common logger.
 """
+
 import argparse
 import datetime
 import importlib.metadata
@@ -89,7 +90,31 @@ def log_input_args(args):
 def log_metrics(metrics):
     """Log the metrics table."""
     if not metrics.is_empty:
-        LOGGER.info(f"{get_header('')}\n{metrics}\n{get_header('')}")
+        metrics_str = f"{get_header('')}\n{metrics}\n{get_header('')}"
+        # Replace Unicode box-drawing characters with ASCII equivalents for Windows compatibility
+        if sys.platform == "win32":
+            replacements = {
+                "╒": "+",
+                "═": "=",
+                "╤": "+",
+                "╕": "+",
+                "├": "+",
+                "─": "-",
+                "┼": "+",
+                "┤": "+",
+                "╘": "+",
+                "╧": "+",
+                "╛": "+",
+                "│": "|",
+            }
+            for old, new in replacements.items():
+                metrics_str = metrics_str.replace(old, new)
+        try:
+            LOGGER.info(metrics_str)
+        except UnicodeEncodeError:
+            # Fallback: encode as ASCII with replacement
+            safe_str = metrics_str.encode("ascii", errors="replace").decode("ascii")
+            LOGGER.info(safe_str)
 
 
 def get_header(header_name: str):

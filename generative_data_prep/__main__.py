@@ -15,9 +15,12 @@ limitations under the License.
 
 Entry point to the Text Processing Pipeline.
 """
+
 import json
 import logging
+import logging.config
 import os
+import sys
 from typing import Optional
 
 from transformers import AutoConfig, AutoTokenizer, PreTrainedTokenizerBase
@@ -45,6 +48,21 @@ from generative_data_prep.utils import (
 
 logger = logging.getLogger("generative_data_prep_logger")
 logging.config.fileConfig(get_config_file_path())
+
+# Fix Unicode encoding issues on Windows console
+# Configure stdout/stderr to handle Unicode encoding errors on Windows
+if sys.platform == "win32":
+    # Try to reconfigure streams to use UTF-8 with error replacement
+    if hasattr(sys.stdout, "reconfigure"):
+        try:
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
+    if hasattr(sys.stderr, "reconfigure"):
+        try:
+            sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
 
 
 def add_special_tokens_dict(tokenizer: PreTrainedTokenizerBase, special_tokens_dict: str):
@@ -129,7 +147,7 @@ def get_categories(categories_path: str):
             _, file_extension = os.path.splitext(categories_path)
             if file_extension != ".json":
                 raise ValueError(f"Your --categories_path flag must point to a json file, you used {categories_path}")
-            with open(categories_path, "r") as categories_file:
+            with open(categories_path, "r", encoding="utf-8") as categories_file:
                 categories_list = json.load(categories_file)
                 if not isinstance(categories_list, list):
                     err_msg = (
