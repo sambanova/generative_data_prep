@@ -1,0 +1,5 @@
+# Gitleaks config for generative_data_prep. Extends the built-in default ruleset.
+title = "generative_data_prep gitleaks config"
+
+[extend]
+useDefault = true
