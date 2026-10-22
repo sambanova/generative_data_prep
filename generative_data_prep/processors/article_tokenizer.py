@@ -126,8 +126,16 @@ class ArticleTokenizer:
         if pad_token_id is None:
             pad_token_id = tokenizer.eos_token_id
         self.packer = SequencePacker(max_seq_length, pad_token_id, packing_config, self.metrics)
-        self.prompt_prefix = prompt_prefix
-        self.prompt_postfix = prompt_postfix
+        self.prompt_prefix = (
+            prompt_prefix.encode("utf-8").decode("unicode_escape")
+            if isinstance(prompt_prefix, str) and "\\n" in prompt_prefix
+            else prompt_prefix
+        )
+        self.prompt_postfix = (
+            prompt_postfix.encode("utf-8").decode("unicode_escape")
+            if isinstance(prompt_postfix, str) and "\\n" in prompt_postfix
+            else prompt_postfix
+        )
         transformers_logging.set_verbosity_error()
 
         self.logged_prompt_only_warn_msg_prepack = False
