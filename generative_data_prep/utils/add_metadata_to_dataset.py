@@ -89,8 +89,10 @@ def add_seq_metadata_dataset(dataset_path):
 
     if train_sequences > 0:
         metadata = update_metadata(metadata, "train_sequences", train_sequences)
+        metadata = update_metadata(metadata, "training_samples", train_sequences)
     if dev_sequences > 0:
         metadata = update_metadata(metadata, "dev_sequences", dev_sequences)
+        metadata = update_metadata(metadata, "evaluation_samples", dev_sequences)
 
     save_metadata(metadata_path, metadata)
 
