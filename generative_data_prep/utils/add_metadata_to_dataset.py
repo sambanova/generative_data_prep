@@ -116,7 +116,11 @@ def add_all_metadata_to_dataset(dataset_path):  # noqa: C901
     Args:
         dataset_path (str): Path to the dataset directory.
     """
+    metadata_path = os.path.join(dataset_path, "metadata.yaml")
     metadata = {}
+    if os.path.exists(metadata_path):
+        with open(metadata_path, "r", encoding="utf-8") as f:
+            metadata = yaml.safe_load(f) or {}
     tokenizer_dir = os.path.join(dataset_path, "tokenizer")
     if not os.path.exists(tokenizer_dir):
         tokenizer_dir = dataset_path
