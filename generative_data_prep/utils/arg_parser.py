@@ -166,6 +166,15 @@ def data_prep_arg_builder(parser: argparse.ArgumentParser):
     )
 
     parser.add_argument(
+        "--grad_accum_steps",
+        "--grad_accumulation_steps",
+        dest="grad_accum_steps",
+        default=None,
+        type=int,
+        required=False,
+        help="Number of gradient accumulation steps.",
+    )
+    parser.add_argument(
         "--prompt_prefix",
         default=None,
         type=str,
