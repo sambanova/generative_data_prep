@@ -85,7 +85,7 @@ def large_file_shuffle(
 
     1. splits the input file into [num_splits]
     2. shuffles each split
-    3. If yous set concat_splits=True, then the splits are concatenated in a random order
+    3. If you set concat_splits=True, then the splits are concatenated in a random order
 
     Requirements:
     1. you must have enough storage in output_dir to store a shuffled file the same size as input_file_path
@@ -102,7 +102,7 @@ def large_file_shuffle(
         concat_splits (bool): flag that determines if the output should be concatenated or not
         num_splits (int): number of splits to split input file into,
         the more splits the slower it will be, but the better approximation
-        to a fare shuffle
+        to a fair shuffle
 
     Returns:
         output_file_path (str): The file path where the shuffled input was saved

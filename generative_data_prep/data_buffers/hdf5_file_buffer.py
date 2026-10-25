@@ -104,7 +104,7 @@ class Hdf5FileBuffer(FileBuffer):
         """Resizes self.hdf5_file to new_shape then dumps data into it.
 
         Args:
-            dataset_name: string to index index into hdf5 dataset
+            dataset_name: string to index into hdf5 dataset
             new_shape: New shape to resize dataset
             data: Data to add into self.hdf5_file['dataset_name']
         """

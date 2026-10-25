@@ -31,9 +31,9 @@ class DatasetMetadata(BaseModel):
         number_of_training_files: number of hdf5 files available for training
         number_of_dev_files: number of hdf5 files available for evaluation during training
         number_of_test_files: number of test files
-        max_batch_size_train: the minimum datapoints across all training file
+        max_batch_size_train: the minimum datapoints across all training files
         which is what the maximum batch size during training can be
-        max_batch_size_dev: the minimum datapoints across all dev file which
+        max_batch_size_dev: the minimum datapoints across all dev files which
         is what the maximum batch size during training can be
 
     """
@@ -70,7 +70,7 @@ class DatasetMetadata(BaseModel):
         """Validates number of training files."""
         use_token_type_ids = info.context.get("use_token_type_ids")
         if type(use_token_type_ids) is not bool:
-            raise ValueError("Token type id context param should be an boolean variable")
+            raise ValueError("Token type id context param should be a boolean variable")
         if use_token_type_ids is True:
             if v is not True:
                 raise ValueError(
@@ -151,7 +151,7 @@ class DatasetMetadata(BaseModel):
     @field_validator("max_batch_size_dev")
     @classmethod
     def validation_batch_size_dev(cls, v: int, info: ValidationInfo):
-        """Validates bath size for evaluation."""
+        """Validates batch size for evaluation."""
         do_eval = info.context.get("eval")
         if type(do_eval) is not bool:
             raise ValueError("eval context param should be a boolean variable")

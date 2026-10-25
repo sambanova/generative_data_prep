@@ -23,7 +23,7 @@ from typing import Optional
 
 
 def execute_and_return_stdout(command):
-    """Execute [command] using os.system, and then returns the terminal outputs.
+    """Execute [command] using os.system, and then return the terminal outputs.
 
     The text can be accessed by accessing [result].stderr or [result].stdout
 
@@ -31,7 +31,7 @@ def execute_and_return_stdout(command):
         command (str): string format of linux command to execute
 
     Returns:
-        Piped Out object: Access text using .stout or .stderr attributes of output object
+        Piped Out object: Access text using .stdout or .stderr attributes of output object
     """
     result = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=True, shell=True)  # nosec
     return result
@@ -75,7 +75,7 @@ def validate_sha256(output_dir: str):
         output_dir (str)
 
     Returns:
-        Boolean value: False for the files have been modified, and True for all
+        Boolean value: False if the files have been modified, and True if all
         files have not been modified
     """
     files_to_hash = _get_walk_files_to_hash(output_dir, "sha256")
